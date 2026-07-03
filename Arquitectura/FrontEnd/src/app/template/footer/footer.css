@@ -1,0 +1,349 @@
+.main-footer {
+  background: #8B0015;
+  color: #ffffff;
+  padding: 60px 5% 0;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.footer-container {
+  max-width: 1300px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr 0.9fr 1.2fr;
+  gap: 30px;
+  padding-bottom: 60px;
+}
+
+/* Estilo del Logo */
+.footer-logo {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: -1px;
+  margin-bottom: 10px;
+}
+
+/* Título de la sección */
+.footer-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 30px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 10px;
+}
+
+/* Contenedor de cada persona */
+/* Contenedor de cada persona con línea divisoria */
+.office-info {
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  /* Espacio antes de la línea */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  /* Línea sutil */
+  transition: all 0.3s ease;
+}
+
+/* Quitamos la línea al último elemento para que se vea limpio */
+.office-info:last-of-type {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+/* Efecto Hover mejorado */
+.office-info:hover {
+  transform: translateX(8px);
+  border-bottom-color: rgba(255, 255, 255, 0.3);
+  /* La línea se ilumina al pasar el mouse */
+}
+
+/* Ajuste de los nombres para que resalten más */
+.responsible-name {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 2px 0;
+  /* Un poco más de aire vertical */
+}
+
+/* El Cargo (Antiguo .country) */
+.role-badge {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #ffdada;
+  /* Tu color de acento */
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* Enlace de contacto con Icono */
+.contact-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  font-size: 0.9rem;
+  margin-top: 5px;
+  transition: color 0.2s ease;
+}
+
+.contact-link i {
+  color: #ffdada;
+  font-size: 0.85rem;
+}
+
+.contact-link:hover {
+  color: #ffffff;
+}
+
+/* Animación sutil al pasar el mouse por la info */
+.office-info:hover {
+  transform: translateX(5px);
+}
+
+/* Navegación */
+/* ===== NAVEGACIÓN FOOTER PREMIUM ===== */
+.footer-nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-nav li {
+  margin-bottom: 18px;
+  /* Espaciado amplio para mayor legibilidad */
+}
+
+.footer-nav a {
+  color: #ffffff;
+  text-decoration: none;
+
+  /* Tamaño aumentado y peso visual */
+  font-size: 1.1rem;
+  font-weight: 500;
+
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  opacity: 0.8;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+/* Efecto al pasar el mouse (Hover) */
+.footer-nav a:hover {
+  opacity: 1;
+  color: #ffdada;
+  /* Color de acento sutil */
+  padding-left: 12px;
+  /* Desplazamiento fluido */
+  transform: scale(1.03);
+  /* Ligero aumento de tamaño */
+}
+
+/* Indicador visual (Flecha) que aparece al hacer hover */
+.footer-nav a::before {
+  position: absolute;
+  left: -15px;
+  opacity: 0;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.footer-nav a:hover::before {
+  left: -8px;
+  opacity: 1;
+}
+
+/* Estilo específico para el ítem de Autenticación (Login) */
+/* Se aplica si usas routerLink="/login" en el HTML */
+.footer-nav a[routerLink="/login"],
+.footer-nav a.login-highlight {
+  background: rgba(255, 255, 255, 0.12);
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-weight: 700;
+  margin-left: -5px;
+}
+
+.footer-nav a[routerLink="/login"]:hover,
+.footer-nav a.login-highlight:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: #ffffff;
+  padding-left: 20px;
+  /* Un poco más de espacio por el icono */
+}
+
+/* Ajuste para pantallas pequeñas */
+@media (max-width: 768px) {
+  .footer-nav a {
+    font-size: 1.2rem;
+    /* Aún más grande en móviles para facilitar el toque */
+  }
+}
+
+/* Blog - Estilo Imagen Referencia */
+.blog-item {
+  display: flex;
+  gap: 18px;
+  margin-bottom: 22px;
+  align-items: flex-start;
+  padding: 15px;
+  /* Espacio interno para que el borde no pegue al texto */
+
+  /* BORDE ESTILIZADO */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  /* Borde completo muy suave */
+  border-left: 4px solid #ffdada;
+  /* Borde izquierdo grueso para resaltar */
+
+  background: rgba(255, 255, 255, 0.03);
+  /* Fondo casi invisible */
+  border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Efecto al pasar el mouse */
+.blog-item:hover {
+  transform: translateX(10px);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.3);
+  border-left-color: #ffffff;
+  /* El borde lateral brilla al hacer hover */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilo para los thumbnails con iconos */
+.blog-thumb {
+  width: 70px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: #ffffff;
+}
+
+.blog-item:hover .blog-thumb {
+  background: white;
+  color: #8B0015;
+  transform: scale(1.1);
+}
+
+/* Etiquetas de categoría (Texto pequeño arriba del título) */
+.item-category {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #ffb4b4;
+  /* Un rojo claro para resaltar */
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Ajuste de texto para los ítems */
+.blog-item p:last-child {
+  font-size: 0.85rem;
+  margin-top: 2px;
+  line-height: 1.2;
+}
+
+/* Bottom */
+.footer-bottom {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 20px 5%;
+  margin: 0 -5.3%;
+}
+
+.bottom-content {
+  max-width: 1300px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+}
+
+.bottom-links a {
+  color: white;
+  text-decoration: none;
+  margin: 0 10px;
+}
+
+@media (max-width: 992px) {
+  .footer-container {
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-footer {
+    padding-top: 40px;
+  }
+
+  .footer-container {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 50px;
+  }
+
+  .footer-title {
+    margin-bottom: 20px;
+  }
+
+  .office-info {
+    transform: none !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .footer-nav a {
+    font-size: 1.1rem;
+    justify-content: center;
+  }
+
+  .blog-item {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .footer-bottom {
+    margin: 0 -5%;
+  }
+
+  .bottom-content {
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-logo {
+    font-size: 2rem;
+  }
+
+  .responsible-name {
+    font-size: 1rem;
+  }
+
+  .bottom-links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+}

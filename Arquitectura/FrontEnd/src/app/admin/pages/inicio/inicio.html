@@ -1,0 +1,141 @@
+<app-menu #sidebar></app-menu>
+
+<div class="main-container" [class.menu-collapsed]="sidebar.isCollapsed">
+    <section class="dashboard-content">
+        <header class="content-header">
+            <h2 class="fw-bold text-slate">Te damos la bienvenida a HTAS</h2>
+            <p class="text-muted small">Panel de control y monitoreo clínico en tiempo real.</p>
+        </header>
+
+        @if (isLoading) {
+        <div class="d-flex flex-column align-items-center justify-content-center" style="height: 50vh;">
+            <div class="spinner-loading"></div>
+            <p class="text-muted mt-3 font-semibold">Cargando analíticas desde el servidor HTAS...</p>
+        </div>
+        } @else {
+        <main class="dashboard-body">
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <article class="stat-card border-htas">
+                        <h3 class="stat-title">Usuarios Registrados</h3>
+                        <p class="stat-value">{{ metrics.totalUsuarios }}</p>
+                        <p class="stat-meta">Cuentas globales activas</p>
+                    </article>
+                </div>
+                <div class="col-md-3">
+                    <article class="stat-card">
+                        <h3 class="stat-title">Número de Pacientes</h3>
+                        <p class="stat-value text-primary">{{ metrics.totalPacientes }}</p>
+                        <p class="stat-meta">Bajo monitoreo continuo</p>
+                    </article>
+                </div>
+                <div class="col-md-3">
+                    <article class="stat-card">
+                        <h3 class="stat-title">Número de Médicos</h3>
+                        <p class="stat-value text-success">{{ metrics.totalMedicos }}</p>
+                        <p class="stat-meta">Especialistas validados</p>
+                    </article>
+                </div>
+                <div class="col-md-3">
+                    <article class="stat-card">
+                        <h3 class="stat-title">Acompañantes</h3>
+                        <p class="stat-value text-info">{{ metrics.totalAcompanantes }}</p>
+                        <p class="stat-meta">Tutores vinculados</p>
+                    </article>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-lg-7">
+                    <div class="chart-container p-4 shadow-sm bg-white rounded-card">
+                        <h4 class="mb-3 panel-title">Control de Medicamentos en Inventario</h4>
+                        <p class="text-muted small mb-3">Sustancias activas cargadas en el sistema:</p>
+                        <div class="chart-wrapper" style="position: relative; height: 280px;">
+                            @if (medicamentosControl.length > 0) {
+                            <canvas baseChart [data]="medicamentosChartData" [options]="barChartOptions" [type]="'bar'">
+                            </canvas>
+                            } @else {
+                            <div class="placeholder-chart d-flex align-items-center justify-content-center h-100">
+                                <p class="text-muted m-0">No hay fármacos registrados en el catálogo.</p>
+                            </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-5">
+                    <div class="chart-container p-4 shadow-sm bg-white rounded-card">
+                        <h4 class="mb-3 panel-title">Distribución del Personal HTAS</h4>
+                        <p class="text-muted small mb-3">Porcentaje de cuentas activas según rol:</p>
+                        <div class="chart-wrapper d-flex justify-content-center align-items-center"
+                            style="position: relative; height: 280px;">
+                            <canvas baseChart [data]="usuariosChartData" [options]="doughnutChartOptions"
+                                [type]="'doughnut'">
+                            </canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-7">
+                    <div class="chart-container p-4 shadow-sm bg-white rounded-card">
+                        <h4 class="mb-3 panel-title">Desglose Técnico de Fármacos</h4>
+                        <div class="meds-list-scroll">
+                            @if (medicamentosControl.length > 0) {
+                            @for (med of medicamentosControl; track med.nombre) {
+                            <div class="med-item-row mb-3 border-bottom pb-2">
+                                <div class="d-flex justify-content-between mb-1 small font-semibold text-slate">
+                                    <span>{{ med.nombre }} <span class="text-muted">({{ med.sustancia }} - {{
+                                            med.concentracion }})</span></span>
+                                    <span class="badge badge-info">{{ med.presentacion }}</span>
+                                </div>
+                            </div>
+                            }
+                            } @else {
+                            <p class="text-muted small m-0">Sin detalles de presentación.</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-5">
+                    <div class="alerts-container p-4 shadow-sm bg-white rounded-card">
+                        <h4 class="mb-4 panel-title">Agenda de Citas Activas</h4>
+                        <div class="citas-list-scroll">
+                            @if (citasRecientes.length > 0) {
+                            @for (cita of citasRecientes; track cita.id) {
+                            <div class="cita-card-item p-3 mb-2 rounded-lg" [ngClass]="cita.estado.toLowerCase()">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div style="max-width: 70%;">
+                                        <h5 class="cita-motivo m-0 text-truncate">{{ cita.motivo }}</h5>
+                                        <p class="cita-paciente text-muted small m-0">Ref: {{ cita.paciente }}</p>
+                                        <span class="cita-fecha text-secondary extra-small">
+                                            <i class="bi bi-calendar3"></i> {{ cita.fecha }} a las {{ cita.hora }} hrs.
+                                        </span>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge mb-1 d-block" [ngClass]="getEstadoClass(cita.estado)">
+                                            {{ cita.estado }}
+                                        </span>
+                                        <span class="modalidad-tag text-muted">{{ cita.modalidad }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            }
+                            } @else {
+                            <div class="text-center py-5 text-muted">
+                                <p class="small m-0">No cuentas con registros de citas médicas agendadas en tu perfil.
+                                </p>
+                            </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+        }
+    </section>
+</div>

@@ -1,0 +1,163 @@
+<div class="contacto-main-container">
+    <app-shader-background></app-shader-background>
+
+    <div class="contact-page-content">
+        <div id="contactos" class="container">
+            <!-- Información -->
+            <div class="info">
+                <div class="content">
+                    <h2 class="animate-entrance" #animateUp>Información de Contacto</h2>
+
+                    <div class="info-text">
+                        <div class="item animate-entrance" #animateUp>
+                            <i class="bi bi-heart-pulse-fill"></i>
+                            <span>La hipertensión afecta a 1 de cada 3 adultos; HTAS te ayuda a tomar el control.</span>
+                        </div>
+
+                        <div class="item animate-entrance" #animateUp>
+                            <i class="bi bi-envelope-at-fill"></i>
+                            <span>20233l001139@utcv.edu.mx</span>
+                        </div>
+
+                        <div class="item animate-entrance" #animateUp>
+                            <i class="bi bi-phone-vibrate-fill"></i>
+                            <span>Monitoreo inteligente y seguimiento médico en tiempo real.</span>
+                        </div>
+
+                    </div> <!-- info - text-->
+                </div> <!-- Content -->
+
+                <!--  Redes Sociales -->
+                <div class="sociales animate-entrance" #animateUp>
+                    <a><i class="fa-brands fa-facebook-f"></i></a>
+                    <a><i class="fa-brands fa-x-twitter"></i></a>
+                    <a><i class="fa-brands fa-instagram"></i></a>
+                    <a><i class="fa-brands fa-youtube"></i></a>
+                    <a><i class="fa-brands fa-tiktok"></i></a>
+                </div>
+            </div> <!-- info -->
+
+
+            <!-- Form -->
+            <div class="form">
+                <h2 class="animate-entrance" #animateUp>Comunicate con Nosotros</h2>
+
+                <form (submit)="enviarContacto($event)">
+                    <div class="form-box">
+
+                        <div class="input-box w50 animate-entrance" #animateUp>
+                            <input type="text" name="nombre" [(ngModel)]="datosContacto.nombre" required maxlength="20"
+                                pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+"
+                                oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g, '')">
+                            <span>Nombre</span>
+                        </div>
+
+                        <div class="input-box w50 animate-entrance" #animateUp>
+                            <input type="text" name="apellidos" [(ngModel)]="datosContacto.apellidos" required
+                                maxlength="40" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+"
+                                oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g, '')">
+                            <span>Apellidos</span>
+                        </div>
+
+                        <div class="input-box w50 animate-entrance" #animateUp>
+                            <input type="email" name="email" [(ngModel)]="datosContacto.email" required maxlength="60">
+                            <span>Email</span>
+                        </div>
+
+                        <div class="input-box w50 animate-entrance" #animateUp>
+                            <input type="tel" name="telefono" [(ngModel)]="datosContacto.telefono" required
+                                maxlength="10" pattern="[0-9]*"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                            <span>Teléfono</span>
+                        </div>
+
+                        <div class="input-box w100 animate-entrance" #animateUp>
+                            <textarea name="mensaje" [(ngModel)]="datosContacto.mensaje" required
+                                maxlength="300"></textarea>
+                            <span>Escribe tu mensaje...</span>
+                        </div>
+
+                        <div class="input-box w100 btn animate-entrance" #animateUp>
+                            <input type="submit" [value]="enviando ? 'Enviando...' : 'Enviar'" [disabled]="enviando">
+                        </div>
+
+                    </div> <!-- Form Box -->
+                </form>
+            </div> <!-- Form-->
+        </div>
+    </div>
+
+    <div class="custom-modal-overlay" [class.show]="modal.visible">
+        <div class="custom-modal"
+            [ngClass]="{'modal-success': modal.tipo === 'success', 'modal-error': modal.tipo === 'error'}">
+            <div class="modal-icon">
+                <i
+                    [class]="modal.tipo === 'success' ? 'bi bi-check-circle-fill' : 'bi bi-exclamation-triangle-fill'"></i>
+            </div>
+            <h3>{{ modal.titulo }}</h3>
+            <p>{{ modal.mensaje }}</p>
+            <button class="modal-button" (click)="cerrarModal()">Aceptar</button>
+        </div>
+    </div>
+
+    <section class="accordion-section">
+        <div class="section-header">
+            <h2 #animateUp>Centro de Información HTAS</h2>
+        </div>
+
+        <div class="accordion-container">
+            <div class="accordion-item" #animateUp>
+                <div class="accordion-header" onclick="this.parentElement.classList.toggle('active')">
+                    <div class="accordion-icon-box">
+                        <i class="bi bi-activity"></i>
+                    </div>
+                    <span class="accordion-title">¿Qué es la Hipertensión Arterial Sistémica (HTAS)?</span>
+                    <span class="arrow-indicator">+</span>
+                </div>
+                <div class="accordion-content">
+                    <p>La HTAS es una enfermedad crónica donde la fuerza de la sangre contra las paredes de las
+                        arterias es
+                        demasiado alta de forma sostenida. Nuestra plataforma ayuda a monitorear este "asesino
+                        silencioso",
+                        permitiendo detectar a tiempo variaciones que podrían causar daños en el corazón, cerebro o
+                        riñones.
+                    </p>
+                </div>
+            </div>
+
+            <div class="accordion-item" #animateUp>
+                <div class="accordion-header" onclick="this.parentElement.classList.toggle('active')">
+                    <div class="accordion-icon-box">
+                        <i class="bi bi-cpu"></i>
+                    </div>
+                    <span class="accordion-title">¿Cómo integra el ecosistema mis niveles de salud?</span>
+                    <span class="arrow-indicator">+</span>
+                </div>
+                <div class="accordion-content">
+                    <p>El ecosistema vincula el hardware de medición con nuestra arquitectura en la nube mediante
+                        tecnología
+                        BLE. Esto permite que cada toma de presión se analice instantáneamente, comparándola con tus
+                        rangos
+                        históricos para enviarte recomendaciones personalizadas o alertas de riesgo en tiempo real.</p>
+                </div>
+            </div>
+
+            <div class="accordion-item" #animateUp>
+                <div class="accordion-header" onclick="this.parentElement.classList.toggle('active')">
+                    <div class="accordion-icon-box">
+                        <i class="bi bi-shield-lock"></i>
+                    </div>
+                    <span class="accordion-title">¿Cómo protegen mis registros clínicos?</span>
+                    <span class="arrow-indicator">+</span>
+                </div>
+                <div class="accordion-content">
+                    <p>Utilizamos estándares de encriptación AES-256 para asegurar que tu historial de presión arterial
+                        y
+                        datos biométricos sean privados. Cumplimos con las normativas internacionales de protección de
+                        datos
+                        de salud, garantizando que tú tienes el control total sobre quién accede a tu información.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

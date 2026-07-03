@@ -1,0 +1,180 @@
+<app-menu #sidebar></app-menu>
+
+<main class="main-content" [class.menu-collapsed]="sidebar.isCollapsed">
+    <div class="container-fluid">
+
+        <div class="header-section">
+            <div class="title-group">
+                <h2 class="title-page">Gestión de Acompañantes</h2>
+                <p class="subtitle-page">Administra y supervisa a los acompañantes vinculados a los pacientes del
+                    sistema.</p>
+            </div>
+
+            <div class="header-controls">
+                <div class="search-box-pill">
+                    <i class="bi bi-search"></i>
+                    <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar por nombre o correo...">
+                </div>
+
+                <div class="action-buttons-group" [class.visible]="usuarioSeleccionado">
+                    <button class="btn-action btn-edit-premium" (click)="abrirEditar()" title="Editar usuario">
+                        <i class="bi bi-pencil-fill"></i>
+                        <span>Editar</span>
+                    </button>
+                    <button class="btn-action btn-delete-premium" (click)="abrirEliminar()" title="Eliminar usuario">
+                        <i class="bi bi-trash-fill"></i>
+                        <span>Eliminar</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Correo</th>
+                        <th>Rol</th>
+                        <th>Asignación</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (u of usuariosPaginados; track u.id) {
+                    <tr class="user-row" (click)="seleccionar(u)" [class.selected]="usuarioSeleccionado?.id === u.id"
+                        [class.expanded]="expandedId === u.id">
+                        <td>
+                            <div class="name-cell-premium">
+                                <button class="btn-expand-circle" (click)="toggleExpand(u.id, $event)">
+                                    <i class="bi bi-chevron-right" [class.rotated]="expandedId === u.id"></i>
+                                </button>
+                                <div class="user-info-stack">
+                                    <span class="user-name-main">{{u.NombreCompleto}}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="email-cell">
+                                <i class="bi bi-envelope-at me-2 text-muted"></i>
+                                {{u.correo || u.Correo}}
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge-premium" [attr.data-rol]="u.rol || u.Rol || 'Paciente'">
+                                <span class="dot-indicator"></span>
+                                {{u.rol || u.Rol || 'Paciente'}}
+                            </span>
+                        </td>
+
+                        <td>
+                            <div class="date-cell">
+                                <i class="bi bi-calendar-event me-2 text-muted"></i>
+                                {{u.fechaAsignacion || 'Pendiente' }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="status-pill-container">
+                                <span class="status-chip" [class.active-chip]="u.activo || u.Activo">
+                                    {{(u.activo || u.Activo) ? 'Activo' : 'Inactivo'}}
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                    @if (expandedId === u.id) {
+                    <tr class="detail-row">
+                        <td colspan="5">
+                            <div class="detail-content">
+                                <div class="detail-cards-grid">
+                                    <div class="detail-card-item">
+                                        <div class="detail-icon"><i class="bi bi-person"></i></div>
+                                        <div class="detail-data">
+                                            <label>Nombre Completo</label>
+                                            <span class="uid-text-display">{{u.NombreCompleto || u.nombre}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="detail-card-item">
+                                        <div class="detail-icon"><i class="bi bi-telephone"></i></div>
+                                        <div class="detail-data">
+                                            <label>Teléfono de Contacto</label>
+                                            <span>{{u.telefono || u.Telefono || 'No registrado'}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="detail-card-item">
+                                        <div class="detail-icon"><i class="bi bi-calendar-event"></i></div>
+                                        <div class="detail-data">
+                                            <label>Fecha de Asignación</label>
+                                            <span>{{u.fechaAsignacion || 'Pendiente'}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="detail-card-item">
+                                        <div class="detail-icon"><i class="bi bi-envelope-at"></i></div>
+                                        <div class="detail-data">
+                                            <label>Correo Electrónico</label>
+                                            <span>{{u.correo || u.Correo}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                    }
+                    @if (usuariosPaginados.length === 0) {
+                    <tr>
+                        <td colspan="5" class="empty-state">
+                            <i class="bi bi-people"></i>
+                            <p>No se encontraron acompañantes registrados.</p>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="pagination-bar">
+                <span>Mostrando {{usuariosPaginados.length}} de {{usuariosFiltrados.length}} usuarios</span>
+                <div class="nav-arrows">
+                    <button (click)="cambiarPagina(-1)" [disabled]="paginaActual === 0">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                    <span class="page-num">{{paginaActual + 1}}</span>
+                    <button (click)="cambiarPagina(1)"
+                        [disabled]="(paginaActual + 1) * itemsPorPagina >= (usuariosFiltrados.length || 0)">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+
+@if (mostrarModalDelete) {
+<div class="modal-overlay">
+    <div class="modal-content">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <i class="bi bi-exclamation-triangle" style="font-size: 3rem; color: #e81123;"></i>
+        </div>
+        <h3 style="text-align: center; color: #1a1a1a;">¿Confirmar Eliminación?</h3>
+        <p style="text-align: center; color: #64748b; margin: 20px 0;">
+            Estás a punto de eliminar permanentemente a <strong>{{usuarioSeleccionado?.NombreCompleto ||
+                usuarioSeleccionado?.nombre}}</strong>.<br>
+            Esta acción no se puede deshacer.
+        </p>
+
+        <div class="modal-footer">
+            <button class="btn-cancel" (click)="cerrarModal()" [disabled]="isDeleting">Cancelar</button>
+            <button class="btn-save" style="background: #e81123;" (click)="confirmarEliminar()" [disabled]="isDeleting">
+                @if (isDeleting) {
+                <span class="spinner-save"></span>
+                <span>Eliminando...</span>
+                } @else {
+                <i class="bi bi-trash3-fill"></i>
+                <span>Eliminar Permanentemente</span>
+                }
+            </button>
+        </div>
+    </div>
+</div>
+}

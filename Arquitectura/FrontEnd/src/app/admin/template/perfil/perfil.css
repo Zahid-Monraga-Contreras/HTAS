@@ -1,0 +1,227 @@
+.main-content {
+
+    margin-top: 60px;
+
+    margin-left: 260px;
+
+    padding: 40px;
+
+    transition: all 0.3s ease;
+
+    min-height: calc(100vh - 70px);
+
+    background-color: #f4f6f9;
+
+}
+
+
+
+.main-content.content-collapsed {
+
+    margin-left: 80px;
+
+}
+
+
+
+.profile-container {
+
+    max-width: 800px;
+
+    margin: 0 auto;
+
+}
+
+
+
+.profile-card {
+
+    background: white;
+
+    border-radius: 16px;
+
+    padding: 40px;
+
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+
+    border: 1px solid #e1e4e8;
+
+}
+
+
+
+.photo-section {
+
+    text-align: center;
+
+    margin-bottom: 40px;
+
+}
+
+
+
+.avatar-wrapper {
+
+    position: relative;
+
+    width: 130px;
+
+    height: 130px;
+
+    margin: 0 auto 20px;
+
+}
+
+
+
+.avatar-wrapper img {
+
+    width: 100%;
+
+    height: 100%;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+
+    border: 5px solid #fff;
+
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+
+}
+
+
+
+.status-badge {
+
+    position: absolute;
+
+    bottom: 10px;
+
+    right: 10px;
+
+    width: 20px;
+
+    height: 20px;
+
+    background: #ccc;
+
+    border: 3px solid #fff;
+
+    border-radius: 50%;
+
+}
+
+
+
+.status-badge.active {
+
+    background: #28a745;
+
+}
+
+
+
+.role-tag {
+
+    background: #b0001e;
+
+    color: white;
+
+    padding: 4px 16px;
+
+    border-radius: 20px;
+
+    font-size: 14px;
+
+    text-transform: uppercase;
+
+    font-weight: bold;
+
+}
+
+
+
+.info-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+
+    gap: 30px;
+
+    border-top: 1px solid #eee;
+
+    padding-top: 30px;
+
+}
+
+
+
+.info-group label {
+
+    display: block;
+
+    font-size: 13px;
+
+    color: #6c757d;
+
+    margin-bottom: 5px;
+
+    font-weight: 500;
+
+}
+
+
+
+.info-group label i {
+
+    margin-right: 8px;
+
+    color: #b0001e;
+
+}
+
+
+
+.info-group p {
+
+    font-size: 16px;
+
+    color: #2c3e50;
+
+    font-weight: 600;
+
+    margin: 0;
+
+}
+
+
+
+.text-success {
+
+    color: #28a745 !important;
+
+}
+
+
+
+@media (max-width: 768px) {
+
+    .main-content {
+
+        margin-left: 0 !important;
+
+        padding: 20px;
+
+    }
+
+
+
+    .info-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}

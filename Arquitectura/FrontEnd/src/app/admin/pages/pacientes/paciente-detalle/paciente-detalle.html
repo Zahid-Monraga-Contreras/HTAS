@@ -1,0 +1,206 @@
+<app-menu #sidebar></app-menu>
+
+@if (mostrarToast) {
+<div class="toast-premium-container" [ngClass]="tipoToast">
+    <div class="toast-content">
+        @if (tipoToast === 'success') { <i class="bi bi-check-circle-fill icon-toast"></i> }
+        @if (tipoToast === 'error') { <i class="bi bi-exclamation-triangle-fill icon-toast"></i> }
+        @if (tipoToast === 'warning') { <i class="bi bi-exclamation-circle-fill icon-toast"></i> }
+        <span class="toast-message">{{ mensajeToast }}</span>
+    </div>
+</div>
+}
+
+<main class="main-content" [class.menu-collapsed]="sidebar.isCollapsed">
+    @if (usuarioSeleccionado) {
+    <div class="container-fluid">
+        <div class="header-section">
+            <div class="title-group">
+                <h2 class="title-page">Editar Paciente</h2>
+                <p class="subtitle-page">Actualiza la información y el expediente del paciente.</p>
+            </div>
+
+            <div class="header-controls">
+                <button class="btn-cancel-premium" (click)="volver()">
+                    <i class="bi bi-arrow-left"></i>
+                    <span>Volver a la lista</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="detail-card">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Nombre(s)</label>
+                    <input type="text" required maxlength="40" [(ngModel)]="usuarioSeleccionado.nombre"
+                        class="form-control-premium">
+                </div>
+                <div class="form-group">
+                    <label>Apellido Paterno</label>
+                    <input type="text" required maxlength="30" [(ngModel)]="usuarioSeleccionado.tempApellidoPaterno"
+                        class="form-control-premium">
+                </div>
+                <div class="form-group">
+                    <label>Apellido Materno</label>
+                    <input type="text" required maxlength="30" [(ngModel)]="usuarioSeleccionado.tempApellidoMaterno"
+                        class="form-control-premium">
+                </div>
+                <div class="form-group">
+                    <label>Correo Electrónico</label>
+                    <input type="email" maxlength="60" [(ngModel)]="usuarioSeleccionado.correo"
+                        class="form-control-premium">
+                </div>
+                <div class="form-group">
+                    <label>Teléfono</label>
+                    <input type="text" maxlength="10" [(ngModel)]="usuarioSeleccionado.telefono"
+                        class="form-control-premium">
+                </div>
+                <div class="form-group">
+                    <label>NSS (Seguro Social)</label>
+                    <input type="text" maxlength="11" placeholder="Ingrese 11 dígitos"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '')" [(ngModel)]="usuarioSeleccionado.nss"
+                        class="form-control-premium">
+                </div>
+
+                <div class="form-group">
+                    <label>Género</label>
+                    <select [(ngModel)]="usuarioSeleccionado.genero" class="form-control-premium">
+                        <option [ngValue]="null" disabled selected>Seleccione género...</option>
+                        <option value="Masculino">Masculino</option>
+                        <option value="Femenino">Femenino</option>
+                        <option value="Otro">Otro</option>
+                        <option value="No especificado">No especificado</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Tipo de Sangre</label>
+                    <select [(ngModel)]="usuarioSeleccionado.tipoSangre" class="form-control-premium">
+                        <option [ngValue]="null" disabled selected>Seleccione tipo...</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Peso (kg)</label>
+                    <input type="number" step="0.01" min="0" max="600" placeholder="Ej: 78.50"
+                        [(ngModel)]="usuarioSeleccionado.peso" class="form-control-premium">
+                </div>
+
+                <div class="form-group">
+                    <label>Altura (metros)</label>
+                    <input type="number" step="0.01" min="0" max="3" placeholder="Ej: 1.75"
+                        [(ngModel)]="usuarioSeleccionado.altura" class="form-control-premium">
+                </div>
+            </div>
+            <div class="form-group" style="margin-top: 15px; padding: 0 15px;">
+                <label>Antecedentes Familiares</label>
+                <textarea [(ngModel)]="usuarioSeleccionado.antecedentesFamiliares" rows="3"
+                    placeholder="Describa antecedentes médicos familiares relevantes..."
+                    class="form-control-premium"></textarea>
+            </div>
+
+            <div class="action-footer">
+                <div class="footer-buttons">
+                    <button type="button" class="btn-appointment" (click)="abrirModalCita()">
+                        <i class="bi bi-calendar-plus"></i>
+                        <span>Asignar Cita</span>
+                    </button>
+
+                    <button class="btn-cancel-premium" (click)="volver()" [disabled]="isSaving">Cancelar</button>
+
+                    <button class="btn-save" (click)="guardarCambios()" [disabled]="isSaving">
+                        @if (isSaving) {
+                        <span class="spinner-save"></span>
+                        <span>Guardando...</span>
+                        } @else {
+                        <i class="bi bi-check-lg"></i>
+                        <span>Guardar Cambios</span>
+                        }
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    }
+
+    @if (mostrarModalCita) {
+    <div class="modal-overlay">
+        <div class="modal-premium-card">
+            <div class="modal-header">
+                <h3>Agendar Cita Médica</h3>
+                <button type="button" class="btn-close-modal" (click)="cerrarModalCita()">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <p class="modal-patient-info">
+                    <strong>Paciente asociado:</strong> {{ usuarioSeleccionado?.nombre }} {{
+                    usuarioSeleccionado?.tempApellidoPaterno }}
+                </p>
+
+                <div class="form-grid-modal">
+                    <div class="form-group">
+                        <label>Fecha de la Cita</label>
+                        <div class="input-picker-wrapper">
+                            <input type="text" id="fechaCitaInput" [(ngModel)]="nuevaCita.fechaCita"
+                                placeholder="Seleccione fecha..." class="form-control-premium picker-custom" readonly>
+                            <i class="bi bi-calendar3 icon-embed"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Hora de la Cita</label>
+                        <div class="input-picker-wrapper">
+                            <input type="text" id="horaCitaInput" [(ngModel)]="nuevaCita.horaCita"
+                                placeholder="Seleccione hora..." class="form-control-premium picker-custom" readonly>
+                            <i class="bi bi-clock icon-embed"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Modalidad</label>
+                        <select [(ngModel)]="nuevaCita.modalidad" class="form-control-premium">
+                            <option value="Presencial">Presencial</option>
+                            <option value="Virtual">Virtual</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group full-width-modal">
+                    <label>Motivo de la Consulta</label>
+                    <input type="text" [(ngModel)]="nuevaCita.motivo"
+                        placeholder="Ej: Control de rutina, revisión de presión arterial" class="form-control-premium">
+                </div>
+
+                <div class="form-group full-width-modal">
+                    <label>Síntomas actuales</label>
+                    <textarea [(ngModel)]="nuevaCita.sintomas" rows="3"
+                        placeholder="Escribe aquí si el paciente presenta malestares..."
+                        class="form-control-premium"></textarea>
+                </div>
+            </div>
+
+            <div class="modal-footer-premium">
+                <button type="button" class="btn-cancel-premium" (click)="cerrarModalCita()"
+                    [disabled]="isSavingCita">Cancelar</button>
+                <button type="button" class="btn-save-appointment" (click)="registrarCita()" [disabled]="isSavingCita">
+                    @if (isSavingCita) {
+                    <span class="spinner-save"></span>
+                    <span>Registrando...</span>
+                    } @else {
+                    <i class="bi bi-calendar-check"></i>
+                    <span>Confirmar Cita</span>
+                    }
+                </button>
+            </div>
+        </div>
+    </div>
+    }
+</main>

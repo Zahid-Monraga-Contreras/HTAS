@@ -1,0 +1,276 @@
+<app-menu #sidebar></app-menu>
+
+@if (mostrarToast) {
+<div class="toast-premium-container" [ngClass]="tipoToast">
+    <div class="toast-content">
+        @if (tipoToast === 'success') { <i class="bi bi-check-circle-fill icon-toast"></i> }
+        @if (tipoToast === 'error') { <i class="bi bi-exclamation-triangle-fill icon-toast"></i> }
+        @if (tipoToast === 'warning') { <i class="bi bi-exclamation-circle-fill icon-toast"></i> }
+        <span class="toast-message">{{ mensajeToast }}</span>
+    </div>
+</div>
+}
+
+<main class="main-content" [class.menu-collapsed]="sidebar.isCollapsed">
+    <div class="container-fluid">
+
+        <div class="header-section">
+            <div class="title-group">
+                <h2 class="title-page">Gestión de Citas Médicas</h2>
+                <p class="subtitle-page">Administra, supervisa y actualiza el estado de las citas en el sistema.</p>
+            </div>
+
+            <div class="header-controls">
+                <div class="search-box-pill">
+                    <i class="bi bi-search"></i>
+                    <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar por paciente o motivo...">
+                </div>
+
+                @if (verificarPermiso('crear')) {
+                <button class="btn-save btn-new-appointment" (click)="abrirCrearCita()">
+                    <i class="bi bi-plus-lg"></i>
+                    <span>Cita</span>
+                </button>
+                }
+
+                <div class="action-buttons-group" [class.visible]="citaSeleccionada">
+                    @if (verificarPermiso('editar')) {
+                    <button class="btn-action btn-edit-premium" (click)="abrirEditarCita()" title="Editar cita">
+                        <i class="bi bi-pencil-fill"></i>
+                        <span>Editar</span>
+                    </button>
+                    }
+
+                    @if (verificarPermiso('eliminar')) {
+                    <button class="btn-action btn-delete-premium" (click)="abrirEliminarCita()" title="Eliminar cita">
+                        <i class="bi bi-trash-fill"></i>
+                        <span>Eliminar</span>
+                    </button>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Fecha y Hora</th>
+                        <th>Paciente</th>
+                        <th>Motivo</th>
+                        <th>Modalidad</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (cita of citasPaginadas; track cita.idcita) {
+                    <tr class="user-row" (click)="seleccionarCita(cita)"
+                        [class.selected]="citaSeleccionada?.idcita === cita.idcita"
+                        [class.expanded]="expandedId === cita.idcita">
+                        <td>
+                            <div class="name-cell-premium">
+                                <button class="btn-expand-circle" (click)="toggleExpand(cita.idcita, $event)">
+                                    <i class="bi bi-chevron-right" [class.rotated]="expandedId === cita.idcita"></i>
+                                </button>
+                                <div class="user-info-stack">
+                                    <span class="user-name-main">{{cita.fechacita | date:'dd/MM/yyyy'}}</span>
+                                    <small class="text-muted">{{cita.horacita}}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="email-cell">
+                                <i class="bi bi-person-circle me-2 text-muted"></i>
+                                {{ cita.nombrepaciente }} {{ cita.appaternopaciente }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="date-cell">
+                                <i class="bi bi-chat-left-text me-2 text-muted"></i>
+                                {{cita.motivo}}
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge-premium" [attr.data-rol]="cita.modalidad">
+                                <span class="dot-indicator"></span>
+                                {{cita.modalidad}}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="status-pill-container">
+                                <span class="status-chip"
+                                    [class.active-chip]="cita.estado === 'Confirmada' || cita.estado === 'Completada'"
+                                    [class.pending-chip]="cita.estado === 'Programada'"
+                                    [class.danger-chip]="cita.estado === 'Cancelada'">
+                                    {{cita.estado}}
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+
+                    @if (expandedId === cita.idcita) {
+                    <tr class="detail-row">
+                        <td colspan="5">
+                            <div class="detail-content">
+                                <div class="detail-cards-grid">
+                                    <div class="detail-card-item">
+                                        <div class="detail-icon"><i class="bi bi-person-badge"></i></div>
+                                        <div class="detail-data">
+                                            <label>Paciente</label>
+                                            <span>{{ cita.nombrepaciente }} {{ cita.appaternopaciente }} {{
+                                                cita.apmaternopaciente }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="detail-card-item">
+                                        <div class="detail-icon"><i class="bi bi-calendar-event"></i></div>
+                                        <div class="detail-data">
+                                            <label>Fecha y Hora</label>
+                                            <span>{{ cita.fechacita | date:'dd/MM/yyyy' }} - {{ cita.horacita }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="detail-card-item">
+                                        <div class="detail-icon"><i class="bi bi-chat-dots"></i></div>
+                                        <div class="detail-data">
+                                            <label>Motivo de Consulta</label>
+                                            <span>{{ cita.sintomas || 'No especificado' }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="detail-card-item">
+                                        <div class="detail-icon"><i class="bi bi-display"></i></div>
+                                        <div class="detail-data">
+                                            <label>Modalidad de Atención</label>
+                                            <span class="badge-premium" [attr.data-rol]="cita.modalidad">
+                                                <span class="dot-indicator"></span>
+                                                {{ cita.modalidad }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                    }
+                    @if (citasPaginadas.length === 0) {
+                    <tr>
+                        <td colspan="5" class="empty-state">
+                            <i class="bi bi-calendar"></i>
+                            <p>No se encontraron citas programadas.</p>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="pagination-bar">
+                <span>Mostrando {{citasPaginadas.length}} de {{citasFiltradas.length}} citas</span>
+                <div class="nav-arrows">
+                    <button (click)="cambiarPagina(-1)" [disabled]="paginaActual === 0">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                    <span class="page-num">{{paginaActual + 1}}</span>
+                    <button (click)="cambiarPagina(1)"
+                        [disabled]="(paginaActual + 1) * itemsPorPagina >= (citasFiltradas.length || 0)">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+@if (mostrarModalCrear) {
+<div class="modal-overlay">
+    <div class="modal-premium-card">
+        <div class="modal-header">
+            <h3>Programar Nueva Cita</h3>
+            <button type="button" class="btn-close-modal" (click)="cerrarModal()">&times;</button>
+        </div>
+
+        <div class="modal-body">
+            <p class="modal-patient-info">
+                <strong>Paciente asociado:</strong> {{ currentUser?.nombre }} {{ currentUser?.apPaterno }}
+            </p>
+
+            <div class="form-grid-modal">
+                <div class="form-group">
+                    <label>Fecha de la Cita</label>
+                    <div class="input-picker-wrapper">
+                        <input type="text" id="fechaCitaInput"
+                            class="form-control-premium picker-custom datepicker-input"
+                            placeholder="Seleccione fecha..." readonly>
+                        <i class="bi bi-calendar3 icon-embed"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Hora de la Cita</label>
+                    <div class="input-picker-wrapper">
+                        <input type="text" id="horaCitaInput" [(ngModel)]="nuevaCita.hora"
+                            class="form-control-premium picker-custom timepicker-input" placeholder="Seleccione hora..."
+                            readonly>
+                        <i class="bi bi-clock icon-embed"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Modalidad</label>
+                    <select [(ngModel)]="nuevaCita.modalidad" class="form-control-premium">
+                        <option value="Presencial">Presencial</option>
+                        <option value="Virtual">Virtual</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group full-width-modal">
+                <label>Motivo de la Consulta</label>
+                <input type="text" [(ngModel)]="nuevaCita.motivo"
+                    placeholder="Ej: Control de rutina, revisión de presión arterial" class="form-control-premium">
+            </div>
+
+            <div class="form-group full-width-modal">
+                <label>Síntomas actuales</label>
+                <textarea [(ngModel)]="nuevaCita.sintomas" rows="3"
+                    placeholder="Escribe aquí tus malestares o síntomas actuales..."
+                    class="form-control-premium"></textarea>
+            </div>
+        </div>
+
+        <div class="modal-footer-premium">
+            <button type="button" class="btn-cancel-premium" (click)="cerrarModal()"
+                [disabled]="isSaving">Cancelar</button>
+            <button type="button" class="btn-save-appointment" (click)="guardarNuevaCita()" [disabled]="isSaving">
+                @if (isSaving) {
+                <span class="spinner-save"></span>
+                <span>Registrando...</span>
+                } @else {
+                <i class="bi bi-calendar-check"></i>
+                <span>Confirmar Cita</span>
+                }
+            </button>
+        </div>
+    </div>
+</div>
+}
+
+@if (mostrarModalDelete) {
+<div class="modal-overlay">
+    <div class="modal-content modal-danger">
+        <div class="warning-icon-circle">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+        <h3>¿Cancelar Cita?</h3>
+        <p class="text-muted">Esta acción notificará automáticamente al sistema.</p>
+        <div class="modal-footer-danger">
+            <button class="btn-danger-confirm" (click)="confirmarEliminarCita()" [disabled]="isDeleting">
+                @if (isDeleting) { <span class="spinner-save"></span> }
+                @else { <span>Sí, Cancelar Cita</span> }
+            </button>
+            <button class="btn-outline-cancel" (click)="cerrarModal()" [disabled]="isDeleting">No, volver</button>
+        </div>
+    </div>
+</div>
+}

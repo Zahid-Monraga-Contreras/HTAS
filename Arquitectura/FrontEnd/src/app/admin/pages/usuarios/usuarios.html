@@ -1,0 +1,134 @@
+<app-menu #sidebar></app-menu>
+
+<main class="main-content" [class.menu-collapsed]="sidebar.isCollapsed">
+    <div class="container-fluid">
+
+        <div class="header-section">
+            <div class="title-group">
+                <h2 class="title-page">Gestión de Usuarios</h2>
+                <p class="subtitle-page">Administra y supervisa los usuarios registrados en el sistema de salud.</p>
+            </div>
+            <div class="header-controls">
+                <div class="search-box-pill">
+                    <i class="bi bi-search"></i>
+                    <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar por nombre o correo...">
+                </div>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Correo</th>
+                        <th>Rol</th>
+                        <th>Dispositivo</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (u of usuariosPaginados; track u.id) {
+                    <tr class="user-row" [class.expanded]="expandedId === u.id">
+                        <td>
+                            <div class="name-cell-premium">
+                                <button class="btn-expand-circle" (click)="toggleExpand(u.id, $event)">
+                                    <i class="bi bi-chevron-right" [class.rotated]="expandedId === u.id"></i>
+                                </button>
+                                <div class="user-info-stack">
+                                    <span class="user-name-main">{{ u.nombre }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="email-cell">
+                                <i class="bi bi-envelope-at me-2 text-muted"></i>
+                                {{u.correo || u.Correo}}
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge-premium" [attr.data-rol]="u.rol || u.Rol || 'Paciente'">
+                                <span class="dot-indicator"></span>
+                                {{u.rol || u.Rol || 'Paciente'}}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="device-cell">
+                                <i class="bi bi-smartwatch me-2 text-muted"></i>
+                                {{u.dispositivo || 'Sin asignar'}}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="status-pill-container">
+                                <span class="status-chip" [class.active-chip]="u.activo || u.Activo">
+                                    {{(u.activo || u.Activo) ? 'Activo' : 'Inactivo'}}
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                    @if (expandedId === u.id) {
+                    <tr class="detail-row">
+                        <td colspan="5">
+                            <div class="detail-content">
+                                <div class="detail-cards-grid">
+                                    <div class="detail-card-item">
+                                        <div class="detail-icon"><i class="bi bi-person"></i></div>
+                                        <div class="detail-data">
+                                            <label>Nombre Completo</label>
+                                            <span class="uid-text-display">{{ u.nombre }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="detail-card-item">
+                                        <div class="detail-icon"><i class="bi bi-telephone"></i></div>
+                                        <div class="detail-data">
+                                            <label>Teléfono de Contacto</label>
+                                            <span>{{u.telefono || u.Telefono || 'No registrado'}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="detail-card-item">
+                                        <div class="detail-icon"><i class="bi bi-shield-lock"></i></div>
+                                        <div class="detail-data">
+                                            <label>Rol de Usuario</label>
+                                            <span>{{u.rol || u.Rol || 'Paciente'}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="detail-card-item">
+                                        <div class="detail-icon"><i class="bi bi-smartwatch"></i></div>
+                                        <div class="detail-data">
+                                            <label>Dispositivo Asignado</label>
+                                            <span>{{u.dispositivo || 'Sin asignar'}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                    }
+                    @if (usuariosPaginados.length === 0) {
+                    <tr>
+                        <td colspan="5" class="empty-state">
+                            <i class="bi bi-people"></i>
+                            <p>No se encontraron usuarios registrados.</p>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="pagination-bar">
+                <span>Mostrando {{usuariosPaginados.length}} de {{usuariosFiltrados.length}} usuarios</span>
+                <div class="nav-arrows">
+                    <button (click)="cambiarPagina(-1)" [disabled]="paginaActual === 0">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                    <span class="page-num">{{paginaActual + 1}}</span>
+                    <button (click)="cambiarPagina(1)"
+                        [disabled]="(paginaActual + 1) * itemsPorPagina >= usuariosTodo.length">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

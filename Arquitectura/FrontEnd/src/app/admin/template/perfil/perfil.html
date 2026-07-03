@@ -1,0 +1,49 @@
+<app-menu #sidebar></app-menu>
+
+<div class="main-content" [class.content-collapsed]="sidebar.isCollapsed">
+    <div class="profile-container" *ngIf="userName !== 'Cargando...'">
+
+        <div class="profile-card info-main">
+            <div class="photo-section">
+                <div class="avatar-wrapper">
+                    <img [src]="userPhoto" alt="Foto de perfil">
+                    <span class="status-badge" [class.active]="isActive"></span>
+                </div>
+                <h2>{{ userName }}</h2>
+                <span class="role-tag">{{ userRole }}</span>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-group">
+                    <label><i class="bi bi-envelope"></i> Correo Electrónico</label>
+                    <p>{{ userEmail }}</p>
+                </div>
+
+                <div class="info-group">
+                    <label><i class="bi bi-telephone"></i> Teléfono</label>
+                    <p>{{ userPhone }}</p>
+                </div>
+
+                <div class="info-group">
+                    <label><i class="bi bi-shield-lock"></i> Rol Asignado</label>
+                    <p>{{ userRole }}</p>
+                </div>
+
+                <div class="info-group">
+                    <label><i class="bi bi-calendar3"></i> Miembro desde</label>
+                    <p>{{ createdAt }}</p>
+                </div>
+
+                <div class="info-group">
+                    <label><i class="bi bi-check-circle"></i> Estado de cuenta</label>
+                    <p [class.text-success]="isActive">{{ isActive ? 'Activo' : 'Inactivo' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="userName === 'Cargando...'" class="text-center mt-5">
+        <div class="spinner-border text-danger" role="status"></div>
+        <p>Obteniendo información de perfil...</p>
+    </div>
+</div>

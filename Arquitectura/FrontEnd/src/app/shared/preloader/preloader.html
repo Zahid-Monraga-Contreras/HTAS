@@ -1,0 +1,38 @@
+<div class="preloader-overlay" [class.fade-out]="!isVisible()" *ngIf="isBrowser">
+    <div class="heart-container">
+        <!-- Pulsos con la misma forma del corazón -->
+        <svg class="heart-pulse-svg pulse-1" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M16 27.5L14 25.5C7.5 19.5 2 15 2 9.5C2 5 5.5 1.5 10 1.5C12.5 1.5 14.8 2.6 16 4.5C17.2 2.6 19.5 1.5 22 1.5C26.5 1.5 30 5 30 9.5C30 15 24.5 19.5 18 25.5L16 27.5Z"
+                fill="#b0001e" />
+        </svg>
+        <svg class="heart-pulse-svg pulse-2" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M16 27.5L14 25.5C7.5 19.5 2 15 2 9.5C2 5 5.5 1.5 10 1.5C12.5 1.5 14.8 2.6 16 4.5C17.2 2.6 19.5 1.5 22 1.5C26.5 1.5 30 5 30 9.5C30 15 24.5 19.5 18 25.5L16 27.5Z"
+                fill="#b0001e" />
+        </svg>
+
+        <!-- Corazón central con efecto de llenado -->
+        <svg class="heart-svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <clipPath id="heart-clip">
+                    <rect id="clip-rect" x="0" y="32" width="32" height="32" />
+                </clipPath>
+            </defs>
+            <!-- Capa fondo: Contorno tenue -->
+            <path
+                d="M16 27.5L14 25.5C7.5 19.5 2 15 2 9.5C2 5 5.5 1.5 10 1.5C12.5 1.5 14.8 2.6 16 4.5C17.2 2.6 19.5 1.5 22 1.5C26.5 1.5 30 5 30 9.5C30 15 24.5 19.5 18 25.5L16 27.5Z"
+                fill="none" stroke="#b0001e" stroke-width="1.5" opacity="0.3" />
+            <!-- Capa frente: La que se llena -->
+            <path
+                d="M16 27.5L14 25.5C7.5 19.5 2 15 2 9.5C2 5 5.5 1.5 10 1.5C12.5 1.5 14.8 2.6 16 4.5C17.2 2.6 19.5 1.5 22 1.5C26.5 1.5 30 5 30 9.5C30 15 24.5 19.5 18 25.5L16 27.5Z"
+                fill="#b0001e" clip-path="url(#heart-clip)" />
+        </svg>
+    </div>
+    <div class="loading-text">
+        <span class="text-gradient">INICIANDO SISTEMA HTAS</span>
+        <div class="loading-dots">
+            <span>.</span><span>.</span><span>.</span>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,1022 @@
+/* Reutilización de estilos uniformes basados en landing.css */
+
+.nosotros-container {
+    width: 100%;
+    min-height: 100vh;
+    padding-top: 0px;
+    overflow-x: hidden;
+}
+
+/* ===== CONTENT SECTION ===== */
+.content-section {
+    padding: 4rem 5% 4rem;
+    background: #f9fbfc;
+    margin-top: -40px;
+    position: relative;
+    z-index: 10;
+    overflow: visible;
+    border-top: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+.container-glass {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4rem;
+    padding: 2.5rem;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.04);
+    /* SOLUCIÓN: Aísla el contexto de apilamiento para evitar errores de renderizado en resize */
+    isolation: isolate;
+    position: relative;
+    overflow: hidden;
+}
+
+.laptop-wrapper {
+    flex: 1;
+    min-width: 400px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.laptop-stage {
+    position: absolute;
+    width: 350px;
+    height: 40px;
+    background: radial-gradient(ellipse at center, rgba(176, 0, 30, 0.1) 0%, transparent 70%);
+    bottom: 20px;
+    transform: rotateX(60deg);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.promo-decor {
+    position: absolute;
+    font-size: 300px;
+    /* Reducido un poco para que sea más manejable */
+    color: rgba(176, 0, 29, 0.151);
+    /* Un poco más sutil para que no tape el texto */
+    pointer-events: none;
+    line-height: 1;
+    z-index: -1;
+    /* Cambiado a -1 para que el texto siempre esté POR ENCIMA */
+}
+
+.decor-top-right {
+    top: -50px;
+    right: -80px;
+    transform: rotate(15deg);
+}
+
+.decor-bottom-left {
+    bottom: -50px;
+    left: -80px;
+    /* Ajustado para que se vea una parte importante del icono */
+    transform: rotate(-15deg);
+}
+
+.content-block {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.content-text {
+    flex: 1;
+    min-width: 300px;
+    position: relative;
+    z-index: 10;
+    /* Asegura que el texto esté por encima de cualquier artefacto visual */
+}
+
+.content-text h2 {
+    font-size: 2.4rem;
+    color: #8B0015;
+    margin-bottom: 1.8rem;
+    font-weight: 700;
+    line-height: 1.3;
+    position: relative;
+    display: inline-block;
+    padding-bottom: 10px;
+}
+
+.content-text h2::after {
+    content: '';
+    position: absolute;
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, #8B0015, #690014);
+    bottom: 0;
+    left: 0;
+    border-radius: 2px;
+}
+
+.content-text p {
+    font-size: 1.15rem;
+    line-height: 1.8;
+    margin-bottom: 1.8rem;
+    color: #444;
+    font-weight: 400;
+}
+
+/* Eliminados estilos de placeholder antiguos que causaban ruido visual */
+
+/* Contenedor con la rotación de perfil que te gusta */
+.laptop {
+    position: relative;
+    width: 400px;
+    height: 260px;
+    transform-style: preserve-3d;
+    transform: rotateX(15deg) rotateY(-35deg);
+    transition: transform 0.8s ease;
+    margin: 20px 40px 60px -20px;
+}
+
+/* --- BASE: AQUÍ ESTÁ EL TRUCO --- */
+.base {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background: #1e272e;
+    /* Graphite reverted */
+    border-radius: 15px;
+    transform: rotateX(90deg) translateZ(-1px);
+    transform-origin: bottom;
+    box-shadow: -30px 30px 60px rgba(0, 0, 0, 0.4);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+
+    /* GROSOR EXTREMO DE LA BASE: Mantenido */
+    border-bottom: 25px solid #0f1418;
+    /* Darker graphite for depth */
+    border-left: 10px solid #141a1f;
+    border-right: 10px solid #141a1f;
+
+    box-shadow:
+        0 8px 1px rgba(0, 0, 0, 0.5),
+        -15px 25px 50px rgba(0, 0, 0, 0.6),
+        -30px 40px 100px rgba(0, 0, 0, 0.4);
+}
+
+/* TECLADO: Ahora se posiciona arriba (al fondo, junto a la pantalla) */
+.keyboard {
+    width: 95%;
+    height: 55%;
+    background: #1a1a1a;
+    border-radius: 8px;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid #3d4a57;
+    box-shadow: inset 0 5px 15px rgba(0, 0, 0, 0.5);
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    gap: 4px;
+    margin-top: 15px;
+    position: relative;
+    z-index: 1;
+    /* Mantén esto bajo */
+    transform: translateZ(0);
+    /* Obliga a que se queden pegados a la base */
+    /* Espacio respecto al touchpad que ahora está al frente */
+}
+
+.key {
+    background: linear-gradient(145deg, #2d3436, #1e272e);
+    /* Original graphite-ish */
+    border-radius: 3px;
+    border-bottom: 3px solid #000;
+    box-shadow: 0 2px 0 #000;
+    transition: transform 0.1s;
+}
+
+.key:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 0 #000;
+}
+
+.key.space {
+    grid-column: span 6;
+}
+
+/* TOUCHPAD: Ahora se posiciona abajo (al frente) */
+.touchpad {
+    width: 120px;
+    height: 70px;
+    background: #252d35;
+    /* Reverted color */
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
+    position: relative;
+    z-index: 1;
+    transform: translateZ(2px);
+}
+
+.lid-back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #1e272e;
+    border-radius: 15px;
+    /* Reducimos el translateZ para que estén más pegadas */
+    transform: translateZ(-2px);
+    backface-visibility: visible !important;
+    -webkit-backface-visibility: visible !important;
+    z-index: 1;
+    box-shadow:
+        inset 0 0 40px rgba(0, 0, 0, 0.5),
+        0 0 0 5px #0f1418;
+    /* Borde exterior para sellar el canto */
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.lid-back::after {
+    content: 'HTAS';
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 2.5rem;
+    color: rgba(255, 255, 255, 0.15);
+    letter-spacing: 5px;
+    text-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+}
+
+/* --- PANTALLA --- */
+.lid {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    bottom: 0;
+    transform-style: preserve-3d;
+    transform-origin: bottom;
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateZ(10px) rotateX(90deg);
+    z-index: 50;
+    /* Estado cerrado */
+}
+
+.lid-screen {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    border-radius: 15px;
+    /* Reducimos el translateZ para que estén más pegadas */
+    transform: translateZ(2px);
+    backface-visibility: visible !important;
+    -webkit-backface-visibility: visible !important;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 15px solid #1e272e;
+    box-sizing: border-box;
+    isolation: isolate;
+    /* SELLADO DE BORDES: Sombras que cubren el "hueco" lateral */
+    box-shadow:
+        inset 0 0 0 2px rgba(255, 255, 255, 0.05),
+        /* Capas de profundidad para cerrar el gap */
+        0 1px 0 #0f1418,
+        0 -1px 0 #0f1418,
+        1px 0 0 #0f1418,
+        -1px 0 0 #0f1418,
+        /* Grosor visual unificado */
+        0 0 0 4px #0f1418;
+}
+
+.screen-content {
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 50% 0%, #ffffff 0%, #f1f4f8 100%);
+    /* Color exacto del phone */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: black;
+    font-family: 'Segoe UI', 'Montserrat', sans-serif;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow: hidden;
+    transform: translateZ(0);
+    transform-style: flat !important;
+}
+
+.screen-content {
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.pulse-background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0.4;
+    display: flex;
+    align-items: center;
+    z-index: 1;
+}
+
+.pulse-path {
+    fill: none;
+    stroke: #8B0015;
+    stroke-width: 1;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    animation: dash 3s linear infinite;
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+}
+
+@keyframes dash {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+.main-heart-container {
+    position: relative;
+    z-index: 2;
+    font-size: 6rem;
+    color: #8B0015;
+    filter: drop-shadow(0 0 15px rgba(139, 0, 21, 0.4));
+    animation: pulseHeart 1.5s infinite ease-in-out;
+}
+
+@keyframes pulseHeart {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+/* --- TUS ANIMACIONES --- */
+.laptop:hover .lid {
+    transform: translateZ(5px) rotateX(-25deg);
+}
+
+.laptop:hover {
+    transform: rotateX(25deg) rotateY(-25deg) scale(1.1);
+    /* Better view angle for thickness */
+}
+
+/* Al quitar el hover (Cuando se cierra) */
+.laptop:not(:hover) .lid {
+    /* Reforzamos que al cerrar use este valor */
+    transform: translateZ(10px) rotateX(90deg);
+}
+
+/* ===== SECTION HEADER (通用) ===== */
+.section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.section-header h2 {
+    font-size: 2.4rem;
+    color: #8B0015;
+    font-weight: 700;
+    position: relative;
+    display: inline-block;
+    padding-bottom: 1rem;
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.section-header h2::after {
+    content: '';
+    position: absolute;
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, #8B0015, #690014);
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 2px;
+}
+
+/* ===== REDISEÑO NOSOTROS GRID (Estilo Referencia) ===== */
+.nosotros-grid-section {
+    padding: 6rem 5%;
+    background-color: #4D000D;
+    color: #ffffff;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.nosotros-grid-section .grid-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.nosotros-grid-section .main-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 4rem;
+    color: #ffffff;
+    max-width: 800px;
+}
+
+.nosotros-grid-section .features-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4rem;
+}
+
+.nosotros-grid-section .feature-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.nosotros-grid-section .feature-icon {
+    width: 60px;
+    height: 60px;
+    background: #8B0015;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: #ffffff;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 20px rgba(176, 0, 30, 0.3);
+}
+
+.nosotros-grid-section .feature-body h3 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #ffffff;
+}
+
+.nosotros-grid-section .feature-body p {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #cccccc;
+    margin: 0;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .nosotros-grid-section .main-title {
+        font-size: 1.8rem;
+    }
+
+    .nosotros-grid-section .features-grid {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+    }
+
+    .nosotros-grid-section {
+        padding: 4rem 5%;
+    }
+}
+
+/* ===== VALUES SECTION (Carrusel 3D) ===== */
+.values-section {
+    width: 100%;
+    padding: 20px 20px 0px;
+    /* Reduced from 50px 20px */
+    border-radius: 20px;
+    margin: 1rem 0 0;
+    /* Reduced from 2rem 0 */
+    overflow: hidden;
+}
+
+.cont-carrusel {
+    width: 100%;
+    height: 470px;
+    /* Reduced height from 500px to tighten space */
+    display: grid;
+    grid-template-rows: 380px 40px;
+    /* Adjusted row heights */
+    grid-template-columns: 1fr 30px 30px 30px 1fr;
+    align-items: center;
+    justify-items: center;
+}
+
+main#items-carrusel {
+    grid-row: 1 / 2;
+    grid-column: 1 / 6;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+    transform-style: preserve-3d;
+    perspective: 800px;
+    --items: 3;
+    --middle: 2;
+    --posicion: 1;
+    pointer-events: none;
+}
+
+.item {
+    position: absolute;
+    width: 320px;
+    height: 380px;
+    pointer-events: auto;
+    cursor: pointer;
+    --r: calc(var(--posicion) - var(--offset));
+    --abs: max(calc(var(--r) * -1), var(--r));
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transform: rotateY(calc(-15deg * var(--r))) translateX(calc(-250px * var(--r))) translateZ(calc(-100px * var(--abs)));
+    z-index: calc(10 - var(--abs));
+    opacity: calc(1 - (0.15 * var(--abs)));
+    /* Menos transparencia en laterales */
+    user-select: none;
+}
+
+.item:hover:not([for^="pos"]) {
+    /* Si no es la principal (esto es un truco, mejoramos abajo) */
+    transform: rotateY(calc(-15deg * var(--r))) translateX(calc(-250px * var(--r))) translateZ(calc(-50px * var(--abs))) scale(1.02);
+}
+
+.item:nth-of-type(1) {
+    --offset: 1;
+}
+
+.item:nth-of-type(2) {
+    --offset: 2;
+}
+
+.item:nth-of-type(3) {
+    --offset: 3;
+}
+
+/* Radio Button Controls */
+input[name="posicion"] {
+    grid-row: 2;
+    cursor: pointer;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border: 2px solid #8B0015;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    z-index: 10;
+    margin: 0 5px;
+}
+
+input[name="posicion"]:checked {
+    background-color: #8B0015;
+    transform: scale(1.4);
+    box-shadow: 0 0 15px rgba(176, 0, 30, 0.4);
+}
+
+input#pos1 {
+    grid-column: 2;
+}
+
+input#pos2 {
+    grid-column: 3;
+}
+
+input#pos3 {
+    grid-column: 4;
+}
+
+input#pos1:checked~main#items-carrusel {
+    --posicion: 1;
+}
+
+input#pos2:checked~main#items-carrusel {
+    --posicion: 2;
+}
+
+input#pos3:checked~main#items-carrusel {
+    --posicion: 3;
+}
+
+.value-card {
+    background: #ffffff;
+    /* Sólido como pidió el usuario */
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 25px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.value-icon {
+    background-color: #8B0015;
+    min-width: 90px;
+    /* Aumentado nuevamente */
+    width: 90px;
+    height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    /* Aumentado nuevamente */
+    border-radius: 0 0 30px 0;
+    /* Ajustado al nuevo tamaño */
+    color: #fff;
+}
+
+.value-icon i,
+.value-icon .bi {
+    font-size: 2.8rem;
+    /* Aumentado nuevamente */
+    line-height: 1;
+}
+
+.value-content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.value-content h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: #8B0015;
+    margin-bottom: 0.8rem;
+    white-space: nowrap;
+}
+
+.value-content p {
+    color: #666;
+    line-height: 1.5;
+    font-size: 0.9rem;
+    min-width: 200px;
+    margin: 0;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===== RESPONSIVE BREAKPOINTS ===== */
+
+/* ============================================================
+   RESPONSIVE: PANTALLAS PEQUEÑAS (CORREGIDO)
+   ============================================================ */
+/* ============================================================
+   SOLUCIÓN PARA MÓVIL (CORRECCIÓN DE DESBORDE, ALINEACIÓN Y HOVER)
+   ============================================================ */
+
+/* 1024px */
+@media (max-width: 1024px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .section-header h2,
+    .content-text h2 {
+        font-size: 2.2rem;
+    }
+}
+
+/* 800px */
+@media (max-width: 800px) {
+
+    .purpose-grid,
+    .values-grid {
+        flex-direction: column;
+    }
+
+    .purpose-card,
+    .value-card {
+        flex: none !important;
+        width: 100%;
+    }
+
+    .purpose-section .section-header h2,
+    .values-section .section-header h2 {
+        font-size: 2rem;
+    }
+
+    /* Ajuste de escala hover para tablet */
+    .laptop {
+        transform: scale(0.8) rotateX(15deg) rotateY(-35deg);
+        margin: -20px auto 20px auto;
+    }
+
+    .laptop:hover {
+        transform: scale(0.85) rotateX(20deg) rotateY(-30deg) !important;
+    }
+}
+
+/* 768px */
+@media (max-width: 768px) {
+
+    .content-section,
+    .content-block,
+    .content-image,
+    .image-placeholder {
+        overflow: visible !important;
+    }
+
+    .content-text {
+        padding: 0 20px;
+        box-sizing: border-box;
+        flex: 1 1 100%;
+        max-width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .content-text h2 {
+        display: block;
+        text-align: center;
+        width: 100%;
+    }
+
+    .content-text h2::after {
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+    }
+
+    .content-section {
+        margin-top: -30px;
+        /* Reduced to bring content closer to the hero shape */
+        padding: 3rem 5% 1rem;
+        /* Significantly reduced from 8rem to match visual flow */
+    }
+
+    .hero-section,
+    .hero-layer--1,
+    .hero-layer--2 {
+        padding: 4rem 5%;
+        clip-path: polygon(0 0, 100% 0, 100% 88%, 50% 100%, 0 88%);
+    }
+
+    .hero-title {
+        font-size: 2.2rem;
+    }
+
+    .purpose-section,
+    .methodology-section,
+    .values-section {
+        padding: 2rem 5% 1rem;
+    }
+
+    .methodology-card {
+        padding: 2rem;
+    }
+
+    .image-placeholder {
+        height: 300px;
+    }
+
+    .container-glass {
+        padding: 1.5rem;
+        gap: 2rem;
+        overflow: visible;
+        /* Permitir que la laptop sobresalga si es necesario sin "cortar" el cristal */
+    }
+
+    .laptop-wrapper {
+        min-width: 0;
+        width: 100%;
+    }
+
+    /* Laptop ajustada para no crecer de más en hover */
+    .laptop {
+        transform: scale(0.55) rotateX(15deg) rotateY(-35deg);
+        margin: 0 auto 0px auto !important;
+        /* Reduced negative margin since padding is now smaller */
+        transform-origin: center center;
+    }
+
+    .laptop:hover {
+        transform: scale(0.6) rotateX(20deg) rotateY(-30deg) !important;
+    }
+
+    .cont-carrusel {
+        height: 400px;
+        grid-template-rows: 320px 40px;
+        grid-template-columns: 1fr 20px 20px 20px 1fr;
+    }
+
+    .item {
+        width: 280px;
+        height: 330px;
+    }
+}
+
+/* 480px */
+@media (max-width: 480px) {
+    .hero-section {
+        clip-path: polygon(0 0, 100% 0, 100% 92%, 50% 100%, 0 92%);
+    }
+
+    .hero-layer--1,
+    .hero-layer--2 {
+        display: none;
+    }
+
+    .hero-title {
+        font-size: 1.8rem !important;
+        padding: 0 15px;
+    }
+
+    .content-text p {
+        font-size: 1rem !important;
+        line-height: 1.6;
+        text-align: center;
+    }
+
+    .section-header h2,
+    .content-text h2 {
+        font-size: 1.7rem !important;
+        text-align: center;
+    }
+
+    .content-text h2::after {
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+    }
+
+    .image-placeholder {
+        height: 250px;
+    }
+
+    /* Laptop: Mantenemos la escala pequeña incluso en el hover táctil */
+    .laptop {
+        transform: scale(0.35) rotateX(15deg) rotateY(-30deg);
+        margin: -80px auto -60px auto !important;
+        transform-origin: center center;
+    }
+
+    .laptop:hover {
+        transform: scale(0.38) rotateX(20deg) rotateY(-25deg) !important;
+    }
+
+    .cont-carrusel {
+        height: 350px;
+        grid-template-rows: 280px 40px;
+    }
+
+    .item {
+        width: 220px;
+        height: 260px;
+        transform: rotateY(calc(-12deg * var(--r))) translateX(calc(-110px * var(--r))) translateZ(calc(-60px * var(--abs)));
+    }
+
+    .item:hover:not([for^="pos"]) {
+        transform: rotateY(calc(-12deg * var(--r))) translateX(calc(-110px * var(--r))) translateZ(calc(-30px * var(--abs))) scale(1.02);
+    }
+}
+
+/* Contenedor Principal */
+.ecosystem-container {
+    padding: 70px 20px;
+    text-align: center;
+}
+
+/* Wrapper de las Tarjetas */
+.cards-wrapper {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    max-width: 1300px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+}
+
+/* La Tarjeta Individual */
+.eco-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    flex: 1;
+    min-width: 320px;
+    max-width: 400px;
+    padding: 60px 40px;
+    border-radius: 35px;
+    position: relative;
+    transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    overflow: hidden;
+}
+
+.eco-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 100%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.eco-card:hover {
+    transform: translateY(-20px) scale(1.02);
+    box-shadow: 0 40px 80px rgba(176, 0, 30, 0.12);
+    border-color: rgba(176, 0, 30, 0.3);
+    background: rgba(255, 255, 255, 0.9);
+}
+
+/* Icono de Bootstrap */
+.icon-circle {
+    width: 85px;
+    height: 85px;
+    background: linear-gradient(135deg, #8B0015 0%, #690014 100%);
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: white;
+    margin-bottom: 35px;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 2;
+    box-shadow: 0 15px 30px rgba(176, 0, 30, 0.3);
+}
+
+.eco-card:hover .icon-circle {
+    transform: scale(1.15) rotate(8deg);
+    box-shadow: 0 20px 40px rgba(176, 0, 30, 0.4);
+}
+
+/* Contenido de Texto */
+.card-content h3 {
+    color: #8B0015;
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+    letter-spacing: 0.5px;
+}
+
+.card-content p {
+    color: #4a4a4a;
+    line-height: 1.8;
+    font-size: 1rem;
+    margin: 0;
+    font-weight: 700;
+}
+
+
+/* Línea Inferior */
+.card-footer-line {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 8px;
+    background: linear-gradient(90deg, #8B0015, #690014);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s ease;
+}
+
+.eco-card:hover .card-footer-line {
+    transform: scaleX(1);
+}

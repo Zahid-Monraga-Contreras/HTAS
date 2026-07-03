@@ -1,0 +1,229 @@
+<app-headermenu></app-headermenu>
+
+<div class="landing-container">
+  <!-- New Hero Video Section -->
+  <section class="hero-video-section">
+    <div class="shader-bg-wrapper">
+      <app-electric-waves></app-electric-waves>
+    </div>
+    <div class="video-overlay"></div>
+
+    <div class="hero-content">
+      <span class="hero-badge">BIENVENIDO AL PROYECTO</span>
+      <h1 class="hero-title" #animateUp>Hipertensión Arterial Sistémica</h1>
+      <h2 class="hero-subtitle" #animateUp>Monitoreo Inteligente y Control Digital</h2>
+      <p class="hero-description" #animateUp>
+        Innovación y tecnología al servicio de tu salud cardiovascular.
+        Únete a la plataforma líder en el monitoreo y control de la presión arterial.
+      </p>
+    </div>
+  </section>
+
+  <div id="appmovil" class="app-promo-section">
+    <!-- Background Decor -->
+    <div class="promo-decor decor-top-right"><i class="bi bi-qr-code-scan"></i></div>
+    <div class="promo-decor decor-bottom-left"><i class="bi bi-shield-lock-fill"></i></div>
+
+    <div class="content-block">
+      <div class="content-text">
+        <span class="promo-badge">DISPONIBLE AHORA</span>
+        <h2 #animateUp>Tu aliado diario en el control tensional.</h2>
+        <p #animateUp>Nuestra aplicación facilita el autocontrol de tu condición de manera organizada y sencilla.
+          Registra sistemáticamente tus mediciones de presión arterial y frecuencia cardiaca.</p>
+        <p #animateUp>Más que un registro, es un asistente personal: incorpora recordatorios inteligentes para tu
+          medicación y citas médicas.</p>
+
+        <!--<div class="promo-actions">
+          <div class="download-btn">
+            <i class="bi bi-download"></i>
+            <span>Descargar la aplicación ahora</span>
+          </div>
+        </div>-->
+      </div>
+
+      <div class="phone-mockup-wrapper">
+        <!-- Dynamic Feature Boxes -->
+        @for (feature of appScreens[activeScreenIndex].features; track feature.title) {
+        <div class="feature-label-box" [ngClass]="feature.position" #animateUp>
+          <div class="label-icon"><i class="bi" [ngClass]="feature.icon"></i></div>
+          <div class="label-content">
+            <h4>{{ feature.title }}</h4>
+            <p>{{ feature.desc }}</p>
+          </div>
+        </div>
+        }
+
+        <div class="phone-mockup">
+          <div class="buttons">
+            <div class="silent"></div>
+            <div class="sleep"></div>
+            <div class="vol-up"></div>
+            <div class="vol-down"></div>
+          </div>
+          <div class="top-bar"></div>
+          <div class="bottom-bar"></div>
+
+          <div class="phone-screen">
+            <div class="dynamic-island">
+              <div class="speaker-grill"></div>
+              <div class="camera-lens">
+                <div class="lens-glint"></div>
+              </div>
+            </div>
+            <div class="status-bar">
+              <div class="status-left">
+                <div class="signal-bars">
+                  <div class="bar bar1"></div>
+                  <div class="bar bar2"></div>
+                  <div class="bar bar3"></div>
+                  <div class="bar bar4"></div>
+                </div>
+                <span class="operator">AT&T</span>
+                <i class="bi bi-wifi"></i>
+              </div>
+              <div class="status-right">
+                <div class="battery-icon">
+                  <div class="battery-body">
+                    <div class="battery-level"></div>
+                  </div>
+                  <div class="battery-tip"></div>
+                </div>
+              </div>
+            </div>
+            <div class="screen-track" [style.transform]="screenTransform">
+              <img src="assets/Imagen1.png" alt="App Screen 1" class="app-screen" loading="lazy">
+              <img src="assets/Imagen2.png" alt="App Screen 2" class="app-screen" loading="lazy">
+              <img src="assets/Imagen4.png" alt="App Screen 3" class="app-screen" loading="lazy">
+            </div>
+          </div>
+          <div class="phone-reflections"></div>
+
+          <!-- Interactive Controls -->
+          <div class="mockup-controls">
+            <button class="mockup-dot" [class.active]="activeScreenIndex === 0" (click)="setScreenIndex(0)"></button>
+            <button class="mockup-dot" [class.active]="activeScreenIndex === 1" (click)="setScreenIndex(1)"></button>
+            <button class="mockup-dot" [class.active]="activeScreenIndex === 2" (click)="setScreenIndex(2)"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="bracelet-schematic-section">
+    <div class="tech-circles-container">
+      <div class="ellipses-container">
+        <div class="ellipses ellipses__outer--thin">
+          <div class="ellipses ellipses__orbit"></div>
+        </div>
+        <div class="ellipses ellipses__outer--thick"></div>
+      </div>
+    </div>
+
+    <div class="schematic-container">
+      <div class="feature-column left">
+        <div class="feature-mini-box">
+          <div class="feature-card">
+            <div class="pointer-line"></div>
+            <h3 #animateUp>Presión Arterial</h3>
+            <p #animateUp>Monitoreo sistólico y diastólico en tiempo real.</p>
+          </div>
+        </div>
+        <div class="feature-mini-box">
+          <div class="feature-card">
+            <div class="pointer-line"></div>
+            <h3 #animateUp>Bio-Sensores</h3>
+            <p #animateUp>Detección de arritmias y frecuencia cardíaca.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bracelet-center-display">
+        <img src="assets/baumanometro.png" class="bracelet-hero-img" alt="Smart Bracelet" loading="lazy" #animateUp>
+        <div class="bracelet-shadow-ellipse" #animateUp></div>
+      </div>
+
+      <div class="feature-column right">
+        <div class="feature-mini-box">
+          <div class="feature-card">
+            <div class="pointer-line"></div>
+            <h3 #animateUp>Nivel de Oxígeno</h3>
+            <p #animateUp>Saturación de SpO2 constante para tu seguridad.</p>
+          </div>
+        </div>
+        <div class="feature-mini-box">
+          <div class="feature-card">
+            <div class="pointer-line"></div>
+            <h3 #animateUp>Actividad Diaria</h3>
+            <p #animateUp>Seguimiento de pasos, calorías y calidad del sueño.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="diseño" class="gallery-section">
+    <div class="section-header">
+      <h2 #animateUp>Nuestra Tecnología</h2>
+    </div>
+
+    <div class="filter-pills">
+      <button class="pill" [class.active]="activeGalleryTab === 1" (click)="setActiveGalleryTab(1)" #animateUp>Monitoreo
+        App</button>
+      <button class="pill" [class.active]="activeGalleryTab === 2" (click)="setActiveGalleryTab(2)"
+        #animateUp>Baumanometro
+        Inteligente</button>
+      <button class="pill" [class.active]="activeGalleryTab === 3" (click)="setActiveGalleryTab(3)"
+        #animateUp>Plataforma
+        Web</button>
+    </div>
+
+    <!-- Slider Container -->
+    <div class="slider-window">
+      <div class="slider-track" [style.transform]="sliderTransform">
+
+        <div class="slide" [class.active]="activeGalleryTab === 1" (click)="setActiveGalleryTab(1)">
+          <div class="image-card">
+            <img src="assets/celhtas.png" alt="Monitoreo App" class="gallery-img" loading="lazy">
+          </div>
+        </div>
+
+        <div class="slide" [class.active]="activeGalleryTab === 2" (click)="setActiveGalleryTab(2)">
+          <div class="image-card">
+            <img src="assets/baumanometrohtas2.jpg" alt="Detalle Pulsera" class="gallery-img" loading="lazy">
+          </div>
+        </div>
+
+        <div class="slide" [class.active]="activeGalleryTab === 3" (click)="setActiveGalleryTab(3)">
+          <div class="image-card">
+            <img src="assets/laptophtas3.png" alt="Plataforma Web" class="gallery-img" loading="lazy">
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Dots Navigation -->
+    <div class="dots-container">
+      <button class="dot" [class.active]="activeGalleryTab === 1" (click)="setActiveGalleryTab(1)"></button>
+      <button class="dot" [class.active]="activeGalleryTab === 2" (click)="setActiveGalleryTab(2)"></button>
+      <button class="dot" [class.active]="activeGalleryTab === 3" (click)="setActiveGalleryTab(3)"></button>
+    </div>
+  </div>
+
+  <section id="nosotros">
+    <app-nosotros></app-nosotros>
+  </section>
+
+  <section id="recursos">
+    <app-recursos></app-recursos>
+  </section>
+
+  <section id="pagos">
+    <app-pagos></app-pagos>
+  </section>
+
+  <section id="contacto">
+    <app-contacto></app-contacto>
+  </section>
+
+  <app-footer></app-footer>

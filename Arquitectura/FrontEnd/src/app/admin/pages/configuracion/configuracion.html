@@ -1,0 +1,110 @@
+<app-menu #sidebar></app-menu>
+
+<div class="main-container" [class.menu-collapsed]="sidebar.isCollapsed">
+    <section class="config-content">
+
+        <header class="content-header mb-4">
+            <h2 class="fw-bold text-slate">Configuración de la Cuenta</h2>
+            <p class="text-muted small">Modifica tus datos de contacto e identificación personal en el sistema HTAS.</p>
+        </header>
+
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="card-perfil-info p-4 text-center shadow-sm rounded-card bg-white">
+                    <div class="avatar-container mb-3">
+                        <img [src]="currentUser?.photoURL || 'https://ui-avatars.com/api/?name=U&background=b0001e&color=fff'"
+                            alt="Avatar Usuario" class="rounded-circle profile-preview shadow-sm">
+                    </div>
+                    <h4 class="fw-bold text-slate m-0">{{ perfilEdit.nombre }} {{ perfilEdit.apPaterno }}</h4>
+                    <p class="text-muted small mb-3">{{ perfilEdit.correo }}</p>
+
+                    <span class="badge-rol text-uppercase" [ngClass]="perfilEdit.rol?.toLowerCase()">
+                        {{ perfilEdit.rol || 'Usuario' }}
+                    </span>
+
+                    <hr class="my-4 text-slate opacity-10">
+                    <p class="extra-small text-muted m-0 text-start">
+                        <i class="bi bi-shield-lock-fill text-primary"></i> Tus datos médicos, de salud o de asignación
+                        se encuentran resguardados de forma segura.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="form-container p-4 shadow-sm bg-white rounded-card">
+                    <h4 class="panel-title mb-4">Información Personal</h4>
+
+                    <form (ngSubmit)="guardarCambiosPerfil()" #formPerfil="ngForm">
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label font-semibold small text-slate">Nombre(s) <span
+                                        class="text-danger"></span></label>
+                                <input type="text" class="form-control htas-input" [(ngModel)]="perfilEdit.nombre"
+                                    name="nombre" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label font-semibold small text-slate">Apellido Paterno <span
+                                        class="text-danger"></span></label>
+                                <input type="text" class="form-control htas-input" [(ngModel)]="perfilEdit.apPaterno"
+                                    name="apPaterno" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label font-semibold small text-slate">Apellido Materno</label>
+                                <input type="text" class="form-control htas-input" [(ngModel)]="perfilEdit.apMaterno"
+                                    name="apMaterno">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label font-semibold small text-slate">Correo Electrónico <span
+                                        class="text-danger"></span></label>
+                                <input type="email" class="form-control htas-input" [(ngModel)]="perfilEdit.correo"
+                                    name="correo" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label font-semibold small text-slate">Teléfono Celular</label>
+                                <input type="tel" class="form-control htas-input" [(ngModel)]="perfilEdit.telefono"
+                                    name="telefono" placeholder="Ej. 2731234567">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label font-semibold small text-slate">Género / Sexo</label>
+                                <select class="form-control htas-input" [(ngModel)]="perfilEdit.genero" name="genero">
+                                    <option value="Masculino">Masculino</option>
+                                    <option value="Femenino">Femenino</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="text-end mt-4 pt-2">
+                            <button type="submit" class="btn btn-htas-submit px-4 py-2 font-semibold"
+                                [disabled]="isSaving">
+                                @if (isSaving) {
+                                <span class="spinner-border spinner-border-sm me-2" role="status"
+                                    aria-hidden="true"></span>
+                                Guardando...
+                                } @else {
+                                <i class="bi bi-check-circle-fill me-2"></i> Guardar Cambios
+                                }
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </section>
+</div>
+
+@if (mostrarToast) {
+<div class="htas-toast-container" [ngClass]="tipoToast">
+    <div class="d-flex align-items-center gap-2">
+        @if (tipoToast === 'success') { <i class="bi bi-check-circle-fill fs-5"></i> }
+        @if (tipoToast === 'error') { <i class="bi bi-exclamation-triangle-fill fs-5"></i> }
+        @if (tipoToast === 'warning') { <i class="bi bi-info-circle-fill fs-5"></i> }
+        <p class="m-0 small font-semibold">{{ mensajeToast }}</p>
+    </div>
+</div>
+}

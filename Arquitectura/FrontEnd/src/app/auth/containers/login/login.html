@@ -1,0 +1,202 @@
+<div class="login-container">
+  <button class="back-home-button" (click)="irAInicio()">
+    <i class="bi bi-arrow-left"></i>
+    <span>Volver al inicio</span>
+  </button>
+  <div class="background-circles">
+    <div class="circle circle-1"></div>
+    <div class="circle circle-2"></div>
+    <div class="circle circle-3"></div>
+    <div class="circle circle-4"></div>
+  </div>
+  <div class="container" [class.toggle]="isToggled">
+
+    <div id="google" class="container-form">
+      <div class="sign-in">
+        <div class="decor-icon"><i class="bi bi-shield-lock"></i></div>
+        <div class="decor-icon-2"><i class="bi bi-shield-check"></i></div>
+
+        <h2>{{ esperandoPin ? 'Verificar Identidad' : 'Iniciar Sesión' }}</h2>
+        <span>{{ esperandoPin ? 'Ingresa el PIN de tu correo' : 'Accede de forma segura con tu cuenta' }}</span>
+
+        <div *ngIf="!esperandoPin" [formGroup]="loginForm" class="login-form-content">
+          <div class="container-input">
+            <i class="bi bi-envelope"></i>
+            <input type="email" formControlName="Email" placeholder="Correo Electrónico">
+          </div>
+          <div class="container-input">
+            <i class="bi bi-lock"></i>
+            <input type="password" formControlName="Password" placeholder="Contraseña">
+          </div>
+          <re-captcha formControlName="recaptcha" [formGroup]="loginForm" [siteKey]="recaptchaSiteKey"
+            (resolved)="onCaptchaLoginResolved($event)">
+          </re-captcha>
+          <button type="button" class="button google-style" (click)="onLoginWithEmailPassword()"
+            [disabled]="loading || loginForm.invalid">
+            <i class="bi bi-box-arrow-in-right"></i>
+            <span>{{ loading ? 'Iniciando...' : 'Iniciar Sesión' }}</span>
+          </button>
+
+          <div class="social-networks">
+            <p>O inicia sesión con:</p>
+            <button type="button" class="google-btn" (click)="onLoginWithGoogle()" [disabled]="loading">
+              <i class="bi bi-google"></i>
+              <span>{{ loading ? 'Conectando...' : 'Google' }}</span>
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="esperandoPin" class="pin-verification-container">
+
+          <div *ngIf="users.estaBloqueado()" class="alert-lock">
+            <i class="bi bi-clock-history"></i>
+            <span>Intenta de nuevo en: <strong>{{ tiempoBloqueo }}</strong></span>
+          </div>
+
+          <div class="container-input" [class.disabled-input]="users.estaBloqueado()">
+            <i class="bi bi-key-fill"></i>
+            <input type="text" [(ngModel)]="pinIngresado" placeholder="Introduce tu PIN de 6 dígitos" maxlength="6"
+              [class.disabled-input]="users.estaBloqueado()" (keypress)="soloNumeros($event)">
+          </div>
+          <button type="button" class="button google-style" (click)="verificarPin()"
+            [disabled]="loading || users.estaBloqueado() || pinIngresado.length < 6">
+            <i class="bi bi-shield-check"></i> {{ users.estaBloqueado() ? 'Bloqueado temporalmente' : 'Verificar y
+            Entrar' }}
+          </button>
+          <p class="resend-pin-text" *ngIf="esperandoPin">
+            ¿No recibiste el código?
+            <a (click)="reenviarPin()" [class.disabled]="loading">
+              {{ loading ? 'Reenviando...' : 'Reenviar PIN' }}
+            </a>
+          </p>
+          <p class="mobile-toggle"><a (click)="esperandoPin = false">Intentar con otra cuenta</a></p>
+        </div>
+
+        <div *ngIf="!esperandoPin" class="security-badge">
+          <i class="bi bi-patch-check-fill"></i>
+          <span>Protección de datos</span>
+        </div>
+
+        <p *ngIf="!esperandoPin" class="mobile-toggle">¿No tienes cuenta? <a (click)="toggleToSignUp()">Regístrate
+            aquí</a></p>
+      </div>
+    </div>
+
+    <div class="container-form">
+      <form class="sign-up" [formGroup]="registerForm" (ngSubmit)="onSubmitSignUp()"
+        [class.doctor-active]="registerForm.get('Rol')?.value === 'Doctor'"
+        [class.paciente-active]="registerForm.get('Rol')?.value === 'Paciente'"
+        [class.acompanante-active]="registerForm.get('Rol')?.value === 'Acompañante'">
+        <div class="decor-icon"><i class="bi bi-person-badge"></i></div>
+        <div class="decor-icon-2"><i class="bi bi-person-fill-add"></i></div>
+        <h2>Registrarse</h2>
+        <span>Completa tus datos personales</span>
+
+        <div class="container-input">
+          <i class="bi bi-person"></i>
+          <input type="text" formControlName="NombreCompleto" placeholder="Nombre Completo"
+            (keypress)="onKeyPress($event)" maxlength="60">
+        </div>
+
+        <div class="container-input">
+          <i class="bi bi-telephone"></i>
+          <input type="text" formControlName="Telefono" placeholder="Teléfono" (keypress)="soloNumeros($event)"
+            maxlength="10">
+        </div>
+
+        <div class="container-input">
+          <i class="bi bi-envelope"></i>
+          <input type="email" formControlName="Email" placeholder="Correo Electrónico">
+        </div>
+
+        <div class="container-input">
+          <i class="bi bi-lock"></i>
+          <input type="password" formControlName="Password" placeholder="Contraseña">
+        </div>
+
+        <div class="container-input">
+          <i class="bi bi-person-badge"></i>
+          <select formControlName="Rol" class="select-custom">
+            <option value="" disabled selected>Selecciona tu Rol</option>
+            <option value="Paciente">Paciente</option>
+            <option value="Doctor">Doctor</option>
+            <option value="Acompañante">Acompañante</option>
+          </select>
+          <i class="bi bi-chevron-down arrow-select"></i>
+        </div>
+
+        <!-- Campos adicionales para Paciente -->
+        <ng-container *ngIf="registerForm.get('Rol')?.value === 'Paciente'">
+          <div class="container-input">
+            <i class="bi bi-card-text"></i>
+            <input type="text" formControlName="NSS" placeholder="Número de Seguridad Social"
+              (keypress)="soloNumeros($event)" maxlength="11">
+          </div>
+        </ng-container>
+
+        <!-- Campos adicionales para Doctor -->
+        <ng-container *ngIf="registerForm.get('Rol')?.value === 'Doctor'">
+          <div class="container-input file-input-wrapper" [class.has-file]="nombreArchivoCedula">
+            <i class="bi bi-file-earmark-pdf"></i>
+            <input type="file" accept="application/pdf" id="fotoCedula" class="file-input-hidden"
+              (change)="onFileSelected($event)" />
+            <label for="fotoCedula" class="file-label">
+              {{ nombreArchivoCedula || 'Cédula en formato PDF (Requerida)' }}
+            </label>
+          </div>
+
+          <div class="container-input">
+            <i class="bi bi-clipboard-data"></i>
+            <input type="text" formControlName="Especialidad" placeholder="Especialidad"
+              (keypress)="soloNumeros($event)" maxlength="25">
+          </div>
+
+          <div class="container-input">
+            <i class="bi bi-geo-alt"></i>
+            <input type="text" formControlName="DireccionClinica" placeholder="Dirección Clínica" maxlength="100">
+          </div>
+        </ng-container>
+
+        <div class="container-input date-wrapper-premium" *ngIf="registerForm.get('Rol')?.value === 'Acompañante'">
+          <i class="bi bi-calendar-check main-icon"></i>
+          <input type="text" id="fechaInput" formControlName="FechaAsignacion" placeholder="Seleccione fecha"
+            class="input-clean" (focus)="inicializarCalendario()" readonly>
+        </div>
+
+        <re-captcha formControlName="recaptcha" [formGroup]="registerForm" [siteKey]="recaptchaSiteKey"
+          (resolved)="onCaptchaRegisterResolved($event)">
+        </re-captcha>
+
+        <button type="submit" class="button google-style" [disabled]="registerForm.invalid || loading">
+          <i class="bi bi-person-plus-fill"></i>
+          <span>{{ loading ? 'Procesando...' : 'Crear Cuenta' }}</span>
+        </button>
+
+        <p class="mobile-toggle">¿Ya tienes cuenta? <a (click)="toggleToSignIn()">Inicia Sesión</a></p>
+      </form>
+    </div>
+
+    <div class="container-welcome">
+      <div class="welcome-sign-up welcome">
+        <h3>¡Bienvenido!</h3>
+        <p>Regístrate para crear tu cuenta y empezar a guardar tus datos</p>
+        <button class="button" (click)="toggleToSignUp()">Registrarse</button>
+      </div>
+      <div class="welcome-sign-in welcome">
+        <h3>¡Hola de nuevo!</h3>
+        <p>Inicia sesión rápidamente con tu cuenta de Google</p>
+        <button class="button" (click)="toggleToSignIn()">Iniciar Sesión</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="custom-modal-overlay" [class.show]="showModal" (click)="closeModal()">
+  <div class="custom-modal" (click)="$event.stopPropagation()" [ngClass]="modalType">
+    <div class="modal-icon"><i [ngClass]="modalIcon"></i></div>
+    <h3>{{ modalTitle }}</h3>
+    <p>{{ modalMessage }}</p>
+    <button class="modal-button" (click)="closeModal()">Aceptar</button>
+  </div>
+</div>

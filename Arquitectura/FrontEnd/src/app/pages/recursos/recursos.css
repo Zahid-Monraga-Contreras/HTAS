@@ -1,0 +1,703 @@
+/* ==========================================================================
+   1. Reset y Base
+   ========================================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Montserrat", sans-serif;
+}
+
+body {
+    /* Evitamos el scroll horizontal por el canvas */
+    overflow-x: hidden;
+}
+
+/* ==========================================================================
+   2. Header y Navegación (Fijo)
+   ========================================================================== */
+:host ::ng-deep .main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 5%;
+    position: fixed;
+    width: 100%;
+    left: 0;
+    top: 0;
+    z-index: 10000 !important;
+}
+
+.gallery-wrapper {
+    position: relative;
+    width: 100%;
+    /* Calculamos el alto restando el header y un poco del breadcrumb */
+    height: calc(100vh - 60px);
+    overflow: hidden;
+}
+
+#canvas-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    transform: translateY(-80px);
+}
+
+#ui-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+    pointer-events: none;
+    /* Deja pasar el scroll al canvas */
+}
+
+.slide-content {
+    position: absolute;
+    top: 10%;
+    left: 8%;
+    width: 35%;
+    max-width: 480px;
+    opacity: 0;
+    padding: 2.5rem;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    pointer-events: none;
+
+    /* --- EFECTO CUADRO TRANSPARENTE (Glassmorphism) --- */
+    background: rgba(255, 255, 255, 0.15);
+    /* Fondo blanco muy transparente */
+    backdrop-filter: blur(10px);
+    /* Desenfoque del fondo 3D */
+    -webkit-backdrop-filter: blur(10px);
+    /* Soporte para Safari */
+    border-radius: 20px;
+    /* Bordes redondeados */
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    /* Borde sutil */
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    /* Sombra suave */
+}
+
+.nav-dots {
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 15px;
+    z-index: 10;
+    pointer-events: auto;
+}
+
+.dot {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background-color: rgba(148, 121, 121, 0.418);
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.dot.active {
+    background-color: #8B0015;
+    border-color: rgba(255, 255, 255, 0.8);
+    transform: scale(1.2);
+}
+
+.dot:hover {
+    background-color: rgba(176, 0, 30, 0.7);
+}
+
+.slide-content.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    /* Permite interactuar con el texto si tuviera links */
+}
+
+h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+    font-size: clamp(2.5rem, 4.5vw, 4rem);
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    color: black;
+}
+
+.catalogue-number {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: #8B0015;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.description {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: black;
+    text-align: justify;
+}
+
+/* Tablets (hasta 1024px) */
+@media (max-width: 1024px) {
+    .slide-content {
+        width: 45%;
+        left: 27.5%;
+        /* Centrado: (100% - 45%) / 2 = 27.5% */
+        padding: 2rem;
+    }
+}
+
+@media (max-width: 900px) {
+    .info-grid {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .info-card {
+        flex: none !important;
+        width: 100%;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .info-grid:hover .info-card {
+        opacity: 1;
+    }
+}
+
+/* Tablets pequeñas (hasta 768px) */
+@media (max-width: 768px) {
+    app-breadcrumbs {
+        margin-top: 60px;
+    }
+
+    .gallery-wrapper {
+        height: calc(100vh - 120px);
+    }
+
+    /* CORREGIDO: Cuadrado centrado en tablets */
+    .slide-content {
+        width: 80%;
+        left: 10%;
+        /* Centrado: (100% - 80%) / 2 = 10% */
+        top: 15%;
+        padding: 1.8rem;
+        border-radius: 16px;
+    }
+
+    h1 {
+        font-size: 2.2rem;
+        margin-bottom: 1rem;
+    }
+
+    .nav-dots {
+        bottom: 30px;
+    }
+
+    .dot {
+        width: 12px;
+        height: 12px;
+    }
+
+    .marquee-footer {
+        height: 60px;
+    }
+
+    .marquee-item {
+        font-size: 1.3rem;
+        padding: 0 30px;
+    }
+}
+
+/* Móviles grandes (hasta 600px) */
+@media (max-width: 600px) {
+
+    /* CORREGIDO: Cuadrado centrado en móviles grandes */
+    .slide-content {
+        width: 85%;
+        left: 7.5%;
+        /* Centrado: (100% - 85%) / 2 = 7.5% */
+        top: 12%;
+        padding: 1.5rem;
+    }
+
+    h1 {
+        font-size: 1.9rem;
+    }
+
+    .description {
+        font-size: 0.95rem;
+    }
+}
+
+/* Móviles pequeños (hasta 480px) */
+@media (max-width: 480px) {
+    .hero-section {
+        padding: 4rem 4%;
+    }
+
+    .hero-title {
+        font-size: 2rem;
+    }
+
+    .hero-description {
+        font-size: 1rem;
+    }
+
+    /* CORREGIDO: Cuadrado centrado en móviles pequeños */
+    .slide-content {
+        width: 90%;
+        left: 5%;
+        /* Centrado: (100% - 90%) / 2 = 5% */
+        top: 10%;
+        padding: 1.2rem;
+        border-radius: 12px;
+    }
+
+    h1 {
+        font-size: 1.7rem;
+    }
+
+    .catalogue-number {
+        font-size: 0.6rem;
+        letter-spacing: 2px;
+    }
+
+    .description {
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    .nav-dots {
+        bottom: 20px;
+        gap: 10px;
+    }
+
+    .dot {
+        width: 10px;
+        height: 10px;
+    }
+
+    .info-section {
+        padding: 1.5rem 4%;
+    }
+
+    .main-wrapper {
+        padding: 30px 15px;
+        border-radius: 20px;
+    }
+
+    .card-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .card-body h3 {
+        font-size: 1.2rem;
+    }
+
+    .card-body p {
+        font-size: 0.85rem;
+    }
+
+    h2 {
+        font-size: 2rem;
+    }
+
+    .accordion-section {
+        padding: 3rem 4%;
+    }
+
+    .accordion-header {
+        padding: 0.8rem 1.2rem;
+    }
+
+    .accordion-icon-box {
+        min-width: 40px;
+        width: 40px;
+        height: 40px;
+        font-size: 1.1rem;
+        margin-right: 1rem;
+    }
+
+    .accordion-title {
+        font-size: 0.95rem;
+    }
+
+    .arrow-indicator {
+        font-size: 1.3rem;
+    }
+
+    .accordion-content p {
+        padding: 0.8rem 0 1.5rem 3.5rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Móviles muy pequeños (hasta 360px) */
+@media (max-width: 360px) {
+    .hero-title {
+        font-size: 1.8rem;
+    }
+
+    /* CORREGIDO: Cuadrado centrado en móviles muy pequeños */
+    .slide-content {
+        width: 92%;
+        left: 4%;
+        /* Centrado: (100% - 92%) / 2 = 4% */
+        top: 8%;
+        padding: 1rem;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    .catalogue-number {
+        font-size: 0.55rem;
+        letter-spacing: 1px;
+    }
+
+    .description {
+        font-size: 0.8rem;
+    }
+
+    .card-body h3 {
+        font-size: 1.1rem;
+    }
+
+    .card-body p {
+        font-size: 0.8rem;
+    }
+
+    .accordion-title {
+        font-size: 0.85rem;
+    }
+
+    .accordion-content p {
+        font-size: 0.8rem;
+        padding-left: 3rem;
+    }
+}
+
+/* ===== MARQUEE PULSO REALTIME ===== */
+.marquee-footer-ekg {
+    background: radial-gradient(circle at center, #8B0015 0%, #8B0015 100%);
+    height: 80px;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    border-top: 2px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.ekg-active-layer {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.ekg-svg {
+    width: 100%;
+    /* Abarca todo el ancho del footer */
+    height: 60px;
+    overflow: visible;
+}
+
+.ekg-path {
+    fill: none;
+    stroke: #ffffff;
+    stroke-width: 0.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.heart-icon {
+    fill: #ffffff;
+    font-size: 8px;
+    /* Ajustado al viewBox de 20 */
+    font-family: Arial, sans-serif;
+    filter: drop-shadow(0 0 3px #fff);
+    animation: heart-beat-footer 0.8s ease-in-out infinite;
+    dominant-baseline: middle;
+}
+
+/* --- ANIMACIONES --- */
+
+/* Latido del corazón */
+@keyframes heart-beat-footer {
+
+    0%,
+    100% {
+        transform: scale(1);
+        transform-origin: center;
+    }
+
+    50% {
+        transform: scale(1.3);
+        transform-origin: center;
+    }
+}
+
+.info-section {
+    padding: -1rem 5% 0.5rem;
+    margin-bottom: 0;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+    opacity: 1;
+    position: relative;
+    /* Base para z-index */
+    transition: z-index 0.3s step-start;
+}
+
+.info-section.section-expanded {
+    z-index: 900;
+    /* Elevado, pero siempre menor que el header (10000) */
+}
+
+.main-wrapper {
+    background-color: #f2f2f2;
+    padding: 20px 20px;
+    border-radius: 20px;
+    display: flex;
+    justify-content: center;
+    margin: 2rem 0;
+}
+
+/* Contenedor Principal */
+.info-grid {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    /* Evita que las tarjetas se estiren juntas */
+    gap: 25px;
+    width: 100%;
+    max-width: 1200px;
+}
+
+/* Estilo Individual de la Card */
+.info-card {
+    flex: 1;
+    min-width: 0;
+    background: #ffffff;
+    border-radius: 24px;
+    padding: 35px 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    cursor: default;
+    position: relative;
+    /* Necesario para el overlay hijo */
+}
+
+/* Efecto Hover en la Card */
+.info-card:hover {
+    transform: translateY(-15px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.12);
+    border-color: rgba(176, 0, 30, 0.1);
+    /* Sutil tinte rojo en el borde */
+}
+
+/* --- TRATAMIENTO DE IMÁGENES --- */
+.card-image-container {
+    width: 100%;
+    height: 180px;
+    /* Altura controlada para balancear la fila */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 25px;
+}
+
+.card-image-container img {
+    max-width: 85%;
+    max-height: 100%;
+    object-fit: contain;
+    /* Mantiene proporción sin cortes */
+    /* Sombra que sigue la forma del PNG (silueta) */
+    filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.15));
+    transition: transform 0.6s ease;
+}
+
+/* Animación de la imagen al hacer hover */
+.info-card:hover .card-image-container img {
+    transform: scale(1.1) rotate(-1deg);
+}
+
+/* --- CUERPO Y TEXTO --- */
+.card-body {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    /* Permite que el botón se empuje al fondo */
+}
+
+.card-body h3 {
+    color: #8B0015;
+    /* Rojo HTAS */
+    font-weight: 800;
+    font-size: 1.35rem;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+}
+
+.card-body p {
+    color: #555555;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    flex-grow: 1;
+    text-align: center;
+}
+
+/* --- BOTÓN ACCIÓN --- */
+.btn-action {
+    background-color: #8B0015;
+    color: #ffffff;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 50px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(176, 0, 30, 0.2);
+    align-self: center;
+}
+
+.btn-action:hover {
+    background-color: #8B0015;
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(176, 0, 30, 0.4);
+}
+
+/* --- ESTILOS DE EXPANSIÓN (INTEGRACIÓN FLUIDA) --- */
+.extra-info {
+    position: relative;
+    width: 100%;
+    background: transparent;
+    /* Hereda del padre */
+    padding: 0;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    z-index: 100;
+    transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+    transform: translateY(10px);
+    pointer-events: none;
+}
+
+.detail-text {
+    padding-top: 5px;
+    color: #555555;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    text-align: center;
+    font-weight: 400;
+}
+
+.info-card.expanded {
+    z-index: 200;
+    border-radius: 24px;
+    /* Mantiene el radio original */
+    border-color: rgba(176, 0, 30, 0.2);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    background: #ffffff;
+    padding-bottom: 30px;
+    /* Restaurado para balancear el cierre */
+}
+
+.info-card.expanded .card-body p {
+    margin-bottom: 0;
+    /* Eliminado el margen inferior del texto corto */
+}
+
+.info-card.expanded .extra-info {
+    max-height: 800px;
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+    overflow: visible;
+    /* Permite que la sombra y el escalado del botón no se corten */
+}
+
+.info-card.expanded .card-image-container img {
+    transform: scale(0.8) translateY(-5px);
+    filter: brightness(1.05);
+    opacity: 0.9;
+}
+
+.info-card.expanded .btn-action {
+    background-color: #8B0015;
+    margin-top: 1.5rem;
+    margin-bottom: 10px;
+    /* Espacio extra para que no se corte al hacer hover */
+    display: table;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Efecto para "difuminar" lo que queda atrás */
+.section-expanded .info-card:not(.expanded) {
+    filter: blur(2px) grayscale(0.3);
+    opacity: 0.6;
+    pointer-events: none;
+    transform: scale(0.95);
+}
+
+/* --- RESPONSIVIDAD --- */
+
+/* Tablets y Laptops pequeñas */
+@media (max-width: 1024px) {
+    .info-grid {
+        gap: 15px;
+    }
+
+    .card-body h3 {
+        font-size: 1.2rem;
+    }
+}
+
+/* Móviles (Se apilan para mejor lectura) */
+@media (max-width: 768px) {
+    .info-grid {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .info-card {
+        width: 100%;
+        max-width: 450px;
+        flex: none;
+    }
+
+    .main-wrapper {
+        padding: 40px 20px;
+    }
+}

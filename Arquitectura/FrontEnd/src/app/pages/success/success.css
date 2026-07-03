@@ -1,0 +1,202 @@
+/* --- Contenedor Principal --- */
+.success-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f8f9fa;
+    font-family: 'Montserrat', sans-serif;
+    margin: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+/* --- Círculos Decorativos (Identidad Visual HTAS) --- */
+.background-circles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.circle {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.4;
+    background-color: #8B0015;
+    /* Tu color Guinda */
+    animation: drift 25s infinite alternate ease-in-out;
+}
+
+.circle-1 {
+    width: 500px;
+    height: 500px;
+    top: -150px;
+    left: -150px;
+}
+
+.circle-2 {
+    width: 400px;
+    height: 400px;
+    bottom: -100px;
+    right: -100px;
+    animation-delay: -5s;
+}
+
+.circle-3 {
+    width: 300px;
+    height: 300px;
+    top: 20%;
+    right: 15%;
+    animation-delay: -10s;
+}
+
+.circle-4 {
+    width: 250px;
+    height: 250px;
+    bottom: 10%;
+    left: 10%;
+    animation-delay: -15s;
+}
+
+@keyframes drift {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    100% {
+        transform: translate(60px, 40px) scale(1.1);
+    }
+}
+
+/* --- Tarjeta de Éxito --- */
+.success-card {
+    position: relative;
+    width: 95%;
+    max-width: 650px;
+    background: white;
+    border-radius: 40px;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.1);
+    padding: 60px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 10;
+    text-align: center;
+}
+
+/* --- Icono y Animación de Pulso --- */
+.stage {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.success-icon-container {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.success-icon {
+    width: 100px;
+    height: 100px;
+    background-color: #8B0015;
+    /* Verde éxito */
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3.5rem;
+    z-index: 2;
+    box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+}
+
+.pulse-ring {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    border: 4px solid #8B0015;
+    border-radius: 50%;
+    animation: success-pulse 2s infinite;
+    z-index: 1;
+}
+
+@keyframes success-pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1.8);
+        opacity: 0;
+    }
+}
+
+/* --- Capa de Texto --- */
+.info-layer h2 {
+    font-size: 2.2rem;
+    color: #333;
+    font-weight: 800;
+    margin-bottom: 15px;
+}
+
+.info-layer p {
+    font-size: 1.1rem;
+    color: #666;
+    line-height: 1.6;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+/* --- Botón Continuar (Estilo HTAS) --- */
+.btn-continue {
+    margin-top: 40px;
+    padding: 16px 50px;
+    background-color: #8B0015;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-weight: bold;
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(139, 0, 21, 0.2);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-continue:hover {
+    transform: scale(1.05);
+    background-color: #a0001a;
+    box-shadow: 0 15px 30px rgba(139, 0, 21, 0.4);
+}
+
+.btn-continue:active {
+    transform: scale(0.98);
+}
+
+/* --- Responsividad --- */
+@media (max-width: 768px) {
+    .success-card {
+        padding: 40px 15px;
+    }
+
+    .info-layer h2 {
+        font-size: 1.8rem;
+    }
+
+    .info-layer p {
+        font-size: 1rem;
+    }
+
+    .btn-continue {
+        width: 100%;
+        max-width: 280px;
+    }
+}

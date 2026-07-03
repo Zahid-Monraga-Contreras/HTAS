@@ -1,0 +1,67 @@
+<div class="gallery-wrapper" *ngIf="isBrowser">
+    <div #canvasContainer id="canvas-container"></div>
+
+    <div id="ui-layer">
+        @for (slide of slides; track $index) {
+        <div class="slide-content" [id]="'slide-' + $index" [class.active]="currentSlideIndex === $index">
+            <span class="catalogue-number">Módulo {{slide.num}} / Sistema</span>
+            <h1 [innerHTML]="slide.title"></h1>
+            <div class="description">{{slide.description}}</div>
+        </div>
+        }
+
+        <div class="nav-dots">
+            @for (slide of slides; track $index) {
+            <div class="dot" [class.active]="currentSlideIndex === $index" (click)="goToSlide($index)">
+            </div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="marquee-footer-ekg">
+    <div class="ekg-active-layer">
+        <svg class="ekg-svg" viewBox="0 0 120 20" preserveAspectRatio="none">
+            <defs>
+                <mask id="footer-sweep">
+                    <rect x="-120" y="0" width="120" height="20" fill="white">
+                        <animate attributeName="x" from="-120" to="120" dur="3s" repeatCount="indefinite" />
+                    </rect>
+                </mask>
+            </defs>
+
+            <path class="ekg-path" mask="url(#footer-sweep)"
+                d="M0,10 L10,10 L15,3 L20,17 L25,10 L40,10 L45,3 L50,17 L55,10 L70,10 L75,3 L80,17 L85,10 L100,10 L105,3 L110,17 L115,10 L120,10" />
+
+        </svg>
+    </div>
+</div>
+
+<section class="info-section" [class.section-expanded]="expandedCardIndex !== null">
+    <div class="main-wrapper">
+        <div class="info-grid">
+            @for (card of infoCardsContent; track $index) {
+            <div class="info-card" #infoCard [class.expanded]="expandedCardIndex === $index">
+                <div class="card-image-container">
+                    <img [src]="card.image" [alt]="card.title">
+                </div>
+                <div class="card-body">
+                    <h3>{{card.title}}</h3>
+                    <p>{{card.shortDesc}}</p>
+
+                    <div class="extra-info">
+                        <p class="detail-text">{{card.extraInfo}}</p>
+                        <button class="btn-action close-btn" (click)="toggleCard($index)">
+                            Cerrar
+                        </button>
+                    </div>
+
+                    <button *ngIf="expandedCardIndex !== $index" class="btn-action" (click)="toggleCard($index)">
+                        Leer más
+                    </button>
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+</section>

@@ -1,0 +1,275 @@
+<app-menu #sidebar></app-menu>
+
+@if (mostrarToast) {
+<div class="toast-premium-container" [ngClass]="tipoToast">
+    <div class="toast-content">
+        @if (tipoToast === 'success') { <i class="bi bi-check-circle-fill icon-toast"></i> }
+        @if (tipoToast === 'error') { <i class="bi bi-exclamation-triangle-fill icon-toast"></i> }
+        @if (tipoToast === 'warning') { <i class="bi bi-exclamation-circle-fill icon-toast"></i> }
+        <span class="toast-message">{{ mensajeToast }}</span>
+    </div>
+</div>
+}
+
+<main class="main-content" [class.menu-collapsed]="sidebar.isCollapsed">
+    <div class="container-fluid">
+
+        <div class="header-section">
+            <div class="title-group">
+                <h2 class="title-page">Gestión de Tratamientos</h2>
+                <p class="subtitle-page">Administra y supervisa los tratamientos médicos registrados en el sistema.</p>
+            </div>
+
+            <div class="header-controls">
+                <div class="search-box-pill">
+                    <i class="bi bi-search"></i>
+                    <input type="text" [(ngModel)]="searchTerm"
+                        placeholder="Buscar tratamiento (paciente, medicamento)...">
+                </div>
+
+                @if (verificarPermiso('crear')) {
+                <button class="btn-save" (click)="abrirCrear()">
+                    <i class="bi bi-plus-lg"></i>
+                    <span>Nuevo</span>
+                </button>
+                }
+
+                <div class="action-buttons-group" [class.visible]="tratamientoSeleccionado">
+                    @if (verificarPermiso('editar')) {
+                    <button class="btn-action btn-edit-premium" (click)="abrirDetalle(tratamientoSeleccionado)"
+                        title="Editar tratamiento" [disabled]="!tratamientoSeleccionado">
+                        <i class="bi bi-pencil-fill"></i>
+                        <span>Editar</span>
+                    </button>
+                    }
+
+                    @if (verificarPermiso('eliminar')) {
+                    <button class="btn-action btn-delete-premium" (click)="abrirEliminar()"
+                        title="Eliminar tratamiento">
+                        <i class="bi bi-trash-fill"></i>
+                        <span>Eliminar</span>
+                    </button>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Paciente</th>
+                        <th>Medicamento</th>
+                        <th>Dosis / Frecuencia</th>
+                        <th>Periodo del Tratamiento</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (t of tratamientosPaginados; track t.idtratamiento ?? t.id) {
+                    <tr class="user-row" (click)="seleccionarTratamiento(t)"
+                        [class.selected]="tratamientoSeleccionado?.idtratamiento === t.idtratamiento">
+                        <td>
+                            <div class="name-cell-premium">
+                                <div class="avatar-icon-circle">
+                                    <i class="bi bi-heart-pulse-fill"></i>
+                                </div>
+                                <div class="user-info-stack">
+                                    <span class="user-name-main">
+                                        {{ t.nombre_paciente || t.nombrepaciente || 'Paciente #' + t.idpaciente }}
+                                        {{ t.appaternopaciente || '' }} {{ t.apmaternopaciente || '' }}
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-cell-truncate">
+                                <strong>{{ t.nombre_medicamento || t.nombremedicamento || 'Medicamento #' +
+                                    t.idmedicamento }}</strong>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-cell-truncate">
+                                {{ t.dosis }} / cada {{ t.frecuenciahoras || t.frecuenciaHoras }} hrs
+                            </div>
+                        </td>
+                        <td>
+                            <div class="date-cell">
+                                <i class="bi bi-calendar-range me-2 text-muted"></i>
+                                {{ (t.fechainicio || t.fechaInicio) | date:'dd/MM/yyyy' }} - {{ (t.fechafin ||
+                                t.fechaFin) | date:'dd/MM/yyyy' }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="status-pill-container">
+                                <span class="status-chip"
+                                    [class.active-chip]="t.activo === true || t.activo === 'true' || t.estado === 'Activo'"
+                                    [class.danger-chip]="t.activo === false || t.activo === 'false' || t.estado === 'Inactivo'">
+                                    {{ (t.activo === true || t.activo === 'true') ? 'Activo' : 'Inactivo' }}
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                    @if (tratamientosPaginados.length === 0) {
+                    <tr>
+                        <td colspan="5" class="empty-state">
+                            <i class="bi bi-clipboard-pulse"></i>
+                            <p>No se encontraron tratamientos registrados.</p>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="pagination-bar">
+                <span>Mostrando {{ tratamientosPaginados.length }} de {{ tratamientosFiltrados.length }}
+                    tratamientos</span>
+                <div class="nav-arrows">
+                    <button (click)="cambiarPagina(-1)" [disabled]="paginaActual === 0">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                    <span class="page-num">{{ paginaActual + 1 }}</span>
+                    <button (click)="cambiarPagina(1)"
+                        [disabled]="(paginaActual + 1) * itemsPorPagina >= (tratamientosFiltrados.length || 0)">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+@if (mostrarModalCrear) {
+<div class="modal-overlay">
+    <div class="modal-premium-card">
+        <div class="modal-header">
+            <h3>Nuevo Tratamiento Médico</h3>
+            <button type="button" class="btn-close-modal" (click)="cerrarModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-grid-modal">
+
+                <div class="form-group" style="position: relative;">
+                    <label>Paciente</label>
+                    <div class="search-box-pill" style="width: 100%; border-radius: 8px;">
+                        <i class="bi bi-search"></i>
+                        <input type="text" [(ngModel)]="filtroPacienteModal" (focus)="mostrarDropdownPacientes = true"
+                            (blur)="ocultarDropdownPacientes()" placeholder="Buscar paciente...">
+                    </div>
+                    @if (mostrarDropdownPacientes) {
+                    <div class="custom-dropdown-list">
+                        @if (pacientesFiltradosModal.length === 0) {
+                        <div class="custom-dropdown-item" style="color: #94a3b8; cursor: default;">No se encontraron
+                            pacientes registrados.</div>
+                        }
+                        @for (p of pacientesFiltradosModal; track p.idusuario ?? p.id) {
+                        <div class="custom-dropdown-item" (mousedown)="seleccionarPacienteModal(p)">
+                            {{ p.nombre }} {{ p.apPaterno || p.appaterno || '' }} {{ p.apMaterno || p.apmaterno || '' }}
+                        </div>
+                        }
+                    </div>
+                    }
+                </div>
+
+                <div class="form-group" style="position: relative;">
+                    <label>Medicamento</label>
+                    <div class="search-box-pill" style="width: 100%; border-radius: 8px;">
+                        <i class="bi bi-search"></i>
+                        <input type="text" [(ngModel)]="filtroMedicamentoModal"
+                            (focus)="mostrarDropdownMedicamentos = true" (blur)="ocultarDropdownMedicamentos()"
+                            placeholder="Buscar medicamento...">
+                    </div>
+                    @if (mostrarDropdownMedicamentos) {
+                    <div class="custom-dropdown-list">
+                        @if (medicamentosFiltradosModal.length === 0) {
+                        <div class="custom-dropdown-item" style="color: #94a3b8; cursor: default;">No se encontraron
+                            medicamentos registrados.</div>
+                        }
+                        @for (m of medicamentosFiltradosModal; track m.idmedicamento) {
+                        <div class="custom-dropdown-item" (mousedown)="seleccionarMedicamentoModal(m)">
+                            {{ m.nombrecomercial || m.NombreComercial }} ({{ m.sustanciaactiva || m.SustanciaActiva ||
+                            'N/A' }})
+                        </div>
+                        }
+                    </div>
+                    }
+                </div>
+
+                <div class="form-group">
+                    <label>Dosis</label>
+                    <input type="text" [(ngModel)]="nuevoTratamiento.dosis" maxlength="100" class="form-control-premium"
+                        placeholder="Ej: 1 tableta de 500mg, 5 ml...">
+                </div>
+
+                <div class="form-group">
+                    <label>Frecuencia (Horas)</label>
+                    <input type="number" [(ngModel)]="nuevoTratamiento.frecuenciaHoras" min="1" max="168"
+                        class="form-control-premium" placeholder="Ej: 8 (Cada 8 horas)">
+                </div>
+
+                <div class="form-group">
+                    <label for="fechaInicioInput">Fecha de Inicio</label>
+                    <input type="text" id="fechaInicioInput" class="form-control-premium calendar-input"
+                        placeholder="Seleccione la fecha de inicio" [(ngModel)]="nuevoTratamiento.fechaInicio"
+                        name="fechaInicio" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="fechaFinInput">Fecha de Finalización</label>
+                    <input type="text" id="fechaFinInput" class="form-control-premium calendar-input"
+                        placeholder="Seleccione la fecha de término" [(ngModel)]="nuevoTratamiento.fechaFin"
+                        name="fechaFin" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label>Estado Inicial</label>
+                    <select [(ngModel)]="nuevoTratamiento.activo" class="form-control-premium">
+                        <option [ngValue]="true">Activo</option>
+                        <option [ngValue]="false">Inactivo</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group full-width-modal mt-3">
+                <label>Notas e Instrucciones Adicionales</label>
+                <textarea [(ngModel)]="nuevoTratamiento.notasInstrucciones" rows="3" class="form-control-premium"
+                    placeholder="Ej: Tomar después de los alimentos. No suspender repentinamente..."></textarea>
+            </div>
+        </div>
+        <div class="modal-footer-premium">
+            <button type="button" class="btn-cancel-premium" (click)="cerrarModal()"
+                [disabled]="isSaving">Cancelar</button>
+            <button type="button" class="btn-save-appointment" (click)="guardarNuevoTratamiento()"
+                [disabled]="isSaving">
+                @if (isSaving) {
+                <span class="spinner-save"></span>
+                <span>Guardando...</span>
+                } @else {
+                <i class="bi bi-check-lg"></i>
+                <span>Guardar Tratamiento</span>
+                }
+            </button>
+        </div>
+    </div>
+</div>
+}
+
+@if (mostrarModalDelete) {
+<div class="modal-overlay">
+    <div class="modal-content modal-danger">
+        <div class="warning-icon-circle">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+        <h3>¿Eliminar Tratamiento?</h3>
+        <p class="text-muted">Esta acción no se puede deshacer de los expedientes médicos de HTAS.</p>
+        <div class="modal-footer-danger">
+            <button class="btn-danger-confirm btn-save" (click)="confirmarEliminar()" [disabled]="isDeleting">
+                @if (isDeleting) { <span class="spinner-save"></span> }
+                @else { <span>Sí, Eliminar</span> }
+            </button>
+            <button class="btn-outline-cancel" (click)="cerrarModal()" [disabled]="isDeleting">No, volver</button>
+        </div>
+    </div>
+</div>
+}

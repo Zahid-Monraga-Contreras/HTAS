@@ -1,0 +1,244 @@
+/* ==========================================================================
+   LAYOUT ADAPTATIVO (Cálculo del espacio del Menú Lateral y Barra Superior)
+   ========================================================================== */
+.page-content {
+    margin-top: 60px;
+    /* Altura fija de tu .navbar-top */
+    margin-left: 250px;
+    /* Ancho de tu .sidebar-menu expandido */
+    padding: 30px 20px;
+    min-height: calc(100vh - 60px);
+    background-color: #f8f9fa;
+    /* Fondo gris claro clínico para resaltar las tarjetas */
+    box-sizing: border-box;
+    /* Misma transición exacta que usas en tu menú lateral (.sidebar-menu) */
+    transition: margin-left 0.3s ease;
+}
+
+/* Cuando el menú se colapsa, el contenido se mueve suavemente a la izquierda */
+.page-content.sidebar-collapsed {
+    margin-left: 70px;
+    /* Ancho de tu .sidebar-menu.collapsed */
+}
+
+.container-fluid {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* ==========================================================================
+   ELEMENTOS DE TEXTO
+   ========================================================================== */
+h2 {
+    color: #2c3e50;
+    margin-top: 0;
+    margin-bottom: 5px;
+    font-weight: 700;
+}
+
+.subtitle {
+    color: #7f8c8d;
+    margin-bottom: 30px;
+    font-size: 0.95rem;
+}
+
+/* ==========================================================================
+   ESTRUCTURA DE TARJETAS GRID (Responsivo)
+   ========================================================================== */
+.card-layout {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 25px;
+}
+
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    border: 1px solid #e0e0e0;
+    height: fit-content;
+}
+
+h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #333;
+    border-bottom: 2px solid #f1f2f6;
+    padding-bottom: 12px;
+    font-size: 1.15rem;
+}
+
+/* ==========================================================================
+   FORMULARIOS
+   ========================================================================== */
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #4f5d73;
+    font-size: 0.88rem;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccd1d9;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus {
+    border-color: #b0001e;
+    /* Color rojo de tu identidad HTAS */
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(176, 0, 30, 0.1);
+}
+
+button {
+    width: 100%;
+    background-color: #b0001e;
+    /* Color rojo corporativo de HTAS */
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #8c0018;
+}
+
+button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.error-msg {
+    color: #b0001e;
+    font-weight: 600;
+    margin-top: 15px;
+    font-size: 0.9rem;
+}
+
+/* ==========================================================================
+   RESULTADOS DE DIAGNÓSTICO E IA
+   ========================================================================== */
+.badge {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 20px;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-normal {
+    background-color: #2ecc71;
+}
+
+.badge-danger {
+    background-color: #b0001e;
+}
+
+.info-row {
+    margin-bottom: 18px;
+    font-size: 1rem;
+    color: #2c3e50;
+}
+
+.recomendacion-txt {
+    background: #fff5f6;
+    border-left: 4px solid #b0001e;
+    padding: 15px;
+    border-radius: 0 8px 8px 0;
+    font-style: italic;
+    color: #333;
+    line-height: 1.6;
+    margin-top: 8px;
+}
+
+.spinner-container {
+    text-align: center;
+    color: #6c757d;
+    padding: 40px 0;
+    font-style: italic;
+}
+
+/* Botón principal */
+.btn-analizar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    /* Espacio entre el círculo y el texto */
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* El círculo de carga */
+.spinner-button {
+    width: 18px;
+    height: 18px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    /* Círculo de fondo semi-transparente */
+    border-radius: 50%;
+    border-top-color: #fff;
+    /* Parte blanca que va a girar */
+    animation: spin 0.8s linear infinite;
+    /* Animación continua */
+}
+
+/* Deshabilitado durante la carga */
+.btn-analizar:disabled {
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+/* Animación de rotación */
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.htas-prediction-block {
+    background-color: #e3f2fd;
+    border-left: 5px solid #1e88e5;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+}
+
+.htas-prediction-block.htas-danger {
+    background-color: #ffebee;
+    border-left: 5px solid #e53935;
+}
+
+.porcentaje-riesgo {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #d32f2f;
+}
+
+.form-select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background-color: white;
+}

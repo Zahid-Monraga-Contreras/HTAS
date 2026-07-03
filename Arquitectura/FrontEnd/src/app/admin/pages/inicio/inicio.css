@@ -1,0 +1,395 @@
+.main-container {
+    margin-left: 250px;
+    padding-top: 60px;
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 100vh;
+    background-color: #fcfdfe;
+}
+
+.main-container.menu-collapsed {
+    margin-left: 80px;
+}
+
+.dashboard-content {
+    padding: 40px;
+}
+
+.content-header {
+    margin-bottom: 35px;
+}
+
+.text-slate {
+    color: #1e293b;
+}
+
+.font-semibold {
+    font-weight: 600;
+}
+
+/* Tarjetas Estadísticas */
+.stat-card {
+    background: white;
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    height: 100%;
+    border: 1px solid #f1f5f9;
+    transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+}
+
+.border-htas {
+    border-top: 4px solid #b0001e;
+}
+
+.stat-title {
+    font-size: 0.8rem;
+    color: #64748b;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-value {
+    font-size: 1.85rem;
+    font-weight: 800;
+    margin: 12px 0 6px 0;
+    color: #0f172a;
+}
+
+.stat-meta {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.panel-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.rounded-card {
+    border-radius: 16px;
+    border: 1px solid #f1f5f9;
+    background: #ffffff;
+}
+
+/* Sección Control de Medicamentos */
+.meds-list-scroll,
+.citas-list-scroll {
+    max-height: 360px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+/* Scrollbar estética */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.progress-bar {
+    background-color: #b0001e;
+    /* Color institucional */
+}
+
+/* Contenedor de Citas */
+.cita-card-item {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid #64748b;
+    /* Por defecto */
+    transition: background-color 0.2s ease;
+}
+
+.cita-card-item:hover {
+    background-color: #f1f5f9;
+}
+
+.cita-doctor {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #334155;
+}
+
+.cita-fecha {
+    font-size: 0.8rem;
+}
+
+/* Insignias de Estado (Badges) */
+.badge {
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.badge-success {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.badge-warning {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.badge-danger {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.badge-info {
+    background-color: #e0f2fe;
+    color: #0369a1;
+}
+
+/* Loading state spinner */
+.spinner-loading {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e2e8f0;
+    border-radius: 50%;
+    border-top-color: #b0001e;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 768px) {
+    .main-container {
+        margin-left: 0;
+        padding: 15px;
+        padding-top: 80px;
+    }
+
+    .dashboard-content {
+        padding: 0;
+    }
+}
+
+/* Estructuras de las Citas Dinámicas */
+.cita-card-item {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid #94a3b8;
+    /* Por defecto */
+    transition: all 0.2s ease-in-out;
+}
+
+.cita-card-item:hover {
+    background-color: #f8fafc;
+    transform: translateX(2px);
+}
+
+/* Indicadores de borde según estado del Backend */
+.cita-card-item.programada,
+.cita-card-item.confirmada,
+.cita-card-item.activa {
+    border-left-color: #10b981;
+}
+
+.cita-card-item.pendiente {
+    border-left-color: #f59e0b;
+}
+
+.cita-card-item.cancelada {
+    border-left-color: #ef4444;
+    opacity: 0.7;
+}
+
+.cita-motivo {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.cita-paciente {
+    font-weight: 500;
+}
+
+.extra-small {
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.modalidad-tag {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    background-color: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+/* El resto de tus estilos generales de menú y grid se mantienen idénticos */
+.main-container {
+    margin-left: 250px;
+    padding-top: 60px;
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 100vh;
+    background-color: #fcfdfe;
+}
+
+.main-container.menu-collapsed {
+    margin-left: 80px;
+}
+
+.dashboard-content {
+    padding: 40px;
+}
+
+.content-header {
+    margin-bottom: 35px;
+}
+
+.text-slate {
+    color: #1e293b;
+}
+
+.font-semibold {
+    font-weight: 600;
+}
+
+.stat-card {
+    background: white;
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    height: 100%;
+    border: 1px solid #f1f5f9;
+    transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+}
+
+.border-htas {
+    border-top: 4px solid #b0001e;
+}
+
+.stat-title {
+    font-size: 0.8rem;
+    color: #64748b;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.stat-value {
+    font-size: 1.85rem;
+    font-weight: 800;
+    margin: 12px 0 6px 0;
+    color: #0f172a;
+}
+
+.stat-meta {
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+
+.panel-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.rounded-card {
+    border-radius: 16px;
+    border: 1px solid #f1f5f9;
+    background: #ffffff;
+}
+
+.meds-list-scroll,
+.citas-list-scroll {
+    max-height: 360px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.progress-bar {
+    background-color: #b0001e;
+}
+
+.badge {
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.badge-success {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.badge-warning {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.badge-danger {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.badge-info {
+    background-color: #e0f2fe;
+    color: #0369a1;
+}
+
+.spinner-loading {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e2e8f0;
+    border-radius: 50%;
+    border-top-color: #b0001e;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 768px) {
+    .main-container {
+        margin-left: 0;
+        padding: 15px;
+        padding-top: 80px;
+    }
+
+    .dashboard-content {
+        padding: 0;
+    }
+}
+
+/* ==========================================================================
+   AGREGADO EXCLUSIVO PARA RENDERIZADO DE CONTENEDORES CANVAS (CHART.JS)
+   ========================================================================== */
+.chart-wrapper {
+    width: 100%;
+    display: block;
+    position: relative;
+}

@@ -1,0 +1,215 @@
+/* ==========================================================================
+   Estilos base compartidos y paleta de colores integrada
+   ========================================================================== */
+.main-content {
+    margin-top: 60px;
+    margin-left: 260px;
+    padding: 40px;
+    transition: all 0.3s ease;
+    min-height: calc(100vh - 70px);
+    background-color: #f4f6f9;
+}
+
+.main-content.content-collapsed {
+    margin-left: 80px;
+}
+
+.profile-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.profile-card {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e1e4e8;
+}
+
+.mb-4 {
+    margin-bottom: 24px;
+}
+
+/* ==========================================================================
+   Componentes Específicos de Notificaciones
+   ========================================================================== */
+.section-header {
+    margin-bottom: 30px;
+}
+
+.section-header h2 {
+    color: #2c3e50;
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.section-header h2 i {
+    color: #b0001e;
+    /* Tu Color Rojo */
+}
+
+.section-header p {
+    color: #6c757d;
+    margin: 0;
+}
+
+.role-indicator {
+    margin-bottom: 15px;
+}
+
+.role-tag {
+    background: #b0001e;
+    /* Tu Color Rojo */
+    color: white;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    text-transform: uppercase;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.profile-card h3 {
+    font-size: 18px;
+    color: #2c3e50;
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.text-primary-color {
+    color: #b0001e !important;
+}
+
+/* Lista de ítems de notificación */
+.notification-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.notification-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    border-radius: 12px;
+    background-color: #fafbfc;
+    border: 1px solid #f0f2f5;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.notification-item:hover {
+    transform: translateY(-2px);
+    background-color: #fcfdfe;
+    border-color: #e1e4e8;
+}
+
+/* Contenedor circular del icono */
+.notification-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.notification-body {
+    flex-grow: 1;
+}
+
+.notification-text {
+    font-size: 14px;
+    color: #2c3e50;
+    margin: 0 0 4px 0;
+    line-height: 1.4;
+}
+
+.notification-time {
+    font-size: 12px;
+    color: #95a5a6;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.badge-tipo {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #6c757d;
+    display: block;
+    margin-bottom: 2px;
+    letter-spacing: 0.5px;
+}
+
+/* Tarjeta especial para bienvenida de paciente */
+.welcome-card {
+    border-left: 5px solid #28a745;
+    /* Color Verde Éxito */
+    background: #f8fff9;
+}
+
+.layout-huge-icon {
+    font-size: 40px;
+    margin-right: 20px;
+}
+
+/* Clases de colores dinámicos alineadas con la paleta corporativa */
+.bg-red {
+    background-color: #b0001e;
+}
+
+.bg-green {
+    background-color: #28a745;
+}
+
+.bg-blue {
+    background-color: #007bff;
+}
+
+.bg-purple {
+    background-color: #6f42c1;
+}
+
+.bg-orange {
+    background-color: #fd7e14;
+}
+
+.bg-secondary {
+    background-color: #6c757d;
+}
+
+.text-success {
+    color: #28a745 !important;
+}
+
+.d-flex {
+    display: flex;
+}
+
+.align-items-center {
+    align-items: center;
+}
+
+.margin-0 {
+    margin: 0;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 0 !important;
+        padding: 20px;
+    }
+
+    .notification-item {
+        align-items: flex-start;
+    }
+}

@@ -1,0 +1,27 @@
+<header class="main-header">
+    <div class="logo">
+        <a routerLink="/landing">HTAS</a>
+    </div>
+    <div class="menu-toggle" (click)="toggleMenu()">
+        {{ isMenuOpen ? 'X' : '☰'}}
+    </div>
+    <nav class="main-nav" [class.active]="isMenuOpen">
+        <ul>
+            <li><a style="cursor: pointer;" (click)="scrollToFragment('inicio')"
+                    [class.active]="activeSection === 'inicio'">Inicio</a></li>
+            <li><a style="cursor: pointer;" (click)="scrollToFragment('nosotros')"
+                    [class.active]="activeSection === 'nosotros'">Conocenos</a></li>
+            <li><a style="cursor: pointer;" (click)="scrollToFragment('recursos')"
+                    [class.active]="activeSection === 'recursos'">Recursos</a></li>
+            <li><a style="cursor: pointer;" (click)="scrollToFragment('pagos')"
+                    [class.active]="activeSection === 'pagos'">Pagos</a>
+            </li>
+            <li><a style="cursor: pointer;" (click)="scrollToFragment('contacto')"
+                    [class.active]="activeSection === 'contacto'">Contactos</a></li>
+            <li><a routerLink="/login" routerLinkActive="active" (click)="closeMenu()">Iniciar Sesión</a></li>
+        </ul>
+    </nav>
+    <div class="scroll-progress-container">
+        <div class="scroll-progress-bar" [style.width.%]="scrollPercentage"></div>
+    </div>
+</header>

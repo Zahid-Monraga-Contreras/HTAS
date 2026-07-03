@@ -1,0 +1,44 @@
+<div class="error-wrapper">
+    <div class="background-circles">
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+        <div class="circle circle-3"></div>
+        <div class="circle circle-4"></div>
+    </div>
+    <div class="error-card">
+
+        <div class="stage">
+            <div class="pulse-layer">
+                <svg viewBox="0 0 300 100" preserveAspectRatio="none" class="ekg-svg">
+                    <defs>
+                        <mask id="sweep-mask">
+                            <rect x="-300" y="0" width="300" height="100" fill="white">
+                                <animate attributeName="x" from="-300" to="300" dur="3s" repeatCount="indefinite" />
+                            </rect>
+                        </mask>
+                    </defs>
+
+                    <path class="ekg-line" mask="url(#sweep-mask)"
+                        d="M0,50 L20,50 L25,30 L30,70 L35,10 L40,90 L45,50 L70,50 L75,30 L80,70 L85,10 L90,90 L95,50 L120,50 L125,30 L130,70 L135,10 L140,90 L145,50 L170,50 L175,30 L180,70 L185,10 L190,90 L195,50 L220,50 L225,30 L230,70 L235,10 L240,90 L245,50 L270,50 L280,30 L290,70 L300,50" />
+                </svg>
+            </div>
+
+            <div class="numbers-layer">
+                <span>4</span>
+                <div class="heart-container">
+                    <div class="heart"></div>
+                </div>
+                <span>4</span>
+            </div>
+        </div>
+
+        <div class="info-layer">
+            <h2>Página sin Signos Vitales</h2>
+            <p>El recurso que buscas no está respondiendo en este momento.</p>
+            <button class="btn-reanimate" (click)="goToHome()">
+                Volver al inicio
+            </button>
+        </div>
+
+    </div>
+</div>

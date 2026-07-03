@@ -1,0 +1,160 @@
+.preloader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(15px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+}
+
+.preloader-overlay.fade-out {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.heart-container {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.heart-svg {
+    width: 80px;
+    height: 80px;
+    filter: drop-shadow(0 0 15px rgba(176, 0, 30, 0.4));
+    z-index: 10;
+    position: relative;
+    animation: heartbeat 1.2s ease-in-out infinite;
+}
+
+.heart-pulse-svg {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    opacity: 0;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.pulse-1 {
+    animation: heartPulseAnim 2s ease-out infinite;
+}
+
+.pulse-2 {
+    animation: heartPulseAnim 2s ease-out infinite 0.7s;
+}
+
+@keyframes heartPulseAnim {
+    0% {
+        transform: scale(1);
+        opacity: 0.4;
+    }
+
+    100% {
+        transform: scale(3);
+        opacity: 0;
+    }
+}
+
+#clip-rect {
+    animation: fillHeart 2s ease-in-out forwards;
+}
+
+@keyframes fillHeart {
+    0% {
+        y: 32;
+    }
+
+    100% {
+        y: 0;
+    }
+}
+
+@keyframes heartbeat {
+    0% {
+        transform: scale(1);
+    }
+
+    15% {
+        transform: scale(1.15);
+    }
+
+    30% {
+        transform: scale(1);
+    }
+
+    45% {
+        transform: scale(1.25);
+    }
+
+    70% {
+        transform: scale(1);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: scale(2.5);
+        opacity: 0;
+    }
+}
+
+.loading-text {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    letter-spacing: 4px;
+    font-size: 0.9rem;
+    color: #333;
+    display: flex;
+    align-items: center;
+}
+
+.text-gradient {
+    background: linear-gradient(90deg, #b0001e, #ff6b6b);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.loading-dots span {
+    animation: blink 1.4s infinite both;
+}
+
+.loading-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.loading-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes blink {
+    0% {
+        opacity: 0.2;
+    }
+
+    20% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.2;
+    }
+}

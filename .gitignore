@@ -1,0 +1,10 @@
+*.env
+.env
+.env.local
+node_modules/
+dist/
+.angular/
+
+*.json
+Metodologia/*.json
+*client_secret*

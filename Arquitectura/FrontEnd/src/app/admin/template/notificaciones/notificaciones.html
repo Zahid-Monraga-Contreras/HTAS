@@ -1,0 +1,205 @@
+<app-menu #sidebar></app-menu>
+
+<div class="main-content" [class.content-collapsed]="sidebar.isCollapsed">
+    <div class="profile-container">
+
+        <div class="section-header">
+            <h2><i class="bi bi-bell-fill"></i> Centro de Notificaciones</h2>
+            <p>Gestión de alertas y avisos del sistema</p>
+        </div>
+
+        <!-- ================= PANEL MÉDICO ================= -->
+        @if (rolUsuario === 'Doctor' || rolUsuario === 'Medico') {
+        <div class="role-indicator">
+            <span class="role-tag">Panel Médico</span>
+        </div>
+
+        <!-- Tarjeta de Bienvenida Personalizada -->
+        <div class="profile-card mb-4 welcome-card">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-patch-check-fill text-success layout-huge-icon me-3"></i>
+                <div>
+                    <h3>¡Bienvenido al Panel Médico de HTAS!</h3>
+                    <p class="margin-0">Tu cuenta está activa. Aquí puedes supervisar las alertas clínicas, nuevos
+                        registros de usuarios y la actividad de los dispositivos médicos en tiempo real.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-card mb-4">
+            <h3><i class="bi bi-people-fill text-primary-color"></i> Nuevos Registros en el Sistema</h3>
+            <div class="notification-list">
+                @for (usuario of registrosUsuarios; track usuario.idusuario) {
+                <div class="notification-item">
+                    <div class="notification-icon bg-red"><i class="bi bi-person-plus-fill"></i></div>
+                    <div class="notification-body">
+                        <p class="notification-text">El usuario <strong>{{usuario.nombre}}</strong> se ha registrado
+                            como <strong>{{usuario.rol}}</strong>.</p>
+                        <span class="notification-time"><i class="bi bi-clock"></i> {{usuario.fecha}}</span>
+                    </div>
+                </div>
+                } @empty {
+                <p class="text-muted text-center py-3">No hay registros de nuevos usuarios recientes.</p>
+                }
+            </div>
+        </div>
+
+        <div class="profile-card">
+            <h3><i class="bi bi-heart-pulse-fill text-primary-color"></i> Alertas de Control Clínico (Citas,
+                Tratamientos, Medicamentos y Dispositivos)</h3>
+            <div class="notification-list">
+                @for (alerta of alertasMedicas; track alerta.id) {
+                <div class="notification-item">
+                    <div class="notification-icon" [ngClass]="obtenerIconoClase(alerta.tipo)">
+                        <i [ngClass]="obtenerIconoNotificacion(alerta.tipo)"></i>
+                    </div>
+                    <div class="notification-body">
+                        <span class="badge-tipo">{{alerta.tipo}}</span>
+                        <p class="notification-text">{{alerta.mensaje}}</p>
+                        <span class="notification-time"><i class="bi bi-clock"></i> {{alerta.fecha}}</span>
+                    </div>
+                </div>
+                } @empty {
+                <p class="text-muted text-center py-3">No se registran alertas clínicas pendientes.</p>
+                }
+            </div>
+        </div>
+        }
+
+        <!-- ================= PANEL ADMINISTRADOR ================= -->
+        @if (rolUsuario === 'Administrador' || rolUsuario === 'admin') {
+        <div class="role-indicator">
+            <span class="role-tag">Panel Administrador</span>
+        </div>
+
+        <!-- Tarjeta de Bienvenida Personalizada -->
+        <div class="profile-card mb-4 welcome-card">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-shield-check text-success layout-huge-icon me-3"></i>
+                <div>
+                    <h3>¡Bienvenido al Panel de Control Administrador!</h3>
+                    <p class="margin-0">Acceso total concedido. Desde este centro global puedes auditar los movimientos
+                        de la plataforma, nuevos registros y las incidencias de los dispositivos médicos.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-card mb-4">
+            <h3><i class="bi bi-people-fill text-primary-color"></i> Auditoría de Usuarios Registrados</h3>
+            <div class="notification-list">
+                @for (usuario of registrosUsuarios; track usuario.idusuario) {
+                <div class="notification-item">
+                    <div class="notification-icon bg-red"><i class="bi bi-person-plus-fill"></i></div>
+                    <div class="notification-body">
+                        <p class="notification-text">El usuario <strong>{{usuario.nombre}}</strong> se ha registrado
+                            como <strong>{{usuario.rol}}</strong>.</p>
+                        <span class="notification-time"><i class="bi bi-clock"></i> {{usuario.fecha}}</span>
+                    </div>
+                </div>
+                } @empty {
+                <p class="text-muted text-center py-3">No hay registros de nuevos usuarios recientes.</p>
+                }
+            </div>
+        </div>
+
+        <div class="profile-card">
+            <h3><i class="bi bi-activity text-primary-color"></i> Control y Alertas Globales del Sistema</h3>
+            <div class="notification-list">
+                @for (alerta of alertasMedicas; track alerta.id) {
+                <div class="notification-item">
+                    <div class="notification-icon" [ngClass]="obtenerIconoClase(alerta.tipo)">
+                        <i [ngClass]="obtenerIconoNotificacion(alerta.tipo)"></i>
+                    </div>
+                    <div class="notification-body">
+                        <span class="badge-tipo">{{alerta.tipo}}</span>
+                        <p class="notification-text">{{alerta.mensaje}}</p>
+                        <span class="notification-time"><i class="bi bi-clock"></i> {{alerta.fecha}}</span>
+                    </div>
+                </div>
+                } @empty {
+                <p class="text-muted text-center py-3">No hay alertas globales registradas.</p>
+                }
+            </div>
+        </div>
+        }
+
+        <!-- ================= PANEL PACIENTE ================= -->
+        @if (rolUsuario === 'Paciente') {
+        <div class="role-indicator">
+            <span class="role-tag">Panel Paciente</span>
+        </div>
+
+        <!-- Tarjeta de Bienvenida Personalizada -->
+        <div class="profile-card mb-4 welcome-card">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-patch-check-fill text-success layout-huge-icon me-3"></i>
+                <div>
+                    <h3>¡Registro Exitoso en HTAS!</h3>
+                    <p class="margin-0">Tu cuenta ha sido verificada. Ya puedes realizar el seguimiento de tu salud de
+                        forma segura.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-card">
+            <h3><i class="bi bi-calendar-heart text-primary-color"></i> Mis Actualizaciones Médicas</h3>
+            <div class="notification-list">
+                @for (notif of notificacionesPaciente; track notif.id) {
+                <div class="notification-item">
+                    <div class="notification-icon" [ngClass]="obtenerIconoClase(notif.tipo)">
+                        <i [ngClass]="obtenerIconoNotificacion(notif.tipo)"></i>
+                    </div>
+                    <div class="notification-body">
+                        <span class="badge-tipo">{{notif.tipo}}</span>
+                        <p class="notification-text">{{notif.mensaje}}</p>
+                        <span class="notification-time"><i class="bi bi-clock"></i> {{notif.fecha}}</span>
+                    </div>
+                </div>
+                } @empty {
+                <p class="text-muted text-center py-3">No tienes actualizaciones médicas recientes.</p>
+                }
+            </div>
+        </div>
+        }
+
+        <!-- ================= PANEL ACOMPAÑANTE ================= -->
+        @if (rolUsuario === 'Acompañante') {
+        <div class="role-indicator">
+            <span class="role-tag">Panel Acompañante</span>
+        </div>
+
+        <!-- Tarjeta de Bienvenida Personalizada -->
+        <div class="profile-card mb-4 welcome-card">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-heart-fill text-danger layout-huge-icon me-3"></i>
+                <div>
+                    <h3>¡Bienvenido al Panel de Acompañamiento!</h3>
+                    <p class="margin-0">Gracias por tu apoyo continuo. En este espacio podrás monitorear de cerca el
+                        estado de salud, citas programadas y tratamientos de tus pacientes asignados.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-card">
+            <h3><i class="bi bi-shield-heart text-primary-color"></i> Monitoreo de Pacientes Asignados</h3>
+            <div class="notification-list">
+                @for (item of notificacionesAcompanante; track item.id) {
+                <div class="notification-item">
+                    <div class="notification-icon" [ngClass]="obtenerIconoClase(item.tipo)">
+                        <i [ngClass]="obtenerIconoNotificacion(item.tipo)"></i>
+                    </div>
+                    <div class="notification-body">
+                        <span class="badge-tipo">{{item.tipo}}</span>
+                        <p class="notification-text">{{item.mensaje}}</p>
+                        <span class="notification-time"><i class="bi bi-clock"></i> {{item.fecha}}</span>
+                    </div>
+                </div>
+                } @empty {
+                <p class="text-muted text-center py-3">No hay alertas de monitoreo para tus pacientes asignados.</p>
+                }
+            </div>
+        </div>
+        }
+
+    </div>
+</div>

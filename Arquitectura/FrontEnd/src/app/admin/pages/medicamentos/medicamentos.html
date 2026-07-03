@@ -1,0 +1,215 @@
+<app-menu #sidebar></app-menu>
+
+@if (mostrarToast) {
+<div class="toast-premium-container" [ngClass]="tipoToast">
+    <div class="toast-content">
+        @if (tipoToast === 'success') { <i class="bi bi-check-circle-fill icon-toast"></i> }
+        @if (tipoToast === 'error') { <i class="bi bi-exclamation-triangle-fill icon-toast"></i> }
+        @if (tipoToast === 'warning') { <i class="bi bi-exclamation-circle-fill icon-toast"></i> }
+        <span class="toast-message">{{ mensajeToast }}</span>
+    </div>
+</div>
+}
+
+<main class="main-content" [class.menu-collapsed]="sidebar.isCollapsed">
+    <div class="container-fluid">
+
+        <div class="header-section">
+            <div class="title-group">
+                <h2 class="title-page">Gestión de Medicamentos</h2>
+                <p class="subtitle-page">Administra el catálogo de medicamentos disponibles en el sistema.</p>
+            </div>
+
+            <div class="header-controls">
+                <div class="search-box-pill">
+                    <i class="bi bi-search"></i>
+                    <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar medicamento...">
+                </div>
+
+                <!-- CONTROL DE RENDERIZADO PARA AGREGAR NUEVO MEDICAMENTO -->
+                @if (canAdd) {
+                <button class="btn-save" (click)="abrirCrear()">
+                    <i class="bi bi-plus-lg"></i>
+                    <span>Nuevo</span>
+                </button>
+                }
+
+                <!-- CONTROL DE RENDERIZADO PARA ACCIONES (EDITAR / ELIMINAR) -->
+                @if (canEdit || canDelete) {
+                <div class="action-buttons-group" [class.visible]="medicamentoSeleccionado">
+
+                    @if (canEdit) {
+                    <button class="btn-action btn-edit-premium" (click)="abrirDetalle(medicamentoSeleccionado)"
+                        title="Editar medicamento" [disabled]="!medicamentoSeleccionado">
+                        <i class="bi bi-pencil-fill"></i>
+                        <span>Editar</span>
+                    </button>
+                    }
+
+                    @if (canDelete) {
+                    <button class="btn-action btn-delete-premium" (click)="abrirEliminar()"
+                        title="Eliminar medicamento">
+                        <i class="bi bi-trash-fill"></i>
+                        <span>Eliminar</span>
+                    </button>
+                    }
+
+                </div>
+                }
+            </div>
+        </div>
+
+        <div class="table-card">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Nombre Comercial</th>
+                        <th>Sustancia Activa</th>
+                        <th>Presentación</th>
+                        <th>Concentración</th>
+                        <th>Laboratorio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (m of medicamentosPaginados; track m.idmedicamento ?? $index) {
+                    <tr class="user-row" (click)="seleccionarMedicamento(m)"
+                        [class.selected]="medicamentoSeleccionado && (medicamentoSeleccionado.idmedicamento === m.idmedicamento)">
+                        <td>
+                            <div class="name-cell-premium">
+                                <div class="avatar-icon-circle">
+                                    <i class="bi bi-capsule-pill"></i>
+                                </div>
+                                <div class="user-info-stack">
+                                    <span class="user-name-main">{{ m.nombrecomercial }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-cell-truncate">{{ m.sustanciaactiva || 'No definida' }}</div>
+                        </td>
+                        <td>
+                            <div class="date-cell">
+                                <i class="bi bi-box-seam me-2 text-muted"></i>
+                                {{ m.presentacion || 'No definida' }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="date-cell">
+                                <i class="bi bi-prescription2 me-2 text-muted"></i>
+                                {{ m.concentracion || 'No definida' }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="date-cell">
+                                <i class="bi bi-building me-2 text-muted"></i>
+                                {{ m.laboratorio || 'No definido' }}
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                    @if (medicamentosPaginados.length === 0) {
+                    <tr>
+                        <td colspan="5" class="empty-state">
+                            <i class="bi bi-capsule-pill"></i>
+                            <p>No se encontraron medicamentos registrados.</p>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="pagination-bar">
+                <span>Mostrando {{ medicamentosPaginados.length }} de {{ medicamentosFiltrados.length }}
+                    medicamentos</span>
+                <div class="nav-arrows">
+                    <button (click)="cambiarPagina(-1)" [disabled]="paginaActual === 0">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                    <span class="page-num">{{ paginaActual + 1 }}</span>
+                    <button (click)="cambiarPagina(1)"
+                        [disabled]="(paginaActual + 1) * itemsPorPagina >= (medicamentosFiltrados.length || 0)">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+@if (mostrarModalCrear) {
+<div class="modal-overlay">
+    <div class="modal-premium-card">
+        <div class="modal-header">
+            <h3>Nuevo Medicamento</h3>
+            <button type="button" class="btn-close-modal" (click)="cerrarModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-grid-modal">
+                <div class="form-group" style="grid-column: span 2;">
+                    <label>Nombre Comercial</label>
+                    <input type="text" [(ngModel)]="nuevoMedicamento.nombreComercial" maxlength="100"
+                        class="form-control-premium" placeholder="Ej: Amoxicilina, Ibuprofeno...">
+                </div>
+                <div class="form-group">
+                    <label>Sustancia Activa</label>
+                    <input type="text" [(ngModel)]="nuevoMedicamento.sustanciaActiva" maxlength="100"
+                        class="form-control-premium" placeholder="Ej: Paracetamol...">
+                </div>
+                <div class="form-group">
+                    <label>Presentación</label>
+                    <input type="text" [(ngModel)]="nuevoMedicamento.presentacion" maxlength="50"
+                        class="form-control-premium" placeholder="Ej: Caja, Jarabe, Ampolletas...">
+                </div>
+                <div class="form-group">
+                    <label>Concentración</label>
+                    <input type="text" [(ngModel)]="nuevoMedicamento.concentracion" maxlength="50"
+                        class="form-control-premium" placeholder="Ej: 500 mg, 10 ml...">
+                </div>
+                <div class="form-group">
+                    <label>Laboratorio</label>
+                    <input type="text" [(ngModel)]="nuevoMedicamento.laboratorio" maxlength="100"
+                        class="form-control-premium" placeholder="Ej: Bayer, Genomma Lab...">
+                </div>
+            </div>
+            <div class="form-group full-width-modal mt-3">
+                <label>Indicaciones Generales</label>
+                <textarea [(ngModel)]="nuevoMedicamento.indicacionesGenerales" rows="3" class="form-control-premium"
+                    placeholder="Describe el uso del medicamento e indicaciones..."></textarea>
+            </div>
+        </div>
+        <div class="modal-footer-premium">
+            <button type="button" class="btn-cancel-premium" (click)="cerrarModal()"
+                [disabled]="isSaving">Cancelar</button>
+            <button type="button" class="btn-save-appointment" (click)="guardarNuevoMedicamento()"
+                [disabled]="isSaving">
+                @if (isSaving) {
+                <span class="spinner-save"></span>
+                <span>Guardando...</span>
+                } @else {
+                <i class="bi bi-check-lg"></i>
+                <span>Guardar Medicamento</span>
+                }
+            </button>
+        </div>
+    </div>
+</div>
+}
+
+@if (mostrarModalDelete) {
+<div class="modal-overlay">
+    <div class="modal-content modal-danger">
+        <div class="warning-icon-circle">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+        <h3>¿Eliminar Medicamento?</h3>
+        <p class="text-muted">Esta acción no se puede deshacer.</p>
+        <div class="modal-footer-danger">
+            <button class="btn-danger-confirm" (click)="confirmarEliminar()" [disabled]="isDeleting">
+                @if (isDeleting) { <span class="spinner-save"></span> }
+                @else { <span>Sí, Eliminar</span> }
+            </button>
+            <button class="btn-outline-cancel" (click)="cerrarModal()" [disabled]="isDeleting">No, volver</button>
+        </div>
+    </div>
+</div>
+}

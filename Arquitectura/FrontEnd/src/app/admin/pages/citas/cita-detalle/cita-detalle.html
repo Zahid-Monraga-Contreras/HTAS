@@ -1,0 +1,129 @@
+<app-menu #sidebar></app-menu>
+
+@if (mostrarToast) {
+<div class="toast-premium-container" [ngClass]="tipoToast">
+    <div class="toast-content">
+        @if (tipoToast === 'success') { <i class="bi bi-check-circle-fill icon-toast"></i> }
+        @if (tipoToast === 'error') { <i class="bi bi-exclamation-triangle-fill icon-toast"></i> }
+        @if (tipoToast === 'warning') { <i class="bi bi-exclamation-circle-fill icon-toast"></i> }
+        <span class="toast-message">{{ mensajeToast }}</span>
+    </div>
+</div>
+}
+
+<main class="main-content" [class.menu-collapsed]="sidebar.isCollapsed">
+    @if (citaSeleccionada) {
+    <div class="container-fluid">
+        <div class="header-section">
+            <div class="title-group">
+                <h2 class="title-page">Editar Cita Médica</h2>
+                <p class="subtitle-page">Actualiza la información detallada de la cita.</p>
+            </div>
+
+            <div class="header-controls">
+                <button class="btn-cancel-premium" (click)="volver()">
+                    <i class="bi bi-arrow-left"></i>
+                    <span>Volver a la lista</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="detail-card">
+
+            <div class="section-block">
+                <h4 class="section-title">
+                    Información del Paciente
+                </h4>
+                <div class="form-grid readonly-grid">
+                    <div class="form-group">
+                        <label>Nombre del Paciente</label>
+                        <input type="text" class="form-control-premium readonly-field"
+                            [value]="citaSeleccionada.nombrepaciente + ' ' + citaSeleccionada.appaternopaciente + ' ' + (citaSeleccionada.apmaternopaciente || '')"
+                            readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Correo del Paciente</label>
+                        <input type="email" class="form-control-premium readonly-field"
+                            [value]="citaSeleccionada.correopaciente || 'No registrado'" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Teléfono del Paciente</label>
+                        <input type="text" class="form-control-premium readonly-field"
+                            [value]="citaSeleccionada.telefonopaciente || 'No registrado'" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="section-divider">
+
+            <div class="section-block">
+                <h4 class="section-title">
+                    Detalles de la Cita
+                </h4>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Fecha de la Cita</label>
+                        <input type="text" id="fechaCitaDetalleInput" [(ngModel)]="citaSeleccionada.fechacita"
+                            placeholder="Seleccione fecha" class="form-control-premium" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Hora de la Cita</label>
+                        <input type="text" id="horaCitaDetalleInput" [(ngModel)]="citaSeleccionada.horacita"
+                            placeholder="Seleccione hora" class="form-control-premium" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Modalidad</label>
+                        <select [(ngModel)]="citaSeleccionada.modalidad" class="form-control-premium">
+                            @for (m of modalidades; track m) {
+                            <option [value]="m">{{ m }}</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Estado de la Cita</label>
+                        <select [(ngModel)]="citaSeleccionada.estado" class="form-control-premium">
+                            @for (e of estadosCita; track e) {
+                            <option [value]="e">{{ e }}</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>Motivo de la Consulta</label>
+                        <input type="text" [(ngModel)]="citaSeleccionada.motivo" maxlength="255"
+                            class="form-control-premium" placeholder="Ej: Control de rutina, revisión general...">
+                    </div>
+                </div>
+
+                <div class="form-group full-width-group">
+                    <label>Síntomas del Paciente</label>
+                    <textarea [(ngModel)]="citaSeleccionada.sintomas" rows="3" class="form-control-premium"
+                        placeholder="Síntomas reportados por el paciente..."></textarea>
+                </div>
+
+                <div class="form-group full-width-group">
+                    <label>Notas del Doctor</label>
+                    <textarea [(ngModel)]="citaSeleccionada.notasdoctor" rows="3" class="form-control-premium"
+                        placeholder="Diagnóstico, indicaciones médicas u observaciones..."></textarea>
+                </div>
+            </div>
+
+            <div class="action-footer">
+                <button class="btn-cancel-premium" (click)="volver()" [disabled]="isSaving">Cancelar</button>
+                <button class="btn-save" (click)="guardarCambios()" [disabled]="isSaving">
+                    @if (isSaving) {
+                    <span class="spinner-save"></span>
+                    <span>Guardando...</span>
+                    } @else {
+                    <i class="bi bi-check-lg"></i>
+                    <span>Guardar Cambios</span>
+                    }
+                </button>
+            </div>
+        </div>
+    </div>
+    }
+</main>

@@ -1,0 +1,321 @@
+.main-content {
+    margin-left: 250px;
+    padding: 85px 40px 40px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 100vh;
+    background-color: #fcfdfe;
+}
+
+.main-content.menu-collapsed {
+    margin-left: 80px;
+}
+
+.container-fluid {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.title-page {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin: 0;
+    letter-spacing: -0.5px;
+}
+
+.subtitle-page {
+    color: #64748b;
+    font-size: 1rem;
+    margin: 0;
+}
+
+.detail-card {
+    background: white;
+    border-radius: 16px;
+    padding: 2.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Secciones internas del card */
+.section-block {
+    margin-bottom: 1.5rem;
+}
+
+.section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section-title i {
+    color: #b0001e;
+    font-size: 1.1rem;
+}
+
+.section-divider {
+    border: none;
+    border-top: 1px solid #e2e8f0;
+    margin: 1.5rem 0;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.readonly-grid {
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 1.25rem;
+    border: 1px dashed #cbd5e1;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.full-width-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #475569;
+}
+
+.form-control-premium {
+    padding: 0.75rem 1rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #1e293b;
+    transition: all 0.2s ease;
+    background: #f8fafc;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-control-premium:focus {
+    outline: none;
+    border-color: #b0001e;
+    box-shadow: 0 0 0 3px rgba(176, 0, 30, 0.1);
+    background: white;
+}
+
+.readonly-field {
+    background: #f1f5f9;
+    color: #64748b;
+    cursor: not-allowed;
+    border-style: dashed;
+}
+
+.action-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    /* Margen entre botones */
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+/* ==========================================================================
+   Estilos de Botones Premium unificados
+   ========================================================================== */
+.btn-save {
+    padding: 0.75rem 2rem;
+    background: #b0001e;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s;
+}
+
+.btn-save:hover:not(:disabled) {
+    background: #8e0018;
+    transform: translateY(-1px);
+}
+
+.btn-save:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Estilo unificado para los botones secundarios/cancelar premium */
+.btn-cancel-premium {
+    padding: 0.75rem 1.5rem;
+    background: white;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s;
+}
+
+.btn-cancel-premium:hover:not(:disabled) {
+    background: #f1f5f9;
+    color: #1e293b;
+    transform: translateY(-1px);
+}
+
+.btn-cancel-premium:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.spinner-save {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ==========================================================================
+   Componente Toast de Notificación Premium Flotante
+   ========================================================================== */
+.toast-premium-container {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    z-index: 10005;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    max-width: 400px;
+    animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: white;
+}
+
+.toast-premium-container.success {
+    background: #10b981;
+    border-left: 6px solid #047857;
+}
+
+.toast-premium-container.error {
+    background: #ef4444;
+    border-left: 6px solid #b91c1c;
+}
+
+.toast-premium-container.warning {
+    background: #f59e0b;
+    border-left: 6px solid #b45309;
+}
+
+.toast-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.icon-toast {
+    font-size: 1.3rem;
+}
+
+.toast-message {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* ==========================================================================
+   Diseño Responsivo (Media Queries)
+   ========================================================================== */
+@media (max-width: 1024px) {
+    .form-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .form-group[style*="span 2"] {
+        grid-column: span 2 !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-group[style*="span"] {
+        grid-column: span 1 !important;
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 1rem;
+        padding-top: 85px;
+    }
+
+    .header-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    /* Adaptación responsiva de botones para móvil */
+    .action-footer {
+        flex-direction: column-reverse;
+    }
+
+    .action-footer button,
+    .header-controls button {
+        width: 100%;
+        justify-content: center;
+    }
+}

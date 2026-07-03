@@ -1,0 +1,60 @@
+<div class="pricing-container">
+    <div class="pricing-header animate-entrance" #animateUp>
+        <h1 class="pricing-title">Invierte en tu Salud Cardiovascular</h1>
+        <p class="pricing-subtitle">Elige el plan que mejor se adapte a tus necesidades. Desde monitoreo básico hasta
+            atención integral con IA.</p>
+    </div>
+
+    <div class="pricing-grid">
+        <!-- Plan Básico (Gratis) -->
+        <div class="pricing-card animate-entrance" #animateUp>
+            <div class="card-content">
+                <h2 class="plan-name">Plan Básico</h2>
+                <p class="plan-description">Comienza a cuidar tu corazón con herramientas esenciales de seguimiento.</p>
+
+                <div class="price-container">
+                    <span class="price-amount">0 MXN</span>
+                    <span class="price-period">gratis para siempre</span>
+                </div>
+
+                <button class="cta-button secondary" (click)="empezarGratis()" [disabled]="loadingBasic || loadingPro">
+                    <span *ngIf="!loadingBasic">Empezar Gratis</span>
+                    <span *ngIf="loadingBasic" class="spinner"></span>
+                </button>
+
+                <ul class="feature-list">
+                    <li><i class="bi bi-check2"></i> Registro manual de presión</li>
+                    <li><i class="bi bi-check2"></i> Historial de los últimos 30 días</li>
+                    <li><i class="bi bi-check2"></i> Perfil de salud básico</li>
+                    <li><i class="bi bi-check2"></i> Consejos generales de salud</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Plan HTAS (Full) -->
+        <div class="pricing-card max animate-entrance" #animateUp>
+            <div class="card-content">
+                <h2 class="plan-name">Plan HTAS Full</h2>
+                <p class="plan-description">Atención integral y monitoreo avanzado para tu salud cardiovascular.</p>
+
+                <div class="price-container">
+                    <span class="price-amount">265 MXN</span>
+                    <span class="price-period">al mes/facturado anualmente</span>
+                </div>
+
+                <button class="cta-button" (click)="contratarPlanFull()" [disabled]="loadingBasic || loadingPro">
+                    <span *ngIf="!loadingPro">Comprar Ahora</span>
+                    <span *ngIf="loadingPro" class="spinner"></span>
+                </button>
+
+                <ul class="feature-list">
+                    <li><i class="bi bi-check2"></i> Monitoreo de presión en tiempo real</li>
+                    <li><i class="bi bi-check2"></i> Diagnósticos preventivos mediante IA</li>
+                    <li><i class="bi bi-check2"></i> Alertas compartidas con familiares/médicos</li>
+                    <li><i class="bi bi-check2"></i> Historial ilimitado y análisis de tendencias</li>
+                    <li><i class="bi bi-check2"></i> Reportes detallados y recomendaciones personalizadas</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
