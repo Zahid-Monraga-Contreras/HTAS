@@ -1271,3 +1271,1309 @@ input[type="date"] {
   cursor: not-allowed;
   text-decoration: none;
 }
+
+/* ============================================================
+   NUEVOS ESTILOS PARA FORMULARIO POR PASOS (REGISTRO)
+   ============================================================ */
+
+/* --- BARRA DE PROGRESO --- */
+.progress-steps {
+  width: 100%;
+  max-width: 320px;
+  padding: 0 5px;
+  margin-bottom: 20px;
+}
+
+.step-indicators {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  padding: 0 5px;
+}
+
+.step-dot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+  cursor: default;
+}
+
+.step-dot span {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #e8e8e8;
+  color: #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 3px solid transparent;
+  position: relative;
+}
+
+.step-dot.active span {
+  background: linear-gradient(135deg, #8B0015 0%, #b0001e 100%);
+  color: #fff;
+  border-color: #8B0015;
+  transform: scale(1.1);
+  box-shadow: 0 4px 15px rgba(139, 0, 21, 0.35);
+}
+
+.step-dot.completed span {
+  background: #10b981;
+  color: #fff;
+  border-color: #10b981;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
+}
+
+.step-dot.completed span::after {
+  content: '✓';
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.step-label {
+  font-size: 10px;
+  margin-top: 5px;
+  color: #bbb;
+  font-weight: 600;
+  transition: color 0.3s;
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+}
+
+.step-dot.active .step-label,
+.step-dot.completed .step-label {
+  color: #8B0015;
+}
+
+.step-dot.completed .step-label {
+  color: #10b981;
+}
+
+.step-line {
+  flex: 1;
+  height: 3px;
+  background: #e8e8e8;
+  margin: 0 3px;
+  border-radius: 3px;
+  transition: background 0.5s ease;
+  position: relative;
+  z-index: 1;
+  min-width: 20px;
+}
+
+.step-line.active {
+  background: linear-gradient(90deg, #8B0015, #b0001e);
+}
+
+/* --- CONTENIDO DE PASOS --- */
+.step-content {
+  animation: fadeSlideIn 0.35s ease;
+  width: 100%;
+  max-width: 320px;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(15px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* --- WRAPPER PARA CONTRASEÑAS CON OJO --- */
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper .bi-eye,
+.password-wrapper .bi-eye-slash {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+  cursor: pointer;
+  font-size: 18px;
+  transition: color 0.3s ease;
+  z-index: 3;
+  background: transparent;
+  padding: 4px;
+  border-radius: 50%;
+}
+
+.password-wrapper .bi-eye:hover,
+.password-wrapper .bi-eye-slash:hover {
+  color: #8B0015;
+  background: rgba(139, 0, 21, 0.05);
+}
+
+.password-wrapper input {
+  padding-right: 44px !important;
+}
+
+/* --- BOTONES DE NAVEGACIÓN --- */
+.step-navigation {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  margin-top: 16px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.btn-step {
+  padding: 10px 22px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 100px;
+  justify-content: center;
+  font-family: "Montserrat", sans-serif;
+}
+
+.btn-prev {
+  background: #f0f0f0;
+  color: #666;
+  border: 1px solid #e0e0e0;
+}
+
+.btn-prev:hover:not(:disabled) {
+  background: #e8e8e8;
+  transform: translateX(-3px);
+  border-color: #ccc;
+}
+
+.btn-next {
+  background: linear-gradient(135deg, #8B0015 0%, #b0001e 100%);
+  color: #fff;
+  margin-left: auto;
+  border: 1px solid transparent;
+}
+
+.btn-next:hover:not(:disabled) {
+  transform: translateX(3px);
+  box-shadow: 0 4px 15px rgba(139, 0, 21, 0.35);
+}
+
+.btn-submit {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #fff;
+  margin-left: auto;
+  border: 1px solid transparent;
+}
+
+.btn-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.35);
+}
+
+.btn-step:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.btn-step i {
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+}
+
+/* --- RECAPTCHA WRAPPER --- */
+.recaptcha-wrapper {
+  margin-top: 14px;
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  justify-content: center;
+  transform: scale(0.9);
+  transform-origin: center center;
+}
+
+/* --- AJUSTES PARA MÓVIL (steps) --- */
+@media (max-width: 768px) {
+  .progress-steps {
+    max-width: 100%;
+    padding: 0 5px;
+  }
+
+  .step-navigation {
+    max-width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn-step {
+    min-width: 90px;
+    padding: 9px 16px;
+    font-size: 12px;
+    flex: 1;
+  }
+
+  .step-dot span {
+    width: 30px;
+    height: 30px;
+    font-size: 11px;
+  }
+
+  .step-label {
+    font-size: 9px;
+    margin-top: 4px;
+  }
+
+  .recaptcha-wrapper {
+    transform: scale(0.8);
+  }
+
+  .step-content {
+    max-width: 100%;
+  }
+
+  .btn-prev {
+    order: 1;
+  }
+
+  .btn-next,
+  .btn-submit {
+    order: 2;
+  }
+}
+
+@media (max-width: 480px) {
+  .step-dot span {
+    width: 26px;
+    height: 26px;
+    font-size: 10px;
+  }
+
+  .step-label {
+    display: none;
+  }
+
+  .btn-step {
+    min-width: 70px;
+    padding: 8px 12px;
+    font-size: 11px;
+  }
+
+  .step-line {
+    min-width: 10px;
+  }
+}
+
+/* --- ANIMACIÓN DE SHAKE PARA ERRORES --- */
+.step-content .container-input.error-shake {
+  animation: shakeError 0.4s ease;
+}
+
+@keyframes shakeError {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  20% {
+    transform: translateX(-6px);
+  }
+
+  40% {
+    transform: translateX(6px);
+  }
+
+  60% {
+    transform: translateX(-4px);
+  }
+
+  80% {
+    transform: translateX(4px);
+  }
+}
+
+/* --- ESTILO PARA INPUTS CON ERROR EN PASOS --- */
+.step-content .container-input.input-error {
+  border: 1.5px solid #e74c3c !important;
+  background-color: #fff5f5 !important;
+}
+
+.step-content .container-input.input-error i {
+  color: #e74c3c !important;
+}
+
+/* --- INDICADOR DE CAMPO OBLIGATORIO --- */
+.required-field::after {
+  content: '*';
+  color: #8B0015;
+  font-weight: 700;
+  margin-left: 2px;
+  font-size: 14px;
+}
+
+/* --- ESTILO PARA EL SELECT EN EL PASO 3 --- */
+.sign-up .container-input .select-custom {
+  font-size: 14px;
+  color: #444;
+}
+
+.sign-up .container-input .select-custom option:disabled {
+  color: #aaa;
+}
+
+/* --- MEJORA EN EL CONTENEDOR DEL FORMULARIO --- */
+.sign-up {
+  padding: 30px 0;
+  gap: 2px;
+}
+
+.sign-up h2 {
+  margin-bottom: 5px;
+}
+
+.sign-up>span {
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #888;
+}
+
+.sign-up .container-input {
+  height: 42px;
+  margin-bottom: 10px;
+}
+
+/* --- AJUSTE PARA EL BOTÓN DE CREAR CUENTA DENTRO DEL PASO 3 --- */
+.sign-up .step-navigation .btn-submit {
+  background: linear-gradient(135deg, #8B0015 0%, #b0001e 100%);
+}
+
+.sign-up .step-navigation .btn-submit:hover:not(:disabled) {
+  box-shadow: 0 4px 20px rgba(139, 0, 21, 0.35);
+  transform: translateY(-2px);
+}
+
+/* --- AJUSTE PARA EL MODAL EN MÓVIL --- */
+@media (max-width: 768px) {
+  .custom-modal {
+    padding: 25px 18px;
+  }
+
+  .custom-modal h3 {
+    font-size: 19px;
+  }
+
+  .custom-modal p {
+    font-size: 14px;
+  }
+}
+
+/* --- ESTILO PARA EL BOTÓN DE REGISTRO COMPLETO --- */
+.btn-submit i {
+  font-size: 16px;
+}
+
+/* --- MEJORA DE VISIBILIDAD DEL PUNTO ACTIVO --- */
+.step-dot.active span {
+  animation: pulseDot 2s infinite;
+}
+
+@keyframes pulseDot {
+
+  0%,
+  100% {
+    box-shadow: 0 4px 15px rgba(139, 0, 21, 0.35);
+  }
+
+  50% {
+    box-shadow: 0 4px 25px rgba(139, 0, 21, 0.55);
+  }
+}
+
+/* --- ESTILO PARA CUANDO EL FORMULARIO ESTÁ CARGANDO --- */
+.btn-step .spinner-border-sm {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+}
+
+/* --- AJUSTE DEL SELECT EN EL PASO 3 PARA QUE SE VEA BIEN --- */
+.container-input select.select-custom {
+  background-color: transparent;
+  padding-right: 30px;
+}
+
+.container-input select.select-custom:focus {
+  outline: none;
+}
+
+/* --- ESTILO PARA EL ARCHIVO PDF (Doctor) --- */
+.file-input-wrapper .file-label {
+  font-size: 13px;
+  color: #666;
+}
+
+.file-input-wrapper.has-file .file-label {
+  color: #8B0015;
+  font-weight: 600;
+}
+
+/* --- ESTILOS PARA EL CALENDARIO (Acompañante) --- */
+.date-wrapper-premium {
+  background-color: #EEEEEE !important;
+  border: 2px solid transparent;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.date-wrapper-premium:focus-within {
+  background-color: #fff !important;
+  border-color: #8B0015;
+  box-shadow: 0 4px 12px rgba(176, 0, 30, 0.1);
+}
+
+.input-clean {
+  border: none;
+  outline: none;
+  background: transparent;
+  width: 100%;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+/* --- ESTILOS DEL PIN EN LOGIN --- */
+.pin-verification-container .container-input input {
+  letter-spacing: 0.8rem;
+  font-weight: 700;
+  text-align: center;
+  font-size: 1.3rem;
+  color: #8B0015;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  background-color: #fcfcfc;
+  transition: all 0.3s ease;
+}
+
+.pin-verification-container .container-input input:focus {
+  border-color: #8B0015;
+  background-color: #fff;
+  box-shadow: 0 0 0 4px rgba(176, 0, 30, 0.05);
+}
+
+.pin-verification-container .button.google-style {
+  background: linear-gradient(135deg, #8B0015 0%, #b0001e 100%);
+  color: #fff;
+  border: none;
+}
+
+.pin-verification-container .button.google-style i {
+  color: #fff;
+}
+
+.pin-verification-container .button.google-style:hover {
+  box-shadow: 0 4px 15px rgba(139, 0, 21, 0.35);
+  transform: translateY(-2px);
+}
+
+.pin-verification-container .button.google-style:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.alert-lock {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  border: 1px solid #ffcdd2;
+  animation: shake 0.5s ease-in-out;
+  width: 100%;
+}
+
+/* --- MEJORA DE RESPONSIVE PARA EL LOGIN EN MÓVIL --- */
+@media (max-width: 768px) {
+  .pin-verification-container {
+    max-width: 100%;
+    padding: 10px 0;
+  }
+
+  .pin-verification-container .container-input {
+    width: 100%;
+  }
+
+  .pin-verification-container .button.google-style {
+    width: 100%;
+  }
+
+  .alert-lock {
+    font-size: 0.8rem;
+    padding: 8px 12px;
+  }
+}
+
+/* --- SEGURIDAD PARA QUE EL CONTENIDO NO SE SALGA --- */
+.sign-in,
+.sign-up {
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: #ddd transparent;
+}
+
+.sign-in::-webkit-scrollbar,
+.sign-up::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sign-in::-webkit-scrollbar-thumb,
+.sign-up::-webkit-scrollbar-thumb {
+  background-color: #ddd;
+  border-radius: 4px;
+}
+
+.sign-in::-webkit-scrollbar-track,
+.sign-up::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* --- ESTILO PARA EL RECAPTCHA EN EL PASO 3 --- */
+.recaptcha-wrapper iframe {
+  border-radius: 8px !important;
+}
+
+/* --- ESTILO PARA EL BOTÓN DE GOOGLE EN LOGIN --- */
+.social-networks .google-btn {
+  width: 320px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background-color: #EEEEEE;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: #444;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 0;
+  margin: 0 auto;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.social-networks .google-btn i {
+  color: #8B0015;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.social-networks .google-btn:hover {
+  background-color: #f5f5f5;
+  border-color: #8B0015;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.social-networks .google-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* --- ESTILO PARA EL BOTÓN DE INICIO DE SESIÓN CON EMAIL --- */
+.button.google-style {
+  width: 320px;
+  height: 45px;
+  background: linear-gradient(135deg, #8B0015 0%, #b0001e 100%);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  margin-top: 5px;
+  padding: 0;
+}
+
+.button.google-style i {
+  color: #fff;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  margin: 0;
+}
+
+.button.google-style:hover:not(:disabled) {
+  box-shadow: 0 4px 15px rgba(139, 0, 21, 0.35);
+  transform: translateY(-2px);
+}
+
+.button.google-style:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* --- RESPONSIVE PARA EL LOGIN EN MÓVIL --- */
+@media (max-width: 768px) {
+
+  .social-networks .google-btn,
+  .button.google-style {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* ============================================================
+   MODIFICACIONES PARA EL LOGIN (QUITAR SCROLL)
+   ============================================================ */
+
+/* --- ELIMINAR SCROLL DEL LOGIN --- */
+.sign-in {
+  overflow: visible !important;
+  padding: 40px 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.sign-in::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* --- MANTENER SCROLL SOLO EN REGISTRO SI ES NECESARIO --- */
+.sign-up {
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 30px 0;
+  gap: 2px;
+  scrollbar-width: thin;
+  scrollbar-color: #ddd transparent;
+}
+
+.sign-up::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sign-up::-webkit-scrollbar-thumb {
+  background-color: #ddd;
+  border-radius: 4px;
+}
+
+.sign-up::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ============================================================
+   NUEVOS ESTILOS PARA FORMULARIO POR PASOS (REGISTRO) - MEJORADOS
+   ============================================================ */
+
+/* --- BARRA DE PROGRESO MEJORADA --- */
+.progress-steps {
+  width: 100%;
+  max-width: 360px;
+  padding: 0 5px;
+  margin-bottom: 25px;
+}
+
+.step-indicators {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  padding: 0 5px;
+}
+
+.step-dot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+  cursor: default;
+}
+
+.step-dot span {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e8e8e8;
+  color: #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 15px;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  position: relative;
+  box-shadow: 0 0 0 3px #e8e8e8, 0 2px 8px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  text-align: center;
+  line-height: 1;
+}
+
+/* Punto activo (actual) */
+.step-dot.active span {
+  background: linear-gradient(135deg, #8B0015 0%, #b0001e 100%);
+  color: #ffffff !important;
+  transform: scale(1.15);
+  box-shadow: 0 0 0 3px #8B0015, 0 4px 20px rgba(139, 0, 21, 0.4);
+  animation: pulseDot 2s infinite;
+}
+
+/* Punto completado con palomita */
+.step-dot.completed span {
+  background: #8B0015;
+  color: #ffffff !important;
+  transform: scale(1.05);
+  box-shadow: 0 0 0 3px #8B0015, 0 4px 20px rgba(16, 185, 129, 0.35);
+}
+
+/* Asegurar que el contenido esté centrado */
+.step-dot span i,
+.step-dot span ng-container,
+.step-dot span span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.step-label {
+  font-size: 11px;
+  margin-top: 6px;
+  color: #bbb;
+  font-weight: 600;
+  transition: color 0.4s ease;
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.step-dot.active .step-label {
+  color: #8B0015;
+  font-weight: 700;
+}
+
+.step-dot.completed .step-label {
+  color: #8B0015;
+  font-weight: 700;
+}
+
+/* Líneas de conexión */
+.step-line {
+  flex: 1;
+  height: 4px;
+  background: #e8e8e8;
+  margin: 0 4px;
+  border-radius: 4px;
+  transition: background 0.6s ease;
+  position: relative;
+  z-index: 1;
+  min-width: 20px;
+}
+
+.step-line.active {
+  background: linear-gradient(90deg, #8B0015, #b0001e);
+}
+
+.step-line.completed {
+  background: #10b981;
+}
+
+/* --- Animación del punto activo --- */
+@keyframes pulseDot {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px #8B0015, 0 4px 20px rgba(139, 0, 21, 0.4);
+  }
+
+  50% {
+    box-shadow: 0 0 0 3px #8B0015, 0 4px 35px rgba(139, 0, 21, 0.6);
+  }
+}
+
+/* --- CONTENIDO DE PASOS --- */
+.step-content {
+  animation: fadeSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+  max-width: 360px;
+}
+
+/* --- ESTILO ESPECIAL PARA EL PASO DE DOCTOR (input más pequeños) --- */
+.step-content.doctor-step .container-input {
+  height: 40px !important;
+  margin-bottom: 10px !important;
+  padding: 0 14px !important;
+}
+
+.step-content.doctor-step .container-input i {
+  font-size: 15px !important;
+}
+
+.step-content.doctor-step .container-input input,
+.step-content.doctor-step .container-input .select-custom {
+  font-size: 13px !important;
+}
+
+.step-content.doctor-step .container-input .file-label {
+  font-size: 13px !important;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* --- INPUTS MÁS GRANDES PARA REGISTRO (Paciente y Acompañante) --- */
+.sign-up .container-input {
+  width: 100%;
+  max-width: 360px;
+  height: 50px;
+  border-radius: 14px;
+  margin-bottom: 14px;
+  padding: 0 20px;
+  background-color: #EEEEEE;
+  transition: all 0.3s ease;
+}
+
+.sign-up .container-input i {
+  font-size: 18px;
+}
+
+.sign-up .container-input input {
+  font-size: 15px;
+}
+
+.sign-up .container-input .select-custom {
+  font-size: 15px;
+}
+
+/* --- WRAPPER PARA CONTRASEÑAS CON OJO --- */
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper .bi-eye,
+.password-wrapper .bi-eye-slash {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+  cursor: pointer;
+  font-size: 20px;
+  transition: color 0.3s ease;
+  z-index: 3;
+  background: transparent;
+  padding: 6px;
+  border-radius: 50%;
+}
+
+.password-wrapper .bi-eye:hover,
+.password-wrapper .bi-eye-slash:hover {
+  color: #8B0015;
+  background: rgba(139, 0, 21, 0.05);
+}
+
+.password-wrapper input {
+  padding-right: 48px !important;
+}
+
+/* --- BOTONES DE NAVEGACIÓN --- */
+.step-navigation {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  margin-top: 20px;
+  width: 100%;
+  max-width: 360px;
+}
+
+.btn-step {
+  padding: 12px 28px;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 120px;
+  justify-content: center;
+  font-family: "Montserrat", sans-serif;
+}
+
+.btn-prev {
+  background: #f0f0f0;
+  color: #666;
+  border: 1px solid #e0e0e0;
+}
+
+.btn-prev:hover:not(:disabled) {
+  background: #e8e8e8;
+  transform: translateX(-3px);
+  border-color: #ccc;
+}
+
+.btn-next {
+  background: linear-gradient(135deg, #8B0015 0%, #b0001e 100%);
+  color: #fff;
+  margin-left: auto;
+  border: 1px solid transparent;
+}
+
+.btn-next:hover:not(:disabled) {
+  transform: translateX(3px);
+  box-shadow: 0 4px 20px rgba(139, 0, 21, 0.4);
+}
+
+.btn-submit {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #fff;
+  margin-left: auto;
+  border: 1px solid transparent;
+}
+
+.btn-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 25px rgba(16, 185, 129, 0.4);
+}
+
+.btn-step:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.btn-step i {
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+}
+
+/* --- RECAPTCHA WRAPPER --- */
+.recaptcha-wrapper {
+  margin-top: 14px;
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  justify-content: center;
+  transform: scale(0.9);
+  transform-origin: center center;
+}
+
+.recaptcha-wrapper iframe {
+  border-radius: 8px !important;
+}
+
+/* --- ESTILO PARA EL BOTÓN DE GOOGLE EN LOGIN --- */
+.social-networks .google-btn {
+  width: 320px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background-color: #EEEEEE;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: #444;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 0;
+  margin: 0 auto;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.social-networks .google-btn i {
+  color: #8B0015;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.social-networks .google-btn:hover {
+  background-color: #f5f5f5;
+  border-color: #8B0015;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.social-networks .google-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* --- ESTILO PARA EL BOTÓN DE INICIO DE SESIÓN CON EMAIL --- */
+.button.google-style {
+  width: 320px;
+  height: 45px;
+  background: linear-gradient(135deg, #8B0015 0%, #b0001e 100%);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  margin-top: 5px;
+  padding: 0;
+}
+
+.button.google-style i {
+  color: #fff;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  margin: 0;
+}
+
+.button.google-style:hover:not(:disabled) {
+  box-shadow: 0 4px 15px rgba(139, 0, 21, 0.35);
+  transform: translateY(-2px);
+}
+
+.button.google-style:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* --- ESTILOS DEL PIN EN LOGIN --- */
+.pin-verification-container .container-input input {
+  letter-spacing: 0.8rem;
+  font-weight: 700;
+  text-align: center;
+  font-size: 1.3rem;
+  color: #8B0015;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  background-color: #fcfcfc;
+  transition: all 0.3s ease;
+}
+
+.pin-verification-container .container-input input:focus {
+  border-color: #8B0015;
+  background-color: #fff;
+  box-shadow: 0 0 0 4px rgba(176, 0, 30, 0.05);
+}
+
+.pin-verification-container .button.google-style {
+  background: linear-gradient(135deg, #8B0015 0%, #b0001e 100%);
+  color: #fff;
+  border: none;
+}
+
+.pin-verification-container .button.google-style i {
+  color: #fff;
+}
+
+.pin-verification-container .button.google-style:hover {
+  box-shadow: 0 4px 15px rgba(139, 0, 21, 0.35);
+  transform: translateY(-2px);
+}
+
+.pin-verification-container .button.google-style:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.alert-lock {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  border: 1px solid #ffcdd2;
+  animation: shake 0.5s ease-in-out;
+  width: 100%;
+}
+
+/* --- MEJORA DE RESPONSIVE --- */
+@media (max-width: 768px) {
+  .pin-verification-container {
+    max-width: 100%;
+    padding: 10px 0;
+  }
+
+  .pin-verification-container .container-input {
+    width: 100%;
+  }
+
+  .pin-verification-container .button.google-style {
+    width: 100%;
+  }
+
+  .alert-lock {
+    font-size: 0.8rem;
+    padding: 8px 12px;
+  }
+
+  .progress-steps {
+    max-width: 100%;
+    padding: 0 5px;
+  }
+
+  .step-dot span {
+    width: 36px;
+    height: 36px;
+    font-size: 13px;
+  }
+
+  .step-label {
+    font-size: 10px;
+  }
+
+  .step-navigation {
+    max-width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .btn-step {
+    min-width: 100px;
+    padding: 10px 20px;
+    font-size: 13px;
+    flex: 1;
+  }
+
+  .recaptcha-wrapper {
+    transform: scale(0.85);
+  }
+
+  .step-content {
+    max-width: 100%;
+  }
+
+  .sign-up .container-input {
+    max-width: 100%;
+    height: 48px;
+  }
+
+  .step-content.doctor-step .container-input {
+    height: 38px !important;
+  }
+
+  .btn-prev {
+    order: 1;
+  }
+
+  .btn-next,
+  .btn-submit {
+    order: 2;
+  }
+
+  .social-networks .google-btn,
+  .button.google-style {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .step-dot span {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+
+  .step-label {
+    display: none;
+  }
+
+  .btn-step {
+    min-width: 80px;
+    padding: 8px 14px;
+    font-size: 12px;
+  }
+
+  .step-line {
+    min-width: 10px;
+  }
+
+  .sign-up .container-input {
+    height: 44px;
+    padding: 0 16px;
+  }
+
+  .sign-up .container-input input {
+    font-size: 14px;
+  }
+
+  .step-content.doctor-step .container-input {
+    height: 36px !important;
+    padding: 0 12px !important;
+  }
+
+  .step-content.doctor-step .container-input input {
+    font-size: 12px !important;
+  }
+}

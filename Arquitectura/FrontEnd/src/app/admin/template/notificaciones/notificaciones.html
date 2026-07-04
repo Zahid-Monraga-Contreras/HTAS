@@ -8,116 +8,123 @@
             <p>Gestión de alertas y avisos del sistema</p>
         </div>
 
+        @if (loading) {
+        <div class="text-center py-5">
+            <div class="spinner-border text-danger" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+            <p class="text-muted mt-3">Cargando notificaciones...</p>
+        </div>
+        }
+
+        @if (!loading) {
+
         <!-- ================= PANEL MÉDICO ================= -->
         @if (rolUsuario === 'Doctor' || rolUsuario === 'Medico') {
         <div class="role-indicator">
             <span class="role-tag">Panel Médico</span>
         </div>
 
-        <!-- Tarjeta de Bienvenida Personalizada -->
+        <!-- Tarjeta de Bienvenida -->
         <div class="profile-card mb-4 welcome-card">
             <div class="d-flex align-items-center">
                 <i class="bi bi-patch-check-fill text-success layout-huge-icon me-3"></i>
                 <div>
                     <h3>¡Bienvenido al Panel Médico de HTAS!</h3>
-                    <p class="margin-0">Tu cuenta está activa. Aquí puedes supervisar las alertas clínicas, nuevos
-                        registros de usuarios y la actividad de los dispositivos médicos en tiempo real.</p>
+                    <p class="margin-0">Tu cuenta está activa. Aquí puedes supervisar las citas, tratamientos,
+                        medicamentos y dispositivos médicos en tiempo real.</p>
                 </div>
             </div>
         </div>
 
+        <!-- Citas -->
         <div class="profile-card mb-4">
-            <h3><i class="bi bi-people-fill text-primary-color"></i> Nuevos Registros en el Sistema</h3>
+            <h3><i class="bi bi-calendar-check-fill text-primary-color"></i> Citas Programadas</h3>
             <div class="notification-list">
-                @for (usuario of registrosUsuarios; track usuario.idusuario) {
+                @for (cita of citas; track cita.id) {
                 <div class="notification-item">
-                    <div class="notification-icon bg-red"><i class="bi bi-person-plus-fill"></i></div>
+                    <div class="notification-icon" style="background-color: #b0001e;">
+                        <i class="bi bi-calendar-event-fill" style="color: white; font-size: 18px;"></i>
+                    </div>
                     <div class="notification-body">
-                        <p class="notification-text">El usuario <strong>{{usuario.nombre}}</strong> se ha registrado
-                            como <strong>{{usuario.rol}}</strong>.</p>
-                        <span class="notification-time"><i class="bi bi-clock"></i> {{usuario.fecha}}</span>
+                        <span class="badge-tipo">Cita Médica</span>
+                        <p class="notification-text"><strong>{{cita.paciente}}</strong> - {{cita.motivo}}</p>
+                        <span class="notification-time"><i class="bi bi-clock"></i> {{cita.fecha}} a las {{cita.hora}}
+                            hrs.</span>
+                        <span class="badge" [ngClass]="getEstadoClass(cita.estado)">{{cita.estado}}</span>
                     </div>
                 </div>
                 } @empty {
-                <p class="text-muted text-center py-3">No hay registros de nuevos usuarios recientes.</p>
+                <p class="text-muted text-center py-3">No hay citas programadas.</p>
                 }
             </div>
         </div>
 
-        <div class="profile-card">
-            <h3><i class="bi bi-heart-pulse-fill text-primary-color"></i> Alertas de Control Clínico (Citas,
-                Tratamientos, Medicamentos y Dispositivos)</h3>
-            <div class="notification-list">
-                @for (alerta of alertasMedicas; track alerta.id) {
-                <div class="notification-item">
-                    <div class="notification-icon" [ngClass]="obtenerIconoClase(alerta.tipo)">
-                        <i [ngClass]="obtenerIconoNotificacion(alerta.tipo)"></i>
-                    </div>
-                    <div class="notification-body">
-                        <span class="badge-tipo">{{alerta.tipo}}</span>
-                        <p class="notification-text">{{alerta.mensaje}}</p>
-                        <span class="notification-time"><i class="bi bi-clock"></i> {{alerta.fecha}}</span>
-                    </div>
-                </div>
-                } @empty {
-                <p class="text-muted text-center py-3">No se registran alertas clínicas pendientes.</p>
-                }
-            </div>
-        </div>
-        }
-
-        <!-- ================= PANEL ADMINISTRADOR ================= -->
-        @if (rolUsuario === 'Administrador' || rolUsuario === 'admin') {
-        <div class="role-indicator">
-            <span class="role-tag">Panel Administrador</span>
-        </div>
-
-        <!-- Tarjeta de Bienvenida Personalizada -->
-        <div class="profile-card mb-4 welcome-card">
-            <div class="d-flex align-items-center">
-                <i class="bi bi-shield-check text-success layout-huge-icon me-3"></i>
-                <div>
-                    <h3>¡Bienvenido al Panel de Control Administrador!</h3>
-                    <p class="margin-0">Acceso total concedido. Desde este centro global puedes auditar los movimientos
-                        de la plataforma, nuevos registros y las incidencias de los dispositivos médicos.</p>
-                </div>
-            </div>
-        </div>
-
+        <!-- Tratamientos - CORREGIDO -->
         <div class="profile-card mb-4">
-            <h3><i class="bi bi-people-fill text-primary-color"></i> Auditoría de Usuarios Registrados</h3>
+            <h3><i class="bi bi-prescription text-primary-color"></i> Tratamientos Activos</h3>
             <div class="notification-list">
-                @for (usuario of registrosUsuarios; track usuario.idusuario) {
+                @for (tratamiento of tratamientos; track tratamiento.id) {
                 <div class="notification-item">
-                    <div class="notification-icon bg-red"><i class="bi bi-person-plus-fill"></i></div>
+                    <div class="notification-icon" style="background-color: #b0001e;">
+                        <i class="bi bi-capsule" style="color: white; font-size: 18px;"></i>
+                    </div>
                     <div class="notification-body">
-                        <p class="notification-text">El usuario <strong>{{usuario.nombre}}</strong> se ha registrado
-                            como <strong>{{usuario.rol}}</strong>.</p>
-                        <span class="notification-time"><i class="bi bi-clock"></i> {{usuario.fecha}}</span>
+                        <span class="badge-tipo">Tratamiento</span>
+                        <p class="notification-text"><strong>{{tratamiento.nombre || tratamiento.id ||
+                                'Tratamiento'}}</strong></p>
+                        <span class="notification-time"><i class="bi bi-clock"></i> Dosis: {{tratamiento.dosis ||
+                            'N/A'}} | Frecuencia: {{tratamiento.frecuenciaHoras || 'N/A'}}h</span>
                     </div>
                 </div>
                 } @empty {
-                <p class="text-muted text-center py-3">No hay registros de nuevos usuarios recientes.</p>
+                <p class="text-muted text-center py-3">No hay tratamientos activos.</p>
                 }
             </div>
         </div>
 
-        <div class="profile-card">
-            <h3><i class="bi bi-activity text-primary-color"></i> Control y Alertas Globales del Sistema</h3>
+        <!-- Medicamentos -->
+        <div class="profile-card mb-4">
+            <h3><i class="bi bi-capsule text-primary-color"></i> Medicamentos en Inventario</h3>
             <div class="notification-list">
-                @for (alerta of alertasMedicas; track alerta.id) {
+                @for (medicamento of medicamentos; track medicamento.id) {
                 <div class="notification-item">
-                    <div class="notification-icon" [ngClass]="obtenerIconoClase(alerta.tipo)">
-                        <i [ngClass]="obtenerIconoNotificacion(alerta.tipo)"></i>
+                    <div class="notification-icon" style="background-color: #b0001e;">
+                        <i class="bi bi-droplet-fill" style="color: white; font-size: 18px;"></i>
                     </div>
                     <div class="notification-body">
-                        <span class="badge-tipo">{{alerta.tipo}}</span>
-                        <p class="notification-text">{{alerta.mensaje}}</p>
-                        <span class="notification-time"><i class="bi bi-clock"></i> {{alerta.fecha}}</span>
+                        <span class="badge-tipo">Medicamento</span>
+                        <p class="notification-text"><strong>{{medicamento.nombreComercial ||
+                                medicamento.nombre}}</strong> - {{medicamento.sustanciaActiva || medicamento.sustancia
+                            || 'N/A'}}</p>
+                        <span class="notification-time"><i class="bi bi-box"></i> Presentación:
+                            {{medicamento.presentacion}}</span>
                     </div>
                 </div>
                 } @empty {
-                <p class="text-muted text-center py-3">No hay alertas globales registradas.</p>
+                <p class="text-muted text-center py-3">No hay medicamentos registrados.</p>
+                }
+            </div>
+        </div>
+
+        <!-- Dispositivos -->
+        <div class="profile-card">
+            <h3><i class="bi bi-device-ssd text-primary-color"></i> Dispositivos Médicos Activos</h3>
+            <div class="notification-list">
+                @for (dispositivo of dispositivos; track dispositivo.id) {
+                <div class="notification-item">
+                    <div class="notification-icon" style="background-color: #b0001e;">
+                        <i class="bi bi-cpu-fill" style="color: white; font-size: 18px;"></i>
+                    </div>
+                    <div class="notification-body">
+                        <span class="badge-tipo">Dispositivo</span>
+                        <p class="notification-text"><strong>{{dispositivo.nombre}}</strong></p>
+                        <span class="notification-time"><i class="bi bi-check-circle"></i> MAC:
+                            {{dispositivo.direccionMac || 'N/A'}}</span>
+                    </div>
+                </div>
+                } @empty {
+                <p class="text-muted text-center py-3">No hay dispositivos registrados.</p>
                 }
             </div>
         </div>
@@ -129,34 +136,58 @@
             <span class="role-tag">Panel Paciente</span>
         </div>
 
-        <!-- Tarjeta de Bienvenida Personalizada -->
+        <!-- Tarjeta de Bienvenida -->
         <div class="profile-card mb-4 welcome-card">
             <div class="d-flex align-items-center">
                 <i class="bi bi-patch-check-fill text-success layout-huge-icon me-3"></i>
                 <div>
                     <h3>¡Registro Exitoso en HTAS!</h3>
-                    <p class="margin-0">Tu cuenta ha sido verificada. Ya puedes realizar el seguimiento de tu salud de
-                        forma segura.</p>
+                    <p class="margin-0">Tu cuenta ha sido verificada. Aquí puedes ver tus citas y medicamentos.</p>
                 </div>
             </div>
         </div>
 
-        <div class="profile-card">
-            <h3><i class="bi bi-calendar-heart text-primary-color"></i> Mis Actualizaciones Médicas</h3>
+        <!-- Citas del Paciente -->
+        <div class="profile-card mb-4">
+            <h3><i class="bi bi-calendar-heart text-primary-color"></i> Mis Citas Médicas</h3>
             <div class="notification-list">
                 @for (notif of notificacionesPaciente; track notif.id) {
                 <div class="notification-item">
-                    <div class="notification-icon" [ngClass]="obtenerIconoClase(notif.tipo)">
-                        <i [ngClass]="obtenerIconoNotificacion(notif.tipo)"></i>
+                    <div class="notification-icon" style="background-color: #b0001e;">
+                        <i class="bi bi-calendar-event-fill" style="color: white; font-size: 18px;"></i>
                     </div>
                     <div class="notification-body">
-                        <span class="badge-tipo">{{notif.tipo}}</span>
-                        <p class="notification-text">{{notif.mensaje}}</p>
-                        <span class="notification-time"><i class="bi bi-clock"></i> {{notif.fecha}}</span>
+                        <span class="badge-tipo">Cita Médica</span>
+                        <p class="notification-text"><strong>{{notif.mensaje}}</strong></p>
+                        <span class="notification-time"><i class="bi bi-clock"></i> {{notif.fecha}} a las {{notif.hora}}
+                            hrs.</span>
+                        <span class="badge" [ngClass]="getEstadoClass(notif.estado)">{{notif.estado}}</span>
                     </div>
                 </div>
                 } @empty {
-                <p class="text-muted text-center py-3">No tienes actualizaciones médicas recientes.</p>
+                <p class="text-muted text-center py-3">No tienes citas programadas.</p>
+                }
+            </div>
+        </div>
+
+        <!-- Medicamentos - Paciente -->
+        <div class="profile-card">
+            <h3><i class="bi bi-capsule text-primary-color"></i> Medicamentos Disponibles</h3>
+            <div class="notification-list">
+                @for (medicamento of medicamentos; track medicamento.id) {
+                <div class="notification-item">
+                    <div class="notification-icon" style="background-color: #b0001e;">
+                        <i class="bi bi-droplet-fill" style="color: white; font-size: 18px;"></i>
+                    </div>
+                    <div class="notification-body">
+                        <span class="badge-tipo">Medicamento</span>
+                        <p class="notification-text"><strong>{{medicamento.nombreComercial ||
+                                medicamento.nombre}}</strong></p>
+                        <span class="notification-time"><i class="bi bi-box"></i> {{medicamento.presentacion}}</span>
+                    </div>
+                </div>
+                } @empty {
+                <p class="text-muted text-center py-3">No hay medicamentos registrados.</p>
                 }
             </div>
         </div>
@@ -168,14 +199,14 @@
             <span class="role-tag">Panel Acompañante</span>
         </div>
 
-        <!-- Tarjeta de Bienvenida Personalizada -->
+        <!-- Tarjeta de Bienvenida -->
         <div class="profile-card mb-4 welcome-card">
             <div class="d-flex align-items-center">
                 <i class="bi bi-heart-fill text-danger layout-huge-icon me-3"></i>
                 <div>
                     <h3>¡Bienvenido al Panel de Acompañamiento!</h3>
-                    <p class="margin-0">Gracias por tu apoyo continuo. En este espacio podrás monitorear de cerca el
-                        estado de salud, citas programadas y tratamientos de tus pacientes asignados.</p>
+                    <p class="margin-0">Gracias por tu apoyo continuo. Monitorea el estado de salud de tus pacientes
+                        asignados.</p>
                 </div>
             </div>
         </div>
@@ -185,13 +216,13 @@
             <div class="notification-list">
                 @for (item of notificacionesAcompanante; track item.id) {
                 <div class="notification-item">
-                    <div class="notification-icon" [ngClass]="obtenerIconoClase(item.tipo)">
-                        <i [ngClass]="obtenerIconoNotificacion(item.tipo)"></i>
+                    <div class="notification-icon" style="background-color: #b0001e;">
+                        <i class="bi bi-person-heart" style="color: white; font-size: 18px;"></i>
                     </div>
                     <div class="notification-body">
-                        <span class="badge-tipo">{{item.tipo}}</span>
+                        <span class="badge-tipo">{{item.tipo || 'Alerta'}}</span>
                         <p class="notification-text">{{item.mensaje}}</p>
-                        <span class="notification-time"><i class="bi bi-clock"></i> {{item.fecha}}</span>
+                        <span class="notification-time"><i class="bi bi-clock"></i> {{item.fecha || 'Reciente'}}</span>
                     </div>
                 </div>
                 } @empty {
@@ -201,5 +232,89 @@
         </div>
         }
 
+        <!-- ================= PANEL ADMINISTRADOR ================= -->
+        @if (rolUsuario === 'Administrador' || rolUsuario === 'admin') {
+        <div class="role-indicator">
+            <span class="role-tag">Panel Administrador</span>
+        </div>
+
+        <!-- Tarjeta de Bienvenida -->
+        <div class="profile-card mb-4 welcome-card">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-shield-check text-success layout-huge-icon me-3"></i>
+                <div>
+                    <h3>¡Bienvenido al Panel de Control Administrador!</h3>
+                    <p class="margin-0">Acceso total concedido. Audita todos los movimientos de la plataforma.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Usuarios -->
+        <div class="profile-card mb-4">
+            <h3><i class="bi bi-people-fill text-primary-color"></i> Auditoría de Usuarios Registrados</h3>
+            <div class="notification-list">
+                @for (usuario of registrosUsuarios; track usuario.idusuario) {
+                <div class="notification-item">
+                    <div class="notification-icon" style="background-color: #b0001e;">
+                        <i class="bi bi-person-plus-fill" style="color: white; font-size: 18px;"></i>
+                    </div>
+                    <div class="notification-body">
+                        <span class="badge-tipo">Nuevo Usuario</span>
+                        <p class="notification-text"><strong>{{usuario.nombre}}</strong> - {{usuario.rol}}</p>
+                        <span class="notification-time"><i class="bi bi-envelope"></i> {{usuario.correo}}</span>
+                    </div>
+                </div>
+                } @empty {
+                <p class="text-muted text-center py-3">No hay registros de usuarios recientes.</p>
+                }
+            </div>
+        </div>
+
+        <!-- Citas - Admin -->
+        <div class="profile-card mb-4">
+            <h3><i class="bi bi-calendar-check-fill text-primary-color"></i> Citas del Sistema</h3>
+            <div class="notification-list">
+                @for (cita of citas; track cita.id) {
+                <div class="notification-item">
+                    <div class="notification-icon" style="background-color: #b0001e;">
+                        <i class="bi bi-calendar-event-fill" style="color: white; font-size: 18px;"></i>
+                    </div>
+                    <div class="notification-body">
+                        <span class="badge-tipo">Cita Médica</span>
+                        <p class="notification-text"><strong>{{cita.paciente}}</strong> - {{cita.motivo}}</p>
+                        <span class="notification-time"><i class="bi bi-clock"></i> {{cita.fecha}} a las {{cita.hora}}
+                            hrs.</span>
+                    </div>
+                </div>
+                } @empty {
+                <p class="text-muted text-center py-3">No hay citas registradas.</p>
+                }
+            </div>
+        </div>
+
+        <!-- Dispositivos - Admin -->
+        <div class="profile-card">
+            <h3><i class="bi bi-device-ssd text-primary-color"></i> Dispositivos del Sistema</h3>
+            <div class="notification-list">
+                @for (dispositivo of dispositivos; track dispositivo.id) {
+                <div class="notification-item">
+                    <div class="notification-icon" style="background-color: #b0001e;">
+                        <i class="bi bi-cpu-fill" style="color: white; font-size: 18px;"></i>
+                    </div>
+                    <div class="notification-body">
+                        <span class="badge-tipo">Dispositivo</span>
+                        <p class="notification-text"><strong>{{dispositivo.nombre}}</strong></p>
+                        <span class="notification-time"><i class="bi bi-check-circle"></i> MAC:
+                            {{dispositivo.direccionMac || 'N/A'}}</span>
+                    </div>
+                </div>
+                } @empty {
+                <p class="text-muted text-center py-3">No hay dispositivos registrados.</p>
+                }
+            </div>
+        </div>
+        }
+
+        }
     </div>
 </div>

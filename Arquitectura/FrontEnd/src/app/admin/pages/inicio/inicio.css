@@ -393,3 +393,96 @@
     display: block;
     position: relative;
 }
+
+/* ============================================================
+   ESTILOS PARA LOS BOTONES "IR A ..."
+   ============================================================ */
+
+.btn-link-htas {
+    color: #8B0015;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.3s ease;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: rgba(139, 0, 21, 0.06);
+}
+
+.btn-link-htas:hover {
+    color: #b0001e;
+    background: rgba(139, 0, 21, 0.12);
+    transform: translateX(3px);
+}
+
+.btn-link-htas i {
+    font-size: 14px;
+    transition: transform 0.3s ease;
+}
+
+.btn-link-htas:hover i {
+    transform: translateX(4px);
+}
+
+/* Ajuste para los títulos con botón */
+.panel-title {
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 1.1rem;
+}
+
+/* Responsive para los botones */
+@media (max-width: 768px) {
+    .btn-link-htas {
+        font-size: 12px;
+        padding: 3px 10px;
+    }
+
+    .panel-title {
+        font-size: 0.95rem;
+    }
+}
+
+/* ============================================================
+   COLORES DE ROLES PARA TARJETAS ESTADÍSTICAS
+   ============================================================ */
+
+/* Color para el total de usuarios - Rojo institucional */
+.stat-value.text-htas-red {
+    color: #b0001e !important;
+}
+
+/* Color para Pacientes - Morado */
+.stat-value.text-htas-paciente {
+    color: #6d28d9 !important;
+}
+
+/* Color para Médicos - Azul */
+.stat-value.text-htas-medico {
+    color: #0369a1 !important;
+}
+
+/* Color para Acompañantes - Verde */
+.stat-value.text-htas-acompanante {
+    color: #15803d !important;
+}
+
+/* Opcional: agregar un pequeño indicador de color en el borde de la tarjeta */
+.stat-card.border-paciente {
+    border-top: 4px solid #6d28d9 !important;
+}
+
+.stat-card.border-medico {
+    border-top: 4px solid #0369a1 !important;
+}
+
+.stat-card.border-acompanante {
+    border-top: 4px solid #15803d !important;
+}
+
+.stat-card.border-htas {
+    border-top: 4px solid #b0001e !important;
+}

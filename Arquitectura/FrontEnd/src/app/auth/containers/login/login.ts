@@ -40,6 +40,15 @@ export class Login {
   loginForm: FormGroup;
   loading = false;
 
+  // Variables para el registro por pasos
+  currentStep: number = 1;
+  totalSteps: number = 3;
+
+  // Variables para mostrar/ocultar contraseñas
+  showLoginPassword: boolean = false;
+  showRegisterPassword: boolean = false;
+  showConfirmPassword: boolean = false;
+
   esperandoPin = false;
   pinIngresado = '';
   pinCorrectoBD = '';
@@ -63,22 +72,22 @@ export class Login {
 
   recaptchaSiteKey = environment.recaptchaSiteKey;
 
-  constructor(public users: Users, // <--- Agrega esto
-    private fb: FormBuilder,) {
+  constructor(public users: Users, private fb: FormBuilder) {
     this.registerForm = this.fb.group({
       NombreCompleto: ['', [Validators.required, Validators.maxLength(100), soloLetrasValidator()]],
       Telefono: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
       Email: ['', [Validators.required, Validators.email]],
       Password: ['', [Validators.required, Validators.minLength(6)]],
+      ConfirmPassword: ['', [Validators.required]],
       Rol: ['', [Validators.required]],
       NSS: [''],
       FotoCedula: [''],
       Especialidad: [''],
       DireccionClinica: [''],
-      FechaNacimiento: [''],
+      FechaAsignacion: [''],
       Activo: [true],
       recaptcha: ['', Validators.required],
-    });
+    }, { validators: this.passwordMatchValidator });
 
     this.loginForm = this.fb.group({
       Email: ['', [Validators.required, Validators.email]],
@@ -93,33 +102,132 @@ export class Login {
     this.configurarLimitesFecha();
   }
 
-  onCaptchaLoginResolved(token: string | null) {
+  // Validador de coincidencia de contraseñas
+  passwordMatchValidator(group: FormGroup): any {
+    const password = group.get('Password')?.value;
+    const confirmPassword = group.get('ConfirmPassword')?.value;
+    return password === confirmPassword ? null : { mismatch: true };
+  }
+
+  // Funciones para mostrar/ocultar contraseñas
+  toggleLoginPassword(): void {
+    this.showLoginPassword = !this.showLoginPassword;
+  }
+
+  toggleRegisterPassword(): void {
+    this.showRegisterPassword = !this.showRegisterPassword;
+  }
+
+  toggleConfirmPassword(): void {
+    this.showConfirmPassword = !this.showConfirmPassword;
+  }
+
+  // Navegación entre pasos
+  nextStep(): void {
+    if (this.currentStep < this.totalSteps) {
+      // Validar el paso actual antes de avanzar
+      if (this.isStepValid(this.currentStep)) {
+        this.currentStep++;
+        // Si el siguiente paso es el 3, inicializar el calendario
+        if (this.currentStep === 3) {
+          setTimeout(() => this.inicializarCalendario(), 100);
+        }
+      } else {
+        this.openModal('Campos incompletos', 'Por favor, completa todos los campos obligatorios antes de continuar.', 'modal-error');
+      }
+    }
+  }
+
+  prevStep(): void {
+    if (this.currentStep > 1) {
+      this.currentStep--;
+    }
+  }
+
+  // Validar si el paso actual está completo
+  isStepValid(step: number): boolean {
+    const form = this.registerForm;
+    switch (step) {
+      case 1:
+        return !!(form.get('NombreCompleto')?.valid &&
+          form.get('Telefono')?.valid &&
+          form.get('Email')?.valid);
+      case 2:
+        return !!(form.get('Password')?.valid &&
+          form.get('ConfirmPassword')?.valid &&
+          !form.errors?.['mismatch']);
+      case 3:
+        const rol = form.get('Rol')?.value;
+        if (!rol) return false;
+
+        // Validar campos específicos según el rol
+        if (rol === 'Paciente') {
+          return !!(form.get('NSS')?.valid);
+        } else if (rol === 'Doctor') {
+          return !!(form.get('FotoCedula')?.valid &&
+            form.get('Especialidad')?.valid &&
+            form.get('DireccionClinica')?.valid);
+        } else if (rol === 'Acompañante') {
+          return !!(form.get('FechaAsignacion')?.valid);
+        }
+        return true;
+      default:
+        return true;
+    }
+  }
+
+  // Verificar si el paso actual tiene errores visibles
+  isStepInvalid(step: number): boolean {
+    const form = this.registerForm;
+    switch (step) {
+      case 1:
+        return !!(form.get('NombreCompleto')?.invalid ||
+          form.get('Telefono')?.invalid ||
+          form.get('Email')?.invalid);
+      case 2:
+        return !!(form.get('Password')?.invalid ||
+          form.get('ConfirmPassword')?.invalid ||
+          form.errors?.['mismatch']);
+      case 3:
+        const rol = form.get('Rol')?.value;
+        if (!rol) return true;
+        if (rol === 'Paciente') {
+          return !!(form.get('NSS')?.invalid);
+        } else if (rol === 'Doctor') {
+          return !!(form.get('FotoCedula')?.invalid ||
+            form.get('Especialidad')?.invalid ||
+            form.get('DireccionClinica')?.invalid);
+        } else if (rol === 'Acompañante') {
+          return !!(form.get('FechaAsignacion')?.invalid);
+        }
+        return false;
+      default:
+        return false;
+    }
+  }
+
+  onCaptchaLoginResolved(token: string | null): void {
     this.captchaTokenLogin = token;
     this.loginForm.get('recaptcha')?.setValue(token);
   }
 
-  onCaptchaRegisterResolved(token: string | null) {
+  onCaptchaRegisterResolved(token: string | null): void {
     this.captchaTokenRegister = token;
     this.registerForm.get('recaptcha')?.setValue(token);
   }
 
-  private configurarLimitesFecha() {
+  private configurarLimitesFecha(): void {
     const hoy = new Date();
-    // Para nacimiento, permitimos que la fecha máxima sea el día de hoy
     this.fechaMaxima = hoy.toISOString().split('T')[0];
-
-    // Establecemos una fecha mínima razonable (ej. hace 100 años)
     const minFecha = new Date(hoy.getFullYear() - 100, hoy.getMonth(), hoy.getDate());
     this.fechaMinima = minFecha.toISOString().split('T')[0];
-
-    // Opcional: inicializar vacío o con una fecha estimada
-    this.registerForm.patchValue({ FechaNacimiento: '' });
+    this.registerForm.patchValue({ FechaAsignacion: '' });
   }
 
-  private actualizarValidacionesDinamicas(rol: string) {
+  private actualizarValidacionesDinamicas(rol: string): void {
     const pacienteFields = ['NSS'];
     const doctorFields = ['FotoCedula', 'Especialidad', 'DireccionClinica'];
-    const acompananteFields = ['FechaNacimiento'];
+    const acompananteFields = ['FechaAsignacion'];
 
     pacienteFields.forEach(fieldName => {
       const control = this.registerForm.get(fieldName);
@@ -155,7 +263,7 @@ export class Login {
     });
   }
 
-  async onSubmitSignUp() {
+  async onSubmitSignUp(): Promise<void> {
     if (!this.captchaTokenRegister) {
       this.openModal('Verificación requerida', 'Por favor completa el reCAPTCHA.', 'modal-error');
       return;
@@ -166,14 +274,11 @@ export class Login {
       this.cdr.detectChanges();
 
       const f = this.registerForm.value;
-
-      // Lógica para separar el nombre completo en partes para la DB
       const partesNombre = f.NombreCompleto.trim().split(' ');
       const nombre = partesNombre[0] || '';
       const apPaterno = partesNombre[1] || '';
-      const apMaterno = partesNombre.slice(2).join(' ') || ''; // Por si tiene dos nombres o apellidos compuestos
+      const apMaterno = partesNombre.slice(2).join(' ') || '';
 
-      // Estructura que espera tu Backend (auth.controller.js)
       const datosParaBackend = {
         nombre: nombre,
         apPaterno: apPaterno,
@@ -184,21 +289,17 @@ export class Login {
         telefono: f.Telefono,
         recaptchaToken: this.captchaTokenRegister,
         datosExtra: {
-          // Campos específicos según el rol
           cedula: f.FotoCedula,
           especialidad: f.Especialidad,
           direccion: f.DireccionClinica,
           nss: f.NSS,
-          fechaNacimiento: f.FechaNacimiento,
+          fechaAsignacion: f.FechaAsignacion,
           idPacienteAsociado: f.IdPacienteAsociado || null
         }
       };
 
-      // Llamada al servicio que conecta con Node.js
-      // Nota: Asegúrate de haber inyectado 'authService' en el constructor
       this.users.registrar(datosParaBackend).subscribe({
         next: (res: any) => {
-          // Autologuear al usuario inmediatamente después del registro
           this.users.login({ correo: f.Email, contrasenia: f.Password }).subscribe({
             next: (loginRes: any) => {
               this.ngZone.run(() => {
@@ -207,6 +308,7 @@ export class Login {
                 this.pinCorrectoBD = loginRes.pin;
                 this.esperandoPin = true;
                 this.isToggled = false;
+                this.currentStep = 1;
 
                 this.openModal(
                   '¡Registro Exitoso!',
@@ -220,6 +322,7 @@ export class Login {
               this.ngZone.run(() => {
                 this.loading = false;
                 this.isToggled = false;
+                this.currentStep = 1;
                 this.openModal(
                   '¡Registro Exitoso!',
                   'Usuario guardado. Por favor inicia sesión.',
@@ -233,7 +336,6 @@ export class Login {
         error: (err) => {
           this.ngZone.run(() => {
             this.loading = false;
-            // Manejo de errores que vienen del backend (ej: Correo duplicado)
             const mensajeError = err.error?.error || 'No se pudo conectar con el servidor.';
             this.openModal('Error al Registrar', mensajeError, 'modal-error');
           });
@@ -245,27 +347,19 @@ export class Login {
     }
   }
 
-  async onLoginWithGoogle() {
+  async onLoginWithGoogle(): Promise<void> {
     this.loading = true;
     this.cdr.detectChanges();
 
     try {
-      // 1. Llamamos al servicio (que ahora consulta a Node.js + PostgreSQL)
       const res: any = await this.googleService.loginWithGoogle();
-
       this.ngZone.run(() => {
         this.loading = false;
-
-        // Guardamos el UID que viene de nuestra base de datos (Postgres)
         this.usuarioUidTemporal = res.uid;
-
         if (res.pinVerificado === true) {
-          // Si ya está verificado, guardamos el token y entramos
           if (res.accessToken) localStorage.setItem('token', res.accessToken);
           this.router.navigate(['/inicio']);
         } else {
-          // Si NO está verificado, el GoogleService ya disparó el correo con EmailJS
-          // así que solo preparamos la vista del PIN en el HTML
           this.pinCorrectoBD = res.pin;
           this.esperandoPin = true;
           this.openModal('Verificación Requerida', 'Se ha enviado un código de seguridad a tu correo de Google.', 'modal-success');
@@ -275,14 +369,12 @@ export class Login {
     } catch (error: any) {
       this.ngZone.run(() => {
         this.loading = false;
-        // El error puede ser "No tienes cuenta" o "Error de servidor"
         this.openModal('Acceso Denegado', error.message, 'modal-error');
       });
     }
   }
 
-  async onLoginWithEmailPassword() {
-
+  async onLoginWithEmailPassword(): Promise<void> {
     if (!this.captchaTokenLogin) {
       this.openModal('Verificación requerida', 'Por favor completa el reCAPTCHA.', 'modal-error');
       return;
@@ -301,21 +393,15 @@ export class Login {
 
     this.users.login(credenciales).subscribe({
       next: (res: any) => {
-        // ESTO ES LO QUE AGREGAMOS PARA ENVIAR EL CORREO
-        console.log('Respuesta del servidor:', res);
-
         this.ngZone.run(() => {
           this.loading = false;
-
           if (res.pinVerificado === true) {
             if (res.token) localStorage.setItem('token', res.token);
             this.router.navigate(['/inicio']);
           } else {
-            // Si falta verificar PIN, preparamos la vista (El servicio ya mandó el correo)
             this.usuarioUidTemporal = res.uid;
             this.pinCorrectoBD = res.pin;
             this.esperandoPin = true;
-
             this.cdr.detectChanges();
           }
         });
@@ -323,7 +409,6 @@ export class Login {
       error: (err) => {
         this.ngZone.run(() => {
           this.loading = false;
-          // Si el error es 423, el servicio ya activó el bloqueo, así que solo avisamos
           if (err.status === 423) {
             this.openModal('Cuenta Bloqueada', `Demasiados intentos. Espera un momento.`, 'modal-error');
           } else {
@@ -335,19 +420,14 @@ export class Login {
     });
   }
 
-  async verificarPin() {
+  async verificarPin(): Promise<void> {
     if (this.users.estaBloqueado()) return;
     this.loading = true;
 
-    // Envíamos el UID temporal y el PIN que el usuario escribió en el input
     this.users.verificarPin(this.usuarioUidTemporal, this.pinIngresado).subscribe({
       next: (res: any) => {
         this.loading = false;
-
-        // Si tu backend devuelve un token después de verificar el PIN:
         if (res.accessToken) localStorage.setItem('token', res.accessToken);
-
-        // Navegar inmediatamente para que se sienta fluido y rápido
         this.ngZone.run(() => this.router.navigate(['/inicio']));
       },
       error: (err) => {
@@ -369,7 +449,7 @@ export class Login {
     return `${min}:${seg < 10 ? '0' : ''}${seg}`;
   }
 
-  async reenviarPin() {
+  async reenviarPin(): Promise<void> {
     if (!this.usuarioUidTemporal) {
       this.openModal('Error', 'No se pudo identificar al usuario. Intenta iniciar sesión de nuevo.', 'modal-error');
       return;
@@ -378,7 +458,6 @@ export class Login {
     this.loading = true;
     this.cdr.detectChanges();
 
-    // Llamamos al método que actualizamos en el servicio
     this.users.solicitarNuevoPin(this.usuarioUidTemporal).subscribe({
       next: () => {
         this.ngZone.run(() => {
@@ -398,13 +477,16 @@ export class Login {
     });
   }
 
-  onKeyPress(event: KeyboardEvent): boolean { return soloLetras(event); }
+  onKeyPress(event: KeyboardEvent): boolean {
+    return soloLetras(event);
+  }
+
   soloNumeros(event: KeyboardEvent): boolean {
     const charCode = event.key.charCodeAt(0);
     return (charCode >= 48 && charCode <= 57);
   }
 
-  private openModal(title: string, message: string, type: 'modal-success' | 'modal-error') {
+  private openModal(title: string, message: string, type: 'modal-success' | 'modal-error'): void {
     this.modalTitle = title;
     this.modalMessage = message;
     this.modalType = type;
@@ -413,11 +495,12 @@ export class Login {
     this.cdr.detectChanges();
   }
 
-  closeModal() { this.showModal = false; }
+  closeModal(): void {
+    this.showModal = false;
+  }
 
-  inicializarCalendario() {
+  inicializarCalendario(): void {
     if (isPlatformBrowser(this.platformId)) {
-      // Agregamos un pequeño delay para asegurar que el input sea visible en el DOM
       setTimeout(() => {
         const hoy = new Date();
         const fechaMaxima = new Date(hoy.getFullYear(), hoy.getMonth() + 2, hoy.getDate());
@@ -428,9 +511,9 @@ export class Login {
           minDate: "today",
           appendTo: document.body,
           static: false,
-          disableMobile: true, // Esto quita el calendario "feo" del celular
+          disableMobile: true,
           onChange: (selectedDates: any, dateStr: string) => {
-            const control = this.registerForm.get('FechaNacimiento');
+            const control = this.registerForm.get('FechaAsignacion');
             if (control) {
               control.setValue(dateStr);
               control.markAsDirty();
@@ -441,57 +524,50 @@ export class Login {
         };
 
         const fp = flatpickr('#fechaInput', config);
-
-        // Verificación de seguridad para evitar el "TypeError: undefined"
         if (fp) {
           const instance = Array.isArray(fp) ? fp[0] : fp;
           if (instance && typeof instance.open === 'function') {
             instance.open();
           }
-        } else {
-          console.warn('No se encontró el elemento #fechaInput en el DOM');
         }
-      }, 50); // 50ms son suficientes
+      }, 50);
     }
   }
 
-  toggleToSignUp() {
+  toggleToSignUp(): void {
     this.isToggled = true;
+    this.currentStep = 1;
     setTimeout(() => {
       this.inicializarCalendario();
     }, 200);
   }
 
-  toggleToSignIn() {
+  toggleToSignIn(): void {
     this.isToggled = false;
     this.esperandoPin = false;
+    this.currentStep = 1;
   }
 
-  irAInicio() {
+  irAInicio(): void {
     this.router.navigate(['/landing']);
   }
 
-  onFileSelected(event: Event) {
+  onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
-
       if (file.type !== 'application/pdf') {
         this.openModal('Formato Inválido', 'Por favor, selecciona tu Cédula en formato PDF.', 'modal-error');
         input.value = '';
         return;
       }
-
-      // Validar tamaño: Firestore limita a 1MB por documento. Dejamos el límite en 800KB para el PDF.
       if (file.size > 800 * 1024) {
         this.openModal('Archivo muy pesado', 'El PDF debe pesar menos de 800KB para poder registrarlo.', 'modal-error');
         input.value = '';
         return;
       }
-
       this.nombreArchivoCedula = file.name;
       const reader = new FileReader();
-
       reader.onload = (e: any) => {
         this.fotoCedulaBase64 = e.target.result;
         const control = this.registerForm.get('FotoCedula');
@@ -502,7 +578,6 @@ export class Login {
         }
         this.cdr.detectChanges();
       };
-
       reader.readAsDataURL(file);
     }
   }

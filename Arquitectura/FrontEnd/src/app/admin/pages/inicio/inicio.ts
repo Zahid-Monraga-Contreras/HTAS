@@ -1,18 +1,19 @@
 import { Component, OnInit, inject, ChangeDetectorRef, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { Menu } from "../../template/menu/menu";
 import { Users } from '../../../auth/services/users';
 import { firstValueFrom } from 'rxjs';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartData, ChartOptions, Chart, registerables } from 'chart.js';
 
-// REGISTRO GLOBAL DE COMPONENTES DE CHART.JS (Soluciona el error de "linear" is not a registered scale)
+// REGISTRO GLOBAL DE COMPONENTES DE CHART.JS
 Chart.register(...registerables);
 
 @Component({
   selector: 'app-inicio',
   standalone: true,
-  imports: [CommonModule, Menu, BaseChartDirective],
+  imports: [CommonModule, RouterModule, Menu, BaseChartDirective],
   templateUrl: './inicio.html',
   styleUrl: './inicio.css',
 })
@@ -42,7 +43,7 @@ export class Inicio implements OnInit {
 
   public usuariosChartData: ChartData<'doughnut'> = {
     labels: ['Pacientes', 'Médicos', 'Acompañantes'],
-    datasets: [{ data: [0, 0, 0], backgroundColor: ['#0d6efd', '#198754', '#0dcaf0'] }]
+    datasets: [{ data: [0, 0, 0], backgroundColor: ['#6d28d9', '#0369a1', '#15803d'] }]
   };
 
   public barChartOptions: ChartOptions<'bar'> = {
@@ -64,13 +65,10 @@ export class Inicio implements OnInit {
     try {
       this.isLoading = true;
 
-      const sesionGuardada = localStorage.getItem('user_htas');
-      const usuarioLogueado = sesionGuardada ? JSON.parse(sesionGuardada) : null;
-      const correoUsuario = usuarioLogueado?.correo || '';
-
-      const [usuarios, citas, medicamentos] = await Promise.all([
+      // OBTENER TODOS LOS DATOS NECESARIOS (sin filtrar por rol)
+      const [usuarios, todasLasCitas, medicamentos] = await Promise.all([
         firstValueFrom(this.usersService.getUsuariosBackend()),
-        correoUsuario ? firstValueFrom(this.usersService.getMisCitas(correoUsuario)) : Promise.resolve([]),
+        firstValueFrom(this.usersService.getAllCitas()), // <--- NUEVO MÉTODO PARA TODAS LAS CITAS
         firstValueFrom(this.usersService.getMedicamentos())
       ]);
 
@@ -85,14 +83,14 @@ export class Inicio implements OnInit {
           labels: ['Pacientes', 'Médicos', 'Acompañantes'],
           datasets: [{
             data: [this.metrics.totalPacientes, this.metrics.totalMedicos, this.metrics.totalAcompanantes],
-            backgroundColor: ['#0d6efd', '#198754', '#0dcaf0']
+            backgroundColor: ['#6d28d9', '#0369a1', '#15803d']
           }]
         };
       }
 
-      // 2. Agenda de Citas Activas - LIMITADO A LAS ÚLTIMAS 3 REGISTRADAS
-      if (Array.isArray(citas)) {
-        const citasMapeadas = citas.map((c: any) => {
+      // 2. Agenda de Citas - AHORA MUESTRA TODAS LAS CITAS DEL SISTEMA (sin filtrar por rol)
+      if (Array.isArray(todasLasCitas)) {
+        const citasMapeadas = todasLasCitas.map((c: any) => {
           let fechaFormateada = 'Sin fecha';
 
           if (c.fechacita) {
@@ -122,7 +120,7 @@ export class Inicio implements OnInit {
           };
         });
 
-        // .slice(-3) extrae los últimos 3 elementos. .reverse() los muestra ordenados del más nuevo al más antiguo.
+        // Mostrar las últimas 3 citas (más recientes)
         this.citasRecientes = citasMapeadas.slice(-3).reverse();
       }
 

@@ -53,7 +53,7 @@
 
             @for (item of section.items; track item.label) {
             <li>
-                <a [routerLink]="item.route" [queryParams]="item.queryParams" routerLinkActive="active-item"
+                <a [routerLink]="item.route" [queryParams]="item.queryParams" [class.active-item]="isActive(item.route)"
                     class="nav-item-link">
                     <i class="bi {{item.icon}}"></i>
                     @if (!isCollapsed) {

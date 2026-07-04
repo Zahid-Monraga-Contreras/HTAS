@@ -19,28 +19,28 @@
                 <div class="col-md-3">
                     <article class="stat-card border-htas">
                         <h3 class="stat-title">Usuarios Registrados</h3>
-                        <p class="stat-value">{{ metrics.totalUsuarios }}</p>
+                        <p class="stat-value" style="color: #b0001e;">{{ metrics.totalUsuarios }}</p>
                         <p class="stat-meta">Cuentas globales activas</p>
                     </article>
                 </div>
                 <div class="col-md-3">
                     <article class="stat-card">
                         <h3 class="stat-title">Número de Pacientes</h3>
-                        <p class="stat-value text-primary">{{ metrics.totalPacientes }}</p>
+                        <p class="stat-value" style="color: #6d28d9;">{{ metrics.totalPacientes }}</p>
                         <p class="stat-meta">Bajo monitoreo continuo</p>
                     </article>
                 </div>
                 <div class="col-md-3">
                     <article class="stat-card">
                         <h3 class="stat-title">Número de Médicos</h3>
-                        <p class="stat-value text-success">{{ metrics.totalMedicos }}</p>
+                        <p class="stat-value" style="color: #0369a1;">{{ metrics.totalMedicos }}</p>
                         <p class="stat-meta">Especialistas validados</p>
                     </article>
                 </div>
                 <div class="col-md-3">
                     <article class="stat-card">
                         <h3 class="stat-title">Acompañantes</h3>
-                        <p class="stat-value text-info">{{ metrics.totalAcompanantes }}</p>
+                        <p class="stat-value" style="color: #15803d;">{{ metrics.totalAcompanantes }}</p>
                         <p class="stat-meta">Tutores vinculados</p>
                     </article>
                 </div>
@@ -49,7 +49,12 @@
             <div class="row g-4 mb-4">
                 <div class="col-lg-7">
                     <div class="chart-container p-4 shadow-sm bg-white rounded-card">
-                        <h4 class="mb-3 panel-title">Control de Medicamentos en Inventario</h4>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4 class="panel-title m-0">Control de Medicamentos en Inventario</h4>
+                            <a routerLink="/medicamentos" class="btn-link-htas">
+                                Ir a medicamentos <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
                         <p class="text-muted small mb-3">Sustancias activas cargadas en el sistema:</p>
                         <div class="chart-wrapper" style="position: relative; height: 280px;">
                             @if (medicamentosControl.length > 0) {
@@ -81,7 +86,12 @@
             <div class="row g-4">
                 <div class="col-lg-7">
                     <div class="chart-container p-4 shadow-sm bg-white rounded-card">
-                        <h4 class="mb-3 panel-title">Desglose Técnico de Fármacos</h4>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4 class="panel-title m-0">Desglose Técnico de Fármacos</h4>
+                            <a routerLink="/medicamentos" class="btn-link-htas">
+                                Ir a medicamentos <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
                         <div class="meds-list-scroll">
                             @if (medicamentosControl.length > 0) {
                             @for (med of medicamentosControl; track med.nombre) {
@@ -102,7 +112,12 @@
 
                 <div class="col-lg-5">
                     <div class="alerts-container p-4 shadow-sm bg-white rounded-card">
-                        <h4 class="mb-4 panel-title">Agenda de Citas Activas</h4>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4 class="panel-title m-0">Agenda de Citas Activas</h4>
+                            <a routerLink="/citas" class="btn-link-htas">
+                                Ir a citas <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
                         <div class="citas-list-scroll">
                             @if (citasRecientes.length > 0) {
                             @for (cita of citasRecientes; track cita.id) {
@@ -126,8 +141,7 @@
                             }
                             } @else {
                             <div class="text-center py-5 text-muted">
-                                <p class="small m-0">No cuentas con registros de citas médicas agendadas en tu perfil.
-                                </p>
+                                <p class="small m-0">No hay citas médicas agendadas en el sistema.</p>
                             </div>
                             }
                         </div>

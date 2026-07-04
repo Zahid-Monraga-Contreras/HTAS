@@ -1,8 +1,8 @@
 import { Component, inject, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { Subscription, Observable, combineLatest, of } from 'rxjs';
-import { startWith } from 'rxjs/operators';
+import { startWith, filter } from 'rxjs/operators';
 import { GoogleService } from '../../../auth/services/google';
 import { Users } from '../../../auth/services/users';
 
@@ -20,9 +20,11 @@ export class Menu implements OnInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
 
   private authSub?: Subscription;
+  private routerSub?: Subscription;
 
   isCollapsed = false;
   showSearch = false;
+  currentRoute: string = '';
 
   public user$: Observable<any> = this.googleService.user$;
   userName: string = 'Usuario';
@@ -61,6 +63,16 @@ export class Menu implements OnInit, OnDestroy {
     const uService = this.usersService as any;
     const isBrowser = typeof window !== 'undefined';
 
+    // --- DETECTAR RUTA ACTIVA ---
+    this.currentRoute = this.router.url;
+
+    this.routerSub = this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: NavigationEnd) => {
+      this.currentRoute = event.urlAfterRedirects || event.url;
+      this.cdr.detectChanges();
+    });
+
     if (isBrowser && uService.cargarSesionPersistente) {
       uService.cargarSesionPersistente();
     }
@@ -80,7 +92,6 @@ export class Menu implements OnInit, OnDestroy {
       // PRIORIDAD 1: Usuarios registrados/autenticados que provienen de PostgreSQL
       if (pUser) {
         this.userName = pUser.nombre || pUser.NombreCompleto || 'Usuario';
-        // Respeta la foto guardada en base de datos; si no tiene, genera sus iniciales
         this.userPhoto = pUser.photoURL || pUser.foto || this.generarAvatar(this.userName);
         this.userRol = pUser.rol || '';
 
@@ -177,6 +188,19 @@ export class Menu implements OnInit, OnDestroy {
     });
   }
 
+  // --- FUNCIÓN PARA DETECTAR SI UNA RUTA ESTÁ ACTIVA ---
+  isActive(route: string): boolean {
+    if (!this.currentRoute) return false;
+
+    // Para /inicio, verificamos exacto o raíz
+    if (route === '/inicio') {
+      return this.currentRoute === '/inicio' || this.currentRoute === '/' || this.currentRoute === '';
+    }
+
+    // Para las demás rutas, verificamos que comience con la ruta
+    return this.currentRoute.startsWith(route);
+  }
+
   private generarAvatar(nombre: string): string {
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(nombre)}&background=b0001e&color=fff&bold=true`;
   }
@@ -188,6 +212,7 @@ export class Menu implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.authSub?.unsubscribe();
+    this.routerSub?.unsubscribe();
   }
 
   toggleSidebar() { this.isCollapsed = !this.isCollapsed; }

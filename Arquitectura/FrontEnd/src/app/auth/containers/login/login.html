@@ -11,6 +11,7 @@
   </div>
   <div class="container" [class.toggle]="isToggled">
 
+    <!-- LOGIN -->
     <div id="google" class="container-form">
       <div class="sign-in">
         <div class="decor-icon"><i class="bi bi-shield-lock"></i></div>
@@ -24,9 +25,10 @@
             <i class="bi bi-envelope"></i>
             <input type="email" formControlName="Email" placeholder="Correo Electrónico">
           </div>
-          <div class="container-input">
+          <div class="container-input password-wrapper">
             <i class="bi bi-lock"></i>
-            <input type="password" formControlName="Password" placeholder="Contraseña">
+            <input [type]="showLoginPassword ? 'text' : 'password'" formControlName="Password" placeholder="Contraseña">
+            <i class="bi" [ngClass]="showLoginPassword ? 'bi-eye-slash' : 'bi-eye'" (click)="toggleLoginPassword()"></i>
           </div>
           <re-captcha formControlName="recaptcha" [formGroup]="loginForm" [siteKey]="recaptchaSiteKey"
             (resolved)="onCaptchaLoginResolved($event)">
@@ -46,13 +48,12 @@
           </div>
         </div>
 
+        <!-- PIN Verification -->
         <div *ngIf="esperandoPin" class="pin-verification-container">
-
           <div *ngIf="users.estaBloqueado()" class="alert-lock">
             <i class="bi bi-clock-history"></i>
             <span>Intenta de nuevo en: <strong>{{ tiempoBloqueo }}</strong></span>
           </div>
-
           <div class="container-input" [class.disabled-input]="users.estaBloqueado()">
             <i class="bi bi-key-fill"></i>
             <input type="text" [(ngModel)]="pinIngresado" placeholder="Introduce tu PIN de 6 dígitos" maxlength="6"
@@ -82,95 +83,173 @@
       </div>
     </div>
 
+    <!-- REGISTRO POR PASOS -->
     <div class="container-form">
-      <form class="sign-up" [formGroup]="registerForm" (ngSubmit)="onSubmitSignUp()"
-        [class.doctor-active]="registerForm.get('Rol')?.value === 'Doctor'"
-        [class.paciente-active]="registerForm.get('Rol')?.value === 'Paciente'"
-        [class.acompanante-active]="registerForm.get('Rol')?.value === 'Acompañante'">
+      <form class="sign-up" [formGroup]="registerForm" (ngSubmit)="onSubmitSignUp()">
         <div class="decor-icon"><i class="bi bi-person-badge"></i></div>
         <div class="decor-icon-2"><i class="bi bi-person-fill-add"></i></div>
+
         <h2>Registrarse</h2>
         <span>Completa tus datos personales</span>
 
-        <div class="container-input">
-          <i class="bi bi-person"></i>
-          <input type="text" formControlName="NombreCompleto" placeholder="Nombre Completo"
-            (keypress)="onKeyPress($event)" maxlength="60">
-        </div>
+        <!-- BARRA DE PROGRESO MEJORADA -->
+        <div class="progress-steps">
+          <div class="step-indicators">
+            <!-- Paso 1 -->
+            <div class="step-dot" [class.active]="currentStep >= 1" [class.completed]="currentStep > 1">
+              <span>
+                <ng-container *ngIf="currentStep <= 1">
+                  <span
+                    style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">1</span>
+                </ng-container>
+              </span>
+              <div class="step-label">Datos</div>
+            </div>
+            <div class="step-line" [class.active]="currentStep > 1"></div>
 
-        <div class="container-input">
-          <i class="bi bi-telephone"></i>
-          <input type="text" formControlName="Telefono" placeholder="Teléfono" (keypress)="soloNumeros($event)"
-            maxlength="10">
-        </div>
+            <!-- Paso 2 -->
+            <div class="step-dot" [class.active]="currentStep >= 2" [class.completed]="currentStep > 2">
+              <span>
+                <ng-container *ngIf="currentStep <= 2">
+                  <span
+                    style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">2</span>
+                </ng-container>
+              </span>
+              <div class="step-label">Seguridad</div>
+            </div>
+            <div class="step-line" [class.active]="currentStep > 2"></div>
 
-        <div class="container-input">
-          <i class="bi bi-envelope"></i>
-          <input type="email" formControlName="Email" placeholder="Correo Electrónico">
-        </div>
-
-        <div class="container-input">
-          <i class="bi bi-lock"></i>
-          <input type="password" formControlName="Password" placeholder="Contraseña">
-        </div>
-
-        <div class="container-input">
-          <i class="bi bi-person-badge"></i>
-          <select formControlName="Rol" class="select-custom">
-            <option value="" disabled selected>Selecciona tu Rol</option>
-            <option value="Paciente">Paciente</option>
-            <option value="Doctor">Doctor</option>
-            <option value="Acompañante">Acompañante</option>
-          </select>
-          <i class="bi bi-chevron-down arrow-select"></i>
-        </div>
-
-        <!-- Campos adicionales para Paciente -->
-        <ng-container *ngIf="registerForm.get('Rol')?.value === 'Paciente'">
-          <div class="container-input">
-            <i class="bi bi-card-text"></i>
-            <input type="text" formControlName="NSS" placeholder="Número de Seguridad Social"
-              (keypress)="soloNumeros($event)" maxlength="11">
+            <!-- Paso 3 -->
+            <div class="step-dot" [class.active]="currentStep >= 3" [class.completed]="currentStep > 3">
+              <span>
+                <ng-container *ngIf="currentStep <= 3">
+                  <span
+                    style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">3</span>
+                </ng-container>
+              </span>
+              <div class="step-label">Rol</div>
+            </div>
           </div>
-        </ng-container>
+        </div>
 
-        <!-- Campos adicionales para Doctor -->
-        <ng-container *ngIf="registerForm.get('Rol')?.value === 'Doctor'">
-          <div class="container-input file-input-wrapper" [class.has-file]="nombreArchivoCedula">
-            <i class="bi bi-file-earmark-pdf"></i>
-            <input type="file" accept="application/pdf" id="fotoCedula" class="file-input-hidden"
-              (change)="onFileSelected($event)" />
-            <label for="fotoCedula" class="file-label">
-              {{ nombreArchivoCedula || 'Cédula en formato PDF (Requerida)' }}
-            </label>
+        <!-- PASO 1: Datos Personales -->
+        <div class="step-content" *ngIf="currentStep === 1">
+          <div class="container-input">
+            <i class="bi bi-person"></i>
+            <input type="text" formControlName="NombreCompleto" placeholder="Nombre Completo"
+              (keypress)="onKeyPress($event)" maxlength="60">
           </div>
 
           <div class="container-input">
-            <i class="bi bi-clipboard-data"></i>
-            <input type="text" formControlName="Especialidad" placeholder="Especialidad"
-              (keypress)="soloNumeros($event)" maxlength="25">
+            <i class="bi bi-telephone"></i>
+            <input type="text" formControlName="Telefono" placeholder="Teléfono" (keypress)="soloNumeros($event)"
+              maxlength="10">
           </div>
 
           <div class="container-input">
-            <i class="bi bi-geo-alt"></i>
-            <input type="text" formControlName="DireccionClinica" placeholder="Dirección Clínica" maxlength="100">
+            <i class="bi bi-envelope"></i>
+            <input type="email" formControlName="Email" placeholder="Correo Electrónico">
           </div>
-        </ng-container>
-
-        <div class="container-input date-wrapper-premium" *ngIf="registerForm.get('Rol')?.value === 'Acompañante'">
-          <i class="bi bi-calendar-check main-icon"></i>
-          <input type="text" id="fechaInput" formControlName="FechaAsignacion" placeholder="Seleccione fecha"
-            class="input-clean" (focus)="inicializarCalendario()" readonly>
         </div>
 
-        <re-captcha formControlName="recaptcha" [formGroup]="registerForm" [siteKey]="recaptchaSiteKey"
-          (resolved)="onCaptchaRegisterResolved($event)">
-        </re-captcha>
+        <!-- PASO 2: Seguridad -->
+        <div class="step-content" *ngIf="currentStep === 2">
+          <div class="container-input password-wrapper">
+            <i class="bi bi-lock"></i>
+            <input [type]="showRegisterPassword ? 'text' : 'password'" formControlName="Password"
+              placeholder="Contraseña">
+            <i class="bi" [ngClass]="showRegisterPassword ? 'bi-eye-slash' : 'bi-eye'"
+              (click)="toggleRegisterPassword()"></i>
+          </div>
 
-        <button type="submit" class="button google-style" [disabled]="registerForm.invalid || loading">
-          <i class="bi bi-person-plus-fill"></i>
-          <span>{{ loading ? 'Procesando...' : 'Crear Cuenta' }}</span>
-        </button>
+          <div class="container-input password-wrapper">
+            <i class="bi bi-shield-lock"></i>
+            <input [type]="showConfirmPassword ? 'text' : 'password'" formControlName="ConfirmPassword"
+              placeholder="Confirmar Contraseña">
+            <i class="bi" [ngClass]="showConfirmPassword ? 'bi-eye-slash' : 'bi-eye'"
+              (click)="toggleConfirmPassword()"></i>
+          </div>
+        </div>
+
+        <!-- PASO 3: Rol y campos específicos -->
+        <div class="step-content" *ngIf="currentStep === 3"
+          [class.doctor-step]="registerForm.get('Rol')?.value === 'Doctor'">
+          <div class="container-input">
+            <i class="bi bi-person-badge"></i>
+            <select formControlName="Rol" class="select-custom">
+              <option value="" disabled selected>Selecciona tu Rol</option>
+              <option value="Paciente">Paciente</option>
+              <option value="Doctor">Doctor</option>
+              <option value="Acompañante">Acompañante</option>
+            </select>
+            <i class="bi bi-chevron-down arrow-select"></i>
+          </div>
+
+          <!-- Campos para Paciente -->
+          <ng-container *ngIf="registerForm.get('Rol')?.value === 'Paciente'">
+            <div class="container-input">
+              <i class="bi bi-card-text"></i>
+              <input type="text" formControlName="NSS" placeholder="Número de Seguridad Social"
+                (keypress)="soloNumeros($event)" maxlength="11">
+            </div>
+          </ng-container>
+
+          <!-- Campos para Doctor -->
+          <ng-container *ngIf="registerForm.get('Rol')?.value === 'Doctor'">
+            <div class="container-input doctor-input" [class.has-file]="nombreArchivoCedula">
+              <i class="bi bi-file-earmark-pdf"></i>
+              <input type="file" accept="application/pdf" id="fotoCedula" class="file-input-hidden"
+                (change)="onFileSelected($event)" />
+              <label for="fotoCedula" class="file-label">
+                {{ nombreArchivoCedula || 'Cédula en formato PDF (Requerida)' }}
+              </label>
+            </div>
+
+            <div class="container-input doctor-input">
+              <i class="bi bi-clipboard-data"></i>
+              <input type="text" formControlName="Especialidad" placeholder="Especialidad"
+                (keypress)="soloNumeros($event)" maxlength="25">
+            </div>
+
+            <div class="container-input doctor-input">
+              <i class="bi bi-geo-alt"></i>
+              <input type="text" formControlName="DireccionClinica" placeholder="Dirección Clínica" maxlength="100">
+            </div>
+          </ng-container>
+
+          <!-- Campo para Acompañante -->
+          <ng-container *ngIf="registerForm.get('Rol')?.value === 'Acompañante'">
+            <div class="container-input date-wrapper-premium">
+              <i class="bi bi-calendar-check main-icon"></i>
+              <input type="text" id="fechaInput" formControlName="FechaAsignacion" placeholder="Seleccione fecha"
+                class="input-clean" (focus)="inicializarCalendario()" readonly>
+            </div>
+          </ng-container>
+        </div>
+
+        <!-- reCAPTCHA - Movido ARRIBA de los botones -->
+        <div *ngIf="currentStep === 3" class="recaptcha-wrapper">
+          <re-captcha formControlName="recaptcha" [formGroup]="registerForm" [siteKey]="recaptchaSiteKey"
+            (resolved)="onCaptchaRegisterResolved($event)">
+          </re-captcha>
+        </div>
+
+        <!-- Botones de navegación -->
+        <div class="step-navigation">
+          <button type="button" class="btn-step btn-prev" (click)="prevStep()" *ngIf="currentStep > 1">
+            <i class="bi bi-chevron-left"></i> Anterior
+          </button>
+
+          <button type="button" class="btn-step btn-next" (click)="nextStep()" *ngIf="currentStep < 3">
+            Siguiente <i class="bi bi-chevron-right"></i>
+          </button>
+
+          <button type="submit" class="btn-step btn-submit" *ngIf="currentStep === 3"
+            [disabled]="registerForm.invalid || loading">
+            <i class="bi bi-person-plus-fill"></i>
+            <span>{{ loading ? 'Procesando...' : 'Crear Cuenta' }}</span>
+          </button>
+        </div>
 
         <p class="mobile-toggle">¿Ya tienes cuenta? <a (click)="toggleToSignIn()">Inicia Sesión</a></p>
       </form>
@@ -192,6 +271,7 @@
   </div>
 </div>
 
+<!-- Modal -->
 <div class="custom-modal-overlay" [class.show]="showModal" (click)="closeModal()">
   <div class="custom-modal" (click)="$event.stopPropagation()" [ngClass]="modalType">
     <div class="modal-icon"><i [ngClass]="modalIcon"></i></div>
