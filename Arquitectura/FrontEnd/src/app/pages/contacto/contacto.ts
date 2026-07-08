@@ -1,6 +1,6 @@
 import { Component, AfterViewInit, ViewChildren, QueryList, ElementRef, Inject, PLATFORM_ID, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { ShaderBackgroundComponent } from '../../components/ui/shader-background/shader-background.component';
+import { ShaderBackgroundComponent } from '../../shared/components/shader-background/shader-background.component';
 import { HttpClient, HttpClientModule } from '@angular/common/http'; // Importa HttpClientModule
 import { FormsModule } from '@angular/forms';
 
@@ -33,7 +33,7 @@ export class Contacto implements AfterViewInit {
   };
 
   constructor(
-    @Inject(PLATFORM_ID) private platformId: Object, 
+    @Inject(PLATFORM_ID) private platformId: Object,
     private http: HttpClient,
     private cdr: ChangeDetectorRef
   ) { }

@@ -89,7 +89,8 @@
                             <div class="date-cell">
                                 @if (d.nombrepaciente) {
                                 <i class="bi bi-person-fill me-2 text-primary"></i>
-                                {{ d.nombrepaciente }} {{ d.appaternopaciente }}
+                                <!-- ✅ NOMBRE COMPLETO DEL PACIENTE EN LA TABLA -->
+                                {{ getNombreCompletoPaciente(d) }}
                                 } @else {
                                 <i class="bi bi-person-dash me-2 text-muted"></i>
                                 <span class="text-muted">Sin vincular</span>
@@ -172,13 +173,33 @@
                         </div>
                         }
                         @for (p of pacientesFiltradosModal; track p.idusuario) {
+                        <!-- ✅ CORREGIDO: Mostrar nombre completo en el dropdown -->
                         <div class="custom-dropdown-item" (mousedown)="seleccionarPacienteModal(p)">
-                            {{ p.nombre }} {{ p.appaterno || '' }} {{ p.apmaterno || '' }}
+                            {{ getNombreCompletoPacienteObj(p) }}
                         </div>
                         }
                     </div>
                     }
                 </div>
+
+                <!-- ✅ MOSTRAR PACIENTE SELECCIONADO CON NOMBRE COMPLETO -->
+                @if (dispositivoForm.idPacienteAsociado) {
+                <div class="form-group" style="grid-column: span 2; margin-top: 0.5rem;">
+                    <div class="patient-badge-container" style="background: #f0fdf4; border-color: #bbf7d0;">
+                        <div class="patient-info">
+                            <i class="bi bi-person-check-fill icon-patient active"></i>
+                            <span class="patient-name">
+                                <!-- ✅ NOMBRE COMPLETO DEL PACIENTE SELECCIONADO -->
+                                {{ getNombrePacienteSeleccionado() }}
+                            </span>
+                            <button type="button" class="btn-desasignar" (click)="desvincularPaciente()"
+                                title="Desvincular paciente">
+                                <i class="bi bi-x-circle-fill"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                }
             </div>
         </div>
         <div class="modal-footer-premium">

@@ -73,13 +73,11 @@ export class Citas implements OnInit, OnDestroy {
   }
 
   /**
-   * Validador de permisos ajustado: Médicos y Administradores controlan todo,
-   * Pacientes solo crean.
+   * Validador de permisos
    */
   verificarPermiso(accion: 'crear' | 'editar' | 'eliminar'): boolean {
     if (!this.currentUser || !this.currentUser.rol) return false;
 
-    // Normalizamos el rol del usuario actual
     const rol = this.currentUser.rol
       .toLowerCase()
       .trim()
@@ -87,17 +85,14 @@ export class Citas implements OnInit, OnDestroy {
 
     const esAdmin = rol === 'administrador';
     const esMedicoODoctor = rol.includes('medico') || rol.includes('doctor');
+    const esAcompanante = rol === 'acompanante';
 
     switch (accion) {
       case 'crear':
-        // Pacientes, Médicos, Doctores y Administradores pueden generar citas
-        return rol === 'paciente';
-
+        return rol === 'paciente' || esAcompanante;
       case 'editar':
       case 'eliminar':
-        // Solo Médicos, Doctores y el Administrador pueden editar o eliminar
         return esMedicoODoctor || esAdmin;
-
       default:
         return false;
     }
@@ -123,7 +118,6 @@ export class Citas implements OnInit, OnDestroy {
     const rol = this.currentUser.rol.toLowerCase().trim()
       .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-    // Agregamos 'acompanante' a la lógica de acceso total
     const tieneAccesoGlobal = rol.includes('medico') ||
       rol.includes('doctor') ||
       rol.includes('administrador') ||
@@ -133,10 +127,8 @@ export class Citas implements OnInit, OnDestroy {
 
     try {
       if (tieneAccesoGlobal) {
-        // Usamos el nuevo método getAllCitas que creamos
         data = await firstValueFrom(this.usersService.getAllCitas());
       } else {
-        // El paciente solo ve las suyas
         data = await firstValueFrom(this.usersService.getMisCitas(this.currentUser.correo));
       }
 
@@ -272,23 +264,49 @@ export class Citas implements OnInit, OnDestroy {
     this.mostrarModalDelete = true;
   }
 
+  // ✅ CONFIRMAR ELIMINAR CITA - CORREGIDO (Usando cancelarCita)
   async confirmarEliminarCita() {
     if (!this.verificarPermiso('eliminar')) {
       this.lanzarNotificacion('Acción inválida para tu rol.', 'error');
       return;
     }
-    if (!this.citaSeleccionada) return;
+
+    if (!this.citaSeleccionada) {
+      this.lanzarNotificacion('No hay cita seleccionada.', 'warning');
+      return;
+    }
+
+    // ✅ Validar estado de la cita
+    if (this.citaSeleccionada.estado === 'Cancelada') {
+      this.lanzarNotificacion('Esta cita ya está cancelada.', 'warning');
+      this.cerrarModal();
+      return;
+    }
+
+    if (this.citaSeleccionada.estado === 'Completada') {
+      this.lanzarNotificacion('No se puede cancelar una cita ya completada.', 'warning');
+      this.cerrarModal();
+      return;
+    }
+
     this.isDeleting = true;
 
     try {
-      await firstValueFrom(this.usersService.actualizarEstadoCita(this.citaSeleccionada.idcita, { estado: 'Cancelada' }));
+      const idCita = this.citaSeleccionada.idcita || this.citaSeleccionada.id;
+
+      // ✅ USAR CANCELAR CITA (PATCH) - Cambia estado a Cancelada
+      await firstValueFrom(
+        this.usersService.cancelarCita(idCita, 'Cancelada por el usuario')
+      );
+
       await this.cargarCitas();
       this.cerrarModal();
       this.citaSeleccionada = null;
       this.lanzarNotificacion('La cita médica ha sido cancelada con éxito.', 'success');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error al cancelar:', error);
-      this.lanzarNotificacion('Hubo un problema y no se pudo cancelar la cita.', 'error');
+      const mensajeError = error.error?.error || error.message || 'Error al cancelar la cita';
+      this.lanzarNotificacion(`Error: ${mensajeError}`, 'error');
     } finally {
       this.isDeleting = false;
       this.cdr.detectChanges();

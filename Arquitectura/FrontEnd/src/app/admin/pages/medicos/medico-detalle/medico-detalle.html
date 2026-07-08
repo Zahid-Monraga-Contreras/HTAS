@@ -21,6 +21,12 @@
             </div>
 
             <div class="header-controls">
+                <!-- ✅ NUEVO: Badge de estado del médico -->
+                <div class="estado-medico" [ngClass]="getEstadoMedico().clase">
+                    <i class="bi" [ngClass]="getEstadoMedico().icono"></i>
+                    <span>{{ getEstadoMedico().texto }}</span>
+                </div>
+
                 <button class="btn-cancel-premium" (click)="volver()">
                     <i class="bi bi-arrow-left"></i>
                     <span>Volver a la lista</span>
@@ -28,39 +34,260 @@
             </div>
         </div>
 
+        <!-- ✅ NUEVO: Tarjeta de resumen del médico -->
+        <div class="resumen-medico">
+            <div class="resumen-item">
+                <i class="bi bi-person-fill"></i>
+                <div>
+                    <small>Nombre completo</small>
+                    <strong>{{ usuarioSeleccionado.tempNombre || usuarioSeleccionado.nombre }}
+                        {{ usuarioSeleccionado.tempApellidoPaterno || usuarioSeleccionado.apPaterno }}
+                        {{ usuarioSeleccionado.tempApellidoMaterno || usuarioSeleccionado.apMaterno }}</strong>
+                </div>
+            </div>
+            <div class="resumen-item">
+                <i class="bi bi-envelope-fill"></i>
+                <div>
+                    <small>Correo</small>
+                    <strong>{{ usuarioSeleccionado.correo }}</strong>
+                </div>
+            </div>
+            <div class="resumen-item">
+                <i class="bi bi-hospital-fill"></i>
+                <div>
+                    <small>Especialidad</small>
+                    <strong>{{ usuarioSeleccionado.especialidad || 'No especificada' }}</strong>
+                </div>
+            </div>
+            @if (estadisticas) {
+            <div class="resumen-item">
+                <i class="bi bi-clipboard-data"></i>
+                <div>
+                    <small>Pacientes atendidos</small>
+                    <strong>{{ estadisticas.totalPacientes }}</strong>
+                </div>
+            </div>
+            }
+        </div>
+
+        <!-- ✅ NUEVO: Sección de estadísticas -->
+        @if (estadisticas) {
+        <div class="estadisticas-section">
+            <h4 class="section-title">
+                <i class="bi bi-graph-up-arrow"></i>
+                Estadísticas de Actividad
+            </h4>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <small>Total Pacientes</small>
+                    <div class="stat-value">{{ estadisticas.totalPacientes }}</div>
+                </div>
+                <div class="stat-box">
+                    <small>Citas Completadas</small>
+                    <div class="stat-value">{{ estadisticas.citasCompletadas }}</div>
+                </div>
+                <div class="stat-box">
+                    <small>Citas Pendientes</small>
+                    <div class="stat-value">{{ estadisticas.citasPendientes }}</div>
+                </div>
+                <div class="stat-box">
+                    <small>Promedio Consultas</small>
+                    <div class="stat-value">{{ estadisticas.promedioConsultas }} <small>/mes</small></div>
+                </div>
+            </div>
+        </div>
+        }
+
         <div class="detail-card">
+            <!-- ========================================== -->
+            <!-- SECCIÓN 1: DATOS PERSONALES                -->
+            <!-- ========================================== -->
             <div class="form-grid">
                 <div class="form-group">
                     <label>Nombre(s)</label>
-                    <input type="text" [(ngModel)]="usuarioSeleccionado.tempNombre" class="form-control-premium">
+                    <input type="text" [(ngModel)]="usuarioSeleccionado.tempNombre" class="form-control-premium"
+                        placeholder="Ej: Juan">
                 </div>
                 <div class="form-group">
                     <label>Apellido Paterno</label>
                     <input type="text" [(ngModel)]="usuarioSeleccionado.tempApellidoPaterno"
-                        class="form-control-premium">
+                        class="form-control-premium" placeholder="Ej: Pérez">
                 </div>
                 <div class="form-group">
                     <label>Apellido Materno</label>
                     <input type="text" [(ngModel)]="usuarioSeleccionado.tempApellidoMaterno"
-                        class="form-control-premium">
+                        class="form-control-premium" placeholder="Ej: García">
                 </div>
                 <div class="form-group">
                     <label>Correo Electrónico</label>
-                    <input type="email" [(ngModel)]="usuarioSeleccionado.correo" class="form-control-premium">
+                    <input type="email" [(ngModel)]="usuarioSeleccionado.correo" class="form-control-premium"
+                        placeholder="Ej: medico@hospital.com">
                 </div>
                 <div class="form-group">
                     <label>Especialidad</label>
-                    <input type="text" [(ngModel)]="usuarioSeleccionado.especialidad" class="form-control-premium">
+                    <input type="text" [(ngModel)]="usuarioSeleccionado.especialidad" class="form-control-premium"
+                        placeholder="Ej: Cardiología">
                 </div>
                 <div class="form-group">
                     <label>Teléfono</label>
-                    <input type="text" [(ngModel)]="usuarioSeleccionado.telefono" class="form-control-premium">
+                    <input type="text" [(ngModel)]="usuarioSeleccionado.telefono" class="form-control-premium"
+                        placeholder="Ej: 2711234567">
                 </div>
-                <div class="form-group" style="grid-column: span 3;">
-                    <label>Dirección Clínica</label>
-                    <input type="text" [(ngModel)]="usuarioSeleccionado.direccionClinica" class="form-control-premium">
+                <div class="form-group">
+                    <label>Género</label>
+                    <select [(ngModel)]="usuarioSeleccionado.genero" class="form-control-premium">
+                        <option value="Masculino">Masculino</option>
+                        <option value="Femenino">Femenino</option>
+                        <option value="Otro">Otro</option>
+                        <option value="No especificado">No especificado</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Fecha de Nacimiento</label>
+                    <input type="date" [(ngModel)]="usuarioSeleccionado.fechaNacimiento" class="form-control-premium">
+                </div>
+                <div class="form-group">
+                    <label>CURP</label>
+                    <input type="text" [(ngModel)]="usuarioSeleccionado.curp" (input)="formatearCURP()" maxlength="18"
+                        class="form-control-premium" placeholder="Ej: PÉREZ1234567890">
+                    <small class="form-text text-muted">18 caracteres alfanuméricos</small>
                 </div>
             </div>
+
+            <!-- ========================================== -->
+            <!-- SECCIÓN 2: DIRECCIÓN CLÍNICA               -->
+            <!-- ========================================== -->
+            <div class="form-group full-width-group">
+                <label>Dirección Clínica</label>
+                <input type="text" [(ngModel)]="usuarioSeleccionado.direccionClinica" class="form-control-premium"
+                    placeholder="Ej: Av. Reforma #123, Col. Centro">
+            </div>
+
+            <!-- ========================================== -->
+            <!-- SECCIÓN 3: DATOS DE UBICACIÓN (NUEVOS)     -->
+            <!-- ========================================== -->
+            <div class="ubicacion-section">
+                <div class="section-divider">
+                    <span class="section-title">Datos de Ubicación</span>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>Domicilio</label>
+                        <input type="text" [(ngModel)]="usuarioSeleccionado.domicilio"
+                            (blur)="formatearCampoTexto('domicilio')" class="form-control-premium"
+                            placeholder="Ej: Calle Benito Juárez #123">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Código Postal</label>
+                        <input type="text" [(ngModel)]="usuarioSeleccionado.codigoPostal"
+                            (input)="formatearCodigoPostal()" maxlength="5" class="form-control-premium"
+                            placeholder="Ej: 94500">
+                        <small class="form-text text-muted">5 dígitos numéricos</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Localidad</label>
+                        <input type="text" [(ngModel)]="usuarioSeleccionado.localidad"
+                            (blur)="formatearCampoTexto('localidad')" class="form-control-premium"
+                            placeholder="Ej: Córdoba">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Municipio</label>
+                        <input type="text" [(ngModel)]="usuarioSeleccionado.municipio"
+                            (blur)="formatearCampoTexto('municipio')" class="form-control-premium"
+                            placeholder="Ej: Córdoba">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Estado</label>
+                        <input type="text" [(ngModel)]="usuarioSeleccionado.estado"
+                            (blur)="formatearCampoTexto('estado')" class="form-control-premium"
+                            placeholder="Ej: Veracruz">
+                    </div>
+                </div>
+
+                <!-- ✅ Mostrar ubicación formateada -->
+                @if (tieneUbicacionCompleta()) {
+                <div class="ubicacion-resumen">
+                    <i class="bi bi-geo-alt-fill"></i>
+                    <span>{{ getUbicacionFormateada() }}</span>
+                </div>
+                }
+            </div>
+
+            <!-- ✅ NUEVO: Sección de pacientes atendidos -->
+            @if (pacientesAtendidos.length > 0) {
+            <div class="pacientes-section">
+                <div class="pacientes-header" (click)="mostrarPacientes = !mostrarPacientes">
+                    <h4 class="section-title" style="cursor: pointer;">
+                        <i class="bi bi-people-fill"></i>
+                        Pacientes Atendidos Recientemente
+                        <span class="badge-pacientes">{{ pacientesAtendidos.length }}</span>
+                        <i class="bi" [ngClass]="mostrarPacientes ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+                    </h4>
+                </div>
+
+                @if (mostrarPacientes) {
+                <div class="pacientes-lista">
+                    @for (p of pacientesAtendidos; track p.id) {
+                    <div class="paciente-item">
+                        <div class="paciente-info">
+                            <i class="bi bi-person-circle"></i>
+                            <span class="paciente-nombre">{{ p.nombre }}</span>
+                        </div>
+                        <div class="paciente-detalle">
+                            <span class="fecha-info">
+                                <i class="bi bi-calendar"></i>
+                                {{ p.fechaUltimaCita }}
+                            </span>
+                            <span class="motivo-info">{{ p.motivo }}</span>
+                        </div>
+                    </div>
+                    }
+                </div>
+                }
+            </div>
+            }
+
+            <!-- ✅ NUEVO: Historial de cambios -->
+            @if (historialCambios.length > 0) {
+            <div class="historial-section">
+                <hr class="section-divider">
+
+                <div class="historial-header" (click)="mostrarHistorial = !mostrarHistorial">
+                    <h4 class="section-title" style="cursor: pointer;">
+                        <i class="bi bi-clock-history"></i>
+                        Historial del Médico
+                        <i class="bi" [ngClass]="mostrarHistorial ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+                    </h4>
+                    <span class="historial-count">{{ historialCambios.length }} eventos</span>
+                </div>
+
+                @if (mostrarHistorial) {
+                <div class="historial-lista">
+                    @for (item of historialCambios; track item) {
+                    <div class="historial-item">
+                        <div class="historial-fecha">
+                            <i class="bi bi-clock"></i>
+                            {{ item.fecha }}
+                        </div>
+                        <div class="historial-detalle">
+                            <strong>{{ item.accion }}</strong>
+                            <span>{{ item.detalle }}</span>
+                        </div>
+                        <div class="historial-usuario">
+                            <i class="bi bi-person"></i>
+                            {{ item.usuario }}
+                        </div>
+                    </div>
+                    }
+                </div>
+                }
+            </div>
+            }
 
             <div class="action-footer">
                 <button class="btn-cancel-premium" (click)="volver()" [disabled]="isSaving">Cancelar</button>

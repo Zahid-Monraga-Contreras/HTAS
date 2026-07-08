@@ -6,6 +6,27 @@ import { Users } from '../../../../auth/services/users';
 import { firstValueFrom } from 'rxjs';
 import { Menu } from "../../../template/menu/menu";
 
+interface HistorialMedicamento {
+  fecha: string;
+  accion: string;
+  detalle: string;
+  usuario: string;
+}
+
+interface TratamientoAsociado {
+  id: number;
+  paciente: string;
+  nombre: string;
+  apPaterno: string;
+  apMaterno: string;
+  idPaciente: number;
+  fechaInicio: string;
+  fechaFin: string;
+  activo: boolean;
+  dosis: string;
+  idMedicamento: number;
+}
+
 @Component({
   selector: 'app-medicamento-detalle',
   standalone: true,
@@ -23,11 +44,26 @@ export class MedicamentoDetalle implements OnInit, OnDestroy {
   medicamentoSeleccionado: any = null;
   isSaving = false;
 
-  // Sistema de Notificaciones Premium Toast
   mostrarToast = false;
   mensajeToast = '';
   tipoToast: 'success' | 'error' | 'warning' = 'success';
   private toastTimeout: any = null;
+
+  historialCambios: HistorialMedicamento[] = [];
+  mostrarHistorial = false;
+
+  estadisticas: {
+    totalTratamientos: number;
+    tratamientosActivos: number;
+    ultimoUso: string | null;
+    pacientesActivos: number;
+  } | null = null;
+
+  tratamientosAsociados: TratamientoAsociado[] = [];
+  mostrarTratamientos = false;
+
+  cargandoEstadisticas = false;
+  cargandoTratamientos = false;
 
   ngOnInit() {
     let state: any = null;
@@ -39,20 +75,296 @@ export class MedicamentoDetalle implements OnInit, OnDestroy {
     }
 
     if (state && state.medicamento) {
-      // Duplicamos el objeto y mapeamos de manera segura campos por si vienen en mayúsculas/camelCase desde la navegación
       const m = state.medicamento;
+
       this.medicamentoSeleccionado = {
-        idmedicamento: m.idmedicamento || m.IdMedicamento || m.id,
-        nombrecomercial: m.nombrecomercial || m.nombreComercial || '',
-        sustanciaactiva: m.sustanciaactiva || m.sustanciaActiva || '',
-        presentacion: m.presentacion || m.Presentacion || '',
-        concentracion: m.concentracion || m.Concentracion || '',
-        laboratorio: m.laboratorio || m.Laboratorio || '',
-        indicacionesgenerales: m.indicacionesgenerales || m.indicacionesGenerales || ''
+        idmedicamento: m.IdMedicamento || m.idmedicamento || m.id,
+        nombrecomercial: m.NombreComercial || m.nombrecomercial || m.nombre || '',
+        sustanciaactiva: m.SustanciaActiva || m.sustanciaactiva || '',
+        presentacion: m.Presentacion || m.presentacion || '',
+        concentracion: m.Concentracion || m.concentracion || '',
+        laboratorio: m.Laboratorio || m.laboratorio || '',
+        indicacionesgenerales: m.IndicacionesGenerales || m.indicacionesgenerales || ''
       };
+
+      this.inicializarCampos();
+
+      const idMedicamento = this.medicamentoSeleccionado.idmedicamento;
+      if (idMedicamento) {
+        this.cargarEstadisticasReales(idMedicamento);
+        this.cargarTratamientosReales(idMedicamento);
+      }
+
+      this.inicializarHistorial();
+
     } else {
       this.router.navigate(['/medicamentos']);
     }
+  }
+
+  inicializarCampos() {
+    if (!this.medicamentoSeleccionado) return;
+    if (!this.medicamentoSeleccionado.sustanciaactiva) {
+      this.medicamentoSeleccionado.sustanciaactiva = '';
+    }
+    if (!this.medicamentoSeleccionado.concentracion) {
+      this.medicamentoSeleccionado.concentracion = '';
+    }
+    if (!this.medicamentoSeleccionado.laboratorio) {
+      this.medicamentoSeleccionado.laboratorio = '';
+    }
+    if (!this.medicamentoSeleccionado.indicacionesgenerales) {
+      this.medicamentoSeleccionado.indicacionesgenerales = '';
+    }
+  }
+
+  // ✅ CARGAR ESTADÍSTICAS REALES
+  async cargarEstadisticasReales(idMedicamento: number) {
+    if (!idMedicamento) return;
+
+    this.cargandoEstadisticas = true;
+
+    try {
+      const response = await firstValueFrom(
+        this.usersService.getEstadisticasMedicamento(idMedicamento)
+      );
+
+      if (response) {
+        this.estadisticas = {
+          totalTratamientos: response.totalTratamientos || 0,
+          tratamientosActivos: response.tratamientosActivos || 0,
+          ultimoUso: response.ultimoUso || null,
+          pacientesActivos: response.pacientesActivos || 0
+        };
+      } else {
+        this.estadisticas = {
+          totalTratamientos: 0,
+          tratamientosActivos: 0,
+          ultimoUso: null,
+          pacientesActivos: 0
+        };
+      }
+
+    } catch (error) {
+      console.warn('No se pudieron cargar estadísticas reales:', error);
+      if (this.tratamientosAsociados.length > 0) {
+        this.calcularEstadisticasDesdeTratamientos();
+      } else {
+        this.estadisticas = {
+          totalTratamientos: 0,
+          tratamientosActivos: 0,
+          ultimoUso: null,
+          pacientesActivos: 0
+        };
+      }
+    } finally {
+      this.cargandoEstadisticas = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  calcularEstadisticasDesdeTratamientos() {
+    const activos = this.tratamientosAsociados.filter(t => t.activo);
+    const pacientes = new Set(this.tratamientosAsociados.map(t => t.idPaciente));
+
+    this.estadisticas = {
+      totalTratamientos: this.tratamientosAsociados.length,
+      tratamientosActivos: activos.length,
+      ultimoUso: this.tratamientosAsociados.length > 0
+        ? this.tratamientosAsociados[0].fechaInicio
+        : null,
+      pacientesActivos: pacientes.size
+    };
+  }
+
+  // ✅ CARGAR TRATAMIENTOS ASOCIADOS REALES - CORREGIDO
+  async cargarTratamientosReales(idMedicamento: number) {
+    if (!idMedicamento) return;
+
+    this.cargandoTratamientos = true;
+
+    try {
+      const response = await firstValueFrom(
+        this.usersService.getTratamientos()
+      );
+
+      const tratamientosFiltrados = response.filter((t: any) =>
+        t.idmedicamento === idMedicamento ||
+        t.IdMedicamento === idMedicamento ||
+        t.idMedicamento === idMedicamento
+      );
+
+      if (tratamientosFiltrados && tratamientosFiltrados.length > 0) {
+        this.tratamientosAsociados = tratamientosFiltrados.map((t: any) => ({
+          id: t.idtratamiento || t.IdTratamiento || t.id || 0,
+          // ✅ NOMBRE COMPLETO DEL PACIENTE
+          paciente: this.getNombreCompletoPaciente(t),
+          nombre: t.nombre || t.Nombre || t.nombrepaciente || t.NombrePaciente || '',
+          apPaterno: t.appaterno || t.ApPaterno || t.appaternopaciente || t.ApPaternoPaciente || '',
+          apMaterno: t.apmaterno || t.ApMaterno || t.apmaternopaciente || t.ApMaternoPaciente || '',
+          idPaciente: t.idpaciente || t.IdPaciente || 0,
+          // ✅ FORMATEAR FECHAS
+          fechaInicio: this.formatearFecha(t.fechainicio || t.FechaInicio || ''),
+          fechaFin: this.formatearFecha(t.fechafin || t.FechaFin || ''),
+          activo: t.activo !== undefined ? t.activo : true,
+          dosis: t.dosis || t.Dosis || 'Sin dosis especificada',
+          idMedicamento: t.idmedicamento || t.IdMedicamento || idMedicamento
+        }));
+
+        this.calcularEstadisticasDesdeTratamientos();
+
+      } else {
+        this.tratamientosAsociados = [];
+        this.estadisticas = {
+          totalTratamientos: 0,
+          tratamientosActivos: 0,
+          ultimoUso: null,
+          pacientesActivos: 0
+        };
+      }
+
+    } catch (error) {
+      console.warn('No se pudieron cargar tratamientos reales:', error);
+      this.tratamientosAsociados = [];
+    } finally {
+      this.cargandoTratamientos = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  // ✅ OBTENER NOMBRE COMPLETO DEL PACIENTE
+  getNombreCompletoPaciente(t: any): string {
+    const nombre = t.nombre || t.Nombre || t.nombrepaciente || t.NombrePaciente || '';
+    const apPaterno = t.appaterno || t.ApPaterno || t.appaternopaciente || t.ApPaternoPaciente || '';
+    const apMaterno = t.apmaterno || t.ApMaterno || t.apmaternopaciente || t.ApMaternoPaciente || '';
+
+    // Si tiene nombre y apellidos, concatenar
+    if (nombre && apPaterno) {
+      return `${nombre} ${apPaterno} ${apMaterno || ''}`.trim();
+    }
+
+    // Si solo tiene nombre
+    if (nombre) {
+      return nombre;
+    }
+
+    // Si tiene nombrepaciente (como viene del backend)
+    if (t.nombrepaciente || t.NombrePaciente) {
+      return t.nombrepaciente || t.NombrePaciente;
+    }
+
+    return 'Paciente sin nombre';
+  }
+
+  // ✅ FORMATEAR FECHA (eliminar el formato ISO y dejar solo DD/MM/YYYY)
+  formatearFecha(fecha: string): string {
+    if (!fecha) return '';
+
+    try {
+      // Si la fecha viene en formato ISO (2026-07-10T06:00:00.000Z)
+      if (fecha.includes('T')) {
+        const fechaObj = new Date(fecha);
+        if (!isNaN(fechaObj.getTime())) {
+          const dia = String(fechaObj.getDate()).padStart(2, '0');
+          const mes = String(fechaObj.getMonth() + 1).padStart(2, '0');
+          const anio = fechaObj.getFullYear();
+          return `${dia}/${mes}/${anio}`;
+        }
+      }
+
+      // Si ya viene en formato YYYY-MM-DD
+      if (fecha.includes('-')) {
+        const partes = fecha.split('-');
+        if (partes.length === 3) {
+          return `${partes[2]}/${partes[1]}/${partes[0]}`;
+        }
+      }
+
+      return fecha;
+    } catch (error) {
+      return fecha;
+    }
+  }
+
+  inicializarHistorial() {
+    const ahora = new Date();
+    const fechaStr = ahora.toISOString().replace('T', ' ').slice(0, 16);
+
+    this.historialCambios = [
+      {
+        fecha: fechaStr,
+        accion: 'Medicamento registrado',
+        detalle: `Registrado: ${this.medicamentoSeleccionado.nombrecomercial}`,
+        usuario: 'Sistema'
+      }
+    ];
+
+    if (this.medicamentoSeleccionado.laboratorio) {
+      this.historialCambios.push({
+        fecha: fechaStr,
+        accion: 'Laboratorio asignado',
+        detalle: `Laboratorio: ${this.medicamentoSeleccionado.laboratorio}`,
+        usuario: 'Sistema'
+      });
+    }
+  }
+
+  agregarHistorial(accion: string, detalle: string) {
+    const ahora = new Date();
+    const fechaStr = ahora.toISOString().replace('T', ' ').slice(0, 16);
+    this.historialCambios.unshift({
+      fecha: fechaStr,
+      accion: accion,
+      detalle: detalle,
+      usuario: 'Usuario actual'
+    });
+  }
+
+  getEstadoMedicamento(): { texto: string; clase: string; icono: string } {
+    if (!this.estadisticas) {
+      return { texto: 'Sin datos', clase: 'estado-sin-datos', icono: 'bi-question-circle' };
+    }
+
+    if (this.estadisticas.tratamientosActivos > 0) {
+      return {
+        texto: 'En uso activo',
+        clase: 'estado-activo',
+        icono: 'bi-check-circle-fill'
+      };
+    } else if (this.estadisticas.totalTratamientos > 0) {
+      return {
+        texto: 'Sin uso activo',
+        clase: 'estado-inactivo',
+        icono: 'bi-clock'
+      };
+    } else {
+      return {
+        texto: 'Sin tratamientos',
+        clase: 'estado-sin-datos',
+        icono: 'bi-plus-circle'
+      };
+    }
+  }
+
+  formatearIndicaciones(texto: string): string {
+    if (!texto) return '';
+    return texto.split('. ').map(oracion =>
+      oracion.charAt(0).toUpperCase() + oracion.slice(1)
+    ).join('. ');
+  }
+
+  validarCampos(): { valido: boolean; mensaje: string } {
+    const m = this.medicamentoSeleccionado;
+
+    if (!m.nombrecomercial || m.nombrecomercial.trim().length < 2) {
+      return { valido: false, mensaje: 'El nombre comercial debe tener al menos 2 caracteres' };
+    }
+
+    if (!m.presentacion || m.presentacion.trim().length < 2) {
+      return { valido: false, mensaje: 'La presentación es obligatoria' };
+    }
+
+    return { valido: true, mensaje: '' };
   }
 
   ngOnDestroy() {
@@ -79,6 +391,7 @@ export class MedicamentoDetalle implements OnInit, OnDestroy {
     }, 4000);
   }
 
+  // ✅ GUARDAR CAMBIOS
   async guardarCambios() {
     if (!this.medicamentoSeleccionado) return;
 
@@ -94,11 +407,18 @@ export class MedicamentoDetalle implements OnInit, OnDestroy {
       return;
     }
 
+    const validacion = this.validarCampos();
+    if (!validacion.valido) {
+      this.lanzarNotificacion(validacion.mensaje, "warning");
+      return;
+    }
+
     this.isSaving = true;
     this.cdr.detectChanges();
 
     try {
-      // El payload empareja exactamente con las propiedades que lee tu servicio del backend
+      const nombreAnterior = this.medicamentoSeleccionado.nombrecomercial;
+
       const payload = {
         nombreComercial: nombreComercial,
         sustanciaActiva: (this.medicamentoSeleccionado.sustanciaactiva || '').trim(),
@@ -109,6 +429,21 @@ export class MedicamentoDetalle implements OnInit, OnDestroy {
       };
 
       await firstValueFrom(this.usersService.actualizarMedicamento(id, payload));
+
+      if (nombreAnterior !== payload.nombreComercial) {
+        this.agregarHistorial(
+          `Nombre actualizado`,
+          `De: "${nombreAnterior}" → "${payload.nombreComercial}"`
+        );
+      } else {
+        this.agregarHistorial(
+          'Información actualizada',
+          'Datos del medicamento actualizados'
+        );
+      }
+
+      this.cargarEstadisticasReales(id);
+      this.cargarTratamientosReales(id);
 
       this.lanzarNotificacion("¡Éxito! El medicamento ha sido actualizado correctamente.", "success");
 
@@ -124,5 +459,29 @@ export class MedicamentoDetalle implements OnInit, OnDestroy {
       this.isSaving = false;
       this.cdr.detectChanges();
     }
+  }
+
+  getNombreFormateado(): string {
+    if (!this.medicamentoSeleccionado) return '';
+    const nombre = this.medicamentoSeleccionado.nombrecomercial || '';
+    const sustancia = this.medicamentoSeleccionado.sustanciaactiva || '';
+
+    if (sustancia) {
+      return `${nombre} (${sustancia})`;
+    }
+    return nombre;
+  }
+
+  getInfoPresentacion(): string {
+    const m = this.medicamentoSeleccionado;
+    if (!m) return '';
+    const partes = [];
+    if (m.presentacion) partes.push(m.presentacion);
+    if (m.concentracion) partes.push(m.concentracion);
+    return partes.join(' - ');
+  }
+
+  getTotalTratamientos(): number {
+    return this.tratamientosAsociados.length;
   }
 }

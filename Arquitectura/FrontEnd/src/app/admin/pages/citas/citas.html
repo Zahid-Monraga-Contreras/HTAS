@@ -42,9 +42,9 @@
                     }
 
                     @if (verificarPermiso('eliminar')) {
-                    <button class="btn-action btn-delete-premium" (click)="abrirEliminarCita()" title="Eliminar cita">
+                    <button class="btn-action btn-delete-premium" (click)="abrirEliminarCita()" title="Cancelar cita">
                         <i class="bi bi-trash-fill"></i>
-                        <span>Eliminar</span>
+                        <span>Cancelar</span>
                     </button>
                     }
                 </div>
@@ -182,6 +182,7 @@
     </div>
 </main>
 
+<!-- MODAL: CREAR CITA -->
 @if (mostrarModalCrear) {
 <div class="modal-overlay">
     <div class="modal-premium-card">
@@ -256,6 +257,7 @@
 </div>
 }
 
+<!-- MODAL: CANCELAR CITA -->
 @if (mostrarModalDelete) {
 <div class="modal-overlay">
     <div class="modal-content modal-danger">
@@ -266,8 +268,12 @@
         <p class="text-muted">Esta acción notificará automáticamente al sistema.</p>
         <div class="modal-footer-danger">
             <button class="btn-danger-confirm" (click)="confirmarEliminarCita()" [disabled]="isDeleting">
-                @if (isDeleting) { <span class="spinner-save"></span> }
-                @else { <span>Sí, Cancelar Cita</span> }
+                @if (isDeleting) {
+                <span class="spinner-save"></span>
+                <span>Cancelando...</span>
+                } @else {
+                <span>Sí, Cancelar Cita</span>
+                }
             </button>
             <button class="btn-outline-cancel" (click)="cerrarModal()" [disabled]="isDeleting">No, volver</button>
         </div>

@@ -45,11 +45,32 @@ export class AcompananteDetalle implements OnInit, AfterViewInit, OnDestroy {
     if (state && state.usuario) {
       this.usuarioSeleccionado = { ...state.usuario };
 
+      // Limpiar fechas
       if (this.usuarioSeleccionado.fechaNacimiento) {
         this.usuarioSeleccionado.fechaNacimiento = this.limpiarFecha(this.usuarioSeleccionado.fechaNacimiento);
       }
       if (this.usuarioSeleccionado.fechaAsignacion) {
         this.usuarioSeleccionado.fechaAsignacion = this.limpiarFecha(this.usuarioSeleccionado.fechaAsignacion);
+      }
+
+      // ✅ NUEVO: Asegurar que los nuevos campos tengan valores
+      if (!this.usuarioSeleccionado.curp) {
+        this.usuarioSeleccionado.curp = '';
+      }
+      if (!this.usuarioSeleccionado.domicilio) {
+        this.usuarioSeleccionado.domicilio = '';
+      }
+      if (!this.usuarioSeleccionado.codigoPostal) {
+        this.usuarioSeleccionado.codigoPostal = '';
+      }
+      if (!this.usuarioSeleccionado.localidad) {
+        this.usuarioSeleccionado.localidad = '';
+      }
+      if (!this.usuarioSeleccionado.municipio) {
+        this.usuarioSeleccionado.municipio = '';
+      }
+      if (!this.usuarioSeleccionado.estado) {
+        this.usuarioSeleccionado.estado = '';
       }
     } else {
       this.router.navigate(['/acompanantes']);
@@ -123,7 +144,9 @@ export class AcompananteDetalle implements OnInit, AfterViewInit, OnDestroy {
     this.cdr.detectChanges();
 
     try {
+      // ✅ NUEVO: Construir payload con todos los campos
       const payload = {
+        // Campos básicos
         nombre: nombre,
         apPaterno: apPaterno,
         apMaterno: apMaterno,
@@ -132,11 +155,52 @@ export class AcompananteDetalle implements OnInit, AfterViewInit, OnDestroy {
         genero: this.usuarioSeleccionado.genero,
         activo: this.usuarioSeleccionado.activo,
         rol: this.usuarioSeleccionado.rol || 'Acompañante',
+
+        // Fechas
         fechaNacimiento: this.usuarioSeleccionado.fechaNacimiento,
-        fechaAsignacion: this.usuarioSeleccionado.fechaAsignacion
+        fechaAsignacion: this.usuarioSeleccionado.fechaAsignacion,
+
+        // ✅ NUEVOS CAMPOS DE UBICACIÓN Y DATOS PERSONALES
+        curp: (this.usuarioSeleccionado.curp || '').trim().toUpperCase(),
+        domicilio: (this.usuarioSeleccionado.domicilio || '').trim(),
+        codigoPostal: (this.usuarioSeleccionado.codigoPostal || '').trim(),
+        localidad: (this.usuarioSeleccionado.localidad || '').trim(),
+        municipio: (this.usuarioSeleccionado.municipio || '').trim(),
+        estado: (this.usuarioSeleccionado.estado || '').trim()
       };
 
+      // ✅ NUEVO: Validación opcional de CURP (si se proporciona)
+      if (payload.curp && payload.curp.length > 0) {
+        // Validación básica de CURP (18 caracteres alfanuméricos)
+        const curpRegex = /^[A-Z]{4}[0-9]{6}[A-Z]{6}[0-9]{2}$/;
+        if (!curpRegex.test(payload.curp)) {
+          this.lanzarNotificacion("El formato de CURP no es válido. Debe tener 18 caracteres alfanuméricos.", "warning");
+          this.isSaving = false;
+          this.cdr.detectChanges();
+          return;
+        }
+      }
+
+      // ✅ NUEVO: Validación de código postal (si se proporciona)
+      if (payload.codigoPostal && payload.codigoPostal.length > 0) {
+        const cpRegex = /^[0-9]{5}$/;
+        if (!cpRegex.test(payload.codigoPostal)) {
+          this.lanzarNotificacion("El código postal debe tener 5 dígitos numéricos.", "warning");
+          this.isSaving = false;
+          this.cdr.detectChanges();
+          return;
+        }
+      }
+
       await firstValueFrom(this.usersService.updateUsuario(id, payload));
+
+      // ✅ NUEVO: Actualizar datos locales después de guardar
+      this.usuarioSeleccionado.curp = payload.curp;
+      this.usuarioSeleccionado.domicilio = payload.domicilio;
+      this.usuarioSeleccionado.codigoPostal = payload.codigoPostal;
+      this.usuarioSeleccionado.localidad = payload.localidad;
+      this.usuarioSeleccionado.municipio = payload.municipio;
+      this.usuarioSeleccionado.estado = payload.estado;
 
       this.lanzarNotificacion("¡Éxito! La información del acompañante ha sido actualizada.", "success");
 
@@ -198,6 +262,76 @@ export class AcompananteDetalle implements OnInit, AfterViewInit, OnDestroy {
         flatpickr('#fechaInput', configAsignacion);
 
       }, 50);
+    }
+  }
+
+  // ==========================================================================
+  // ✅ NUEVO: Métodos de utilidad para los nuevos campos
+  // ==========================================================================
+
+  /**
+   * Verifica si el usuario tiene datos de ubicación completos
+   */
+  tieneUbicacionCompleta(): boolean {
+    const u = this.usuarioSeleccionado;
+    if (!u) return false;
+    return !!(u.domicilio && u.localidad && u.municipio && u.estado && u.codigoPostal);
+  }
+
+  /**
+   * Obtiene la ubicación formateada para mostrar
+   */
+  getUbicacionFormateada(): string {
+    const u = this.usuarioSeleccionado;
+    if (!u) return '';
+    const partes = [
+      u.domicilio,
+      u.localidad,
+      u.municipio,
+      u.estado,
+      u.codigoPostal ? `CP ${u.codigoPostal}` : ''
+    ].filter(Boolean);
+    return partes.join(', ');
+  }
+
+  /**
+   * Limpia y formatea la CURP automáticamente (mayúsculas)
+   */
+  formatearCURP() {
+    if (this.usuarioSeleccionado && this.usuarioSeleccionado.curp) {
+      this.usuarioSeleccionado.curp = this.usuarioSeleccionado.curp.toUpperCase().trim();
+      this.cdr.detectChanges();
+    }
+  }
+
+  /**
+   * Limpia y valida el código postal
+   */
+  formatearCodigoPostal() {
+    if (this.usuarioSeleccionado && this.usuarioSeleccionado.codigoPostal) {
+      const cp = this.usuarioSeleccionado.codigoPostal.replace(/\D/g, '').slice(0, 5);
+      this.usuarioSeleccionado.codigoPostal = cp;
+      this.cdr.detectChanges();
+    }
+  }
+
+  /**
+   * Capitaliza la primera letra de cada palabra
+   */
+  capitalizarTexto(texto: string): string {
+    if (!texto) return '';
+    return texto.split(' ').map(palabra =>
+      palabra.charAt(0).toUpperCase() + palabra.slice(1).toLowerCase()
+    ).join(' ');
+  }
+
+  /**
+   * Formatea campos de texto (domicilio, localidad, municipio, estado)
+   */
+  formatearCampoTexto(campo: string) {
+    if (this.usuarioSeleccionado && this.usuarioSeleccionado[campo]) {
+      this.usuarioSeleccionado[campo] = this.capitalizarTexto(this.usuarioSeleccionado[campo]);
+      this.cdr.detectChanges();
     }
   }
 }

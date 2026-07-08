@@ -24,18 +24,15 @@ export class Dispositivos implements OnInit, OnDestroy {
   searchTerm: string = '';
   currentUser: any = null;
 
-  // Paginación
   paginaActual = 0;
   itemsPorPagina = 10;
 
-  // Modales y Selección
   dispositivoSeleccionado: any = null;
   mostrarModalFormulario = false;
   mostrarModalDelete = false;
   isSaving = false;
   isDeleting = false;
 
-  // Formulario adaptado para Altas
   dispositivoForm: any = {
     idDispositivo: null,
     nombre: '',
@@ -47,7 +44,6 @@ export class Dispositivos implements OnInit, OnDestroy {
   filtroPacienteModal: string = '';
   mostrarDropdownPacientes = false;
 
-  // Notificaciones Toast
   mostrarToast = false;
   mensajeToast = '';
   tipoToast: 'success' | 'error' | 'warning' = 'success';
@@ -58,7 +54,6 @@ export class Dispositivos implements OnInit, OnDestroy {
       const saved = localStorage.getItem('user_htas');
       if (saved) {
         this.currentUser = JSON.parse(saved);
-        // Depuración: Verifica qué rol llega realmente
         console.log("Usuario actual cargado:", this.currentUser);
       }
       await this.cargarDispositivos();
@@ -71,15 +66,64 @@ export class Dispositivos implements OnInit, OnDestroy {
   }
 
   /**
-   * Validador de roles para el módulo de DISPOSITIVOS.
-   * Se agregó soporte para 'doctor' y 'medico' indistintamente.
+   * ✅ OBTENER NOMBRE COMPLETO DEL PACIENTE DESDE UN OBJETO DISPOSITIVO
    */
+  getNombreCompletoPaciente(dispositivo: any): string {
+    if (!dispositivo) return 'Sin vincular';
+
+    const nombre = dispositivo.nombrepaciente || '';
+    const apPaterno = dispositivo.appaternopaciente || '';
+    const apMaterno = dispositivo.apmaternopaciente || '';
+
+    const nombreCompleto = `${nombre} ${apPaterno} ${apMaterno}`.trim();
+    return nombreCompleto || 'Sin vincular';
+  }
+
+  /**
+   * ✅ OBTENER NOMBRE COMPLETO DEL PACIENTE DESDE UN OBJETO USUARIO
+   */
+  getNombreCompletoPacienteObj(paciente: any): string {
+    if (!paciente) return 'Paciente sin nombre';
+
+    const nombre = paciente.nombre || '';
+    const apPaterno = paciente.appaterno || paciente.apPaterno || '';
+    const apMaterno = paciente.apmaterno || paciente.apMaterno || '';
+
+    const nombreCompleto = `${nombre} ${apPaterno} ${apMaterno}`.trim();
+    return nombreCompleto || 'Paciente sin nombre';
+  }
+
+  /**
+   * ✅ OBTENER NOMBRE DEL PACIENTE SELECCIONADO EN EL FORMULARIO
+   */
+  getNombrePacienteSeleccionado(): string {
+    if (!this.dispositivoForm.idPacienteAsociado) return 'Sin paciente';
+
+    const paciente = this.pacientesLista.find(
+      p => p.idusuario === this.dispositivoForm.idPacienteAsociado
+    );
+
+    if (paciente) {
+      return this.getNombreCompletoPacienteObj(paciente);
+    }
+
+    return 'Paciente no encontrado';
+  }
+
+  /**
+   * ✅ DESVINCULAR PACIENTE DEL FORMULARIO
+   */
+  desvincularPaciente() {
+    this.dispositivoForm.idPacienteAsociado = null;
+    this.filtroPacienteModal = '';
+    this.cdr.detectChanges();
+  }
+
   verificarPermiso(accion: 'crear' | 'editar' | 'eliminar'): boolean {
     if (!this.currentUser || !this.currentUser.rol) return false;
 
     const rol = this.currentUser.rol.toLowerCase().trim();
 
-    // Lista de roles permitidos
     const esAdmin = rol === 'administrador';
     const esMedico = rol === 'medico' || rol === 'doctor';
     const esPaciente = rol === 'paciente';
@@ -178,25 +222,19 @@ export class Dispositivos implements OnInit, OnDestroy {
     });
   }
 
-  // Método para seleccionar el paciente y rellenar el input
   seleccionarPacienteModal(p: any) {
     this.dispositivoForm.idPacienteAsociado = p.idusuario;
-
-    // Concatenación de nombre y apellidos
-    const nombreCompleto = `${p.nombre || ''} ${p.appaterno || ''} ${p.apmaterno || ''}`.trim();
-    this.filtroPacienteModal = nombreCompleto;
-
+    this.filtroPacienteModal = this.getNombreCompletoPacienteObj(p);
     this.mostrarDropdownPacientes = false;
-    this.cdr.detectChanges(); // Vital para que la vista se actualice
+    this.cdr.detectChanges();
   }
 
-  // Getter para filtrar pacientes incluyendo apellidos en la búsqueda
   get pacientesFiltradosModal() {
     let result = this.pacientesLista;
     if (this.filtroPacienteModal) {
       const term = this.filtroPacienteModal.toLowerCase();
       result = this.pacientesLista.filter(p => {
-        const nombreCompleto = `${p.nombre || ''} ${p.appaterno || ''} ${p.apmaterno || ''}`.toLowerCase();
+        const nombreCompleto = this.getNombreCompletoPacienteObj(p).toLowerCase();
         return nombreCompleto.includes(term);
       });
     }
@@ -223,6 +261,7 @@ export class Dispositivos implements OnInit, OnDestroy {
       idPacienteAsociado: null,
       activo: true
     };
+    this.filtroPacienteModal = '';
     this.mostrarModalFormulario = true;
     this.cdr.detectChanges();
   }
@@ -238,7 +277,6 @@ export class Dispositivos implements OnInit, OnDestroy {
       return;
     }
 
-    // Ajustado para permitir formato MAC o Serie (como KF-DT65X)
     const macRegex = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$|^[A-Z0-9-]{5,20}$/;
     if (!macRegex.test(this.dispositivoForm.direccionMac)) {
       this.lanzarNotificacion('Formato no válido. Use MAC estándar o Serie.', 'warning');
@@ -297,5 +335,6 @@ export class Dispositivos implements OnInit, OnDestroy {
   cerrarModal() {
     this.mostrarModalFormulario = false;
     this.mostrarModalDelete = false;
+    this.mostrarDropdownPacientes = false;
   }
 }

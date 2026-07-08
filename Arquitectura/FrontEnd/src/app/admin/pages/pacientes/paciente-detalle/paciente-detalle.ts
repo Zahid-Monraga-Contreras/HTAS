@@ -10,6 +10,13 @@ import { Menu } from "../../../template/menu/menu";
 import flatpickr from 'flatpickr';
 import { Spanish } from 'flatpickr/dist/l10n/es.js';
 
+interface HistorialPaciente {
+  fecha: string;
+  accion: string;
+  detalle: string;
+  usuario: string;
+}
+
 @Component({
   selector: 'app-paciente-detalle',
   standalone: true,
@@ -40,7 +47,7 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     modalidad: 'Presencial'
   };
 
-  // Sistema de Notificaciones Premium (Reemplazo de Alerts de Navegador)
+  // Sistema de Notificaciones Premium
   mostrarToast = false;
   mensajeToast = '';
   tipoToast: 'success' | 'error' | 'warning' = 'success';
@@ -49,6 +56,31 @@ export class PacienteDetalle implements OnInit, OnDestroy {
   // Referencias para destruir las instancias al cerrar el modal o salir del componente
   private fpFechaInstance: any = null;
   private fpHoraInstance: any = null;
+  private fpNacimientoInstance: any = null;
+
+  // Historial de cambios del paciente
+  historialCambios: HistorialPaciente[] = [];
+  mostrarHistorial = false;
+
+  // Lista de citas del paciente
+  citasPaciente: any[] = [];
+  mostrarCitas = false;
+
+  // Estadísticas del paciente
+  estadisticas: {
+    totalCitas: number;
+    citasCompletadas: number;
+    citasPendientes: number;
+    citasCanceladas: number;
+    ultimaCita: string | null;
+    proximaCita: string | null;
+  } | null = null;
+
+  citasCargadas = false;
+  cargandoCitas = false;
+
+  // ID del paciente para cargar datos desde la API
+  pacienteId: number | null = null;
 
   ngOnInit() {
     let state: any = null;
@@ -61,7 +93,19 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     }
 
     if (state && state.usuario) {
+      this.pacienteId = state.usuario.idusuario || state.usuario.id;
       this.usuarioSeleccionado = { ...state.usuario };
+      this.inicializarCampos();
+
+      // Cargar datos completos del paciente
+      this.cargarDatosCompletosPaciente();
+      this.cargarDatosReales();
+
+      // Inicializar calendario con Flatpickr (DESPUÉS de que el DOM esté listo)
+      setTimeout(() => {
+        this.inicializarCalendarioNacimiento();
+      }, 500);
+
     } else {
       if (isPlatformBrowser(this.platformId)) {
         this.router.navigate(['/pacientes']);
@@ -69,8 +113,444 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     }
   }
 
+  // Inicializar calendario de fecha de nacimiento con Flatpickr
+  inicializarCalendarioNacimiento() {
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    // Destruir instancia previa si existe
+    if (this.fpNacimientoInstance) {
+      try { this.fpNacimientoInstance.destroy(); } catch (e) { }
+      this.fpNacimientoInstance = null;
+    }
+
+    // Buscar el elemento y asegurarse de que exista
+    const elemento = document.querySelector('#fechaNacimientoInput') as HTMLInputElement;
+
+    if (!elemento) {
+      console.warn('Elemento #fechaNacimientoInput no encontrado, reintentando...');
+      setTimeout(() => this.inicializarCalendarioNacimiento(), 300);
+      return;
+    }
+
+    // Configuración de Flatpickr
+    const configNacimiento: any = {
+      locale: Spanish,
+      dateFormat: "Y-m-d",
+      defaultDate: this.usuarioSeleccionado?.fechaNacimiento || null,
+      maxDate: "today",
+      appendTo: document.body,
+      static: false,
+      disableMobile: true,
+      onChange: (selectedDates: any, dateStr: string) => {
+        if (this.usuarioSeleccionado) {
+          this.usuarioSeleccionado.fechaNacimiento = dateStr;
+          this.cdr.detectChanges();
+        }
+      }
+    };
+
+    try {
+      this.fpNacimientoInstance = flatpickr('#fechaNacimientoInput', configNacimiento);
+      console.log('✅ Calendario Flatpickr inicializado correctamente');
+    } catch (error) {
+      console.error('Error al inicializar Flatpickr:', error);
+    }
+  }
+
+  // Cargar datos completos del paciente desde la API
+  async cargarDatosCompletosPaciente() {
+    if (!this.pacienteId) return;
+
+    try {
+      const usuarioActualizado = await firstValueFrom(
+        this.usersService.getUsuarioById(this.pacienteId)
+      );
+
+      if (usuarioActualizado) {
+        this.usuarioSeleccionado = {
+          ...this.usuarioSeleccionado,
+          ...usuarioActualizado
+        };
+
+        this.inicializarCampos();
+        this.cdr.detectChanges();
+      }
+    } catch (error) {
+      console.warn('Usando datos del state para el paciente');
+    }
+  }
+
+  // Inicializar todos los campos correctamente
+  inicializarCampos() {
+    if (!this.usuarioSeleccionado) return;
+
+    const usuario = this.usuarioSeleccionado;
+
+    usuario.tempApellidoPaterno = usuario.apPaterno || usuario.appaterno || '';
+    usuario.tempApellidoMaterno = usuario.apMaterno || usuario.apmaterno || '';
+    usuario.nombre = usuario.nombre || '';
+    usuario.correo = usuario.correo || '';
+    usuario.telefono = usuario.telefono || '';
+    usuario.genero = usuario.genero || 'No especificado';
+
+    usuario.fechaNacimiento = usuario.fechaNacimiento || '';
+    usuario.curp = usuario.curp || '';
+    usuario.domicilio = usuario.domicilio || '';
+    usuario.codigoPostal = usuario.codigoPostal || '';
+    usuario.localidad = usuario.localidad || '';
+    usuario.municipio = usuario.municipio || '';
+    usuario.estado = usuario.estado || '';
+
+    usuario.nss = usuario.nss || null;
+    usuario.tipoSangre = usuario.tipoSangre || null;
+
+    usuario.peso = usuario.peso !== undefined && usuario.peso !== null && usuario.peso !== ''
+      ? Number(usuario.peso)
+      : null;
+    usuario.altura = usuario.altura !== undefined && usuario.altura !== null && usuario.altura !== ''
+      ? Number(usuario.altura)
+      : null;
+
+    usuario.antecedentesFamiliares = usuario.antecedentesFamiliares || '';
+    usuario.activo = usuario.activo !== undefined ? usuario.activo : true;
+
+    this.cdr.detectChanges();
+  }
+
+  // Cargar datos reales desde la API
+  async cargarDatosReales() {
+    if (!this.usuarioSeleccionado?.correo) return;
+
+    this.cargandoCitas = true;
+    this.citasCargadas = false;
+
+    try {
+      const citas = await firstValueFrom(
+        this.usersService.getMisCitas(this.usuarioSeleccionado.correo)
+      );
+
+      if (citas && citas.length > 0) {
+        this.citasPaciente = citas;
+        this.calcularEstadisticas(citas);
+        this.generarHistorialDesdeCitas(citas);
+      } else {
+        this.citasPaciente = [];
+        this.estadisticas = {
+          totalCitas: 0,
+          citasCompletadas: 0,
+          citasPendientes: 0,
+          citasCanceladas: 0,
+          ultimaCita: null,
+          proximaCita: null
+        };
+      }
+
+      this.citasCargadas = true;
+
+    } catch (error) {
+      console.error('Error al cargar citas del paciente:', error);
+      this.citasPaciente = [];
+      this.estadisticas = {
+        totalCitas: 0,
+        citasCompletadas: 0,
+        citasPendientes: 0,
+        citasCanceladas: 0,
+        ultimaCita: null,
+        proximaCita: null
+      };
+    } finally {
+      this.cargandoCitas = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  // Calcular estadísticas reales desde las citas
+  calcularEstadisticas(citas: any[]) {
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+
+    const completadas = citas.filter(c => c.estado === 'Completada');
+    const pendientes = citas.filter(c =>
+      c.estado === 'Programada' || c.estado === 'Confirmada'
+    );
+    const canceladas = citas.filter(c => c.estado === 'Cancelada' || c.estado === 'No Asistió');
+
+    const citasOrdenadas = [...citas].sort((a, b) => {
+      const fechaA = new Date(`${a.fechacita}T${a.horacita || '00:00'}`);
+      const fechaB = new Date(`${b.fechacita}T${b.horacita || '00:00'}`);
+      return fechaB.getTime() - fechaA.getTime();
+    });
+
+    const ultimaCita = citasOrdenadas.length > 0 ? citasOrdenadas[0] : null;
+
+    const citasFuturas = citas.filter(c => {
+      const fechaCita = new Date(c.fechacita);
+      return fechaCita >= hoy && (c.estado === 'Programada' || c.estado === 'Confirmada');
+    }).sort((a, b) => {
+      return new Date(a.fechacita).getTime() - new Date(b.fechacita).getTime();
+    });
+
+    const proximaCita = citasFuturas.length > 0 ? citasFuturas[0] : null;
+
+    this.estadisticas = {
+      totalCitas: citas.length,
+      citasCompletadas: completadas.length,
+      citasPendientes: pendientes.length,
+      citasCanceladas: canceladas.length,
+      ultimaCita: ultimaCita ? ultimaCita.fechacita : null,
+      proximaCita: proximaCita ? proximaCita.fechacita : null
+    };
+  }
+
+  // Generar historial desde citas reales con formato de fecha correcto
+  generarHistorialDesdeCitas(citas: any[]) {
+    const historial: HistorialPaciente[] = [];
+
+    const citasOrdenadas = [...citas].sort((a, b) => {
+      return new Date(b.fechacita).getTime() - new Date(a.fechacita).getTime();
+    });
+
+    citasOrdenadas.forEach(cita => {
+      let accion = '';
+      let detalle = '';
+
+      const fechaFormateada = this.formatearFechaYHora(cita.fechacita, cita.horacita);
+
+      switch (cita.estado) {
+        case 'Completada':
+          accion = 'Cita completada';
+          detalle = `Cita del ${fechaFormateada} - ${cita.motivo || 'Sin motivo'}`;
+          break;
+        case 'Programada':
+          accion = 'Cita programada';
+          detalle = `Cita para ${fechaFormateada} - ${cita.motivo || 'Sin motivo'}`;
+          break;
+        case 'Confirmada':
+          accion = 'Cita confirmada';
+          detalle = `Cita confirmada para ${fechaFormateada}`;
+          break;
+        case 'Cancelada':
+          accion = 'Cita cancelada';
+          detalle = `Cita del ${fechaFormateada} - Cancelada`;
+          break;
+        case 'No Asistió':
+          accion = 'No asistió';
+          detalle = `No asistió a cita del ${fechaFormateada}`;
+          break;
+        default:
+          accion = 'Cita registrada';
+          detalle = `Cita del ${fechaFormateada} - ${cita.motivo || ''}`;
+      }
+
+      historial.push({
+        fecha: fechaFormateada,
+        accion: accion,
+        detalle: detalle,
+        usuario: 'Sistema'
+      });
+    });
+
+    if (historial.length === 0) {
+      const fechaActual = new Date();
+      const fechaStr = fechaActual.toLocaleString('es-MX', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      historial.push({
+        fecha: fechaStr,
+        accion: 'Paciente registrado',
+        detalle: `Registrado: ${this.usuarioSeleccionado.nombre || ''} ${this.usuarioSeleccionado.apPaterno || ''}`,
+        usuario: 'Sistema'
+      });
+    }
+
+    this.historialCambios = historial;
+  }
+
+  // Método para formatear fecha y hora correctamente
+  formatearFechaYHora(fecha: string, hora: string): string {
+    if (!fecha) return 'Fecha no disponible';
+
+    try {
+      const fechaObj = new Date(fecha);
+
+      if (isNaN(fechaObj.getTime())) {
+        return fecha;
+      }
+
+      const dia = String(fechaObj.getDate()).padStart(2, '0');
+      const mes = String(fechaObj.getMonth() + 1).padStart(2, '0');
+      const anio = fechaObj.getFullYear();
+      const fechaFormateada = `${dia}/${mes}/${anio}`;
+
+      let horaFormateada = '--:--';
+      if (hora) {
+        let horaLimpia = hora;
+        if (horaLimpia.includes('T')) {
+          horaLimpia = horaLimpia.split('T')[1] || '00:00';
+        }
+        if (horaLimpia.length > 5) {
+          horaLimpia = horaLimpia.substring(0, 5);
+        }
+        if (horaLimpia.includes(':')) {
+          const partes = horaLimpia.split(':');
+          if (partes.length >= 2) {
+            horaFormateada = `${partes[0].padStart(2, '0')}:${partes[1].padStart(2, '0')}`;
+          }
+        } else {
+          horaFormateada = horaLimpia;
+        }
+      }
+
+      return `${fechaFormateada} ${horaFormateada}`;
+    } catch (error) {
+      return fecha;
+    }
+  }
+
+  // Agregar entrada al historial
+  agregarHistorial(accion: string, detalle: string) {
+    const ahora = new Date();
+    const fechaStr = ahora.toLocaleString('es-MX', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    this.historialCambios.unshift({
+      fecha: fechaStr,
+      accion: accion,
+      detalle: detalle,
+      usuario: 'Usuario actual'
+    });
+  }
+
+  // Obtener estado del paciente
+  getEstadoPaciente(): { texto: string; clase: string; icono: string } {
+    if (!this.usuarioSeleccionado) {
+      return { texto: 'Sin datos', clase: 'estado-sin-datos', icono: 'bi-question-circle' };
+    }
+
+    if (this.usuarioSeleccionado.activo === false) {
+      return { texto: 'Inactivo', clase: 'estado-inactivo', icono: 'bi-x-circle-fill' };
+    }
+
+    if (this.estadisticas && this.estadisticas.citasPendientes > 0) {
+      return { texto: `${this.estadisticas.citasPendientes} citas pendientes`, clase: 'estado-pendiente', icono: 'bi-clock-fill' };
+    }
+
+    if (this.estadisticas && this.estadisticas.totalCitas > 0) {
+      return { texto: 'Activo con historial', clase: 'estado-activo', icono: 'bi-check-circle-fill' };
+    }
+
+    return { texto: 'Activo', clase: 'estado-activo', icono: 'bi-check-circle-fill' };
+  }
+
+  // Formatear CURP
+  formatearCURP() {
+    if (this.usuarioSeleccionado && this.usuarioSeleccionado.curp) {
+      this.usuarioSeleccionado.curp = this.usuarioSeleccionado.curp.toUpperCase().trim();
+      this.cdr.detectChanges();
+    }
+  }
+
+  // Formatear código postal
+  formatearCodigoPostal() {
+    if (this.usuarioSeleccionado && this.usuarioSeleccionado.codigoPostal) {
+      const cp = this.usuarioSeleccionado.codigoPostal.replace(/\D/g, '').slice(0, 5);
+      this.usuarioSeleccionado.codigoPostal = cp;
+      this.cdr.detectChanges();
+    }
+  }
+
+  // Capitalizar texto
+  capitalizarTexto(texto: string): string {
+    if (!texto) return '';
+    return texto.split(' ').map(palabra =>
+      palabra.charAt(0).toUpperCase() + palabra.slice(1).toLowerCase()
+    ).join(' ');
+  }
+
+  // Formatear campo de texto
+  formatearCampoTexto(campo: string) {
+    if (this.usuarioSeleccionado && this.usuarioSeleccionado[campo]) {
+      this.usuarioSeleccionado[campo] = this.capitalizarTexto(this.usuarioSeleccionado[campo]);
+      this.cdr.detectChanges();
+    }
+  }
+
+  // Obtener ubicación formateada
+  getUbicacionFormateada(): string {
+    const u = this.usuarioSeleccionado;
+    if (!u) return '';
+    const partes = [
+      u.domicilio,
+      u.localidad,
+      u.municipio,
+      u.estado,
+      u.codigoPostal ? `CP ${u.codigoPostal}` : ''
+    ].filter(Boolean);
+    return partes.length ? partes.join(', ') : 'Sin ubicación registrada';
+  }
+
+  // Verificar si tiene ubicación completa
+  tieneUbicacionCompleta(): boolean {
+    const u = this.usuarioSeleccionado;
+    if (!u) return false;
+    return !!(u.domicilio && u.localidad && u.municipio && u.estado && u.codigoPostal);
+  }
+
+  // Validar campos antes de guardar
+  validarCampos(): { valido: boolean; mensaje: string } {
+    const u = this.usuarioSeleccionado;
+
+    if (!u.nombre || u.nombre.trim().length < 2) {
+      return { valido: false, mensaje: 'El nombre debe tener al menos 2 caracteres' };
+    }
+
+    if (!u.tempApellidoPaterno || u.tempApellidoPaterno.trim().length < 2) {
+      return { valido: false, mensaje: 'El apellido paterno debe tener al menos 2 caracteres' };
+    }
+
+    if (!u.correo || !u.correo.includes('@')) {
+      return { valido: false, mensaje: 'El correo electrónico no es válido' };
+    }
+
+    if (u.curp && u.curp.length > 0) {
+      const curpRegex = /^[A-Z]{4}[0-9]{6}[A-Z]{6}[0-9]{2}$/;
+      if (!curpRegex.test(u.curp.toUpperCase())) {
+        return { valido: false, mensaje: 'El formato de CURP no es válido' };
+      }
+    }
+
+    if (u.codigoPostal && u.codigoPostal.length > 0) {
+      const cpRegex = /^[0-9]{5}$/;
+      if (!cpRegex.test(u.codigoPostal)) {
+        return { valido: false, mensaje: 'El código postal debe tener 5 dígitos numéricos' };
+      }
+    }
+
+    if (u.peso && (u.peso < 10 || u.peso > 500)) {
+      return { valido: false, mensaje: 'El peso debe estar entre 10 y 500 kg' };
+    }
+
+    if (u.altura && (u.altura < 0.5 || u.altura > 3)) {
+      return { valido: false, mensaje: 'La altura debe estar entre 0.5 y 3 metros' };
+    }
+
+    return { valido: true, mensaje: '' };
+  }
+
   ngOnDestroy() {
     this.destruirCalendariosCita();
+    if (this.fpNacimientoInstance) {
+      try { this.fpNacimientoInstance.destroy(); } catch (e) { }
+      this.fpNacimientoInstance = null;
+    }
     if (this.toastTimeout) clearTimeout(this.toastTimeout);
   }
 
@@ -80,6 +560,8 @@ export class PacienteDetalle implements OnInit, OnDestroy {
 
   // --- CONTROL DEL TOAST NOTIFICACIÓN PREMIUM ---
   lanzarNotificacion(mensaje: string, tipo: 'success' | 'error' | 'warning' = 'success') {
+    console.log('📢 Notificación:', mensaje, 'Tipo:', tipo);
+
     this.mensajeToast = mensaje;
     this.tipoToast = tipo;
     this.mostrarToast = true;
@@ -111,7 +593,10 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     this.mostrarModalCita = true;
     this.cdr.detectChanges();
 
-    this.inicializarCalendariosCita();
+    // Inicializar los calendarios después de que el DOM se actualice
+    setTimeout(() => {
+      this.inicializarCalendariosCita();
+    }, 100);
   }
 
   cerrarModalCita() {
@@ -120,12 +605,18 @@ export class PacienteDetalle implements OnInit, OnDestroy {
   }
 
   inicializarCalendariosCita() {
-    if (isPlatformBrowser(this.platformId)) {
-      setTimeout(() => {
-        const hoy = new Date();
-        const fechaMaximaCita = new Date(hoy.getFullYear(), hoy.getMonth() + 2, hoy.getDate());
+    if (!isPlatformBrowser(this.platformId)) return;
 
-        // 1. CONFIGURACIÓN COMPLETA PARA FECHA DE CITA (Flatpickr)
+    this.destruirCalendariosCita();
+
+    setTimeout(() => {
+      const hoy = new Date();
+      const fechaMaximaCita = new Date(hoy.getFullYear(), hoy.getMonth() + 2, hoy.getDate());
+
+      const fechaElement = document.querySelector('#fechaCitaInput');
+      const horaElement = document.querySelector('#horaCitaInput');
+
+      if (fechaElement) {
         this.fpFechaInstance = flatpickr('#fechaCitaInput', {
           locale: Spanish,
           dateFormat: "Y-m-d",
@@ -140,8 +631,9 @@ export class PacienteDetalle implements OnInit, OnDestroy {
             this.cdr.detectChanges();
           }
         });
+      }
 
-        // 2. CONFIGURACIÓN COMPLETA PARA HORA DE CITA (Flatpickr en modo Reloj)
+      if (horaElement) {
         this.fpHoraInstance = flatpickr('#horaCitaInput', {
           locale: Spanish,
           enableTime: true,
@@ -157,24 +649,24 @@ export class PacienteDetalle implements OnInit, OnDestroy {
             this.cdr.detectChanges();
           }
         });
-      }, 50);
-    }
+      }
+    }, 100);
   }
 
   destruirCalendariosCita() {
     if (this.fpFechaInstance) {
-      this.fpFechaInstance.destroy();
+      try { this.fpFechaInstance.destroy(); } catch (e) { }
       this.fpFechaInstance = null;
     }
     if (this.fpHoraInstance) {
-      this.fpHoraInstance.destroy();
+      try { this.fpHoraInstance.destroy(); } catch (e) { }
       this.fpHoraInstance = null;
     }
   }
 
   async registrarCita() {
     if (!this.nuevaCita.fechaCita || !this.nuevaCita.horaCita || !this.nuevaCita.motivo.trim()) {
-      this.lanzarNotificacion("Por favor rellene los campos obligatorios para agendar la cita.", "warning");
+      this.lanzarNotificacion("⚠️ Por favor rellene los campos obligatorios para agendar la cita.", "warning");
       return;
     }
 
@@ -199,13 +691,14 @@ export class PacienteDetalle implements OnInit, OnDestroy {
       };
 
       await firstValueFrom(this.usersService.crearCita(payloadCita));
+      await this.cargarDatosReales();
 
       this.cerrarModalCita();
       this.lanzarNotificacion("¡Cita asignada! Se registró la cita médica correctamente.", "success");
 
     } catch (error: any) {
       console.error("Error al registrar la cita:", error);
-      this.lanzarNotificacion("Hubo un error al registrar la cita médica.", "error");
+      this.lanzarNotificacion("❌ Hubo un error al registrar la cita médica.", "error");
     } finally {
       this.isSavingCita = false;
       this.cdr.detectChanges();
@@ -217,51 +710,76 @@ export class PacienteDetalle implements OnInit, OnDestroy {
 
     const nombre = (this.usuarioSeleccionado.nombre || '').trim();
     const apPaterno = (this.usuarioSeleccionado.tempApellidoPaterno || '').trim();
+    const apMaterno = (this.usuarioSeleccionado.tempApellidoMaterno || '').trim();
 
     if (!nombre || !apPaterno || !this.usuarioSeleccionado.correo) {
-      this.lanzarNotificacion("El nombre, apellido paterno y correo son obligatorios.", "warning");
+      this.lanzarNotificacion("⚠️ El nombre, apellido paterno y correo son obligatorios.", "warning");
+      return;
+    }
+
+    const validacion = this.validarCampos();
+    if (!validacion.valido) {
+      this.lanzarNotificacion(`⚠️ ${validacion.mensaje}`, "warning");
       return;
     }
 
     this.isSaving = true;
-    const fuenteActual = this.usuarioSeleccionado.fuente;
-    const id = this.usuarioSeleccionado.idusuario || this.usuarioSeleccionado.id; // Asegurar captura de ID
+    const id = this.usuarioSeleccionado.idusuario || this.usuarioSeleccionado.id;
 
     try {
-      const apMaterno = (this.usuarioSeleccionado.tempApellidoMaterno || '').trim();
-      const nombreCompleto = [nombre, apPaterno, apMaterno].filter(p => p).join(' ');
+      const pesoFinal = this.usuarioSeleccionado.peso !== undefined &&
+        this.usuarioSeleccionado.peso !== null &&
+        this.usuarioSeleccionado.peso !== ''
+        ? Number(this.usuarioSeleccionado.peso)
+        : null;
 
-      if (fuenteActual === 'Firebase') {
-        const dataFirebase = {
-          NombreCompleto: nombreCompleto,
-          correo: this.usuarioSeleccionado.correo,
-          rol: this.usuarioSeleccionado.rol,
-          telefono: this.usuarioSeleccionado.telefono
-        };
-        await this.googleService.updateUsuario(id, dataFirebase);
-      } else {
-        // Mapeo exacto con las variables estructuradas en el updateUsuario del Backend
-        const datosPostgres = {
-          nombre: nombre,
-          apPaterno: apPaterno,
-          apMaterno: apMaterno,
-          appaterno: apPaterno,
-          apmaterno: apMaterno,
-          correo: this.usuarioSeleccionado.correo,
-          telefono: this.usuarioSeleccionado.telefono,
-          genero: this.usuarioSeleccionado.genero || null, // <- Agregado
-          nss: this.usuarioSeleccionado.nss || null,
-          tipoSangre: this.usuarioSeleccionado.tipoSangre || null, // <- Agregado
-          peso: this.usuarioSeleccionado.peso || null, // <- Agregado
-          altura: this.usuarioSeleccionado.altura || null, // <- Agregado
-          antecedentesFamiliares: this.usuarioSeleccionado.antecedentesFamiliares || null, // <- Agregado
-          rol: 'Paciente',
-          activo: this.usuarioSeleccionado.activo ?? true
-        };
-        await firstValueFrom(this.usersService.updateUsuario(id, datosPostgres));
-      }
+      const alturaFinal = this.usuarioSeleccionado.altura !== undefined &&
+        this.usuarioSeleccionado.altura !== null &&
+        this.usuarioSeleccionado.altura !== ''
+        ? Number(this.usuarioSeleccionado.altura)
+        : null;
+
+      const datosPostgres = {
+        nombre: nombre,
+        apPaterno: apPaterno,
+        apMaterno: apMaterno,
+        appaterno: apPaterno,
+        apmaterno: apMaterno,
+        correo: this.usuarioSeleccionado.correo,
+        telefono: this.usuarioSeleccionado.telefono || null,
+        genero: this.usuarioSeleccionado.genero || null,
+        fechaNacimiento: this.usuarioSeleccionado.fechaNacimiento || null,
+        curp: (this.usuarioSeleccionado.curp || '').toUpperCase().trim() || null,
+        domicilio: (this.usuarioSeleccionado.domicilio || '').trim() || null,
+        codigoPostal: (this.usuarioSeleccionado.codigoPostal || '').trim() || null,
+        localidad: (this.usuarioSeleccionado.localidad || '').trim() || null,
+        municipio: (this.usuarioSeleccionado.municipio || '').trim() || null,
+        estado: (this.usuarioSeleccionado.estado || '').trim() || null,
+        nss: this.usuarioSeleccionado.nss || null,
+        tipoSangre: this.usuarioSeleccionado.tipoSangre || null,
+        peso: pesoFinal,
+        altura: alturaFinal,
+        antecedentesFamiliares: this.usuarioSeleccionado.antecedentesFamiliares || null,
+        rol: 'Paciente',
+        activo: this.usuarioSeleccionado.activo ?? true
+      };
+
+      await firstValueFrom(this.usersService.updateUsuario(id, datosPostgres));
+
+      this.usuarioSeleccionado.nombre = nombre;
+      this.usuarioSeleccionado.apPaterno = apPaterno;
+      this.usuarioSeleccionado.apMaterno = apMaterno;
+      this.usuarioSeleccionado.tempApellidoPaterno = apPaterno;
+      this.usuarioSeleccionado.tempApellidoMaterno = apMaterno;
+      this.usuarioSeleccionado.peso = pesoFinal;
+      this.usuarioSeleccionado.altura = alturaFinal;
 
       this.lanzarNotificacion("¡Éxito! Los datos del paciente se actualizaron correctamente.", "success");
+
+      this.agregarHistorial(
+        'Datos actualizados',
+        `Información del paciente actualizada por el usuario`
+      );
 
       setTimeout(() => {
         this.router.navigate(['/pacientes']);
@@ -269,7 +787,7 @@ export class PacienteDetalle implements OnInit, OnDestroy {
 
     } catch (error: any) {
       console.error('Error al actualizar:', error);
-      this.lanzarNotificacion("No se pudieron guardar los cambios en el servidor.", "error");
+      this.lanzarNotificacion("❌ No se pudieron guardar los cambios en el servidor.", "error");
     } finally {
       this.isSaving = false;
       this.cdr.detectChanges();

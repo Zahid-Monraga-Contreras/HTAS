@@ -29,6 +29,9 @@
         </div>
 
         <div class="detail-card">
+            <!-- ========================================== -->
+            <!-- SECCIÓN 1: DATOS PERSONALES                -->
+            <!-- ========================================== -->
             <div class="form-grid">
                 <div class="form-group">
                     <label>Nombre(s)</label>
@@ -66,18 +69,104 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Fecha de Nacimiento</label>
-                    <input type="text" id="fechaNacimientoInput" [(ngModel)]="usuarioSeleccionado.fechaNacimiento"
-                        placeholder="Seleccione fecha de nacimiento" class="form-control-premium" readonly>
+                    <label>Género</label>
+                    <select [(ngModel)]="usuarioSeleccionado.genero" class="form-control-premium">
+                        <option value="Masculino">Masculino</option>
+                        <option value="Femenino">Femenino</option>
+                        <option value="Otro">Otro</option>
+                        <option value="No especificado">No especificado</option>
+                    </select>
                 </div>
 
+                <!-- ✅ CORREGIDO: Fecha de Nacimiento con icono de calendario -->
+                <div class="form-group">
+                    <label>Fecha de Nacimiento</label>
+                    <div class="input-picker-wrapper">
+                        <input type="text" id="fechaNacimientoInput" [(ngModel)]="usuarioSeleccionado.fechaNacimiento"
+                            placeholder="Seleccione fecha de nacimiento" class="form-control-premium picker-custom"
+                            readonly>
+                        <i class="bi bi-calendar3 icon-embed"></i>
+                    </div>
+                </div>
+
+                <!-- ✅ CORREGIDO: Fecha de Asignación con icono de calendario -->
                 <div class="form-group">
                     <label>Fecha de Asignación</label>
-                    <input type="text" id="fechaInput" [(ngModel)]="usuarioSeleccionado.fechaAsignacion"
-                        placeholder="Seleccione fecha" class="form-control-premium" readonly>
+                    <div class="input-picker-wrapper">
+                        <input type="text" id="fechaInput" [(ngModel)]="usuarioSeleccionado.fechaAsignacion"
+                            placeholder="Seleccione fecha" class="form-control-premium picker-custom" readonly>
+                        <i class="bi bi-calendar3 icon-embed"></i>
+                    </div>
+                </div>
+
+                <!-- CURP -->
+                <div class="form-group">
+                    <label>CURP</label>
+                    <input type="text" maxlength="18" [(ngModel)]="usuarioSeleccionado.curp" (input)="formatearCURP()"
+                        placeholder="Ej: GAML850315HVZRRL01" class="form-control-premium"
+                        title="18 caracteres alfanuméricos">
+                    <small class="form-text text-muted">18 caracteres alfanuméricos</small>
                 </div>
             </div>
 
+            <!-- ========================================== -->
+            <!-- SECCIÓN 2: DATOS DE UBICACIÓN              -->
+            <!-- ========================================== -->
+            <div class="ubicacion-section">
+                <div class="section-divider">
+                    <span class="section-title">Datos de Ubicación</span>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>Domicilio</label>
+                        <input type="text" [(ngModel)]="usuarioSeleccionado.domicilio"
+                            (blur)="formatearCampoTexto('domicilio')"
+                            placeholder="Ej: Calle Benito Juárez #123 Col. Centro" class="form-control-premium">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Código Postal</label>
+                        <input type="text" maxlength="5" [(ngModel)]="usuarioSeleccionado.codigoPostal"
+                            (input)="formatearCodigoPostal()" placeholder="Ej: 94500" class="form-control-premium"
+                            title="5 dígitos numéricos">
+                        <small class="form-text text-muted">5 dígitos numéricos</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Localidad</label>
+                        <input type="text" [(ngModel)]="usuarioSeleccionado.localidad"
+                            (blur)="formatearCampoTexto('localidad')" placeholder="Ej: Córdoba"
+                            class="form-control-premium">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Municipio</label>
+                        <input type="text" [(ngModel)]="usuarioSeleccionado.municipio"
+                            (blur)="formatearCampoTexto('municipio')" placeholder="Ej: Córdoba"
+                            class="form-control-premium">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Estado</label>
+                        <input type="text" [(ngModel)]="usuarioSeleccionado.estado"
+                            (blur)="formatearCampoTexto('estado')" placeholder="Ej: Veracruz"
+                            class="form-control-premium">
+                    </div>
+                </div>
+
+                <!-- Mostrar ubicación formateada si está completa -->
+                @if (tieneUbicacionCompleta()) {
+                <div class="ubicacion-resumen">
+                    <i class="bi bi-geo-alt-fill"></i>
+                    <span>{{ getUbicacionFormateada() }}</span>
+                </div>
+                }
+            </div>
+
+            <!-- ========================================== -->
+            <!-- SECCIÓN: ACCIONES                          -->
+            <!-- ========================================== -->
             <div class="action-footer">
                 <button class="btn-cancel-premium" (click)="volver()" [disabled]="isSaving">Cancelar</button>
                 <button class="btn-save" (click)="guardarCambios()" [disabled]="isSaving">

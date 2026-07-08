@@ -15,6 +15,16 @@
     margin: 0 auto;
 }
 
+/* ========================================== */
+/* ✅ NUEVO: Header controls para botones    */
+/* ========================================== */
+.header-controls {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
 .header-section {
     display: flex;
     justify-content: space-between;
@@ -51,6 +61,468 @@
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
+/* ========================================== */
+/* ✅ NUEVO: Resumen del médico               */
+/* ========================================== */
+.resumen-medico {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    border: 1px solid #e2e8f0;
+}
+
+.resumen-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.resumen-item i {
+    font-size: 1.5rem;
+    color: #b0001e;
+}
+
+.resumen-item div {
+    display: flex;
+    flex-direction: column;
+}
+
+.resumen-item small {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: #94a3b8;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.resumen-item strong {
+    font-size: 0.95rem;
+    color: #1e293b;
+}
+
+/* ========================================== */
+/* ✅ NUEVO: Estado del médico                */
+/* ========================================== */
+.estado-medico {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.estado-medico i {
+    font-size: 0.9rem;
+}
+
+.estado-activo {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.estado-ocupado {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.estado-inactivo {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.estado-sin-datos {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+/* ========================================== */
+/* ✅ NUEVO: Ubicación                        */
+/* ========================================== */
+.ubicacion-section {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid #e9ecef;
+}
+
+.section-divider {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.section-divider .section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #495057;
+    background: #f8f9fa;
+    padding: 0.5rem 1.2rem;
+    border-radius: 8px;
+    border-left: 4px solid #b0001e;
+    margin: 0;
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+.ubicacion-resumen {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    background: #f0f7ff;
+    border-radius: 8px;
+    border-left: 4px solid #0d6efd;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.95rem;
+    color: #0d6efd;
+}
+
+.ubicacion-resumen i {
+    font-size: 1.2rem;
+}
+
+.ubicacion-resumen span {
+    font-weight: 500;
+}
+
+.form-text {
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+.text-muted {
+    color: #6c757d !important;
+}
+
+/* ========================================== */
+/* ✅ NUEVO: Estadísticas                     */
+/* ========================================== */
+.estadisticas-section {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #334155;
+    margin: 0 0 1rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section-title::before {
+    content: "";
+    display: inline-block;
+    width: 4px;
+    height: 18px;
+    background-color: #b0001e;
+    border-radius: 2px;
+}
+
+.section-title i {
+    color: #b0001e;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.stat-box {
+    background: #f8fafc;
+    padding: 1rem;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    text-align: center;
+    transition: transform 0.2s;
+}
+
+.stat-box:hover {
+    transform: translateY(-2px);
+}
+
+.stat-box small {
+    display: block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #64748b;
+    margin-bottom: 0.25rem;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1e293b;
+}
+
+.stat-value small {
+    font-size: 0.7rem;
+    font-weight: 400;
+    color: #94a3b8;
+}
+
+/* ========================================== */
+/* ✅ NUEVO: Pacientes atendidos              */
+/* ========================================== */
+.pacientes-section {
+    margin-top: 1.5rem;
+}
+
+.pacientes-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.pacientes-header .section-title {
+    margin-bottom: 0;
+}
+
+.pacientes-header .section-title i:last-child {
+    font-size: 0.8rem;
+    margin-left: 0.5rem;
+    color: #94a3b8;
+    transition: transform 0.2s ease;
+}
+
+.badge-pacientes {
+    background: #b0001e;
+    color: white;
+    padding: 0.15rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-left: 0.5rem;
+}
+
+.pacientes-lista {
+    margin-top: 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+    animation: fadeIn 0.3s ease;
+}
+
+.paciente-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e2e8f0;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.paciente-item:last-child {
+    border-bottom: none;
+}
+
+.paciente-item:hover {
+    background: #f8fafc;
+}
+
+.paciente-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.paciente-info i {
+    color: #b0001e;
+    font-size: 1.2rem;
+}
+
+.paciente-nombre {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.paciente-detalle {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.fecha-info {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.motivo-info {
+    font-size: 0.85rem;
+    color: #475569;
+}
+
+/* ========================================== */
+/* ✅ NUEVO: Historial                        */
+/* ========================================== */
+.historial-section {
+    margin-top: 1.5rem;
+}
+
+.historial-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 0.5rem 0;
+    user-select: none;
+}
+
+.historial-header:hover {
+    opacity: 0.8;
+}
+
+.historial-header .section-title {
+    margin-bottom: 0;
+}
+
+.historial-header .section-title i:last-child {
+    font-size: 0.8rem;
+    margin-left: 0.5rem;
+    color: #94a3b8;
+    transition: transform 0.2s ease;
+}
+
+.historial-count {
+    font-size: 0.8rem;
+    color: #6c757d;
+    background: #e9ecef;
+    padding: 0.2rem 0.8rem;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.historial-lista {
+    margin-top: 1rem;
+    max-height: 350px;
+    overflow-y: auto;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    background: #fafbfc;
+    animation: fadeIn 0.3s ease;
+}
+
+.historial-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid #e9ecef;
+    font-size: 0.9rem;
+    transition: background 0.15s ease;
+}
+
+.historial-item:last-child {
+    border-bottom: none;
+}
+
+.historial-item:hover {
+    background: #f1f5f9;
+}
+
+.historial-fecha {
+    min-width: 140px;
+    color: #6c757d;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.historial-fecha i {
+    font-size: 0.8rem;
+}
+
+.historial-detalle {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.historial-detalle strong {
+    color: #1e293b;
+    font-size: 0.9rem;
+}
+
+.historial-detalle span {
+    color: #6c757d;
+    font-size: 0.8rem;
+}
+
+.historial-usuario {
+    color: #6c757d;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    white-space: nowrap;
+}
+
+.historial-usuario i {
+    font-size: 0.8rem;
+}
+
+/* Scroll personalizado para el historial */
+.historial-lista::-webkit-scrollbar {
+    width: 6px;
+}
+
+.historial-lista::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.historial-lista::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.historial-lista::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
+}
+
+/* ========================================== */
+/* ✅ NUEVO: Animaciones                      */
+/* ========================================== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========================================== */
+/* ✅ FIN NUEVOS ESTILOS                      */
+/* ========================================== */
+
 .form-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -82,11 +554,53 @@
     box-sizing: border-box;
 }
 
+.form-control-premium:focus {
+    outline: none;
+    border-color: #b0001e;
+    box-shadow: 0 0 0 3px rgba(176, 0, 30, 0.1);
+    background: white;
+}
+
+.form-control-premium:disabled {
+    background: #f1f5f9;
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+/* ========================================== */
+/* ✅ NUEVO: Estilo para select               */
+/* ========================================== */
+select.form-control-premium {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23495057' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+    cursor: pointer;
+}
+
+select.form-control-premium option {
+    padding: 0.5rem;
+}
+
+select.form-control-premium option:checked {
+    background: #b0001e;
+    color: white;
+}
+
+/* ========================================== */
+/* ✅ NUEVO: Estilo para textarea             */
+/* ========================================== */
+textarea.form-control-premium {
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
+}
+
 .action-footer {
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
-    /* Margen intermedio entre botones */
     margin-top: 2rem;
     padding-top: 1.5rem;
     border-top: 1px solid #e2e8f0;
@@ -113,6 +627,7 @@
 .btn-save:hover:not(:disabled) {
     background: #8e0018;
     transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(176, 0, 30, 0.3);
 }
 
 .btn-save:disabled {
@@ -141,6 +656,7 @@
     background: #f1f5f9;
     color: #1e293b;
     transform: translateY(-1px);
+    border-color: #94a3b8;
 }
 
 .btn-cancel-premium:disabled {
@@ -161,16 +677,6 @@
     to {
         transform: rotate(360deg);
     }
-}
-
-/* ==========================================================================
-   Ajustes de Enfoque Institucional
-   ========================================================================== */
-.form-control-premium:focus {
-    outline: none;
-    border-color: #b0001e;
-    box-shadow: 0 0 0 3px rgba(176, 0, 30, 0.1);
-    background: white;
 }
 
 /* ==========================================================================
@@ -244,6 +750,10 @@
     .form-group[style*="grid-column: span 3"] {
         grid-column: span 2 !important;
     }
+
+    .resumen-medico {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 @media (max-width: 768px) {
@@ -267,14 +777,175 @@
         gap: 1rem;
     }
 
-    /* Adaptación responsiva de botones para móvil */
-    .action-footer {
-        flex-direction: column-reverse;
+    .header-controls {
+        width: 100%;
+        flex-direction: column;
     }
 
-    .action-footer button,
     .header-controls button {
         width: 100%;
         justify-content: center;
     }
+
+    .action-footer {
+        flex-direction: column-reverse;
+    }
+
+    .action-footer button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* ✅ NUEVO: Ajustes responsive para resumen */
+    .resumen-medico {
+        grid-template-columns: 1fr;
+    }
+
+    .resumen-item {
+        padding: 0.5rem 0;
+    }
+
+    /* ✅ NUEVO: Ajustes responsive para pacientes */
+    .paciente-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .paciente-detalle {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    /* ✅ NUEVO: Ajustes responsive para estadísticas */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* ✅ NUEVO: Ajustes responsive para historial */
+    .historial-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+        padding: 0.6rem 0.8rem;
+    }
+
+    .historial-fecha {
+        min-width: auto;
+        font-size: 0.7rem;
+    }
+
+    .historial-usuario {
+        align-self: flex-start;
+        font-size: 0.7rem;
+    }
+
+    .historial-detalle strong {
+        font-size: 0.8rem;
+    }
+
+    .historial-detalle span {
+        font-size: 0.75rem;
+    }
+
+    .historial-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    /* ✅ NUEVO: Ajuste para ubicación en móvil */
+    .ubicacion-section {
+        margin-top: 1rem;
+        padding-top: 1rem;
+    }
+
+    .section-divider .section-title {
+        font-size: 1rem;
+        padding: 0.4rem 1rem;
+    }
+
+    .ubicacion-resumen {
+        font-size: 0.85rem;
+        padding: 0.6rem 0.8rem;
+        flex-wrap: wrap;
+    }
+
+    /* ✅ NUEVO: Ajuste para toast en móvil */
+    .toast-premium-container {
+        top: 15px;
+        right: 15px;
+        left: 15px;
+        max-width: none;
+    }
+}
+
+/* ✅ NUEVO: Ajuste para pantallas muy pequeñas */
+@media (max-width: 480px) {
+    .title-page {
+        font-size: 1.5rem;
+    }
+
+    .subtitle-page {
+        font-size: 0.875rem;
+    }
+
+    .detail-card {
+        padding: 1rem;
+    }
+
+    .form-control-premium {
+        font-size: 0.9rem;
+        padding: 0.6rem 0.8rem;
+    }
+
+    .btn-save,
+    .btn-cancel-premium {
+        font-size: 0.9rem;
+        padding: 0.6rem 1.2rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .estado-medico {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .stat-value {
+        font-size: 1.2rem;
+    }
+
+    .full-width {
+        grid-column: 1 / -1;
+    }
+}
+
+/* ✅ NUEVO: Sección divider */
+.section-divider {
+    border: none;
+    border-top: 1px solid #e2e8f0;
+    margin: 1.5rem 0;
+}
+
+/* ✅ NUEVO: Smooth scroll */
+html {
+    scroll-behavior: smooth;
+}
+
+/* ✅ NUEVO: Estilo para campos de fecha */
+input[type="date"].form-control-premium {
+    cursor: pointer;
+}
+
+input[type="date"].form-control-premium::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.6;
+}
+
+input[type="date"].form-control-premium::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
 }

@@ -6,7 +6,7 @@ import { Pagos } from "../pages/pagos/pagos";
 import { Contacto } from "../pages/contacto/contacto";
 import { Nosotros } from "../pages/nosotros/nosotros";
 import { Recursos } from "../pages/recursos/recursos";
-import { ElectricWavesComponent } from '../components/ui/electric-waves/electric-waves.component';
+import { ElectricWavesComponent } from '../shared/components/electric-waves/electric-waves.component';
 
 @Component({
   selector: 'app-landing',
@@ -56,7 +56,7 @@ export class Landing implements AfterViewInit {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           const target = entry.target as HTMLElement;
-          
+
           // Animación para elementos normales
           if (target.getAttribute('animate-type') === 'up') {
             target.animate([
@@ -67,7 +67,7 @@ export class Landing implements AfterViewInit {
               easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
               fill: 'both'
             });
-          } 
+          }
           // Animación para cards 3D
           else if (target.getAttribute('animate-type') === '3d') {
             target.animate([
