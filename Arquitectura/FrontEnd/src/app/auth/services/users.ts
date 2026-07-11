@@ -50,25 +50,25 @@ export interface RegistroData {
   rol: string;
   telefono?: string;
   genero?: string;
-  fechaNacimiento?: string;  // NUEVO
-  curp?: string;            // NUEVO
-  domicilio?: string;       // NUEVO
-  codigoPostal?: string;    // NUEVO
-  localidad?: string;       // NUEVO
-  municipio?: string;       // NUEVO
-  estado?: string;          // NUEVO
+  fechaNacimiento?: string;
+  curp?: string;
+  domicilio?: string;
+  codigoPostal?: string;
+  localidad?: string;
+  municipio?: string;
+  estado?: string;
   datosExtra?: any;
   recaptchaToken?: string;
 }
 
 export interface MedicionData {
   idPaciente: number;
-  sistolica: number;
-  diastolica: number;
+  sistolica: number;  // CORREGIDO: antes era "sistólica" con acento
+  diastolica: number; // CORREGIDO: antes era "diastólica" con acento
   pulso: number;
   metodoSincronizacion?: 'Bluetooth' | 'Manual';
-  idDispositivo?: number | null;  // NUEVO
-  notas?: string;                // NUEVO
+  idDispositivo?: number | null;
+  notas?: string;
 }
 
 export interface DispositivoData {
@@ -219,7 +219,7 @@ export class Users {
   }
 
   // ==========================================================================
-  // --- PERFIL DE USUARIO (NUEVOS MÉTODOS) ---
+  // --- PERFIL DE USUARIO ---
   // ==========================================================================
   getPerfilUsuario(uid: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/auth/perfil/${uid}`);
@@ -240,68 +240,54 @@ export class Users {
   // ==========================================================================
   // --- GESTIÓN DE CITAS ---
   // ==========================================================================
-
-  // ✅ CREAR CITA
   crearCita(datosCita: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/citas/agendar-cita`, datosCita);
   }
 
-  // ✅ OBTENER TODAS LAS CITAS
   getAllCitas(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/citas/todas-las-citas`);
   }
 
-  // ✅ OBTENER CITAS DE UN USUARIO POR EMAIL
   getMisCitas(email: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/citas/mis-citas/${email}`);
   }
 
-  // ✅ ACTUALIZAR ESTADO DE CITA (solo estado y notas)
   actualizarEstadoCita(idCita: number | string, datos: { estado: string, notasDoctor?: string }): Observable<any> {
     return this.http.put(`${this.apiUrl}/citas/actualizar-cita/${idCita}`, datos);
   }
 
-  // ✅ OBTENER CITA POR ID
   getCitaById(idCita: number | string): Observable<any> {
     return this.http.get(`${this.apiUrl}/citas/cita/${idCita}`);
   }
 
-  // ✅ OBTENER CITAS POR FECHA
   getCitasByFecha(fecha: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/citas/citas/fecha/${fecha}`);
   }
 
-  // ✅ OBTENER CITAS DE HOY
   getCitasHoy(): Observable<any> {
     return this.http.get(`${this.apiUrl}/citas/citas/hoy`);
   }
 
-  // ✅ ACTUALIZAR CITA COMPLETA (todos los campos)
   actualizarCita(idCita: number | string, datos: any): Observable<any> {
     return this.http.put(`${this.apiUrl}/citas/cita/${idCita}`, datos);
   }
 
-  // ✅ CANCELAR CITA
   cancelarCita(idCita: number | string, motivoCancelacion?: string): Observable<any> {
     return this.http.patch(`${this.apiUrl}/citas/cita/${idCita}/cancelar`, { motivoCancelacion });
   }
 
-  // ✅ OBTENER ESTADÍSTICAS DE CITAS
   getEstadisticasCitas(): Observable<any> {
     return this.http.get(`${this.apiUrl}/citas/citas/estadisticas`);
   }
 
-  // ✅ ELIMINAR CITA
   eliminarCita(idCita: number | string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/citas/cita/${idCita}`);
   }
 
-  // ✅ NUEVO: OBTENER HISTORIAL DE CAMBIOS DE UNA CITA
   getHistorialCita(idCita: number | string): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/citas/cita/${idCita}/historial`);
   }
 
-  // ✅ NUEVO: GUARDAR HISTORIAL DE CAMBIOS
   guardarHistorialCita(data: {
     idCita: number | string;
     accion: string;
@@ -393,9 +379,8 @@ export class Users {
     return this.http.get(`${this.apiUrl}/medicamentos/medicamentos/estadisticas`);
   }
 
-  // ✅ OBTENER ESTADÍSTICAS DE UN MEDICAMENTO ESPECÍFICO 
   getEstadisticasMedicamento(idMedicamento: number | string): Observable<any> {
-    return this.http.get(` ${this.apiUrl} /medicamentos/medicamento/ ${idMedicamento} /estadisticas `);
+    return this.http.get(`${this.apiUrl}/medicamentos/medicamento/${idMedicamento}/estadisticas`);
   }
 
   // ==========================================================================
@@ -501,54 +486,102 @@ export class Users {
   }
 
   // ==========================================================================
-  // --- GESTIÓN DE MEDICIONES (ACTUALIZADO) ---
+  // --- GESTIÓN DE MEDICIONES (CORREGIDO) ---
   // ==========================================================================
+
+  /**
+   * Registrar una nueva medición manualmente
+   */
   registrarMedicion(datos: MedicionData): Observable<any> {
-    return this.http.post(`${this.apiUrl}/mediciones`, datos);
+    // Asegurar que los nombres de los campos coincidan con el backend
+    const payload = {
+      idPaciente: datos.idPaciente,
+      sistolica: datos.sistolica,
+      diastolica: datos.diastolica,
+      pulso: datos.pulso,
+      metodoSincronizacion: datos.metodoSincronizacion || 'Manual'
+    };
+    return this.http.post(`${this.apiUrl}/mediciones`, payload);
   }
 
+  /**
+   * Obtener todas las mediciones de un paciente
+   */
   getMedicionesPaciente(
     idPaciente: number | string,
-    limite?: number,
-    orden?: string
+    limite?: number
   ): Observable<any> {
     let url = `${this.apiUrl}/mediciones/paciente/${idPaciente}`;
-    const params = [];
-    if (limite) params.push(`limite=${limite}`);
-    if (orden) params.push(`orden=${orden}`);
-    if (params.length) url += `?${params.join('&')}`;
+    if (limite) {
+      url += `?limite=${limite}`;
+    }
     return this.http.get<any>(url);
   }
 
+  /**
+   * Obtener la última medición de un paciente
+   */
   getUltimaMedicionPaciente(idPaciente: number | string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/mediciones/paciente/${idPaciente}/ultima`);
   }
 
+  /**
+   * Obtener mediciones por rango de fechas
+   */
   getMedicionesPorRango(
     idPaciente: number | string,
     fechaInicio: string,
     fechaFin: string
   ): Observable<any[]> {
     return this.http.get<any[]>(
-      `${this.apiUrl}/mediciones/paciente/${idPaciente}/rango?fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`
+      `${this.apiUrl}/mediciones/paciente/${idPaciente}/rango?fechaInicio=${encodeURIComponent(fechaInicio)}&fechaFin=${encodeURIComponent(fechaFin)}`
     );
   }
 
+  /**
+   * Obtener estadísticas de mediciones por período
+   */
   getEstadisticasMediciones(
     idPaciente: number | string,
     periodo?: 'dia' | 'semana' | 'mes' | 'trimestre'
   ): Observable<any> {
     let url = `${this.apiUrl}/mediciones/paciente/${idPaciente}/estadisticas`;
-    if (periodo) url += `?periodo=${periodo}`;
+    if (periodo) {
+      url += `?periodo=${periodo}`;
+    }
     return this.http.get(url);
   }
 
+  /**
+   * Eliminar una medición específica
+   */
   eliminarMedicion(idMedicion: number | string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/mediciones/medicion/${idMedicion}`);
   }
 
+  /**
+   * Registrar múltiples mediciones en lote
+   */
   registrarMultiplesMediciones(mediciones: any[]): Observable<any> {
-    return this.http.post(`${this.apiUrl}/mediciones/registrar-multiples`, { mediciones });
+    // Asegurar que los campos tengan los nombres correctos
+    const medicionesFormateadas = mediciones.map(m => ({
+      idPaciente: m.idPaciente,
+      sistolica: m.sistolica,
+      diastolica: m.diastolica,
+      pulso: m.pulso,
+      metodoSincronizacion: m.metodoSincronizacion || 'Manual'
+    }));
+    return this.http.post(`${this.apiUrl}/mediciones/registrar-multiples`, { mediciones: medicionesFormateadas });
+  }
+
+  /**
+   * OBTENER MEDICIÓN DESDE TENSIÓMETRO VÍA BLUETOOTH
+   * Este método ejecuta el script Python que se conecta al dispositivo
+   */
+  obtenerMedicionTensiometro(idPaciente: number | string): Observable<any> {
+    console.log(`[Service] Solicitando medición para paciente ID: ${idPaciente}`);
+    // Cambiado a GET porque el controller usa req.params, no req.body
+    return this.http.get(`${this.apiUrl}/mediciones/tensiometro/${idPaciente}`);
   }
 
   // ==========================================================================

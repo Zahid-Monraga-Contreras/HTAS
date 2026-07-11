@@ -66,7 +66,40 @@ export class Dispositivos implements OnInit, OnDestroy {
   }
 
   /**
-   * ✅ OBTENER NOMBRE COMPLETO DEL PACIENTE DESDE UN OBJETO DISPOSITIVO
+   * ✅ VERIFICAR PERMISOS SEGÚN ROL
+   */
+  verificarPermiso(accion: 'crear' | 'editar' | 'eliminar' | 'ver' | 'medir' | 'editarPaciente'): boolean {
+    if (!this.currentUser || !this.currentUser.rol) return false;
+
+    const rol = this.currentUser.rol.toLowerCase().trim();
+    const esAdmin = rol === 'administrador' || rol === 'admin';
+    const esMedico = rol === 'medico' || rol === 'doctor';
+    const esPaciente = rol === 'paciente';
+    const esAcompanante = rol === 'acompañante';
+
+    switch (accion) {
+      case 'crear':
+        return esAdmin || esMedico;
+      case 'editar':
+        // Acompañante puede editar nombre y datos básicos, pero no el paciente vinculado
+        return esAdmin || esMedico || esAcompanante;
+      case 'editarPaciente':
+        // Solo admin y médico pueden cambiar el paciente vinculado
+        return esAdmin || esMedico;
+      case 'eliminar':
+        return esAdmin || esMedico;
+      case 'ver':
+        return esAdmin || esMedico || esPaciente || esAcompanante;
+      case 'medir':
+        // Paciente, médico y admin pueden medir, acompañante NO
+        return esAdmin || esMedico || esPaciente;
+      default:
+        return false;
+    }
+  }
+
+  /**
+   * ✅ OBTENER NOMBRE COMPLETO DEL PACIENTE
    */
   getNombreCompletoPaciente(dispositivo: any): string {
     if (!dispositivo) return 'Sin vincular';
@@ -79,9 +112,6 @@ export class Dispositivos implements OnInit, OnDestroy {
     return nombreCompleto || 'Sin vincular';
   }
 
-  /**
-   * ✅ OBTENER NOMBRE COMPLETO DEL PACIENTE DESDE UN OBJETO USUARIO
-   */
   getNombreCompletoPacienteObj(paciente: any): string {
     if (!paciente) return 'Paciente sin nombre';
 
@@ -93,9 +123,6 @@ export class Dispositivos implements OnInit, OnDestroy {
     return nombreCompleto || 'Paciente sin nombre';
   }
 
-  /**
-   * ✅ OBTENER NOMBRE DEL PACIENTE SELECCIONADO EN EL FORMULARIO
-   */
   getNombrePacienteSeleccionado(): string {
     if (!this.dispositivoForm.idPacienteAsociado) return 'Sin paciente';
 
@@ -110,35 +137,15 @@ export class Dispositivos implements OnInit, OnDestroy {
     return 'Paciente no encontrado';
   }
 
-  /**
-   * ✅ DESVINCULAR PACIENTE DEL FORMULARIO
-   */
   desvincularPaciente() {
+    // Solo admin y médico pueden desvincular
+    if (!this.verificarPermiso('editarPaciente')) {
+      this.lanzarNotificacion('No tienes permiso para modificar el paciente vinculado.', 'error');
+      return;
+    }
     this.dispositivoForm.idPacienteAsociado = null;
     this.filtroPacienteModal = '';
     this.cdr.detectChanges();
-  }
-
-  verificarPermiso(accion: 'crear' | 'editar' | 'eliminar'): boolean {
-    if (!this.currentUser || !this.currentUser.rol) return false;
-
-    const rol = this.currentUser.rol.toLowerCase().trim();
-
-    const esAdmin = rol === 'administrador';
-    const esMedico = rol === 'medico' || rol === 'doctor';
-    const esPaciente = rol === 'paciente';
-    const esAcompanante = rol === 'acompañante';
-
-    switch (accion) {
-      case 'crear':
-        return esAdmin || esMedico || esPaciente;
-      case 'editar':
-        return esAdmin || esMedico || esAcompanante;
-      case 'eliminar':
-        return esAdmin || esMedico;
-      default:
-        return false;
-    }
   }
 
   lanzarNotificacion(mensaje: string, tipo: 'success' | 'error' | 'warning' = 'success') {
@@ -204,25 +211,52 @@ export class Dispositivos implements OnInit, OnDestroy {
     this.dispositivoSeleccionado = { ...d };
   }
 
+  /**
+   * ✅ IR A DETALLE - SEGÚN PERMISO
+   */
   irADetalle(dispositivo: any) {
-    if (!this.verificarPermiso('editar')) {
-      this.lanzarNotificacion('Tu rol no cuenta con permisos para editar dispositivos.', 'error');
-      return;
-    }
-
     if (!dispositivo) {
-      this.lanzarNotificacion('Por favor, selecciona un dispositivo para editar.', 'warning');
+      this.lanzarNotificacion('Por favor, selecciona un dispositivo.', 'warning');
       return;
     }
 
-    const id = dispositivo.iddispositivo || dispositivo.idDispositivo || dispositivo.id;
+    // Si es paciente, solo puede ver y medir
+    if (this.currentUser?.rol?.toLowerCase() === 'paciente') {
+      this.router.navigate(['/dispositivos/editar', dispositivo.iddispositivo], {
+        state: {
+          dispositivo: dispositivo,
+          modo: 'paciente'  // Modo solo lectura + botón medir
+        }
+      });
+      return;
+    }
 
-    this.router.navigate(['/dispositivos/editar', id], {
-      state: { dispositivo: dispositivo }
+    // Si es acompañante, puede ver y editar (pero no cambiar paciente vinculado)
+    if (this.currentUser?.rol?.toLowerCase() === 'acompañante') {
+      this.router.navigate(['/dispositivos/editar', dispositivo.iddispositivo], {
+        state: {
+          dispositivo: dispositivo,
+          modo: 'acompanante'  // Modo edición limitada
+        }
+      });
+      return;
+    }
+
+    // Admin y médico: edición completa
+    this.router.navigate(['/dispositivos/editar', dispositivo.iddispositivo], {
+      state: {
+        dispositivo: dispositivo,
+        modo: 'editar'  // Modo edición completa
+      }
     });
   }
 
   seleccionarPacienteModal(p: any) {
+    // Solo admin y médico pueden seleccionar paciente
+    if (!this.verificarPermiso('editarPaciente')) {
+      this.lanzarNotificacion('No tienes permiso para vincular pacientes.', 'error');
+      return;
+    }
     this.dispositivoForm.idPacienteAsociado = p.idusuario;
     this.filtroPacienteModal = this.getNombreCompletoPacienteObj(p);
     this.mostrarDropdownPacientes = false;

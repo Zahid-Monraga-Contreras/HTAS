@@ -34,340 +34,550 @@
             </div>
         </div>
 
-        <!-- RESUMEN DEL PACIENTE -->
-        <div class="resumen-paciente">
-            <div class="resumen-item">
-                <i class="bi bi-person-fill"></i>
-                <div>
-                    <small>Nombre completo</small>
-                    <strong>{{ usuarioSeleccionado.nombre }}
-                        {{ usuarioSeleccionado.tempApellidoPaterno || usuarioSeleccionado.apPaterno }}
-                        {{ usuarioSeleccionado.tempApellidoMaterno || usuarioSeleccionado.apMaterno }}</strong>
-                </div>
-            </div>
-            <div class="resumen-item">
-                <i class="bi bi-envelope-fill"></i>
-                <div>
-                    <small>Correo</small>
-                    <strong>{{ usuarioSeleccionado.correo }}</strong>
-                </div>
-            </div>
-            <div class="resumen-item">
-                <i class="bi bi-activity"></i>
-                <div>
-                    <small>Tipo de Sangre</small>
-                    <strong>{{ usuarioSeleccionado.tipoSangre || 'No especificado' }}</strong>
-                </div>
-            </div>
-            @if (estadisticas) {
-            <div class="resumen-item">
-                <i class="bi bi-calendar3"></i>
-                <div>
-                    <small>Total Citas</small>
-                    <strong>{{ estadisticas.totalCitas }}</strong>
-                </div>
-            </div>
-            }
+        <!-- MENÚ DE NAVEGACIÓN POR PESTAÑAS -->
+        <div class="tabs-nav-wrapper">
+            <nav class="tabs-nav">
+                <button type="button" class="tab-btn" [class.active]="activeTab === 'info'"
+                    (click)="cambiarTab('info')">
+                    <i class="bi bi-person-vcard"></i>
+                    <span>Información del Paciente</span>
+                </button>
+                <button type="button" class="tab-btn" [class.active]="activeTab === 'historial'"
+                    (click)="cambiarTab('historial')">
+                    <i class="bi bi-clock-history"></i>
+                    <span>Historial</span>
+                </button>
+                <button type="button" class="tab-btn" [class.active]="activeTab === 'expediente'"
+                    (click)="cambiarTab('expediente')">
+                    <i class="bi bi-file-earmark-medical"></i>
+                    <span>Expediente</span>
+                </button>
+            </nav>
         </div>
 
-        <!-- ESTADÍSTICAS -->
-        @if (estadisticas) {
-        <div class="estadisticas-section">
-            <h4 class="section-title">
-                <i class="bi bi-graph-up-arrow"></i>
-                Actividad del Paciente
-            </h4>
-            <div class="stats-grid">
-                <div class="stat-box">
-                    <small>Total Citas</small>
-                    <div class="stat-value">{{ estadisticas.totalCitas }}</div>
+        <!-- ============================================================ -->
+        <!-- TAB 1: INFORMACIÓN DEL PACIENTE                               -->
+        <!-- ============================================================ -->
+        @if (activeTab === 'info') {
+        <div class="tab-panel">
+
+            <!-- RESUMEN DEL PACIENTE -->
+            <div class="resumen-paciente">
+                <div class="resumen-item">
+                    <i class="bi bi-person-fill"></i>
+                    <div>
+                        <small>Nombre completo</small>
+                        <strong>{{ usuarioSeleccionado.nombre }}
+                            {{ usuarioSeleccionado.tempApellidoPaterno || usuarioSeleccionado.apPaterno }}
+                            {{ usuarioSeleccionado.tempApellidoMaterno || usuarioSeleccionado.apMaterno }}</strong>
+                    </div>
                 </div>
-                <div class="stat-box">
-                    <small>Citas Completadas</small>
-                    <div class="stat-value">{{ estadisticas.citasCompletadas }}</div>
+                <div class="resumen-item">
+                    <i class="bi bi-envelope-fill"></i>
+                    <div>
+                        <small>Correo</small>
+                        <strong>{{ usuarioSeleccionado.correo }}</strong>
+                    </div>
                 </div>
-                <div class="stat-box">
-                    <small>Citas Pendientes</small>
-                    <div class="stat-value">{{ estadisticas.citasPendientes }}</div>
+                <div class="resumen-item">
+                    <i class="bi bi-activity"></i>
+                    <div>
+                        <small>Tipo de Sangre</small>
+                        <strong>{{ usuarioSeleccionado.tipoSangre || 'No especificado' }}</strong>
+                    </div>
                 </div>
-                <div class="stat-box">
-                    <small>Última Cita</small>
-                    <div class="stat-value" style="font-size: 0.9rem;">{{ estadisticas.ultimaCita | date:'dd/MM/yyyy' }}
+                @if (estadisticas) {
+                <div class="resumen-item">
+                    <i class="bi bi-calendar3"></i>
+                    <div>
+                        <small>Total Citas</small>
+                        <strong>{{ estadisticas.totalCitas }}</strong>
+                    </div>
+                </div>
+                }
+            </div>
+
+            <!-- FORMULARIO PRINCIPAL -->
+            <div class="detail-card">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nombre(s)</label>
+                        <input type="text" required maxlength="40" [(ngModel)]="usuarioSeleccionado.nombre"
+                            class="form-control-premium" placeholder="Ej: Juan">
+                    </div>
+                    <div class="form-group">
+                        <label>Apellido Paterno</label>
+                        <input type="text" required maxlength="30" [(ngModel)]="usuarioSeleccionado.tempApellidoPaterno"
+                            class="form-control-premium" placeholder="Ej: Pérez">
+                    </div>
+                    <div class="form-group">
+                        <label>Apellido Materno</label>
+                        <input type="text" required maxlength="30" [(ngModel)]="usuarioSeleccionado.tempApellidoMaterno"
+                            class="form-control-premium" placeholder="Ej: García">
+                    </div>
+                    <div class="form-group">
+                        <label>Correo Electrónico</label>
+                        <input type="email" maxlength="60" [(ngModel)]="usuarioSeleccionado.correo"
+                            class="form-control-premium" placeholder="Ej: paciente@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Teléfono</label>
+                        <input type="text" maxlength="10" [(ngModel)]="usuarioSeleccionado.telefono"
+                            class="form-control-premium" placeholder="Ej: 2711234567">
+                    </div>
+                    <div class="form-group">
+                        <label>NSS (Seguro Social)</label>
+                        <input type="text" maxlength="11" placeholder="Ingrese 11 dígitos"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                            [(ngModel)]="usuarioSeleccionado.nss" class="form-control-premium">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Género</label>
+                        <select [(ngModel)]="usuarioSeleccionado.genero" class="form-control-premium">
+                            <option [ngValue]="null" disabled selected>Seleccione género...</option>
+                            <option value="Masculino">Masculino</option>
+                            <option value="Femenino">Femenino</option>
+                            <option value="Otro">Otro</option>
+                            <option value="No especificado">No especificado</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tipo de Sangre</label>
+                        <select [(ngModel)]="usuarioSeleccionado.tipoSangre" class="form-control-premium">
+                            <option [ngValue]="null" disabled selected>Seleccione tipo...</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Peso (kg)</label>
+                        <input type="number" step="0.01" min="0" max="600" placeholder="Ej: 78.50"
+                            [(ngModel)]="usuarioSeleccionado.peso" class="form-control-premium">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Altura (metros)</label>
+                        <input type="number" step="0.01" min="0" max="3" placeholder="Ej: 1.75"
+                            [(ngModel)]="usuarioSeleccionado.altura" class="form-control-premium">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Fecha de Nacimiento</label>
+                        <div class="input-picker-wrapper">
+                            <input type="text" id="fechaNacimientoInput"
+                                [(ngModel)]="usuarioSeleccionado.fechaNacimiento"
+                                placeholder="Seleccione fecha de nacimiento..."
+                                class="form-control-premium picker-custom" readonly>
+                            <i class="bi bi-calendar3 icon-embed"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>CURP</label>
+                        <input type="text" [(ngModel)]="usuarioSeleccionado.curp" (input)="formatearCURP()"
+                            maxlength="18" class="form-control-premium" placeholder="Ej: GAML850315HVZRRL01">
+                        <small class="form-text text-muted">18 caracteres alfanuméricos</small>
+                    </div>
+                </div>
+
+                <!-- UBICACIÓN - ESTILO MEJORADO -->
+                <div class="ubicacion-section">
+                    <div class="ubicacion-header">
+                        <i class="bi bi-geo-alt-fill"></i>
+                        <span>Datos de Ubicación</span>
+                    </div>
+
+                    <div class="ubicacion-grid">
+                        <div class="ubicacion-item full-width">
+                            <label>Domicilio</label>
+                            <input type="text" [(ngModel)]="usuarioSeleccionado.domicilio"
+                                (blur)="formatearCampoTexto('domicilio')" class="form-control-premium"
+                                placeholder="Ej: Calle Benito Juárez #123 Col. Centro">
+                        </div>
+
+                        <div class="ubicacion-item">
+                            <label>Código Postal</label>
+                            <input type="text" [(ngModel)]="usuarioSeleccionado.codigoPostal"
+                                (input)="formatearCodigoPostal()" maxlength="5" class="form-control-premium"
+                                placeholder="Ej: 94500">
+                            <small class="form-text text-muted">5 dígitos numéricos</small>
+                        </div>
+
+                        <div class="ubicacion-item">
+                            <label>Localidad</label>
+                            <input type="text" [(ngModel)]="usuarioSeleccionado.localidad"
+                                (blur)="formatearCampoTexto('localidad')" class="form-control-premium"
+                                placeholder="Ej: Córdoba">
+                        </div>
+
+                        <div class="ubicacion-item">
+                            <label>Municipio</label>
+                            <input type="text" [(ngModel)]="usuarioSeleccionado.municipio"
+                                (blur)="formatearCampoTexto('municipio')" class="form-control-premium"
+                                placeholder="Ej: Córdoba">
+                        </div>
+
+                        <div class="ubicacion-item">
+                            <label>Estado</label>
+                            <input type="text" [(ngModel)]="usuarioSeleccionado.estado"
+                                (blur)="formatearCampoTexto('estado')" class="form-control-premium"
+                                placeholder="Ej: Veracruz">
+                        </div>
+                    </div>
+
+                    @if (tieneUbicacionCompleta()) {
+                    <div class="ubicacion-resumen">
+                        <i class="bi bi-geo-alt-fill"></i>
+                        <span>{{ getUbicacionFormateada() }}</span>
+                    </div>
+                    }
+                </div>
+
+                <div class="form-group" style="margin-top: 15px; padding: 0 15px;">
+                    <label>Antecedentes Familiares</label>
+                    <textarea [(ngModel)]="usuarioSeleccionado.antecedentesFamiliares" rows="3"
+                        placeholder="Describa antecedentes médicos familiares relevantes..."
+                        class="form-control-premium"></textarea>
+                </div>
+
+                <!-- ACCIONES -->
+                <div class="action-footer">
+                    <div class="footer-buttons">
+                        <button type="button" class="btn-appointment" (click)="abrirModalCita()">
+                            <i class="bi bi-calendar-plus"></i>
+                            <span>Asignar Cita</span>
+                        </button>
+
+                        <button class="btn-cancel-premium" (click)="volver()" [disabled]="isSaving">Cancelar</button>
+
+                        <button class="btn-save" (click)="guardarCambios()" [disabled]="isSaving">
+                            @if (isSaving) {
+                            <span class="spinner-save"></span>
+                            <span>Guardando...</span>
+                            } @else {
+                            <i class="bi bi-check-lg"></i>
+                            <span>Guardar Cambios</span>
+                            }
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
         }
 
-        <!-- HISTORIAL DE CITAS -->
-        @if (citasPaciente.length > 0) {
-        <div class="citas-section">
-            <div class="citas-header" (click)="mostrarCitas = !mostrarCitas">
-                <h4 class="section-title" style="cursor: pointer;">
-                    <i class="bi bi-calendar-event"></i>
-                    Historial de Citas
-                    <span class="badge-citas">{{ citasPaciente.length }}</span>
-                    <i class="bi" [ngClass]="mostrarCitas ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
-                </h4>
-            </div>
+        <!-- ============================================================ -->
+        <!-- TAB 2: HISTORIAL                                              -->
+        <!-- ============================================================ -->
+        @if (activeTab === 'historial') {
+        <div class="tab-panel">
+            <div class="detail-card">
 
-            @if (mostrarCitas) {
-            @if (citasPaciente.length > 0) {
-            <div class="citas-lista">
-                @for (c of citasPaciente; track c.id) {
-                <div class="cita-item">
-                    <div class="cita-indicador">
-                        <span class="cita-estado-dot" [ngClass]="{
-                        'estado-completada': c.estado === 'Completada',
-                        'estado-programada': c.estado === 'Programada',
-                        'estado-confirmada': c.estado === 'Confirmada',
-                        'estado-cancelada': c.estado === 'Cancelada',
-                        'estado-no-asistio': c.estado === 'No Asistió'
-                    }"></span>
+                <!-- ESTADÍSTICAS -->
+                @if (estadisticas) {
+                <div class="estadisticas-section" style="margin-top:0; padding-top:0; border-top:none;">
+                    <h4 class="section-title">
+                        <i class="bi bi-graph-up-arrow"></i>
+                        Actividad del Paciente
+                    </h4>
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <small>Total Citas</small>
+                            <div class="stat-value">{{ estadisticas.totalCitas }}</div>
+                        </div>
+                        <div class="stat-box">
+                            <small>Citas Completadas</small>
+                            <div class="stat-value">{{ estadisticas.citasCompletadas }}</div>
+                        </div>
+                        <div class="stat-box">
+                            <small>Citas Pendientes</small>
+                            <div class="stat-value">{{ estadisticas.citasPendientes }}</div>
+                        </div>
+                        <div class="stat-box">
+                            <small>Última Cita</small>
+                            <div class="stat-value" style="font-size: 0.9rem;">
+                                {{ estadisticas.ultimaCita | date:'dd/MM/yyyy' }}</div>
+                        </div>
                     </div>
-                    <div class="cita-info">
-                        <i class="bi bi-calendar-check"></i>
-                        <span class="cita-fecha-hora">{{ formatearFechaYHora(c.fechacita, c.horacita) }}</span>
+                </div>
+                }
+
+                <!-- HISTORIAL DE CITAS -->
+                <div class="citas-section">
+                    <div class="citas-header">
+                        <h4 class="section-title">
+                            <i class="bi bi-calendar-event"></i>
+                            Historial de Citas
+                            <span class="badge-citas">{{ citasPaciente.length }}</span>
+                        </h4>
                     </div>
-                    <div class="cita-detalle">
-                        <span class="cita-motivo">{{ c.motivo || 'Sin motivo' }}</span>
-                        @if (c.estado === 'Completada') {
-                        <span class="badge-completada">Completada</span>
-                        } @else if (c.estado === 'Programada') {
-                        <span class="badge-programada">Programada</span>
-                        } @else if (c.estado === 'Confirmada') {
-                        <span class="badge-confirmada">Confirmada</span>
-                        } @else if (c.estado === 'Cancelada') {
-                        <span class="badge-cancelada">Cancelada</span>
-                        } @else {
-                        <span class="badge-no-asistio">No Asistió</span>
+
+                    @if (citasPaciente.length > 0) {
+                    <div class="citas-lista">
+                        @for (c of citasPaciente; track c.id) {
+                        <div class="cita-item">
+                            <div class="cita-indicador">
+                                <span class="cita-estado-dot" [ngClass]="{
+                                'estado-completada': c.estado === 'Completada',
+                                'estado-programada': c.estado === 'Programada',
+                                'estado-confirmada': c.estado === 'Confirmada',
+                                'estado-cancelada': c.estado === 'Cancelada',
+                                'estado-no-asistio': c.estado === 'No Asistió'
+                            }"></span>
+                            </div>
+                            <div class="cita-info">
+                                <i class="bi bi-calendar-check"></i>
+                                <span class="cita-fecha-hora">{{ formatearFechaYHora(c.fechacita, c.horacita)
+                                    }}</span>
+                            </div>
+                            <div class="cita-detalle">
+                                <span class="cita-motivo">{{ c.motivo || 'Sin motivo' }}</span>
+                                @if (c.estado === 'Completada') {
+                                <span class="badge-completada">Completada</span>
+                                } @else if (c.estado === 'Programada') {
+                                <span class="badge-programada">Programada</span>
+                                } @else if (c.estado === 'Confirmada') {
+                                <span class="badge-confirmada">Confirmada</span>
+                                } @else if (c.estado === 'Cancelada') {
+                                <span class="badge-cancelada">Cancelada</span>
+                                } @else {
+                                <span class="badge-no-asistio">No Asistió</span>
+                                }
+                            </div>
+                        </div>
                         }
                     </div>
-                </div>
-                }
-            </div>
-            } @else {
-            <div class="citas-lista">
-                <div class="citas-vacio">
-                    <i class="bi bi-calendar-plus"></i>
-                    <p>No hay citas registradas</p>
-                    <span>Las citas que se agenden aparecerán aquí</span>
-                </div>
-            </div>
-            }
-            }
-        </div>
-        }
-
-        <!-- FORMULARIO PRINCIPAL -->
-        <div class="detail-card">
-            <div class="form-grid">
-                <div class="form-group">
-                    <label>Nombre(s)</label>
-                    <input type="text" required maxlength="40" [(ngModel)]="usuarioSeleccionado.nombre"
-                        class="form-control-premium" placeholder="Ej: Juan">
-                </div>
-                <div class="form-group">
-                    <label>Apellido Paterno</label>
-                    <input type="text" required maxlength="30" [(ngModel)]="usuarioSeleccionado.tempApellidoPaterno"
-                        class="form-control-premium" placeholder="Ej: Pérez">
-                </div>
-                <div class="form-group">
-                    <label>Apellido Materno</label>
-                    <input type="text" required maxlength="30" [(ngModel)]="usuarioSeleccionado.tempApellidoMaterno"
-                        class="form-control-premium" placeholder="Ej: García">
-                </div>
-                <div class="form-group">
-                    <label>Correo Electrónico</label>
-                    <input type="email" maxlength="60" [(ngModel)]="usuarioSeleccionado.correo"
-                        class="form-control-premium" placeholder="Ej: paciente@email.com">
-                </div>
-                <div class="form-group">
-                    <label>Teléfono</label>
-                    <input type="text" maxlength="10" [(ngModel)]="usuarioSeleccionado.telefono"
-                        class="form-control-premium" placeholder="Ej: 2711234567">
-                </div>
-                <div class="form-group">
-                    <label>NSS (Seguro Social)</label>
-                    <input type="text" maxlength="11" placeholder="Ingrese 11 dígitos"
-                        oninput="this.value = this.value.replace(/[^0-9]/g, '')" [(ngModel)]="usuarioSeleccionado.nss"
-                        class="form-control-premium">
-                </div>
-
-                <div class="form-group">
-                    <label>Género</label>
-                    <select [(ngModel)]="usuarioSeleccionado.genero" class="form-control-premium">
-                        <option [ngValue]="null" disabled selected>Seleccione género...</option>
-                        <option value="Masculino">Masculino</option>
-                        <option value="Femenino">Femenino</option>
-                        <option value="Otro">Otro</option>
-                        <option value="No especificado">No especificado</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Tipo de Sangre</label>
-                    <select [(ngModel)]="usuarioSeleccionado.tipoSangre" class="form-control-premium">
-                        <option [ngValue]="null" disabled selected>Seleccione tipo...</option>
-                        <option value="O+">O+</option>
-                        <option value="O-">O-</option>
-                        <option value="A+">A+</option>
-                        <option value="A-">A-</option>
-                        <option value="B+">B+</option>
-                        <option value="B-">B-</option>
-                        <option value="AB+">AB+</option>
-                        <option value="AB-">AB-</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Peso (kg)</label>
-                    <input type="number" step="0.01" min="0" max="600" placeholder="Ej: 78.50"
-                        [(ngModel)]="usuarioSeleccionado.peso" class="form-control-premium">
-                </div>
-
-                <div class="form-group">
-                    <label>Altura (metros)</label>
-                    <input type="number" step="0.01" min="0" max="3" placeholder="Ej: 1.75"
-                        [(ngModel)]="usuarioSeleccionado.altura" class="form-control-premium">
-                </div>
-
-                <div class="form-group">
-                    <label>Fecha de Nacimiento</label>
-                    <div class="input-picker-wrapper">
-                        <input type="text" id="fechaNacimientoInput" [(ngModel)]="usuarioSeleccionado.fechaNacimiento"
-                            placeholder="Seleccione fecha de nacimiento..." class="form-control-premium picker-custom"
-                            readonly>
-                        <i class="bi bi-calendar3 icon-embed"></i>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>CURP</label>
-                    <input type="text" [(ngModel)]="usuarioSeleccionado.curp" (input)="formatearCURP()" maxlength="18"
-                        class="form-control-premium" placeholder="Ej: GAML850315HVZRRL01">
-                    <small class="form-text text-muted">18 caracteres alfanuméricos</small>
-                </div>
-            </div>
-
-            <!-- UBICACIÓN -->
-            <div class="ubicacion-section">
-                <div class="section-divider">
-                    <span class="section-title">Datos de Ubicación</span>
-                </div>
-
-                <div class="form-grid">
-                    <div class="form-group full-width">
-                        <label>Domicilio</label>
-                        <input type="text" [(ngModel)]="usuarioSeleccionado.domicilio"
-                            (blur)="formatearCampoTexto('domicilio')" class="form-control-premium"
-                            placeholder="Ej: Calle Benito Juárez #123 Col. Centro">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Código Postal</label>
-                        <input type="text" [(ngModel)]="usuarioSeleccionado.codigoPostal"
-                            (input)="formatearCodigoPostal()" maxlength="5" class="form-control-premium"
-                            placeholder="Ej: 94500">
-                        <small class="form-text text-muted">5 dígitos numéricos</small>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Localidad</label>
-                        <input type="text" [(ngModel)]="usuarioSeleccionado.localidad"
-                            (blur)="formatearCampoTexto('localidad')" class="form-control-premium"
-                            placeholder="Ej: Córdoba">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Municipio</label>
-                        <input type="text" [(ngModel)]="usuarioSeleccionado.municipio"
-                            (blur)="formatearCampoTexto('municipio')" class="form-control-premium"
-                            placeholder="Ej: Córdoba">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Estado</label>
-                        <input type="text" [(ngModel)]="usuarioSeleccionado.estado"
-                            (blur)="formatearCampoTexto('estado')" class="form-control-premium"
-                            placeholder="Ej: Veracruz">
-                    </div>
-                </div>
-
-                @if (tieneUbicacionCompleta()) {
-                <div class="ubicacion-resumen">
-                    <i class="bi bi-geo-alt-fill"></i>
-                    <span>{{ getUbicacionFormateada() }}</span>
-                </div>
-                }
-            </div>
-
-            <div class="form-group" style="margin-top: 15px; padding: 0 15px;">
-                <label>Antecedentes Familiares</label>
-                <textarea [(ngModel)]="usuarioSeleccionado.antecedentesFamiliares" rows="3"
-                    placeholder="Describa antecedentes médicos familiares relevantes..."
-                    class="form-control-premium"></textarea>
-            </div>
-
-            <!-- HISTORIAL DE CAMBIOS -->
-            @if (historialCambios.length > 0) {
-            <div class="historial-section">
-                <hr class="section-divider">
-
-                <div class="historial-header" (click)="mostrarHistorial = !mostrarHistorial">
-                    <h4 class="section-title" style="cursor: pointer;">
-                        <i class="bi bi-clock-history"></i>
-                        Historial del Paciente
-                        <i class="bi" [ngClass]="mostrarHistorial ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
-                    </h4>
-                    <span class="historial-count">{{ historialCambios.length }} eventos</span>
-                </div>
-
-                @if (mostrarHistorial) {
-                <div class="historial-lista">
-                    @for (item of historialCambios; track item) {
-                    <div class="historial-item">
-                        <div class="historial-fecha">
-                            <i class="bi bi-clock"></i>
-                            {{ item.fecha }}
-                        </div>
-                        <div class="historial-detalle">
-                            <strong>{{ item.accion }}</strong>
-                            <span>{{ item.detalle }}</span>
-                        </div>
-                        <div class="historial-usuario">
-                            <i class="bi bi-person"></i>
-                            {{ item.usuario }}
+                    } @else {
+                    <div class="citas-lista">
+                        <div class="citas-vacio">
+                            <i class="bi bi-calendar-plus"></i>
+                            <p>No hay citas registradas</p>
+                            <span>Las citas que se agenden aparecerán aquí</span>
                         </div>
                     </div>
                     }
                 </div>
-                }
-            </div>
-            }
 
-            <!-- ACCIONES -->
-            <div class="action-footer">
-                <div class="footer-buttons">
-                    <button type="button" class="btn-appointment" (click)="abrirModalCita()">
-                        <i class="bi bi-calendar-plus"></i>
-                        <span>Asignar Cita</span>
-                    </button>
+                <!-- HISTORIAL DE CAMBIOS -->
+                <div class="historial-section">
+                    <hr class="section-divider">
 
-                    <button class="btn-cancel-premium" (click)="volver()" [disabled]="isSaving">Cancelar</button>
+                    <div class="historial-header">
+                        <h4 class="section-title">
+                            <i class="bi bi-clock-history"></i>
+                            Historial del Paciente
+                        </h4>
+                        <span class="historial-count">{{ historialCambios.length }} eventos</span>
+                    </div>
 
-                    <button class="btn-save" (click)="guardarCambios()" [disabled]="isSaving">
-                        @if (isSaving) {
-                        <span class="spinner-save"></span>
-                        <span>Guardando...</span>
-                        } @else {
-                        <i class="bi bi-check-lg"></i>
-                        <span>Guardar Cambios</span>
+                    @if (historialCambios.length > 0) {
+                    <div class="historial-lista">
+                        @for (item of historialCambios; track item) {
+                        <div class="historial-item">
+                            <div class="historial-fecha">
+                                <i class="bi bi-clock"></i>
+                                {{ item.fecha }}
+                            </div>
+                            <div class="historial-detalle">
+                                <strong>{{ item.accion }}</strong>
+                                <span>{{ item.detalle }}</span>
+                            </div>
+                            <div class="historial-usuario">
+                                <i class="bi bi-person"></i>
+                                {{ item.usuario }}
+                            </div>
+                        </div>
                         }
-                    </button>
+                    </div>
+                    } @else {
+                    <div class="citas-vacio">
+                        <i class="bi bi-clock-history"></i>
+                        <p>Aún no hay actividad registrada</p>
+                        <span>Los eventos del paciente aparecerán aquí</span>
+                    </div>
+                    }
                 </div>
             </div>
         </div>
+        }
+
+        <!-- ============================================================ -->
+        <!-- TAB 3: EXPEDIENTE DEL PACIENTE                                -->
+        <!-- ============================================================ -->
+        @if (activeTab === 'expediente') {
+        <div class="tab-panel">
+
+            <div class="expediente-toolbar">
+                <p><i class="bi bi-info-circle"></i> Vista de solo lectura generada a partir de la información
+                    registrada.</p>
+                <button type="button" class="btn-print-expediente" (click)="imprimirExpediente()">
+                    <i class="bi bi-printer"></i>
+                    <span>Imprimir Expediente</span>
+                </button>
+            </div>
+
+            <div class="expediente-wrapper">
+                <div class="expediente-hoja" id="expedienteImprimible">
+
+                    <!-- MEMBRETE -->
+                    <div class="expediente-membrete">
+                        <div class="membrete-logo">
+                            <i class="bi bi-heart-pulse-fill"></i>
+                        </div>
+                        <div class="membrete-texto">
+                            <h1>Expediente Clínico</h1>
+                            <p>Sistema de Gestión de Pacientes</p>
+                        </div>
+                        <div class="membrete-folio">
+                            <small>Folio</small>
+                            <strong>#{{ pacienteId || '---' }}</strong>
+                            <small>{{ fechaGeneracion }}</small>
+                        </div>
+                    </div>
+
+                    <div class="expediente-linea-doble"></div>
+
+                    <!-- DATOS DEL PACIENTE -->
+                    <div class="expediente-encabezado-paciente">
+                        <div class="expediente-avatar">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                        <div class="expediente-nombre-bloque">
+                            <span class="expediente-etiqueta">Paciente</span>
+                            <h2>{{ usuarioSeleccionado.nombre }}
+                                {{ usuarioSeleccionado.tempApellidoPaterno || usuarioSeleccionado.apPaterno }}
+                                {{ usuarioSeleccionado.tempApellidoMaterno || usuarioSeleccionado.apMaterno }}</h2>
+                            <span class="expediente-subetiqueta">{{ usuarioSeleccionado.correo }}</span>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN: DATOS GENERALES -->
+                    <div class="expediente-seccion">
+                        <h3 class="expediente-titulo-seccion"><i class="bi bi-person-lines-fill"></i> Datos
+                            Generales</h3>
+                        <div class="expediente-grid">
+                            <div class="expediente-campo">
+                                <span>Género</span>
+                                <strong>{{ usuarioSeleccionado.genero || 'No especificado' }}</strong>
+                            </div>
+                            <div class="expediente-campo">
+                                <span>Fecha de Nacimiento</span>
+                                <strong>{{ formatearFechaNacimiento(usuarioSeleccionado.fechaNacimiento) }}</strong>
+                            </div>
+                            <div class="expediente-campo">
+                                <span>Edad</span>
+                                <strong>{{ calcularEdad() !== null ? calcularEdad() + ' años' : 'No disponible'
+                                    }}</strong>
+                            </div>
+                            <div class="expediente-campo">
+                                <span>Teléfono</span>
+                                <strong>{{ usuarioSeleccionado.telefono || 'No registrado' }}</strong>
+                            </div>
+                            <div class="expediente-campo">
+                                <span>CURP</span>
+                                <strong>{{ usuarioSeleccionado.curp || 'No registrado' }}</strong>
+                            </div>
+                            <div class="expediente-campo">
+                                <span>NSS</span>
+                                <strong>{{ usuarioSeleccionado.nss || 'No registrado' }}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN: DATOS MÉDICOS -->
+                    <div class="expediente-seccion">
+                        <h3 class="expediente-titulo-seccion"><i class="bi bi-clipboard2-pulse"></i> Datos Médicos
+                        </h3>
+                        <div class="expediente-grid">
+                            <div class="expediente-campo">
+                                <span>Tipo de Sangre</span>
+                                <strong class="destacado">{{ usuarioSeleccionado.tipoSangre || 'No especificado'
+                                    }}</strong>
+                            </div>
+                            <div class="expediente-campo">
+                                <span>Peso</span>
+                                <strong>{{ usuarioSeleccionado.peso ? (usuarioSeleccionado.peso + ' kg') : 'No
+                                    registrado' }}</strong>
+                            </div>
+                            <div class="expediente-campo">
+                                <span>Altura</span>
+                                <strong>{{ usuarioSeleccionado.altura ? (usuarioSeleccionado.altura + ' m') : 'No
+                                    registrada' }}</strong>
+                            </div>
+                            <div class="expediente-campo">
+                                <span>Índice de Masa Corporal</span>
+                                <strong>{{ calcularIMC().valor !== null ? calcularIMC().valor + ' (' +
+                                    calcularIMC().categoria + ')' : 'No disponible' }}</strong>
+                            </div>
+                        </div>
+
+                        <div class="expediente-nota">
+                            <span>Antecedentes Familiares</span>
+                            <p>{{ usuarioSeleccionado.antecedentesFamiliares || 'Sin antecedentes familiares
+                                registrados.' }}</p>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN: UBICACIÓN -->
+                    <div class="expediente-seccion">
+                        <h3 class="expediente-titulo-seccion"><i class="bi bi-geo-alt"></i> Domicilio</h3>
+                        <p class="expediente-direccion">{{ getUbicacionFormateada() }}</p>
+                    </div>
+
+                    <!-- SECCIÓN: RESUMEN DE CITAS -->
+                    <div class="expediente-seccion">
+                        <h3 class="expediente-titulo-seccion"><i class="bi bi-calendar3"></i> Resumen de Consultas
+                        </h3>
+                        <table class="expediente-tabla">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Motivo</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (c of citasPaciente; track c.id) {
+                                <tr>
+                                    <td>{{ formatearFechaYHora(c.fechacita, c.horacita) }}</td>
+                                    <td>{{ c.motivo || 'Sin motivo' }}</td>
+                                    <td>{{ c.estado }}</td>
+                                </tr>
+                                }
+                                @if (citasPaciente.length === 0) {
+                                <tr>
+                                    <td colspan="3" class="expediente-tabla-vacia">Sin consultas registradas</td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- PIE DE DOCUMENTO -->
+                    <div class="expediente-pie">
+                        <div class="expediente-firma">
+                            <div class="expediente-linea-firma"></div>
+                            <span>Firma del Médico Responsable</span>
+                        </div>
+                        <div class="expediente-sello">
+                            <i class="bi bi-patch-check-fill"></i>
+                            <span>Documento generado electrónicamente</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        }
+
     </div>
     }
 </main>

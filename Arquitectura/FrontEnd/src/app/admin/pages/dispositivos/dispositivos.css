@@ -829,3 +829,90 @@
 .custom-dropdown-list::-webkit-scrollbar-thumb:hover {
     background: #94a3b8;
 }
+
+/* ==========================================================================
+   NUEVOS BOTONES PARA ROLES
+   ========================================================================== */
+
+/* Botón VER - Para todos los roles */
+.btn-view-premium {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.btn-view-premium:hover:not(:disabled) {
+    background: #2563eb;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 99, 219, 0.2);
+}
+
+/* Botón MEDIR - Para pacientes, médicos y admin */
+.btn-measure-premium {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.btn-measure-premium:hover:not(:disabled) {
+    background: #15803d;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(21, 128, 61, 0.2);
+}
+
+/* Botón EDITAR - Solo admin y médicos */
+.btn-edit-premium {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.btn-edit-premium:hover:not(:disabled) {
+    background: #2563eb;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 99, 219, 0.2);
+}
+
+/* Botón ELIMINAR - Solo admin y médicos */
+.btn-delete-premium {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.btn-delete-premium:hover:not(:disabled) {
+    background: #dc2626;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+}
+
+/* Ajuste para el grupo de botones */
+.action-buttons-group {
+    display: flex;
+    gap: 10px;
+    opacity: 0;
+    transform: translateY(5px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+    flex-wrap: wrap;
+}
+
+.action-buttons-group.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* Responsive para botones */
+@media (max-width: 768px) {
+    .action-buttons-group {
+        flex-wrap: wrap;
+        justify-content: stretch;
+    }
+
+    .action-buttons-group button {
+        flex: 1;
+        min-width: 80px;
+        justify-content: center;
+    }
+}

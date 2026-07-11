@@ -27,6 +27,7 @@
                     <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar por nombre, MAC o paciente...">
                 </div>
 
+                <!-- ✅ BOTÓN NUEVO - SOLO PARA ADMIN Y MÉDICOS -->
                 @if (verificarPermiso('crear')) {
                 <button class="btn-save" (click)="abrirCrear()">
                     <i class="bi bi-plus-lg"></i>
@@ -35,6 +36,25 @@
                 }
 
                 <div class="action-buttons-group" [class.visible]="dispositivoSeleccionado">
+                    <!-- ✅ VER - Todos los roles -->
+                    @if (verificarPermiso('ver')) {
+                    <button class="btn-action btn-view-premium" (click)="irADetalle(dispositivoSeleccionado)"
+                        title="Ver dispositivo" [disabled]="!dispositivoSeleccionado">
+                        <i class="bi bi-eye-fill"></i>
+                        <span>Ver</span>
+                    </button>
+                    }
+
+                    <!-- ✅ MEDIR - Paciente, Médico y Admin (NO Acompañante) -->
+                    @if (verificarPermiso('medir')) {
+                    <button class="btn-action btn-measure-premium" (click)="irADetalle(dispositivoSeleccionado)"
+                        title="Tomar medición" [disabled]="!dispositivoSeleccionado">
+                        <i class="bi bi-heart-pulse-fill"></i>
+                        <span>Medir</span>
+                    </button>
+                    }
+
+                    <!-- ✅ EDITAR - Médico, Admin y Acompañante -->
                     @if (verificarPermiso('editar')) {
                     <button class="btn-action btn-edit-premium" (click)="irADetalle(dispositivoSeleccionado)"
                         title="Editar dispositivo" [disabled]="!dispositivoSeleccionado">
@@ -43,6 +63,7 @@
                     </button>
                     }
 
+                    <!-- ✅ ELIMINAR - Solo Médico y Admin -->
                     @if (verificarPermiso('eliminar')) {
                     <button class="btn-action btn-delete-premium" (click)="abrirEliminar()"
                         title="Eliminar dispositivo">
@@ -89,7 +110,6 @@
                             <div class="date-cell">
                                 @if (d.nombrepaciente) {
                                 <i class="bi bi-person-fill me-2 text-primary"></i>
-                                <!-- ✅ NOMBRE COMPLETO DEL PACIENTE EN LA TABLA -->
                                 {{ getNombreCompletoPaciente(d) }}
                                 } @else {
                                 <i class="bi bi-person-dash me-2 text-muted"></i>
@@ -136,6 +156,7 @@
     </div>
 </main>
 
+<!-- MODAL: CREAR DISPOSITIVO (SOLO ADMIN/MÉDICO) -->
 @if (mostrarModalFormulario) {
 <div class="modal-overlay">
     <div class="modal-premium-card">
@@ -173,7 +194,6 @@
                         </div>
                         }
                         @for (p of pacientesFiltradosModal; track p.idusuario) {
-                        <!-- ✅ CORREGIDO: Mostrar nombre completo en el dropdown -->
                         <div class="custom-dropdown-item" (mousedown)="seleccionarPacienteModal(p)">
                             {{ getNombreCompletoPacienteObj(p) }}
                         </div>
@@ -182,14 +202,12 @@
                     }
                 </div>
 
-                <!-- ✅ MOSTRAR PACIENTE SELECCIONADO CON NOMBRE COMPLETO -->
                 @if (dispositivoForm.idPacienteAsociado) {
                 <div class="form-group" style="grid-column: span 2; margin-top: 0.5rem;">
                     <div class="patient-badge-container" style="background: #f0fdf4; border-color: #bbf7d0;">
                         <div class="patient-info">
                             <i class="bi bi-person-check-fill icon-patient active"></i>
                             <span class="patient-name">
-                                <!-- ✅ NOMBRE COMPLETO DEL PACIENTE SELECCIONADO -->
                                 {{ getNombrePacienteSeleccionado() }}
                             </span>
                             <button type="button" class="btn-desasignar" (click)="desvincularPaciente()"
@@ -219,6 +237,7 @@
 </div>
 }
 
+<!-- MODAL: ELIMINAR (SOLO ADMIN/MÉDICO) -->
 @if (mostrarModalDelete) {
 <div class="modal-overlay">
     <div class="modal-content modal-danger">

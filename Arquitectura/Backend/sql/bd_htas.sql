@@ -74,6 +74,21 @@ CREATE TABLE DOCTORES (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+SELECT  
+    d . IdUsuario , 
+    u . Nombre , 
+    u . ApPaterno , 
+    u . ApMaterno , 
+    u . Correo , 
+    d . Cedula , 
+    d . Especialidad , 
+    d . TipoSangre , 
+    d . Peso , 
+    d . Altura 
+FROM  DOCTORES d 
+JOIN  USUARIOS u  ON  d . IdUsuario  =  u . IdUsuario 
+WHERE  u . Activo  =  true  AND  u . deleted_at  IS  NULL ; 
+
 -- ============================================
 -- 3. TABLA: PACIENTES
 -- ============================================
@@ -98,6 +113,38 @@ CREATE TABLE PACIENTES (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+SELECT*FROM PACIENTES;
+
+-- Verificar el estado del usuario
+SELECT 
+    IdUsuario,
+    Nombre,
+    ApPaterno,
+    ApMaterno,
+    Correo,
+    Activo,
+    deleted_at
+FROM USUARIOS 
+WHERE IdUsuario = 1;
+
+-- Ver todos los pacientes
+SELECT 
+    p.IdUsuario,
+    u.Nombre,
+    u.ApPaterno,
+    u.ApMaterno,
+    u.Correo,
+    p.NSS,
+    p.TipoSangre,
+    p.Peso,
+    p.Altura,
+    p.AntecedentesFamiliares
+FROM PACIENTES p
+JOIN USUARIOS u ON p.IdUsuario = u.IdUsuario
+WHERE u.Activo = true AND u.deleted_at IS NULL;
+
+SELECT * FROM PACIENTES WHERE IdUsuario = 1;
+
 -- ============================================
 -- 4. TABLA: ACOMPANANTES (ACTUALIZADA)
 -- ============================================
@@ -111,6 +158,32 @@ CREATE TABLE ACOMPANANTES (
 
 -- Alter para permitir NULL en FechaAsignacion
 ALTER TABLE ACOMPANANTES ALTER COLUMN FechaAsignacion DROP NOT NULL;
+
+-- Ver todos los acompañantes
+SELECT 
+    a.IdUsuario,
+    u.Nombre,
+    u.ApPaterno,
+    u.ApMaterno,
+    u.Correo,
+    a.FechaAsignacion,
+    a.IdPacienteAsociado,
+    pu.Nombre AS NombrePaciente,
+    pu.ApPaterno AS ApPaternoPaciente
+FROM ACOMPANANTES a
+JOIN USUARIOS u ON a.IdUsuario = u.IdUsuario
+LEFT JOIN USUARIOS pu ON a.IdPacienteAsociado = pu.IdUsuario
+WHERE u.Activo = true AND u.deleted_at IS NULL;
+
+SELECT IdUsuario, Nombre, Activo, deleted_at 
+FROM USUARIOS 
+WHERE IdUsuario = 1;
+
+-- Ver la estructura exacta de PACIENTES
+SELECT column_name, data_type 
+FROM information_schema.columns 
+WHERE table_name = 'pacientes'
+ORDER BY ordinal_position;
 
 -- ============================================
 -- 5. TABLA: ADMINISTRADORES
@@ -277,6 +350,17 @@ MetodoSincronizacion VARCHAR(20) DEFAULT 'Bluetooth' CHECK (
 FechaHoraLectura TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Momento en que se registró
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+SELECT * FROM MEDICIONES_PRESION WHERE IdPaciente = 2;
+
+-- Eliminar la restricción actual
+ALTER TABLE MEDICIONES_PRESION 
+DROP CONSTRAINT IF EXISTS mediciones_presion_pulso_check;
+
+-- Crear una nueva restricción que permita 0
+ALTER TABLE MEDICIONES_PRESION 
+ADD CONSTRAINT mediciones_presion_pulso_check 
+CHECK (Pulso = 0 OR (Pulso BETWEEN 30 AND 220));
 
 -- ============================================
 -- ÍNDICES PARA MEJORAR RENDIMIENTO

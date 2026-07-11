@@ -51,7 +51,6 @@ export class Menu implements OnInit, OnDestroy {
         { route: '/tratamientos', icon: 'bi-clipboard-data', label: 'Tratamientos', queryParams: {} },
         { route: '/medicamentos', icon: 'bi-capsule', label: 'Medicamentos', queryParams: {} },
         { route: '/dispositivos', icon: 'bi-heart-pulse', label: 'Dispositivos', queryParams: {} },
-        { route: '/monitoreo-presion', icon: 'bi-speedometer2', label: 'Presión Arterial', queryParams: {} }
       ]
     },
     { category: 'Cuenta', items: [{ route: '/configuracion', icon: 'bi-gear', label: 'Configuración', queryParams: {} }] }

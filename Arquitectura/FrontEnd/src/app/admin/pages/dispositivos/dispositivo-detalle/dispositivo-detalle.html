@@ -22,13 +22,17 @@
             </div>
 
             <div class="header-controls">
-                <!-- ✅ NUEVO: Botón de sincronización -->
+                <button class="btn-action btn-medir" (click)="obtenerMedicionTensiometro()"
+                    [disabled]="isObteniendoMedicion">
+                    <i class="bi" [ngClass]="getEstadoBotonMedicion()"></i>
+                    <span>{{ getEstadoBotonTexto() }}</span>
+                </button>
+
                 <button class="btn-action btn-sincronizar" (click)="sincronizarDispositivo()" [disabled]="isSaving">
                     <i class="bi" [ngClass]="getEstadoConexionIcono()"></i>
                     <span>{{ getEstadoConexionTexto() }}</span>
                 </button>
 
-                <!-- ✅ NUEVO: Botón de toggle activo/inactivo -->
                 @if (dispositivoSeleccionado.activo) {
                 <button class="btn-action btn-desactivar" (click)="toggleActivo()" [disabled]="isSaving">
                     <i class="bi bi-power"></i>
@@ -48,7 +52,7 @@
             </div>
         </div>
 
-        <!-- ✅ NUEVO: Banner de estado de conexión -->
+        <!-- Banner de estado de conexión -->
         <div class="estado-banner">
             <div class="estado-badge-conexion" [ngClass]="getEstadoConexionClass()">
                 <i class="bi" [ngClass]="getEstadoConexionIcono()"></i>
@@ -98,30 +102,7 @@
                     </select>
                 </div>
 
-                <!-- ✅ NUEVO: Campo para buscar paciente -->
-                <div class="form-group full-width-group">
-                    <label>Buscar Paciente para Vincular</label>
-                    <div class="search-patient-container">
-                        <input type="text" class="form-control-premium" placeholder="Escribe el nombre del paciente..."
-                            [(ngModel)]="filtroPaciente" (focus)="mostrarDropdown = true" (blur)="ocultarDropdown()">
-                        <i class="bi bi-search search-icon"></i>
-                    </div>
-
-                    <!-- Dropdown de pacientes -->
-                    @if (mostrarDropdown && pacientesFiltrados.length > 0) {
-                    <div class="dropdown-list">
-                        @for (p of pacientesFiltrados; track p.idusuario) {
-                        <div class="dropdown-item" (click)="asignarPaciente(p)">
-                            <i class="bi bi-person-fill"></i>
-                            <span>{{ p.nombre }} {{ p.appaterno }} {{ p.apmaterno || '' }}</span>
-                            <span class="badge-paciente">Paciente</span>
-                        </div>
-                        }
-                    </div>
-                    }
-                </div>
-
-                <!-- ✅ NUEVO: Paciente vinculado con opción de desasignar -->
+                <!-- ✅ PACIENTE VINCULADO (PRIMERO) -->
                 <div class="form-group full-width-group">
                     <label>Paciente Vinculado Actual</label>
                     <div class="patient-badge-container">
@@ -129,16 +110,17 @@
                         <div class="patient-info">
                             <i class="bi bi-person-fill icon-patient active"></i>
                             <span class="patient-name">
-                                {{ dispositivoSeleccionado.nombrepaciente }}
-                                {{ dispositivoSeleccionado.appaternopaciente || '' }}
-                                {{ dispositivoSeleccionado.apmaternopaciente || '' }}
+                                {{ obtenerNombreCompleto({
+                                nombre: dispositivoSeleccionado.nombrepaciente,
+                                appaterno: dispositivoSeleccionado.appaternopaciente,
+                                apmaterno: dispositivoSeleccionado.apmaternopaciente
+                                }) }}
                             </span>
                             <button class="btn-desasignar" (click)="desasignarPaciente()" title="Desasignar paciente">
                                 <i class="bi bi-x-circle-fill"></i>
                             </button>
                         </div>
 
-                        <!-- ✅ NUEVO: Mostrar ubicación del paciente -->
                         @if (pacienteTieneUbicacion()) {
                         <div class="ubicacion-paciente">
                             <i class="bi bi-geo-alt-fill"></i>
@@ -154,9 +136,51 @@
                         }
                     </div>
                 </div>
+
+                <!-- ✅ BUSCADOR DE PACIENTES (DESPUÉS) -->
+                <div class="form-group full-width-group">
+                    <label>Buscar Paciente para Vincular</label>
+                    <div class="search-patient-container">
+                        <input type="text" class="form-control-premium" placeholder="Escribe el nombre del paciente..."
+                            [(ngModel)]="filtroPaciente" (focus)="mostrarDropdown = true" (blur)="ocultarDropdown()"
+                            (input)="onFiltroPacienteChange()">
+                        <i class="bi bi-search search-icon"></i>
+
+                        <!-- ✅ DROPDOWN DE PACIENTES - MÁXIMO 5 RESULTADOS -->
+                        <!-- ⚠️ CORREGIDO: ahora está DENTRO de .search-patient-container -->
+                        <!-- para que el position:absolute se ancle al input y no a un ancestro lejano -->
+                        @if (mostrarDropdown && pacientesFiltrados.length > 0) {
+                        <div class="dropdown-list">
+                            @for (p of pacientesFiltrados.slice(0, 5); track p.idusuario) {
+                            <div class="dropdown-item" (click)="asignarPaciente(p)">
+                                <i class="bi bi-person-fill"></i>
+                                <span class="nombre-completo">{{ obtenerNombreCompleto(p) }}</span>
+                                <span class="badge-paciente">Paciente</span>
+                            </div>
+                            }
+                            @if (pacientesFiltrados.length > 5) {
+                            <div class="dropdown-more">
+                                <i class="bi bi-three-dots"></i>
+                                <span>Mostrando 5 de {{ pacientesFiltrados.length }} resultados</span>
+                            </div>
+                            }
+                        </div>
+                        }
+
+                        <!-- Mensaje cuando no hay resultados -->
+                        @if (mostrarDropdown && filtroPaciente && pacientesFiltrados.length === 0) {
+                        <div class="dropdown-list">
+                            <div class="dropdown-empty">
+                                <i class="bi bi-exclamation-circle"></i>
+                                <span>No se encontraron pacientes con ese nombre</span>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                </div>
             </div>
 
-            <!-- ✅ NUEVO: Sección de estadísticas -->
+            <!-- Sección de estadísticas -->
             @if (estadisticas) {
             <div class="estadisticas-section">
                 <h4 class="section-title">
@@ -228,7 +252,119 @@
             </div>
             }
 
-            <!-- ✅ NUEVO: Historial de cambios -->
+            <!-- SECCIÓN: TENSIÓMETRO -->
+            @if (dispositivoSeleccionado) {
+            <div class="tensiometro-section">
+                <hr class="section-divider">
+
+                <div class="tensiometro-header">
+                    <h4 class="section-title">
+                        <i class="bi bi-heart-pulse-fill"></i>
+                        Tensiómetro FEMMTO
+                    </h4>
+                    <div class="tensiometro-controls">
+                        <button class="btn-action btn-medir" (click)="obtenerMedicionTensiometro()"
+                            [disabled]="isObteniendoMedicion">
+                            <i class="bi" [ngClass]="getEstadoBotonMedicion()"></i>
+                            <span>{{ getEstadoBotonTexto() }}</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Estado del dispositivo -->
+                <div class="bluetooth-status">
+                    <div class="status-indicator" [ngClass]="estadoConexion">
+                        <i class="bi" [ngClass]="getEstadoConexionIcono()"></i>
+                        <span>Estado: {{ getEstadoConexionTexto() }}</span>
+                    </div>
+                    @if (dispositivoSeleccionado.direccionmac) {
+                    <div class="mac-address">
+                        <i class="bi bi-hdd-network"></i>
+                        <span>MAC: {{ dispositivoSeleccionado.direccionmac }}</span>
+                    </div>
+                    }
+                </div>
+
+                @if (progresoLogVisible && progresoLog.length > 0) {
+                <div class="progreso-conexion-panel">
+                    <div class="progreso-header">
+                        <i class="bi bi-terminal-fill"></i>
+                        <span>Progreso de conexión con el tensiómetro</span>
+                    </div>
+                    <div class="progreso-log">
+                        @for (linea of progresoLog; track $index) {
+                        <div class="progreso-linea">
+                            <i class="bi bi-caret-right-fill"></i>
+                            <span>{{ linea }}</span>
+                        </div>
+                        }
+                    </div>
+                </div>
+                }
+
+                <!-- Última medición del tensiómetro -->
+                @if (ultimaMedicionTensiometro) {
+                <div class="medicion-tensiometro">
+                    <div class="medicion-grid">
+                        <div class="medicion-item sistolica">
+                            <span class="medicion-label">Sistólica</span>
+                            <span class="medicion-value">{{ ultimaMedicionTensiometro.sistolica }}
+                                <small>mmHg</small></span>
+                        </div>
+                        <div class="medicion-item diastolica">
+                            <span class="medicion-label">Diastólica</span>
+                            <span class="medicion-value">{{ ultimaMedicionTensiometro.diastolica }}
+                                <small>mmHg</small></span>
+                        </div>
+                        <div class="medicion-item pulso">
+                            <span class="medicion-label">Pulso</span>
+                            <span class="medicion-value">{{ ultimaMedicionTensiometro.pulso }} <small>bpm</small></span>
+                        </div>
+                    </div>
+                    <div class="medicion-fecha">
+                        <i class="bi bi-clock"></i>
+                        <span>Última medición: {{ ultimaMedicionTensiometro.fecha | date:'dd/MM/yyyy HH:mm:ss' }}</span>
+                    </div>
+                </div>
+                }
+
+                <!-- Sin mediciones -->
+                @if (!ultimaMedicionTensiometro) {
+                <div class="sin-mediciones-tensiometro">
+                    <i class="bi bi-heart-pulse"></i>
+                    <span>Presiona "Obtener Medición" para tomar una lectura del tensiómetro.</span>
+                </div>
+                }
+
+                <!-- Historial de mediciones del tensiómetro -->
+                @if (medicionesTensiometro.length > 0) {
+                <div class="mediciones-historial">
+                    <h5 class="historial-titulo">
+                        <i class="bi bi-clock-history"></i>
+                        Historial de mediciones ({{ medicionesTensiometro.length }})
+                    </h5>
+                    <div class="mediciones-lista">
+                        @for (med of medicionesTensiometro; track med.id) {
+                        <div class="medicion-item-historial">
+                            <div class="medicion-fecha-historial">
+                                <i class="bi bi-clock"></i>
+                                {{ med.fecha | date:'dd/MM/yyyy HH:mm:ss' }}
+                            </div>
+                            <div class="medicion-valores-historial">
+                                <span class="sys">{{ med.sistolica }} mmHg</span>
+                                <span class="sep">/</span>
+                                <span class="dia">{{ med.diastolica }} mmHg</span>
+                                <span class="pulse">❤️ {{ med.pulso }} bpm</span>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                </div>
+                }
+            </div>
+            }
+
+            <!-- Historial de cambios -->
             @if (historialCambios.length > 0) {
             <div class="historial-section">
                 <hr class="section-divider">

@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef, PLATFORM_ID } 
 import { CommonModule, Location, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 import { GoogleService } from '../../../../auth/services/google';
 import { Users } from '../../../../auth/services/users';
 import { firstValueFrom } from 'rxjs';
@@ -17,6 +18,8 @@ interface HistorialPaciente {
   usuario: string;
 }
 
+type TabPaciente = 'info' | 'historial' | 'expediente';
+
 @Component({
   selector: 'app-paciente-detalle',
   standalone: true,
@@ -31,9 +34,13 @@ export class PacienteDetalle implements OnInit, OnDestroy {
   private usersService = inject(Users);
   private cdr = inject(ChangeDetectorRef);
   private platformId = inject(PLATFORM_ID);
+  private titleService = inject(Title);
 
   usuarioSeleccionado: any = null;
   isSaving = false;
+
+  // Pestaña activa del panel del paciente
+  activeTab: TabPaciente = 'info';
 
   // Control de estado para el modal de citas
   mostrarModalCita = false;
@@ -60,11 +67,9 @@ export class PacienteDetalle implements OnInit, OnDestroy {
 
   // Historial de cambios del paciente
   historialCambios: HistorialPaciente[] = [];
-  mostrarHistorial = false;
 
   // Lista de citas del paciente
   citasPaciente: any[] = [];
-  mostrarCitas = false;
 
   // Estadísticas del paciente
   estadisticas: {
@@ -82,6 +87,9 @@ export class PacienteDetalle implements OnInit, OnDestroy {
   // ID del paciente para cargar datos desde la API
   pacienteId: number | null = null;
 
+  // Fecha en la que se generó el expediente (para el membrete)
+  fechaGeneracion = '';
+
   ngOnInit() {
     let state: any = null;
 
@@ -91,6 +99,12 @@ export class PacienteDetalle implements OnInit, OnDestroy {
       const navigation = this.router.getCurrentNavigation();
       state = navigation?.extras?.state;
     }
+
+    this.fechaGeneracion = new Date().toLocaleDateString('es-MX', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    });
 
     if (state && state.usuario) {
       this.pacienteId = state.usuario.idusuario || state.usuario.id;
@@ -113,6 +127,20 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     }
   }
 
+  // --- CONTROL DE PESTAÑAS ---
+  cambiarTab(tab: TabPaciente) {
+    if (this.activeTab === tab) return;
+    this.activeTab = tab;
+    this.cdr.detectChanges();
+
+    // El input de fecha de nacimiento solo existe en el DOM cuando la
+    // pestaña "info" está activa, así que hay que reinicializar Flatpickr
+    // cada vez que se regresa a esa pestaña.
+    if (tab === 'info') {
+      setTimeout(() => this.inicializarCalendarioNacimiento(), 100);
+    }
+  }
+
   // Inicializar calendario de fecha de nacimiento con Flatpickr
   inicializarCalendarioNacimiento() {
     if (!isPlatformBrowser(this.platformId)) return;
@@ -127,8 +155,6 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     const elemento = document.querySelector('#fechaNacimientoInput') as HTMLInputElement;
 
     if (!elemento) {
-      console.warn('Elemento #fechaNacimientoInput no encontrado, reintentando...');
-      setTimeout(() => this.inicializarCalendarioNacimiento(), 300);
       return;
     }
 
@@ -151,7 +177,6 @@ export class PacienteDetalle implements OnInit, OnDestroy {
 
     try {
       this.fpNacimientoInstance = flatpickr('#fechaNacimientoInput', configNacimiento);
-      console.log('✅ Calendario Flatpickr inicializado correctamente');
     } catch (error) {
       console.error('Error al inicializar Flatpickr:', error);
     }
@@ -504,6 +529,89 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     return !!(u.domicilio && u.localidad && u.municipio && u.estado && u.codigoPostal);
   }
 
+  // --- CÁLCULOS PARA EL EXPEDIENTE ---
+
+  // Calcula la edad del paciente a partir de su fecha de nacimiento
+  calcularEdad(): number | null {
+    const fechaNacimiento = this.usuarioSeleccionado?.fechaNacimiento;
+    if (!fechaNacimiento) return null;
+
+    const nacimiento = new Date(fechaNacimiento);
+    if (isNaN(nacimiento.getTime())) return null;
+
+    const hoy = new Date();
+    let edad = hoy.getUTCFullYear() - nacimiento.getUTCFullYear();
+    const mes = hoy.getUTCMonth() - nacimiento.getUTCMonth();
+    if (mes < 0 || (mes === 0 && hoy.getUTCDate() < nacimiento.getUTCDate())) {
+      edad--;
+    }
+    return edad >= 0 ? edad : null;
+  }
+
+  // Formatea la fecha de nacimiento como dd/mm/aaaa para el expediente
+  // (usa componentes UTC para no perder/ganar un día por la zona horaria)
+  formatearFechaNacimiento(fecha: string): string {
+    if (!fecha) return 'No registrada';
+
+    try {
+      const d = new Date(fecha);
+      if (isNaN(d.getTime())) return fecha;
+
+      const dia = String(d.getUTCDate()).padStart(2, '0');
+      const mes = String(d.getUTCMonth() + 1).padStart(2, '0');
+      const anio = d.getUTCFullYear();
+
+      return `${dia}/${mes}/${anio}`;
+    } catch (error) {
+      return fecha;
+    }
+  }
+
+  // Calcula el Índice de Masa Corporal y su categoría
+  calcularIMC(): { valor: number | null; categoria: string } {
+    const peso = this.usuarioSeleccionado?.peso;
+    const altura = this.usuarioSeleccionado?.altura;
+
+    if (!peso || !altura || altura <= 0) {
+      return { valor: null, categoria: '' };
+    }
+
+    const imc = peso / (altura * altura);
+    const valor = Math.round(imc * 10) / 10;
+
+    let categoria = 'Peso normal';
+    if (imc < 18.5) categoria = 'Bajo peso';
+    else if (imc >= 25 && imc < 30) categoria = 'Sobrepeso';
+    else if (imc >= 30) categoria = 'Obesidad';
+
+    return { valor, categoria };
+  }
+
+  // Imprime únicamente la hoja del expediente sin encabezados del navegador
+  imprimirExpediente() {
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    const nombreCompleto = [
+      this.usuarioSeleccionado?.nombre,
+      this.usuarioSeleccionado?.tempApellidoPaterno || this.usuarioSeleccionado?.apPaterno,
+      this.usuarioSeleccionado?.tempApellidoMaterno || this.usuarioSeleccionado?.apMaterno
+    ].filter(Boolean).join(' ').trim();
+
+    const tituloOriginal = this.titleService.getTitle();
+    this.titleService.setTitle(`Expediente Clinico - ${nombreCompleto || 'Paciente'}`);
+
+    const restaurarTitulo = () => {
+      this.titleService.setTitle(tituloOriginal);
+      window.removeEventListener('afterprint', restaurarTitulo);
+    };
+    window.addEventListener('afterprint', restaurarTitulo);
+
+    // Usamos setTimeout para asegurar que el título se haya actualizado antes de imprimir
+    setTimeout(() => {
+      window.print();
+    }, 50);
+  }
+
   // Validar campos antes de guardar
   validarCampos(): { valido: boolean; mensaje: string } {
     const u = this.usuarioSeleccionado;
@@ -560,8 +668,6 @@ export class PacienteDetalle implements OnInit, OnDestroy {
 
   // --- CONTROL DEL TOAST NOTIFICACIÓN PREMIUM ---
   lanzarNotificacion(mensaje: string, tipo: 'success' | 'error' | 'warning' = 'success') {
-    console.log('📢 Notificación:', mensaje, 'Tipo:', tipo);
-
     this.mensajeToast = mensaje;
     this.tipoToast = tipo;
     this.mostrarToast = true;

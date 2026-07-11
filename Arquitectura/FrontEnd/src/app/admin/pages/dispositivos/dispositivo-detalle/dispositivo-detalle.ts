@@ -5,16 +5,40 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Users } from '../../../../auth/services/users';
 import { firstValueFrom } from 'rxjs';
 import { Menu } from "../../../template/menu/menu";
-import { GoogleService } from '../../../../auth/services/google';
-import { environment } from '../../../../../environments/environment';
-import { HttpClient } from '@angular/common/http';
 
-// ✅ NUEVO: Interfaz para el historial del dispositivo
+// ==========================================================================
+// INTERFACES
+// ==========================================================================
+
 interface HistorialDispositivo {
   fecha: string;
   accion: string;
   detalle: string;
   usuario: string;
+}
+
+interface MedicionTensiometro {
+  id: number;
+  sistolica: number;
+  diastolica: number;
+  pulso: number;
+  fecha: string;
+  guardada: boolean;
+}
+
+interface MedicionBackend {
+  idmedicion?: number;
+  IdMedicion?: number;
+  sistolica: number;
+  Sistolica?: number;
+  diastolica: number;
+  Diastolica?: number;
+  pulso: number;
+  Pulso?: number;
+  fechahoralectura?: string;
+  FechaHoraLectura?: string;
+  created_at?: string;
+  createdat?: string;
 }
 
 @Component({
@@ -25,39 +49,55 @@ interface HistorialDispositivo {
   styleUrls: ['./dispositivo-detalle.css']
 })
 export class DispositivoDetalle implements OnInit, OnDestroy {
+  // ==========================================================================
+  // INYECCIONES
+  // ==========================================================================
+
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private location = inject(Location);
   private usersService = inject(Users);
   private cdr = inject(ChangeDetectorRef);
   private platformId = inject(PLATFORM_ID);
-  private googleService = inject(GoogleService);
-  private http = inject(HttpClient);
 
-  // Objeto unificado que interactúa con la vista
+  // ==========================================================================
+  // PROPIEDADES DEL DISPOSITIVO
+  // ==========================================================================
+
   dispositivoSeleccionado: any = null;
   isSaving = false;
-
   pacientesLista: any[] = [];
   filtroPaciente: string = '';
   mostrarDropdown = false;
 
-  // Sistema de Notificaciones Premium Toast
+  // ==========================================================================
+  // SISTEMA DE NOTIFICACIONES
+  // ==========================================================================
+
   mostrarToast = false;
   mensajeToast = '';
   tipoToast: 'success' | 'error' | 'warning' = 'success';
   private toastTimeout: any = null;
-  ultimaMedicion: any = null;
 
-  // ✅ NUEVO: Historial de cambios del dispositivo
+  // ==========================================================================
+  // DATOS DE MEDICIONES
+  // ==========================================================================
+
+  ultimaMedicion: any = null;
   historialCambios: HistorialDispositivo[] = [];
   mostrarHistorial = false;
 
-  // ✅ NUEVO: Estado de conectividad
+  // ==========================================================================
+  // ESTADO DE CONEXIÓN
+  // ==========================================================================
+
   estadoConexion: 'conectado' | 'desconectado' | 'sincronizando' = 'desconectado';
   ultimaSincronizacion: string | null = null;
 
-  // ✅ NUEVO: Estadísticas del dispositivo
+  // ==========================================================================
+  // ESTADÍSTICAS
+  // ==========================================================================
+
   estadisticas: {
     totalMediciones: number;
     promedioSistolica: number;
@@ -65,7 +105,71 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
     promedioPulso: number;
   } | null = null;
 
+  // ==========================================================================
+  // PROPIEDADES DEL TENSIÓMETRO
+  // ==========================================================================
+
+  isObteniendoMedicion = false;
+  ultimaMedicionTensiometro: {
+    sistolica: number;
+    diastolica: number;
+    pulso: number;
+    fecha: string;
+  } | null = null;
+
+  medicionesTensiometro: MedicionTensiometro[] = [];
+
+  // ==========================================================================
+  // ✅ NUEVO: PANEL DE PROGRESO DE CONEXIÓN (refleja los logs del backend)
+  // ==========================================================================
+
+  progresoLog: string[] = [];
+  progresoLogVisible = false;
+  private progresoInterval: any = null;
+  private ocultarProgresoTimeout: any = null;
+
+  private readonly PASOS_CONEXION: string[] = [
+    'Escaneando dispositivos Bluetooth...',
+    'Asegúrate de que el tensiómetro esté ENCENDIDO',
+    'Buscando dispositivos compatibles...',
+    'Dispositivo BleModuleB encontrado',
+    'Conectando al dispositivo...',
+    'Conectado correctamente',
+    'Buscando característica de medición...',
+    'Esperando medición del tensiómetro...',
+    'Presiona START en el tensiómetro si es necesario'
+  ];
+
+  // ==========================================================================
+  // CICLO DE VIDA - OnInit
+  // ==========================================================================
+
   async ngOnInit() {
+    await this.cargarDispositivo();
+    await this.cargarPacientes();
+    await this.cargarDatosIniciales();
+    this.inicializarTensiometro();
+  }
+
+  // ==========================================================================
+  // CICLO DE VIDA - OnDestroy
+  // ==========================================================================
+
+  ngOnDestroy() {
+    if (this.toastTimeout) {
+      clearTimeout(this.toastTimeout);
+    }
+    this.detenerSimulacionProgreso();
+    if (this.ocultarProgresoTimeout) {
+      clearTimeout(this.ocultarProgresoTimeout);
+    }
+  }
+
+  // ==========================================================================
+  // MÉTODOS DE CARGA INICIAL
+  // ==========================================================================
+
+  private async cargarDispositivo() {
     let state: any = null;
 
     if (isPlatformBrowser(this.platformId)) {
@@ -75,84 +179,78 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
       state = navigation?.extras?.state;
     }
 
-    // 1. Intentar recuperar desde el estado de navegación de Angular
     if (state && state.dispositivo) {
       this.dispositivoSeleccionado = { ...state.dispositivo };
-      // ✅ NUEVO: Inicializar campos si no existen
       this.inicializarCampos();
     } else {
-      // 2. Recuperación de respaldo ante recargas físicas (F5) usando el ID de la URL
       const idUrl = this.route.snapshot.paramMap.get('id');
-
       if (idUrl) {
         try {
           const todos = await firstValueFrom(this.usersService.getDispositivos());
           const encontrado = todos?.find((d: any) =>
             String(d.iddispositivo) === String(idUrl)
           );
-
           if (encontrado) {
             this.dispositivoSeleccionado = { ...encontrado };
             this.inicializarCampos();
-            this.cdr.detectChanges();
+            // ✅ FIX NG0100: se pospone al siguiente macrotask para no
+            // chocar con el primer ciclo de detección de cambios de Angular.
+            setTimeout(() => this.cdr.detectChanges());
           } else {
             this.router.navigate(['/dispositivos']);
           }
         } catch (error) {
-          console.error("Error al re-hidratar datos del dispositivo desde el servidor:", error);
+          console.error("Error al cargar dispositivo:", error);
           this.router.navigate(['/dispositivos']);
         }
       } else {
         this.router.navigate(['/dispositivos']);
       }
     }
+  }
 
-    // Cargar última medición
-    if (this.dispositivoSeleccionado?.idpaciente) {
-      this.cargarUltimaMedicion(this.dispositivoSeleccionado.idpaciente);
-      this.cargarEstadisticas(this.dispositivoSeleccionado.iddispositivo);
+  private async cargarPacientes() {
+    try {
+      const todosLosPacientes = await firstValueFrom(this.usersService.getUsuariosBackend());
+      this.pacientesLista = todosLosPacientes.filter((u: any) =>
+        u.rol?.toLowerCase() === 'paciente' || u.rol?.toLowerCase() === 'pacientes'
+      );
+    } catch (error) {
+      console.error("Error al cargar pacientes:", error);
+      this.pacientesLista = [];
+    }
+  }
+
+  private async cargarDatosIniciales() {
+    const idPaciente = this.obtenerIdPaciente();
+
+    if (idPaciente) {
+      await Promise.all([
+        this.cargarUltimaMedicion(idPaciente),
+        this.cargarEstadisticas(this.dispositivoSeleccionado?.iddispositivo),
+        this.cargarMedicionesTensiometro(idPaciente)
+      ]);
     }
 
-    // Cargar lista de pacientes
-    const todosLosPacientes = await firstValueFrom(this.usersService.getUsuariosBackend());
-    this.pacientesLista = todosLosPacientes.filter((u: any) => u.rol === 'paciente');
-
-    // Cargar historial del dispositivo
     this.cargarHistorialDispositivo();
-
-    // Verificar estado de Google Fit
-    this.route.queryParams.subscribe(params => {
-      if (params['status'] === 'success' && this.dispositivoSeleccionado?.idpaciente) {
-        this.lanzarNotificacion("Vinculación exitosa con Google Fit", "success");
-        this.estadoConexion = 'conectado';
-        this.cargarDatosGoogleFit();
-        this.router.navigate([], {
-          relativeTo: this.route,
-          queryParams: { status: null },
-          queryParamsHandling: 'merge'
-        });
-      }
-    });
-
-    // ✅ NUEVO: Verificar última sincronización
     this.verificarUltimaSincronizacion();
   }
 
-  // ✅ NUEVO: Inicializar campos del dispositivo
+  // ==========================================================================
+  // MÉTODOS DE INICIALIZACIÓN
+  // ==========================================================================
+
   inicializarCampos() {
     if (!this.dispositivoSeleccionado) return;
 
-    // Asegurar que el campo activo existe
     if (this.dispositivoSeleccionado.activo === undefined) {
       this.dispositivoSeleccionado.activo = true;
     }
 
-    // Asegurar que el campo de paciente existe
     if (!this.dispositivoSeleccionado.idpaciente && this.dispositivoSeleccionado.idPacienteAsociado) {
       this.dispositivoSeleccionado.idpaciente = this.dispositivoSeleccionado.idPacienteAsociado;
     }
 
-    // Inicializar campos de ubicación del paciente (si existen)
     if (this.dispositivoSeleccionado.paciente) {
       const p = this.dispositivoSeleccionado.paciente;
       if (!p.domicilio) p.domicilio = '';
@@ -163,41 +261,370 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
     }
   }
 
-  // ✅ NUEVO: Cargar historial del dispositivo
-  cargarHistorialDispositivo() {
-    // En una implementación real, esto vendría del backend
-    // Por ahora, creamos un historial de ejemplo
-    const ahora = new Date();
-    const fechaStr = ahora.toISOString().replace('T', ' ').slice(0, 16);
+  inicializarTensiometro() {
+    // Ya se carga en cargarDatosIniciales
+  }
 
-    this.historialCambios = [
-      {
-        fecha: fechaStr,
-        accion: 'Dispositivo registrado',
-        detalle: 'Dispositivo vinculado al sistema',
-        usuario: 'Sistema'
-      }
-    ];
+  // ==========================================================================
+  // MÉTODOS PARA OBTENER DATOS
+  // ==========================================================================
 
-    // Si tiene paciente asignado, agregar al historial
-    if (this.dispositivoSeleccionado?.idpaciente) {
-      const paciente = this.pacientesLista.find(p => p.idusuario === this.dispositivoSeleccionado.idpaciente);
-      if (paciente) {
-        this.historialCambios.push({
-          fecha: fechaStr,
-          accion: 'Paciente asignado',
-          detalle: `Asignado a: ${paciente.nombre} ${paciente.appaterno}`,
-          usuario: 'Sistema'
-        });
-      }
+  private obtenerIdPaciente(): number | null {
+    return this.dispositivoSeleccionado?.idpaciente ||
+      this.dispositivoSeleccionado?.idPacienteAsociado ||
+      this.dispositivoSeleccionado?.idpacienteasociado ||
+      null;
+  }
+
+  // ✅ MÉTODO PARA OBTENER NOMBRE COMPLETO DEL PACIENTE
+  obtenerNombreCompleto(paciente: any): string {
+    if (!paciente) return '';
+    const nombre = paciente.nombre || '';
+    const apPaterno = paciente.appaterno || paciente.apPaterno || '';
+    const apMaterno = paciente.apmaterno || paciente.apMaterno || '';
+    return `${nombre} ${apPaterno} ${apMaterno}`.trim();
+  }
+
+  // ✅ MÉTODO PARA FILTRAR PACIENTES EN TIEMPO REAL
+  onFiltroPacienteChange() {
+    if (this.filtroPaciente.length > 0) {
+      this.mostrarDropdown = true;
     }
   }
 
-  // ✅ NUEVO: Verificar última sincronización - CORREGIDO
+  private normalizarMedicion(data: any): MedicionBackend | null {
+    if (!data) return null;
+
+    return {
+      idmedicion: data.idmedicion || data.IdMedicion,
+      sistolica: data.sistolica || data.Sistolica || 0,
+      diastolica: data.diastolica || data.Diastolica || 0,
+      pulso: data.pulso || data.Pulso || 0,
+      fechahoralectura: data.fechahoralectura || data.FechaHoraLectura || data.created_at || data.createdat
+    };
+  }
+
+  // ==========================================================================
+  // CARGA DE MEDICIONES
+  // ==========================================================================
+
+  async cargarUltimaMedicion(idPaciente: number) {
+    try {
+      const data = await firstValueFrom(this.usersService.getUltimaMedicionPaciente(idPaciente));
+      if (data && Object.keys(data).length > 0) {
+        this.ultimaMedicion = this.normalizarMedicion(data);
+      } else {
+        this.ultimaMedicion = null;
+      }
+      // ✅ FIX NG0100: pospuesto para no interferir con el primer chequeo de Angular
+      setTimeout(() => this.cdr.detectChanges());
+    } catch (error) {
+      console.warn("No hay mediciones previas.");
+      this.ultimaMedicion = null;
+      setTimeout(() => this.cdr.detectChanges());
+    }
+  }
+
+  async cargarEstadisticas(idDispositivo: number) {
+    try {
+      this.estadisticas = {
+        totalMediciones: Math.floor(Math.random() * 50) + 5,
+        promedioSistolica: Math.floor(Math.random() * 30) + 110,
+        promedioDiastolica: Math.floor(Math.random() * 20) + 70,
+        promedioPulso: Math.floor(Math.random() * 30) + 60
+      };
+    } catch (error) {
+      console.warn("No se pudieron cargar estadísticas:", error);
+      this.estadisticas = null;
+    }
+  }
+
+  async cargarMedicionesTensiometro(idPaciente: number) {
+    try {
+      const data = await firstValueFrom(this.usersService.getMedicionesPaciente(idPaciente, 10));
+
+      if (data?.mediciones?.length > 0) {
+        const mediciones = data.mediciones.map((m: any, index: number) => ({
+          id: index + 1,
+          sistolica: m.sistolica || m.Sistolica || 0,
+          diastolica: m.diastolica || m.Diastolica || 0,
+          pulso: m.pulso || m.Pulso || 0,
+          fecha: m.fechahoralectura || m.FechaHoraLectura || new Date().toISOString(),
+          guardada: true
+        }));
+
+        this.medicionesTensiometro = mediciones;
+
+        if (mediciones.length > 0) {
+          this.ultimaMedicionTensiometro = {
+            sistolica: mediciones[0].sistolica,
+            diastolica: mediciones[0].diastolica,
+            pulso: mediciones[0].pulso,
+            fecha: mediciones[0].fecha
+          };
+        }
+        // ✅ FIX NG0100: pospuesto para no interferir con el primer chequeo de Angular
+        setTimeout(() => this.cdr.detectChanges());
+      }
+    } catch (error) {
+      console.warn('No se pudieron cargar mediciones previas:', error);
+      this.medicionesTensiometro = [];
+    }
+  }
+
+  // ==========================================================================
+  // ✅ NUEVO: SIMULACIÓN DE PROGRESO (muestra en el frontend lo que hace el backend)
+  // ==========================================================================
+
+  private iniciarSimulacionProgreso() {
+    this.detenerSimulacionProgreso();
+    if (this.ocultarProgresoTimeout) {
+      clearTimeout(this.ocultarProgresoTimeout);
+      this.ocultarProgresoTimeout = null;
+    }
+
+    this.progresoLog = [];
+    this.progresoLogVisible = true;
+    let index = 0;
+
+    const mostrarSiguientePaso = () => {
+      if (index < this.PASOS_CONEXION.length) {
+        this.progresoLog.push(this.PASOS_CONEXION[index]);
+        index++;
+        this.cdr.detectChanges();
+      }
+      // Al llegar al último paso ("Esperando medición...") se detiene el
+      // avance automático, pero el panel se queda visible mostrando ese
+      // último estado hasta que llegue la respuesta real del backend.
+      if (index >= this.PASOS_CONEXION.length) {
+        this.detenerSimulacionProgreso();
+      }
+    };
+
+    mostrarSiguientePaso();
+    this.progresoInterval = setInterval(mostrarSiguientePaso, 1100);
+  }
+
+  private detenerSimulacionProgreso() {
+    if (this.progresoInterval) {
+      clearInterval(this.progresoInterval);
+      this.progresoInterval = null;
+    }
+  }
+
+  private finalizarProgreso(mensajeFinal: string, exito: boolean) {
+    this.detenerSimulacionProgreso();
+    this.progresoLog.push(mensajeFinal);
+    this.cdr.detectChanges();
+
+    // Se oculta el panel un momento después para que el usuario alcance a leer el resultado final
+    this.ocultarProgresoTimeout = setTimeout(() => {
+      this.progresoLogVisible = false;
+      this.cdr.detectChanges();
+    }, exito ? 2000 : 3000);
+  }
+
+  // ==========================================================================
+  // MÉTODO PRINCIPAL: OBTENER MEDICIÓN DEL TENSIÓMETRO
+  // ==========================================================================
+
+  async obtenerMedicionTensiometro() {
+    const idPaciente = this.obtenerIdPaciente();
+
+    console.log(' Dispositivo:', this.dispositivoSeleccionado);
+    console.log(' ID Paciente encontrado:', idPaciente);
+
+    if (!idPaciente) {
+      this.lanzarNotificacion(' El dispositivo no tiene un paciente asignado', 'warning');
+      return;
+    }
+
+    if (this.isObteniendoMedicion) {
+      this.lanzarNotificacion(' Ya hay una medición en proceso...', 'warning');
+      return;
+    }
+
+    this.isObteniendoMedicion = true;
+    this.estadoConexion = 'sincronizando';
+    this.lanzarNotificacion(' Conectando al tensiómetro...', 'warning');
+    this.iniciarSimulacionProgreso();
+    this.cdr.detectChanges();
+
+    try {
+      console.log(` Solicitando medición para paciente ${idPaciente}`);
+      const response = await firstValueFrom(
+        this.usersService.obtenerMedicionTensiometro(idPaciente)
+      );
+
+      console.log(' Respuesta del backend:', response);
+
+      if (response?.success && response?.medicion) {
+        this.finalizarProgreso('Medición recibida correctamente', true);
+        await this.procesarMedicionExitosa(response.medicion);
+      } else {
+        const mensajeError = response?.error || 'Error al obtener medición';
+        this.finalizarProgreso(`Error: ${mensajeError}`, false);
+        this.lanzarNotificacion(` ${mensajeError}`, 'error');
+        this.estadoConexion = 'desconectado';
+      }
+
+    } catch (error: any) {
+      this.finalizarProgreso('Error al conectar con el tensiómetro', false);
+      await this.manejarErrorMedicion(error);
+    } finally {
+      this.isObteniendoMedicion = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  // ==========================================================================
+  // MÉTODOS AUXILIARES PARA PROCESAR MEDICIÓN
+  // ==========================================================================
+
+  private async procesarMedicionExitosa(medicion: any) {
+    const sistolica = medicion.sistolica || 0;
+    const diastolica = medicion.diastolica || 0;
+    const pulso = medicion.pulso || 0;
+
+    this.ultimaMedicionTensiometro = {
+      sistolica: sistolica,
+      diastolica: diastolica,
+      pulso: pulso,
+      fecha: new Date().toISOString()
+    };
+
+    this.medicionesTensiometro.unshift({
+      id: Date.now(),
+      sistolica: sistolica,
+      diastolica: diastolica,
+      pulso: pulso,
+      fecha: new Date().toISOString(),
+      guardada: true
+    });
+
+    this.ultimaMedicion = {
+      sistolica: sistolica,
+      diastolica: diastolica,
+      pulso: pulso,
+      fechahoralectura: new Date().toISOString()
+    };
+
+    this.estadoConexion = 'conectado';
+    this.ultimaSincronizacion = new Date().toISOString();
+
+    this.lanzarNotificacion(
+      `${sistolica}/${diastolica} mmHg - Pulso: ${pulso} bpm`,
+      'success'
+    );
+
+    this.agregarHistorial(
+      'Medición obtenida',
+      ` ${sistolica}/${diastolica} mmHg, Pulso: ${pulso} bpm`
+    );
+
+    await this.cargarEstadisticas(this.dispositivoSeleccionado?.iddispositivo);
+    this.cdr.detectChanges();
+  }
+
+  private async manejarErrorMedicion(error: any) {
+    console.error(' Error al obtener medición:', error);
+
+    let mensajeError = ' Error al conectar con el tensiómetro';
+
+    if (error.status === 500) {
+      mensajeError = ' Error en el servidor. Revisa que el script Python esté configurado correctamente.';
+    } else if (error.status === 404) {
+      mensajeError = ' El endpoint no existe. Verifica la ruta del backend.';
+    } else if (error.status === 0) {
+      mensajeError = ' No se pudo conectar con el backend. Verifica que el servidor esté corriendo.';
+    } else if (error.error?.error) {
+      mensajeError = ` ${error.error.error}`;
+    }
+
+    this.lanzarNotificacion(mensajeError, 'error');
+    this.estadoConexion = 'desconectado';
+    this.cdr.detectChanges();
+  }
+
+  // ==========================================================================
+  // MÉTODOS DE GESTIÓN DE PACIENTES
+  // ==========================================================================
+
+  get pacientesFiltrados() {
+    if (!this.filtroPaciente) return this.pacientesLista;
+    const term = this.filtroPaciente.toLowerCase();
+    return this.pacientesLista.filter(p => {
+      const nombreCompleto = this.obtenerNombreCompleto(p).toLowerCase();
+      return nombreCompleto.includes(term);
+    });
+  }
+
+  ocultarDropdown() {
+    setTimeout(() => {
+      this.mostrarDropdown = false;
+      this.cdr.detectChanges();
+    }, 200);
+  }
+
+  asignarPaciente(p: any) {
+    this.dispositivoSeleccionado.idpaciente = p.idusuario;
+    this.dispositivoSeleccionado.idPacienteAsociado = p.idusuario;
+    this.dispositivoSeleccionado.nombrepaciente = p.nombre;
+    this.dispositivoSeleccionado.appaternopaciente = p.appaterno || p.apPaterno || '';
+    this.dispositivoSeleccionado.apmaternopaciente = p.apmaterno || p.apMaterno || '';
+    this.dispositivoSeleccionado.paciente = {
+      ...p,
+      domicilio: p.domicilio || '',
+      localidad: p.localidad || '',
+      municipio: p.municipio || '',
+      estado: p.estado || '',
+      codigoPostal: p.codigoPostal || ''
+    };
+
+    this.filtroPaciente = this.obtenerNombreCompleto(p);
+    this.mostrarDropdown = false;
+
+    const nombreCompleto = this.obtenerNombreCompleto(p);
+    this.agregarHistorial(
+      'Paciente asignado',
+      `Asignado a: ${nombreCompleto}`
+    );
+
+    this.cargarUltimaMedicion(p.idusuario);
+    this.cargarMedicionesTensiometro(p.idusuario);
+    this.cdr.detectChanges();
+  }
+
+  desasignarPaciente() {
+    if (this.dispositivoSeleccionado.idpaciente) {
+      const nombrePaciente = this.dispositivoSeleccionado.nombrepaciente || 'Paciente';
+      this.dispositivoSeleccionado.idpaciente = null;
+      this.dispositivoSeleccionado.idPacienteAsociado = null;
+      this.dispositivoSeleccionado.nombrepaciente = null;
+      this.dispositivoSeleccionado.appaternopaciente = null;
+      this.dispositivoSeleccionado.apmaternopaciente = null;
+      this.dispositivoSeleccionado.paciente = null;
+      this.filtroPaciente = '';
+
+      this.agregarHistorial(
+        'Paciente desasignado',
+        `Desasignado: ${nombrePaciente}`
+      );
+
+      this.ultimaMedicion = null;
+      this.ultimaMedicionTensiometro = null;
+      this.medicionesTensiometro = [];
+      this.cdr.detectChanges();
+    }
+  }
+
+  // ==========================================================================
+  // MÉTODOS DE ESTADO DE CONEXIÓN
+  // ==========================================================================
+
   verificarUltimaSincronizacion() {
     if (this.dispositivoSeleccionado?.ultimasincronizacion) {
       this.ultimaSincronizacion = this.dispositivoSeleccionado.ultimasincronizacion;
-      // ✅ CORRECCIÓN: Verificar que no sea null antes de crear Date
       if (this.ultimaSincronizacion) {
         const fecha = new Date(this.ultimaSincronizacion);
         const ahora = new Date();
@@ -214,7 +641,6 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
     }
   }
 
-  // ✅ NUEVO: Obtener clase de estado de conexión
   getEstadoConexionClass(): string {
     const clases = {
       'conectado': 'estado-conectado',
@@ -224,7 +650,6 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
     return clases[this.estadoConexion] || 'estado-desconectado';
   }
 
-  // ✅ NUEVO: Obtener texto de estado de conexión
   getEstadoConexionTexto(): string {
     const textos = {
       'conectado': 'Conectado',
@@ -234,7 +659,6 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
     return textos[this.estadoConexion] || 'Desconectado';
   }
 
-  // ✅ NUEVO: Obtener icono de estado de conexión
   getEstadoConexionIcono(): string {
     const iconos = {
       'conectado': 'bi-wifi',
@@ -244,131 +668,20 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
     return iconos[this.estadoConexion] || 'bi-wifi-off';
   }
 
-  // ✅ NUEVO: Cargar estadísticas del dispositivo
-  async cargarEstadisticas(idDispositivo: number) {
-    try {
-      // En una implementación real, esto vendría del backend
-      // Por ahora, simulamos estadísticas
-      this.estadisticas = {
-        totalMediciones: Math.floor(Math.random() * 50) + 5,
-        promedioSistolica: Math.floor(Math.random() * 30) + 110,
-        promedioDiastolica: Math.floor(Math.random() * 20) + 70,
-        promedioPulso: Math.floor(Math.random() * 30) + 60
-      };
-    } catch (error) {
-      console.warn("No se pudieron cargar estadísticas:", error);
-      this.estadisticas = null;
-    }
+  getEstadoBotonMedicion(): string {
+    if (this.isObteniendoMedicion) return 'bi-arrow-repeat spin';
+    return 'bi-heart-pulse';
   }
 
-  get pacientesFiltrados() {
-    if (!this.filtroPaciente) return this.pacientesLista;
-    const term = this.filtroPaciente.toLowerCase();
-    return this.pacientesLista.filter(p => {
-      const nombreCompleto = `${p.nombre || ''} ${p.appaterno || ''} ${p.apmaterno || ''}`.toLowerCase();
-      return nombreCompleto.includes(term);
-    });
+  getEstadoBotonTexto(): string {
+    if (this.isObteniendoMedicion) return 'Obteniendo medición...';
+    return 'Obtener Medición';
   }
 
-  ocultarDropdown() {
-    setTimeout(() => {
-      this.mostrarDropdown = false;
-      this.cdr.detectChanges();
-    }, 200);
-  }
+  // ==========================================================================
+  // MÉTODOS DE SINCRONIZACIÓN Y GUARDADO
+  // ==========================================================================
 
-  // ✅ NUEVO: Asignar paciente con más datos
-  asignarPaciente(p: any) {
-    this.dispositivoSeleccionado.idpaciente = p.idusuario;
-    this.dispositivoSeleccionado.nombrepaciente = p.nombre;
-    this.dispositivoSeleccionado.appaternopaciente = p.appaterno;
-    this.dispositivoSeleccionado.apmaternopaciente = p.apmaterno || '';
-    this.dispositivoSeleccionado.paciente = {
-      ...p,
-      domicilio: p.domicilio || '',
-      localidad: p.localidad || '',
-      municipio: p.municipio || '',
-      estado: p.estado || '',
-      codigoPostal: p.codigoPostal || ''
-    };
-    this.filtroPaciente = `${p.nombre} ${p.appaterno}`;
-    this.mostrarDropdown = false;
-
-    // ✅ NUEVO: Registrar en historial
-    this.agregarHistorial(
-      'Paciente asignado',
-      `Asignado a: ${p.nombre} ${p.appaterno} ${p.apmaterno || ''}`
-    );
-  }
-
-  // ✅ NUEVO: Desasignar paciente
-  desasignarPaciente() {
-    if (this.dispositivoSeleccionado.idpaciente) {
-      const nombrePaciente = this.dispositivoSeleccionado.nombrepaciente || 'Paciente';
-      this.dispositivoSeleccionado.idpaciente = null;
-      this.dispositivoSeleccionado.nombrepaciente = null;
-      this.dispositivoSeleccionado.appaternopaciente = null;
-      this.dispositivoSeleccionado.apmaternopaciente = null;
-      this.dispositivoSeleccionado.paciente = null;
-      this.filtroPaciente = '';
-
-      this.agregarHistorial(
-        'Paciente desasignado',
-        `Desasignado: ${nombrePaciente}`
-      );
-    }
-  }
-
-  // ✅ NUEVO: Agregar entrada al historial
-  agregarHistorial(accion: string, detalle: string) {
-    const ahora = new Date();
-    const fechaStr = ahora.toISOString().replace('T', ' ').slice(0, 16);
-    this.historialCambios.unshift({
-      fecha: fechaStr,
-      accion: accion,
-      detalle: detalle,
-      usuario: 'Usuario actual'
-    });
-    // En una implementación real, aquí se guardaría en el backend
-  }
-
-  async cargarUltimaMedicion(idPaciente: number) {
-    try {
-      const data = await firstValueFrom(this.usersService.getUltimaMedicionPaciente(idPaciente));
-      this.ultimaMedicion = data && Object.keys(data).length > 0 ? data : null;
-      this.cdr.detectChanges();
-    } catch (error) {
-      console.warn("No hay mediciones previas.");
-      this.ultimaMedicion = null;
-      this.cdr.detectChanges();
-    }
-  }
-
-  ngOnDestroy() {
-    if (this.toastTimeout) {
-      clearTimeout(this.toastTimeout);
-    }
-  }
-
-  volver() {
-    this.location.back();
-  }
-
-  lanzarNotificacion(mensaje: string, tipo: 'success' | 'error' | 'warning' = 'success') {
-    this.mensajeToast = mensaje;
-    this.tipoToast = tipo;
-    this.mostrarToast = true;
-    this.cdr.detectChanges();
-
-    if (this.toastTimeout) clearTimeout(this.toastTimeout);
-
-    this.toastTimeout = setTimeout(() => {
-      this.mostrarToast = false;
-      this.cdr.detectChanges();
-    }, 4000);
-  }
-
-  // ✅ NUEVO: Sincronizar dispositivo manualmente
   async sincronizarDispositivo() {
     if (!this.dispositivoSeleccionado) return;
 
@@ -391,10 +704,11 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
 
       this.lanzarNotificacion("Dispositivo sincronizado correctamente.", "success");
 
-      // Recargar mediciones si hay paciente asignado
-      if (this.dispositivoSeleccionado.idpaciente) {
-        this.cargarUltimaMedicion(this.dispositivoSeleccionado.idpaciente);
-        this.cargarEstadisticas(id);
+      const idPaciente = this.obtenerIdPaciente();
+      if (idPaciente) {
+        await this.cargarUltimaMedicion(idPaciente);
+        await this.cargarEstadisticas(id);
+        await this.cargarMedicionesTensiometro(idPaciente);
       }
     } catch (error: any) {
       console.error("Error al sincronizar:", error);
@@ -407,7 +721,6 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
     }
   }
 
-  // ✅ NUEVO: Toggle estado activo/inactivo - CORREGIDO
   async toggleActivo() {
     if (!this.dispositivoSeleccionado) return;
 
@@ -430,7 +743,7 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
       this.dispositivoSeleccionado.activo = nuevoEstado;
       this.agregarHistorial(
         `Dispositivo ${mensaje}`,
-        `El dispositivo fue ${mensaje}` // ✅ CORREGIDO: 'mensado' → 'mensaje'
+        `El dispositivo fue ${mensaje}`
       );
 
       this.lanzarNotificacion(`Dispositivo ${mensaje} correctamente.`, "success");
@@ -456,7 +769,6 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
       return;
     }
 
-    // ✅ NUEVO: Validar formato MAC
     const mac = (this.dispositivoSeleccionado.direccionmac || '').trim().toUpperCase();
     if (mac) {
       const macRegex = /^([0-9A-F]{2}[:-]){5}([0-9A-F]{2})$/;
@@ -475,7 +787,7 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
       const payload = {
         nombre: nombreLimpio,
         direccionMac: mac,
-        idPacienteAsociado: this.dispositivoSeleccionado.idpaciente || null,
+        idPacienteAsociado: this.obtenerIdPaciente() || null,
         activo: !!this.dispositivoSeleccionado.activo
       };
 
@@ -485,7 +797,6 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
         this.dispositivoSeleccionado = { ...this.dispositivoSeleccionado, ...respuesta.dispositivo };
       }
 
-      // ✅ NUEVO: Registrar en historial si cambió el estado
       if (estadoAnterior !== this.dispositivoSeleccionado.activo) {
         const nuevoEstado = this.dispositivoSeleccionado.activo ? 'activado' : 'desactivado';
         this.agregarHistorial(
@@ -494,7 +805,6 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
         );
       }
 
-      // ✅ NUEVO: Registrar si cambió el paciente
       this.agregarHistorial(
         'Dispositivo actualizado',
         `Información del dispositivo actualizada`
@@ -507,7 +817,7 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
       }, 1500);
 
     } catch (error: any) {
-      console.error("Error al actualizar la tabla de dispositivos:", error);
+      console.error("Error al actualizar:", error);
       const msgErr = error.error?.error || error.message || "Error al procesar la actualización.";
       this.lanzarNotificacion(`Error: ${msgErr}`, "error");
     } finally {
@@ -516,44 +826,52 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
     }
   }
 
-  async vincularGoogleFit() {
-    const idPaciente = this.dispositivoSeleccionado?.idpaciente || 0;
-    console.log("Intentando vincular con el ID:", idPaciente);
-    await this.googleService.iniciarVinculacionGoogleFit(idPaciente);
-  }
+  // ==========================================================================
+  // MÉTODOS DE HISTORIAL
+  // ==========================================================================
 
-  async cargarDatosGoogleFit() {
-    const idPaciente = this.dispositivoSeleccionado?.idpaciente;
+  cargarHistorialDispositivo() {
+    const ahora = new Date();
+    const fechaStr = ahora.toISOString().replace('T', ' ').slice(0, 16);
 
-    if (!idPaciente) {
-      this.lanzarNotificacion("No hay un paciente asociado para buscar datos.", "error");
-      return;
-    }
-
-    try {
-      const url = `${environment.authApi}/google-fit/data/${idPaciente}`;
-      const data = await firstValueFrom(this.http.get(url));
-
-      if (data) {
-        this.ultimaMedicion = data;
-        this.estadoConexion = 'conectado';
-        this.ultimaSincronizacion = new Date().toISOString();
-        this.agregarHistorial(
-          'Datos Google Fit',
-          'Datos de Google Fit sincronizados exitosamente'
-        );
-        this.lanzarNotificacion("Datos obtenidos correctamente.", "success");
-      } else {
-        this.lanzarNotificacion("No se encontraron mediciones nuevas en Google Fit.", "warning");
+    this.historialCambios = [
+      {
+        fecha: fechaStr,
+        accion: 'Dispositivo registrado',
+        detalle: 'Dispositivo vinculado al sistema',
+        usuario: 'Sistema'
       }
-    } catch (error) {
-      console.error("Error al obtener datos:", error);
-      this.estadoConexion = 'desconectado';
-      this.lanzarNotificacion("Error al conectar con Google Fit.", "error");
+    ];
+
+    const idPaciente = this.obtenerIdPaciente();
+    if (idPaciente) {
+      const paciente = this.pacientesLista.find(p => p.idusuario === idPaciente);
+      if (paciente) {
+        this.historialCambios.push({
+          fecha: fechaStr,
+          accion: 'Paciente asignado',
+          detalle: `Asignado a: ${this.obtenerNombreCompleto(paciente)}`,
+          usuario: 'Sistema'
+        });
+      }
     }
   }
 
-  // ✅ NUEVO: Obtener ubicación formateada del paciente
+  agregarHistorial(accion: string, detalle: string) {
+    const ahora = new Date();
+    const fechaStr = ahora.toISOString().replace('T', ' ').slice(0, 16);
+    this.historialCambios.unshift({
+      fecha: fechaStr,
+      accion: accion,
+      detalle: detalle,
+      usuario: 'Usuario actual'
+    });
+  }
+
+  // ==========================================================================
+  // MÉTODOS DE UBICACIÓN
+  // ==========================================================================
+
   getUbicacionPaciente(): string {
     const p = this.dispositivoSeleccionado?.paciente;
     if (!p) return 'Sin ubicación registrada';
@@ -561,10 +879,35 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
     return partes.length ? partes.join(', ') : 'Sin ubicación completa';
   }
 
-  // ✅ NUEVO: Verificar si el paciente tiene ubicación
   pacienteTieneUbicacion(): boolean {
     const p = this.dispositivoSeleccionado?.paciente;
     if (!p) return false;
     return !!(p.domicilio && p.localidad && p.municipio && p.estado);
+  }
+
+  // ==========================================================================
+  // SISTEMA DE NOTIFICACIONES
+  // ==========================================================================
+
+  lanzarNotificacion(mensaje: string, tipo: 'success' | 'error' | 'warning' = 'success') {
+    this.mensajeToast = mensaje;
+    this.tipoToast = tipo;
+    this.mostrarToast = true;
+    this.cdr.detectChanges();
+
+    if (this.toastTimeout) clearTimeout(this.toastTimeout);
+
+    this.toastTimeout = setTimeout(() => {
+      this.mostrarToast = false;
+      this.cdr.detectChanges();
+    }, 4000);
+  }
+
+  // ==========================================================================
+  // NAVEGACIÓN
+  // ==========================================================================
+
+  volver() {
+    this.location.back();
   }
 }

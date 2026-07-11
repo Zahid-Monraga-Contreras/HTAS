@@ -59,7 +59,7 @@ app.post('/api/htas/evaluar', async (req, res) => {
             Toma_Medicamento: parseInt(tomaMedicamento)
         };
 
-        // 🌐 Lee la URL exclusiva de tu microservicio de Python en Render
+        //  Lee la URL exclusiva de tu microservicio de Python en Render
         const FASTAPI_URL = process.env.URL_FASTAPI || 'http://127.0.0.1:8000';
 
         // Petición directa a Render (No necesita los headers de ngrok porque ya es pública)

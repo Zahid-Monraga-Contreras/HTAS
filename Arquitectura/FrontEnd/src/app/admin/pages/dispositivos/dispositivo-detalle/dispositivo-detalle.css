@@ -19,7 +19,7 @@
 }
 
 /* ==========================================================================
-   2. ENCABEZADO DE LA PÁGINA (HEADER) - MEJORADO
+   2. ENCABEZADO DE LA PÁGINA (HEADER)
    ========================================================================== */
 .header-section {
     display: flex;
@@ -51,10 +51,6 @@
     letter-spacing: -0.5px;
 }
 
-.title-page::before {
-    font-size: 1.8rem;
-}
-
 .subtitle-page {
     color: #7a8a9e;
     font-size: 1rem;
@@ -63,7 +59,7 @@
 }
 
 /* ==========================================================================
-   3. TARJETA DE DETALLE - MEJORADA
+   3. TARJETA DE DETALLE
    ========================================================================== */
 .detail-card {
     background: #ffffff;
@@ -79,7 +75,7 @@
 }
 
 /* ==========================================================================
-   4. FORMULARIO - MEJORADO
+   4. FORMULARIO
    ========================================================================== */
 .form-grid {
     display: grid;
@@ -92,6 +88,8 @@
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
+    position: relative;
+    /* ✅ AÑADIDO: refuerzo por si algún dropdown queda a este nivel */
 }
 
 .full-width-group {
@@ -107,7 +105,7 @@
 }
 
 .form-control-premium {
-    padding: 0.7rem 1rem;
+    padding: 0.7rem 2.5rem 0.7rem 1rem;
     border: 1.5px solid #e2e7ee;
     border-radius: 10px;
     font-size: 0.95rem;
@@ -144,10 +142,11 @@
 }
 
 /* ==========================================================================
-   5. BUSCADOR DE PACIENTES - MEJORADO
+   5. BUSCADOR DE PACIENTES - MEJORADO CON 5 RESULTADOS
    ========================================================================== */
 .search-patient-container {
     position: relative;
+    /* ✅ Este es el ancla real del dropdown */
     width: 100%;
 }
 
@@ -161,28 +160,34 @@
     font-size: 1.1rem;
 }
 
+/* ✅ DROPDOWN DE PACIENTES - AHORA ANCLADO CORRECTAMENTE DEBAJO DEL INPUT */
 .dropdown-list {
     position: absolute;
-    top: 100%;
+    top: calc(100% + 6px);
     left: 0;
     right: 0;
-    max-height: 200px;
+    max-height: 340px;
+    /* ↑ antes 280px, un poco más grande */
     overflow-y: auto;
     background: #ffffff;
     border: 1.5px solid #e2e7ee;
     border-radius: 12px;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    margin-top: 4px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.14);
+    z-index: 2000;
+    /* ↑ subido para que siempre quede por encima de otras secciones */
     padding: 4px 0;
+    min-width: 0;
+    width: 100%;
+    animation: dropdownSlideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Scrollbar del dropdown */
 .dropdown-list::-webkit-scrollbar {
-    width: 6px;
+    width: 4px;
 }
 
 .dropdown-list::-webkit-scrollbar-track {
-    background: transparent;
+    background: #f1f4f8;
     border-radius: 3px;
 }
 
@@ -195,14 +200,20 @@
     background: #bcc5d0;
 }
 
+/* ✅ ITEMS DEL DROPDOWN - un poco más grandes y legibles */
 .dropdown-item {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.7rem;
     padding: 0.6rem 1rem;
+    /* ↑ antes 0.4rem 0.9rem */
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
     border-bottom: 1px solid #f1f4f8;
+    font-size: 0.9rem;
+    /* ↑ antes 0.85rem */
+    color: #1a2938;
+    background: #ffffff;
 }
 
 .dropdown-item:last-child {
@@ -210,28 +221,85 @@
 }
 
 .dropdown-item:hover {
-    background: #fafbfc;
+    background: #f8fafc;
+}
+
+.dropdown-item:active {
+    background: #f1f4f8;
+}
+
+.dropdown-item i {
+    font-size: 1rem;
+    color: #8a9aa8;
+    flex-shrink: 0;
+}
+
+.dropdown-item .nombre-completo {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 500;
 }
 
 .dropdown-item .badge-paciente {
     margin-left: auto;
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     background: #f1f4f8;
     padding: 0.15rem 0.7rem;
     border-radius: 30px;
     color: #4a5a6e;
     font-weight: 700;
     text-transform: uppercase;
+    letter-spacing: 0.3px;
+    flex-shrink: 0;
+}
+
+/* ✅ MENSAJE "MOSTRANDO 5 DE N" */
+.dropdown-more {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.9rem;
+    color: #8a9aa8;
+    font-size: 0.78rem;
+    font-weight: 500;
+    border-top: 1px solid #f1f4f8;
+    background: #fafbfc;
+    border-radius: 0 0 12px 12px;
+}
+
+.dropdown-more i {
+    font-size: 0.8rem;
+    color: #b0bcc8;
+}
+
+/* ✅ ESTADO VACÍO DEL DROPDOWN */
+.dropdown-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    color: #8a9aa8;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.dropdown-empty i {
+    font-size: 1.1rem;
+    color: #b0bcc8;
 }
 
 /* ==========================================================================
-   6. PACIENTE VINCULADO - MEJORADO
+   6. PACIENTE VINCULADO
    ========================================================================== */
 .patient-badge-container {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    padding: 0.85rem 1.25rem;
+    padding: 0.75rem 1rem;
     border: 1.5px solid #e2e7ee;
     border-radius: 12px;
     background: #fafbfc;
@@ -250,7 +318,8 @@
 }
 
 .icon-patient {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
+    flex-shrink: 0;
 }
 
 .icon-patient.active {
@@ -263,8 +332,9 @@
 
 .patient-name {
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 0.95rem;
     color: #0a1628;
+    flex: 1;
 }
 
 .text-muted {
@@ -278,9 +348,10 @@
     color: #ef4444;
     cursor: pointer;
     padding: 0.2rem 0.4rem;
-    font-size: 1.1rem;
+    font-size: 1rem;
     transition: all 0.25s ease;
     border-radius: 6px;
+    flex-shrink: 0;
 }
 
 .btn-desasignar:hover {
@@ -291,10 +362,10 @@
 
 .ubicacion-paciente {
     margin-top: 0.2rem;
-    padding: 0.3rem 0.8rem;
+    padding: 0.25rem 0.8rem;
     background: #f0f7ff;
     border-radius: 8px;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: #1e40af;
     display: flex;
     align-items: center;
@@ -303,11 +374,11 @@
 }
 
 .ubicacion-paciente i {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
 }
 
 /* ==========================================================================
-   7. BANNER DE ESTADO - MEJORADO
+   7. BANNER DE ESTADO
    ========================================================================== */
 .estado-banner {
     display: flex;
@@ -406,9 +477,8 @@
 }
 
 /* ==========================================================================
-   8. BOTONES DE ACCIÓN - TODOS EN UNA SOLA FILA
+   8. BOTONES DE ACCIÓN
    ========================================================================== */
-/* Contenedor de botones en una sola fila */
 .header-controls {
     display: flex;
     gap: 0.75rem;
@@ -416,7 +486,6 @@
     flex-wrap: nowrap;
 }
 
-/* Estilos base para todos los botones de acción */
 .btn-action,
 .btn-cancel-premium {
     padding: 0.55rem 1.2rem;
@@ -441,7 +510,6 @@
     font-size: 1rem;
 }
 
-/* Botón Sincronizar */
 .btn-sincronizar {
     background: linear-gradient(135deg, #0ea5e9, #0284c7);
     color: #ffffff;
@@ -454,11 +522,6 @@
     box-shadow: 0 8px 24px rgba(14, 165, 233, 0.35);
 }
 
-.btn-sincronizar:active:not(:disabled) {
-    transform: translateY(0);
-}
-
-/* Botón Activar */
 .btn-activar {
     background: linear-gradient(135deg, #10b981, #059669);
     color: #ffffff;
@@ -471,11 +534,6 @@
     box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35);
 }
 
-.btn-activar:active:not(:disabled) {
-    transform: translateY(0);
-}
-
-/* Botón Desactivar */
 .btn-desactivar {
     background: linear-gradient(135deg, #ef4444, #dc2626);
     color: #ffffff;
@@ -488,11 +546,6 @@
     box-shadow: 0 8px 24px rgba(239, 68, 68, 0.35);
 }
 
-.btn-desactivar:active:not(:disabled) {
-    transform: translateY(0);
-}
-
-/* Botón Volver (btn-cancel-premium) */
 .btn-cancel-premium {
     background: #ffffff;
     color: #4a5a6e;
@@ -507,10 +560,6 @@
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
 }
 
-.btn-cancel-premium:active:not(:disabled) {
-    transform: translateY(0);
-}
-
 .btn-action:disabled,
 .btn-cancel-premium:disabled {
     opacity: 0.55;
@@ -520,7 +569,7 @@
 }
 
 /* ==========================================================================
-   9. ESTADÍSTICAS - MEJORADO
+   9. ESTADÍSTICAS
    ========================================================================== */
 .estadisticas-section {
     margin-top: 1.75rem;
@@ -599,7 +648,7 @@
 }
 
 /* ==========================================================================
-   10. SIN MEDICIONES - MEJORADO
+   10. SIN MEDICIONES
    ========================================================================== */
 .sin-mediciones {
     display: flex;
@@ -649,7 +698,7 @@
 }
 
 /* ==========================================================================
-   11. HISTORIAL - MEJORADO
+   11. HISTORIAL
    ========================================================================== */
 .historial-section {
     margin-top: 1.75rem;
@@ -712,11 +761,6 @@
 .historial-lista::-webkit-scrollbar-thumb {
     background: #d0d7df;
     border-radius: 3px;
-    transition: background 0.2s;
-}
-
-.historial-lista::-webkit-scrollbar-thumb:hover {
-    background: #bcc5d0;
 }
 
 .historial-item {
@@ -746,11 +790,6 @@
     gap: 0.4rem;
 }
 
-.historial-fecha i {
-    font-size: 0.8rem;
-    color: #8a9aa8;
-}
-
 .historial-detalle {
     flex: 1;
     display: flex;
@@ -777,13 +816,8 @@
     white-space: nowrap;
 }
 
-.historial-usuario i {
-    font-size: 0.8rem;
-    color: #8a9aa8;
-}
-
 /* ==========================================================================
-   12. BOTONES Y ACCIONES DEL PIE DE PÁGINA (FOOTER) - MEJORADO
+   12. BOTONES DEL PIE DE PÁGINA
    ========================================================================== */
 .action-footer {
     display: flex;
@@ -816,10 +850,6 @@
     box-shadow: 0 8px 24px rgba(176, 0, 30, 0.35);
 }
 
-.btn-save:active:not(:disabled) {
-    transform: translateY(0);
-}
-
 .btn-save:disabled {
     opacity: 0.55;
     cursor: not-allowed;
@@ -843,7 +873,7 @@
 }
 
 /* ==========================================================================
-   13. TOAST NOTIFICACIÓN - MEJORADO
+   13. TOAST NOTIFICACIÓN
    ========================================================================== */
 .toast-premium-container {
     position: fixed;
@@ -919,8 +949,318 @@
     }
 }
 
+@keyframes dropdownSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+        scale: 0.98;
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        scale: 1;
+    }
+}
+
 /* ==========================================================================
-   15. RESPONSIVIDAD - MEJORADA
+   15. SECCIÓN TENSIÓMETRO
+   ========================================================================== */
+.tensiometro-section {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid #e9edf2;
+}
+
+.section-divider {
+    border: none;
+    border-top: 2px solid #e9edf2;
+    margin: 0 0 1.5rem 0;
+}
+
+.tensiometro-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.tensiometro-controls {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.btn-medir {
+    background: linear-gradient(135deg, #b0001e, #8a0016);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(176, 0, 30, 0.25);
+    padding: 0.55rem 1.2rem;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-medir:hover:not(:disabled) {
+    background: linear-gradient(135deg, #8a0016, #6d0012);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(176, 0, 30, 0.35);
+}
+
+.btn-medir:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+/* Estado Bluetooth */
+.bluetooth-status {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 0.75rem 1.25rem;
+    background: #fafbfc;
+    border-radius: 12px;
+    border: 1px solid #e9edf2;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.status-indicator.conectado {
+    color: #059669;
+}
+
+.status-indicator.conectado i {
+    color: #10b981;
+}
+
+.status-indicator.desconectado {
+    color: #dc2626;
+}
+
+.status-indicator.desconectado i {
+    color: #ef4444;
+}
+
+.status-indicator.sincronizando {
+    color: #d97706;
+}
+
+.status-indicator.sincronizando i {
+    color: #f59e0b;
+    animation: spin 1s linear infinite;
+}
+
+.mac-address {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    color: #6b7a8a;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+/* Mediciones del tensiómetro */
+.medicion-tensiometro {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1.5px solid #e2e7ee;
+    margin-bottom: 1.25rem;
+}
+
+.medicion-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.medicion-item {
+    text-align: center;
+    padding: 0.75rem;
+    border-radius: 12px;
+    background: #ffffff;
+    border: 1px solid #e9edf2;
+}
+
+.medicion-item.sistolica {
+    border-left: 4px solid #ef4444;
+}
+
+.medicion-item.diastolica {
+    border-left: 4px solid #3b82f6;
+}
+
+.medicion-item.pulso {
+    border-left: 4px solid #10b981;
+}
+
+.medicion-label {
+    display: block;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #8a9aa8;
+    letter-spacing: 0.3px;
+    margin-bottom: 0.25rem;
+}
+
+.medicion-value {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #0a1628;
+}
+
+.medicion-value small {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #8a9aa8;
+}
+
+.medicion-fecha {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    color: #6b7a8a;
+}
+
+/* Sin mediciones */
+.sin-mediciones-tensiometro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.5rem;
+    background: #fafbfc;
+    border-radius: 14px;
+    border: 1.5px dashed #d0d7df;
+    text-align: center;
+    color: #6b7a8a;
+    gap: 0.5rem;
+}
+
+.sin-mediciones-tensiometro i {
+    font-size: 2.5rem;
+    color: #8a9aa8;
+}
+
+.sin-mediciones-tensiometro span {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+/* Historial de mediciones */
+.mediciones-historial {
+    margin-top: 1.25rem;
+}
+
+.historial-titulo {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #1a2938;
+    margin: 0 0 0.75rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.mediciones-lista {
+    max-height: 250px;
+    overflow-y: auto;
+    border: 1px solid #e9edf2;
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+.mediciones-lista::-webkit-scrollbar {
+    width: 6px;
+}
+
+.mediciones-lista::-webkit-scrollbar-track {
+    background: #f1f4f8;
+    border-radius: 3px;
+}
+
+.mediciones-lista::-webkit-scrollbar-thumb {
+    background: #d0d7df;
+    border-radius: 3px;
+}
+
+.medicion-item-historial {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid #f1f4f8;
+    font-size: 0.85rem;
+    flex-wrap: wrap;
+}
+
+.medicion-item-historial:last-child {
+    border-bottom: none;
+}
+
+.medicion-fecha-historial {
+    min-width: 160px;
+    color: #6b7a8a;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.medicion-valores-historial {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-weight: 600;
+}
+
+.medicion-valores-historial .sys {
+    color: #ef4444;
+}
+
+.medicion-valores-historial .dia {
+    color: #3b82f6;
+}
+
+.medicion-valores-historial .pulse {
+    color: #10b981;
+    margin-left: 0.5rem;
+}
+
+.medicion-valores-historial .sep {
+    color: #8a9aa8;
+}
+
+/* ==========================================================================
+   16. RESPONSIVIDAD
    ========================================================================== */
 @media (max-width: 1200px) {
     .header-controls {
@@ -946,8 +1286,6 @@
 }
 
 @media (max-width: 900px) {
-
-    /* Cuando los botones no caben, permitir que se envuelvan */
     .header-controls {
         flex-wrap: wrap;
         gap: 0.5rem;
@@ -1090,7 +1428,59 @@
     }
 
     .dropdown-list {
-        max-height: 150px;
+        max-height: 260px;
+        border-radius: 10px;
+        top: calc(100% + 4px);
+    }
+
+    .dropdown-item {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.85rem;
+        gap: 0.5rem;
+    }
+
+    .dropdown-item i {
+        font-size: 0.85rem;
+    }
+
+    .dropdown-item .badge-paciente {
+        font-size: 0.55rem;
+        padding: 0.1rem 0.55rem;
+    }
+
+    .dropdown-more {
+        font-size: 0.72rem;
+        padding: 0.4rem 0.7rem;
+    }
+
+    .dropdown-empty {
+        font-size: 0.78rem;
+        padding: 0.7rem;
+    }
+
+    .patient-badge-container {
+        padding: 0.65rem 0.8rem;
+    }
+
+    .patient-info {
+        gap: 0.5rem;
+    }
+
+    .patient-name {
+        font-size: 0.85rem;
+    }
+
+    .icon-patient {
+        font-size: 1rem;
+    }
+
+    .btn-desasignar {
+        font-size: 0.9rem;
+    }
+
+    .ubicacion-paciente {
+        font-size: 0.7rem;
+        padding: 0.15rem 0.6rem;
     }
 
     .sin-mediciones {
@@ -1098,28 +1488,60 @@
         text-align: center;
     }
 
-    .patient-badge-container {
-        padding: 0.65rem 1rem;
+    .tensiometro-header {
+        flex-direction: column;
+        align-items: stretch;
     }
 
-    .patient-info {
+    .tensiometro-controls {
+        justify-content: stretch;
+    }
+
+    .tensiometro-controls button {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .medicion-grid {
+        grid-template-columns: 1fr;
         gap: 0.5rem;
     }
 
-    .ubicacion-paciente {
-        font-size: 0.75rem;
-        padding: 0.2rem 0.6rem;
+    .medicion-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0.75rem;
+    }
+
+    .medicion-item .medicion-label {
+        margin-bottom: 0;
+    }
+
+    .medicion-value {
+        font-size: 1.25rem;
+    }
+
+    .medicion-item-historial {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+    }
+
+    .medicion-fecha-historial {
+        min-width: auto;
+    }
+
+    .bluetooth-status {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
     }
 }
 
 @media (max-width: 480px) {
     .title-page {
         font-size: 1.5rem;
-    }
-
-    .title-page::before {
-        content: "📱 ";
-        font-size: 1.3rem;
     }
 
     .subtitle-page {
@@ -1133,7 +1555,7 @@
 
     .form-control-premium {
         font-size: 0.9rem;
-        padding: 0.6rem 0.8rem;
+        padding: 0.6rem 2rem 0.6rem 0.8rem;
     }
 
     .btn-save,
@@ -1191,37 +1613,68 @@
     }
 
     .btn-desasignar {
-        font-size: 0.9rem;
+        font-size: 0.8rem;
     }
 
     .icon-patient {
-        font-size: 1.1rem;
+        font-size: 0.9rem;
     }
 
     .patient-name {
-        font-size: 0.9rem;
+        font-size: 0.8rem;
     }
 
     .sin-mediciones span {
         font-size: 0.85rem;
     }
+
+    .dropdown-list {
+        max-height: 200px;
+        border-radius: 8px;
+    }
+
+    .dropdown-item {
+        padding: 0.4rem 0.7rem;
+        font-size: 0.8rem;
+        gap: 0.45rem;
+    }
+
+    .dropdown-item i {
+        font-size: 0.75rem;
+    }
+
+    .dropdown-item .badge-paciente {
+        font-size: 0.5rem;
+        padding: 0.08rem 0.45rem;
+    }
+
+    .dropdown-more {
+        font-size: 0.68rem;
+        padding: 0.3rem 0.6rem;
+    }
+
+    .dropdown-empty {
+        font-size: 0.75rem;
+        padding: 0.6rem;
+    }
+
+    .patient-badge-container {
+        padding: 0.5rem 0.7rem;
+    }
 }
 
 /* ==========================================================================
-   16. UTILIDADES ADICIONALES
+   17. UTILIDADES ADICIONALES
    ========================================================================== */
-/* Smooth scroll global */
 html {
     scroll-behavior: smooth;
 }
 
-/* Selección de texto personalizada */
 ::selection {
     background: rgba(176, 0, 30, 0.15);
     color: #b0001e;
 }
 
-/* Enfoque accesible para elementos interactivos */
 button:focus-visible,
 input:focus-visible,
 select:focus-visible,
@@ -1230,7 +1683,6 @@ textarea:focus-visible {
     outline-offset: 2px;
 }
 
-/* Mejora para selects */
 select.form-control-premium {
     appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a5a6e' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
@@ -1249,28 +1701,6 @@ select.form-control-premium option:checked {
     color: #ffffff;
 }
 
-/* Badge paciente */
-.badge-paciente {
-    background: #f1f4f8;
-    color: #4a5a6e;
-    padding: 0.15rem 0.7rem;
-    border-radius: 30px;
-    font-size: 0.65rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-}
-
-/* Estilo para inputs de fecha */
-input[type="text"][readonly] {
-    cursor: pointer;
-}
-
-input[type="text"][readonly]:hover {
-    border-color: #b0bcc8;
-}
-
-/* Empty state */
 .empty-state {
     padding: 3rem 1rem;
     text-align: center;
@@ -1284,11 +1714,179 @@ input[type="text"][readonly]:hover {
     margin-bottom: 0.75rem;
 }
 
-/* Texto muted con tamaño pequeño */
 .text-muted.small {
     margin-top: 1rem;
     color: #8a9aa8 !important;
     font-size: 0.8rem;
     text-align: right;
     font-style: italic;
+}
+
+/* ==========================================================================
+   18. PANEL DE PROGRESO DE CONEXIÓN (estilo integrado)
+   ========================================================================== */
+.progreso-conexion-panel {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+    border: 1.5px solid #e9edf2;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.progreso-conexion-panel:hover {
+    border-color: #d0d7df;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.progreso-header {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    color: #4a5a6e;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 2px solid #f1f4f8;
+}
+
+.progreso-header i {
+    font-size: 1rem;
+    color: #b0001e;
+}
+
+.progreso-log {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    max-height: 220px;
+    overflow-y: auto;
+    padding-right: 0.25rem;
+}
+
+/* Scrollbar personalizada */
+.progreso-log::-webkit-scrollbar {
+    width: 4px;
+}
+
+.progreso-log::-webkit-scrollbar-track {
+    background: #f1f4f8;
+    border-radius: 3px;
+}
+
+.progreso-log::-webkit-scrollbar-thumb {
+    background: #d0d7df;
+    border-radius: 10px;
+}
+
+.progreso-log::-webkit-scrollbar-thumb:hover {
+    background: #bcc5d0;
+}
+
+.progreso-linea {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.4rem 0.75rem;
+    background: #fafbfc;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: #1a2938;
+    animation: slideInLine 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-left: 3px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.progreso-linea:hover {
+    background: #f1f4f8;
+}
+
+.progreso-linea i {
+    font-size: 0.65rem;
+    color: #8a9aa8;
+    flex-shrink: 0;
+}
+
+/* Última línea destacada */
+.progreso-linea:last-child {
+    border-left-color: #b0001e;
+    background: #fef2f2;
+    font-weight: 600;
+}
+
+.progreso-linea:last-child i {
+    color: #b0001e;
+    font-size: 0.7rem;
+}
+
+/* Animación para nuevas líneas */
+@keyframes slideInLine {
+    from {
+        opacity: 0;
+        transform: translateX(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .progreso-conexion-panel {
+        padding: 1rem;
+        border-radius: 12px;
+    }
+
+    .progreso-log {
+        max-height: 180px;
+    }
+
+    .progreso-linea {
+        font-size: 0.78rem;
+        padding: 0.3rem 0.6rem;
+    }
+
+    .progreso-header {
+        font-size: 0.65rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .progreso-conexion-panel {
+        padding: 0.75rem;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+    }
+
+    .progreso-log {
+        max-height: 150px;
+        gap: 0.3rem;
+    }
+
+    .progreso-linea {
+        font-size: 0.72rem;
+        padding: 0.25rem 0.5rem;
+        gap: 0.4rem;
+    }
+
+    .progreso-linea i {
+        font-size: 0.55rem;
+    }
+
+    .progreso-header {
+        font-size: 0.6rem;
+        gap: 0.4rem;
+        margin-bottom: 0.5rem;
+        padding-bottom: 0.4rem;
+    }
+
+    .progreso-header i {
+        font-size: 0.85rem;
+    }
 }

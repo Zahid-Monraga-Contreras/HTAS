@@ -4,7 +4,7 @@
 node_modules/
 dist/
 .angular/
-**/src/environments/
+**/src/environments/*.ts
 
 *.json
 Metodologia/*.json
