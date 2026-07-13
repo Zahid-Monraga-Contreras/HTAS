@@ -10,6 +10,7 @@ const citasRoutes = require('./routes/citas.routes');
 const medicionesRoutes = require('./routes/mediciones.routes');
 const medicamentosRoutes = require('./routes/medicamentos.routes');
 const tratamientosRoutes = require('./routes/tratamientos.routes');
+const tomasRoutes = require('./routes/tomas.routes');
 const dispositivosRoutes = require('./routes/dispositivos.routes');
 const pagosRoutes = require('./routes/pagos.routes');
 const contactoRoutes = require('./routes/contacto.routes');
@@ -31,6 +32,7 @@ app.use('/api/citas', citasRoutes);
 app.use('/api/mediciones', medicionesRoutes);
 app.use('/api/medicamentos', medicamentosRoutes);
 app.use('/api/tratamientos', tratamientosRoutes);
+app.use('/api/tomas', tomasRoutes);
 app.use('/api/dispositivos', dispositivosRoutes);
 app.use('/api/pagos', pagosRoutes);
 app.use('/api/contacto', contactoRoutes);
@@ -102,6 +104,7 @@ app.get('/', (req, res) => {
             mediciones: '/api/mediciones',
             medicamentos: '/api/medicamentos',
             tratamientos: '/api/tratamientos',
+            tomas: '/api/tomas',
             dispositivos: '/api/dispositivos',
             pagos: '/api/pagos',
             contacto: '/api/contacto',

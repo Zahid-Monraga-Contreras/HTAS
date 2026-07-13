@@ -14,6 +14,7 @@
 <main class="main-content" [class.menu-collapsed]="sidebar.isCollapsed">
     @if (citaSeleccionada) {
     <div class="container-fluid">
+        <!-- HEADER SECTION - MODIFICADO: SIN ESTADO -->
         <div class="header-section">
             <div class="title-group">
                 <h2 class="title-page">Editar Cita Médica</h2>
@@ -21,6 +22,7 @@
             </div>
 
             <div class="header-controls">
+                <!-- SOLO BOTONES DE ACCIÓN Y VOLVER -->
                 @if (citaSeleccionada.estado !== 'Completada' && citaSeleccionada.estado !== 'Cancelada') {
                 <button class="btn-action btn-completar" (click)="marcarCompletada()" [disabled]="isSaving">
                     <i class="bi bi-check2-circle"></i>
@@ -42,194 +44,314 @@
             </div>
         </div>
 
-        <!-- Banner de estado -->
-        <div class="estado-banner">
-            <div class="estado-badge" [style.background-color]="getEstadoColor(citaSeleccionada.estado)">
-                <i class="bi bi-circle-fill"></i>
-                <span>{{ citaSeleccionada.estado || 'Sin estado' }}</span>
-            </div>
-
-            @if (esCitaVencida()) {
-            <div class="alerta-vencida">
-                <i class="bi bi-exclamation-triangle-fill"></i>
-                <span>Esta cita está vencida. Por favor, actualice el estado.</span>
-            </div>
-            }
-
-            @if (esCitaHoy()) {
-            <div class="alerta-hoy">
-                <i class="bi bi-calendar-check"></i>
-                <span>Esta cita es para hoy.</span>
-            </div>
-            }
-
-            @if (esCitaFutura() && citaSeleccionada.estado !== 'Cancelada') {
-            <div class="alerta-futura">
-                <i class="bi bi-calendar-event"></i>
-                <span>Esta cita está programada para el futuro.</span>
-            </div>
-            }
+        <!-- MENÚ DE NAVEGACIÓN POR PESTAÑAS -->
+        <div class="tabs-nav-wrapper">
+            <nav class="tabs-nav">
+                <button type="button" class="tab-btn" [class.active]="activeTab === 'detalle'"
+                    (click)="cambiarTab('detalle')">
+                    <i class="bi bi-calendar3"></i>
+                    <span>Detalle de la Cita</span>
+                </button>
+                <button type="button" class="tab-btn" [class.active]="activeTab === 'historial'"
+                    (click)="cambiarTab('historial')">
+                    <i class="bi bi-clock-history"></i>
+                    <span>Historial</span>
+                </button>
+            </nav>
         </div>
 
-        <div class="detail-card">
+        <!-- ============================================================ -->
+        <!-- TAB 1: DETALLE DE LA CITA                                     -->
+        <!-- ============================================================ -->
+        @if (activeTab === 'detalle') {
+        <div class="tab-panel">
 
-            <!-- Información del Paciente -->
-            <div class="section-block">
-                <h4 class="section-title">
-                    <i class="bi bi-person-fill"></i>
-                    Información del Paciente
-                </h4>
-                <div class="form-grid readonly-grid">
-                    <div class="form-group">
-                        <label>Nombre del Paciente</label>
-                        <input type="text" class="form-control-premium readonly-field"
-                            [value]="citaSeleccionada.nombrepaciente + ' ' + citaSeleccionada.appaternopaciente + ' ' + (citaSeleccionada.apmaternopaciente || '')"
-                            readonly>
-                    </div>
-                    <div class="form-group">
-                        <label>Correo del Paciente</label>
-                        <input type="email" class="form-control-premium readonly-field"
-                            [value]="citaSeleccionada.correopaciente || 'No registrado'" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label>Teléfono del Paciente</label>
-                        <input type="text" class="form-control-premium readonly-field"
-                            [value]="citaSeleccionada.telefonopaciente || 'No registrado'" readonly>
-                    </div>
-                </div>
-            </div>
-
-            <hr class="section-divider">
-
-            <!-- Detalles de la Cita -->
-            <div class="section-block">
-                <h4 class="section-title">
-                    <i class="bi bi-calendar3"></i>
-                    Detalles de la Cita
-                </h4>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Fecha de la Cita</label>
-                        <div class="input-picker-wrapper">
-                            <input type="text" id="fechaCitaDetalleInput" [(ngModel)]="citaSeleccionada.fechacita"
-                                placeholder="Seleccione fecha" class="form-control-premium picker-custom">
-                            <i class="bi bi-calendar3 icon-embed"></i>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Hora de la Cita</label>
-                        <div class="input-picker-wrapper">
-                            <input type="text" id="horaCitaDetalleInput" [(ngModel)]="citaSeleccionada.horacita"
-                                placeholder="Seleccione hora" class="form-control-premium picker-custom">
-                            <i class="bi bi-clock icon-embed"></i>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Modalidad</label>
-                        <select [(ngModel)]="citaSeleccionada.modalidad" class="form-control-premium">
-                            @for (m of modalidades; track m) {
-                            <option [value]="m">{{ m }}</option>
-                            }
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Estado de la Cita</label>
-                        <select [(ngModel)]="citaSeleccionada.estado" class="form-control-premium"
-                            [style.border-color]="getEstadoColor(citaSeleccionada.estado)">
-                            @for (e of estadosCita; track e) {
-                            <option [value]="e" [style.color]="getEstadoColor(e)">{{ e }}</option>
-                            }
-                        </select>
-                    </div>
-
-                    <div class="form-group full-width-group">
-                        <label>Motivo de la Consulta</label>
-                        <input type="text" [(ngModel)]="citaSeleccionada.motivo" maxlength="255"
-                            class="form-control-premium" placeholder="Ej: Control de rutina, revisión general...">
-                    </div>
+            <!-- Banner de estado -->
+            <div class="estado-banner">
+                <div class="estado-badge" [style.background-color]="getEstadoColor(citaSeleccionada.estado)">
+                    <i class="bi bi-circle-fill"></i>
+                    <span>{{ citaSeleccionada.estado || 'Sin estado' }}</span>
                 </div>
 
-                <!-- ✅ CORREGIDO: Síntomas del Paciente - FIJO -->
-                <div class="form-group full-width-group">
-                    <label>Síntomas del Paciente</label>
-                    <textarea [(ngModel)]="citaSeleccionada.sintomas" rows="2" maxlength="500"
-                        placeholder="Síntomas reportados por el paciente..." class="form-control-premium"
-                        style="min-height: 60px; max-height: 80px; height: 70px; resize: none !important;"></textarea>
-                    <small class="form-text text-muted">Máximo 500 caracteres</small>
+                @if (esCitaVencida()) {
+                <div class="alerta-vencida">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <span>Esta cita está vencida. Por favor, actualice el estado.</span>
                 </div>
+                }
 
-                <!-- ✅ CORREGIDO: Notas del Doctor - FIJO -->
-                <div class="form-group full-width-group">
-                    <label>Notas del Doctor</label>
-                    <textarea [(ngModel)]="citaSeleccionada.notasdoctor" rows="2" maxlength="500"
-                        placeholder="Diagnóstico, indicaciones médicas u observaciones..." class="form-control-premium"
-                        style="min-height: 60px; max-height: 80px; height: 70px; resize: none !important;"></textarea>
-                    <small class="form-text text-muted">Máximo 500 caracteres</small>
+                @if (esCitaHoy()) {
+                <div class="alerta-hoy">
+                    <i class="bi bi-calendar-check"></i>
+                    <span>Esta cita es para hoy.</span>
                 </div>
-            </div>
+                }
 
-            <!-- Historial -->
-            <hr class="section-divider">
-
-            <div class="section-block">
-                <div class="historial-header" (click)="mostrarHistorial = !mostrarHistorial">
-                    <h4 class="section-title" style="cursor: pointer;">
-                        <i class="bi bi-clock-history"></i>
-                        Historial de Cambios
-                        <i class="bi" [ngClass]="mostrarHistorial ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
-                    </h4>
-                    <span class="historial-count">{{ historialCambios.length }} cambios</span>
-                </div>
-
-                @if (mostrarHistorial) {
-                <div class="historial-lista">
-                    @if (historialCambios.length > 0) {
-                    @for (item of historialCambios; track $index) {
-                    <div class="historial-item">
-                        <div class="historial-fecha">
-                            <i class="bi bi-clock"></i>
-                            {{ item.fecha }}
-                        </div>
-                        <div class="historial-detalle">
-                            <strong>{{ item.accion }}</strong>
-                            <span>{{ item.detalle }}</span>
-                        </div>
-                        <div class="historial-usuario">
-                            <i class="bi bi-person"></i>
-                            {{ item.usuario }}
-                        </div>
-                    </div>
-                    }
-                    } @else {
-                    <div class="historial-vacio">
-                        <i class="bi bi-inbox"></i>
-                        <p>No hay registros en el historial</p>
-                    </div>
-                    }
+                @if (esCitaFutura() && citaSeleccionada.estado !== 'Cancelada') {
+                <div class="alerta-futura">
+                    <i class="bi bi-calendar-event"></i>
+                    <span>Esta cita está programada para el futuro.</span>
                 </div>
                 }
             </div>
 
-            <!-- Acciones -->
-            <div class="action-footer">
-                <button class="btn-cancel-premium" (click)="volver()" [disabled]="isSaving">
-                    <i class="bi bi-x-lg"></i>
-                    Cancelar
-                </button>
-                <button class="btn-save" (click)="guardarCambios()" [disabled]="isSaving">
-                    @if (isSaving) {
-                    <span class="spinner-save"></span>
-                    <span>Guardando...</span>
-                    } @else {
-                    <i class="bi bi-check-lg"></i>
-                    <span>Guardar Cambios</span>
-                    }
-                </button>
+            <div class="detail-card">
+                <!-- Información del Paciente -->
+                <div class="section-block">
+                    <h4 class="section-title">
+                        <i class="bi bi-person-fill"></i>
+                        Información del Paciente
+                    </h4>
+                    <div class="form-grid readonly-grid">
+                        <div class="form-group">
+                            <label>Nombre del Paciente</label>
+                            <input type="text" class="form-control-premium readonly-field"
+                                [value]="citaSeleccionada.nombrepaciente + ' ' + citaSeleccionada.appaternopaciente + ' ' + (citaSeleccionada.apmaternopaciente || '')"
+                                readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Correo del Paciente</label>
+                            <input type="email" class="form-control-premium readonly-field"
+                                [value]="citaSeleccionada.correopaciente || 'No registrado'" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Teléfono del Paciente</label>
+                            <input type="text" class="form-control-premium readonly-field"
+                                [value]="citaSeleccionada.telefonopaciente || 'No registrado'" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="section-divider">
+
+                <!-- Detalles de la Cita -->
+                <div class="section-block">
+                    <h4 class="section-title">
+                        <i class="bi bi-calendar3"></i>
+                        Detalles de la Cita
+                    </h4>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Fecha de la Cita</label>
+                            <div class="input-picker-wrapper">
+                                <input type="text" id="fechaCitaDetalleInput" [(ngModel)]="citaSeleccionada.fechacita"
+                                    placeholder="Seleccione fecha" class="form-control-premium picker-custom" readonly>
+                                <i class="bi bi-calendar3 icon-embed"></i>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Hora de la Cita</label>
+                            <div class="input-picker-wrapper">
+                                <input type="text" id="horaCitaDetalleInput" [(ngModel)]="citaSeleccionada.horacita"
+                                    placeholder="Seleccione hora" class="form-control-premium picker-custom" readonly>
+                                <i class="bi bi-clock icon-embed"></i>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Modalidad</label>
+                            <select [(ngModel)]="citaSeleccionada.modalidad" class="form-control-premium">
+                                @for (m of modalidades; track m) {
+                                <option [value]="m">{{ m }}</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Estado de la Cita</label>
+                            <select [(ngModel)]="citaSeleccionada.estado" class="form-control-premium"
+                                [style.border-color]="getEstadoColor(citaSeleccionada.estado)">
+                                @for (e of estadosCita; track e) {
+                                <option [value]="e" [style.color]="getEstadoColor(e)">{{ e }}</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="form-group full-width-group">
+                            <label>Motivo de la Consulta</label>
+                            <input type="text" [(ngModel)]="citaSeleccionada.motivo" maxlength="255"
+                                class="form-control-premium" placeholder="Ej: Control de rutina, revisión general...">
+                        </div>
+                    </div>
+
+                    <!-- Síntomas del Paciente -->
+                    <div class="form-group full-width-group">
+                        <label>Síntomas del Paciente</label>
+                        <textarea [(ngModel)]="citaSeleccionada.sintomas" rows="2" maxlength="500"
+                            placeholder="Síntomas reportados por el paciente..."
+                            class="form-control-premium"></textarea>
+                        <small class="form-text text-muted">Máximo 500 caracteres</small>
+                    </div>
+
+                    <!-- Notas del Doctor -->
+                    <div class="form-group full-width-group">
+                        <label>Notas del Doctor</label>
+                        <textarea [(ngModel)]="citaSeleccionada.notasdoctor" rows="2" maxlength="500"
+                            placeholder="Diagnóstico, indicaciones médicas u observaciones..."
+                            class="form-control-premium"></textarea>
+                        <small class="form-text text-muted">Máximo 500 caracteres</small>
+                    </div>
+                </div>
+
+                <!-- Acciones -->
+                <div class="action-footer">
+                    <button class="btn-cancel-premium" (click)="volver()" [disabled]="isSaving">
+                        <i class="bi bi-x-lg"></i>
+                        Cancelar
+                    </button>
+                    <button class="btn-save" (click)="guardarCambios()" [disabled]="isSaving">
+                        @if (isSaving) {
+                        <span class="spinner-save"></span>
+                        <span>Guardando...</span>
+                        } @else {
+                        <i class="bi bi-check-lg"></i>
+                        <span>Guardar Cambios</span>
+                        }
+                    </button>
+                </div>
             </div>
         </div>
+        }
+
+        <!-- ============================================================ -->
+        <!-- TAB 2: HISTORIAL                                              -->
+        <!-- ============================================================ -->
+        @if (activeTab === 'historial') {
+        <div class="tab-panel">
+            <div class="detail-card">
+
+                <!-- RESUMEN DE LA CITA -->
+                <div class="resumen-cita">
+                    <div class="resumen-item">
+                        <i class="bi bi-calendar3"></i>
+                        <div>
+                            <small>Fecha</small>
+                            <strong>{{ citaSeleccionada.fechacita | date:'dd/MM/yyyy' }}</strong>
+                        </div>
+                    </div>
+                    <div class="resumen-item">
+                        <i class="bi bi-clock"></i>
+                        <div>
+                            <small>Hora</small>
+                            <strong>{{ citaSeleccionada.horacita }}</strong>
+                        </div>
+                    </div>
+                    <div class="resumen-item">
+                        <i class="bi bi-person-fill"></i>
+                        <div>
+                            <small>Paciente</small>
+                            <strong>{{ citaSeleccionada.nombrepaciente }} {{ citaSeleccionada.appaternopaciente
+                                }}</strong>
+                        </div>
+                    </div>
+                    <div class="resumen-item">
+                        <i class="bi bi-tag-fill"></i>
+                        <div>
+                            <small>Estado</small>
+                            <strong [style.color]="getEstadoColor(citaSeleccionada.estado)">{{ citaSeleccionada.estado
+                                }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ESTADÍSTICAS DEL HISTORIAL -->
+                <div class="estadisticas-section">
+                    <h4 class="section-title">
+                        <i class="bi bi-graph-up-arrow"></i>
+                        Resumen de Actividad
+                    </h4>
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <small>Total Cambios</small>
+                            <div class="stat-value">{{ historialCambios.length }}</div>
+                        </div>
+                        <div class="stat-box">
+                            <small>Cambios de Estado</small>
+                            <div class="stat-value">{{ contarCambiosEstado() }}</div>
+                        </div>
+                        <div class="stat-box">
+                            <small>Actualizaciones</small>
+                            <div class="stat-value">{{ contarActualizaciones() }}</div>
+                        </div>
+                        <div class="stat-box">
+                            <small>Última Modificación</small>
+                            <div class="stat-value" style="font-size: 0.9rem;">
+                                {{ historialCambios.length > 0 ? historialCambios[0].fecha : 'Sin cambios' }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="section-divider">
+
+                <!-- HISTORIAL DE CAMBIOS COMPLETO -->
+                <div class="historial-section">
+                    <div class="historial-header">
+                        <h4 class="section-title">
+                            <i class="bi bi-clock-history"></i>
+                            Historial de Cambios
+                        </h4>
+                        <span class="historial-count">{{ historialCambios.length }} eventos</span>
+                    </div>
+
+                    @if (historialCambios.length > 0) {
+                    <div class="historial-lista">
+                        @for (item of historialCambios; track $index) {
+                        <div class="historial-item" [ngClass]="{
+                            'cambio-estado': item.accion.includes('Estado'),
+                            'cambio-motivo': item.accion.includes('Motivo'),
+                            'cambio-creacion': item.accion.includes('creada'),
+                            'cambio-cancelacion': item.accion.includes('cancelada'),
+                            'cambio-completada': item.accion.includes('completada')
+                        }">
+                            <div class="historial-icono">
+                                @if (item.accion.includes('creada')) {
+                                <i class="bi bi-plus-circle-fill" style="color: #10b981;"></i>
+                                } @else if (item.accion.includes('cancelada')) {
+                                <i class="bi bi-x-circle-fill" style="color: #ef4444;"></i>
+                                } @else if (item.accion.includes('completada')) {
+                                <i class="bi bi-check-circle-fill" style="color: #3b82f6;"></i>
+                                } @else if (item.accion.includes('Estado')) {
+                                <i class="bi bi-arrow-repeat" style="color: #f59e0b;"></i>
+                                } @else {
+                                <i class="bi bi-pencil-square" style="color: #8a9aa8;"></i>
+                                }
+                            </div>
+                            <div class="historial-fecha">
+                                <i class="bi bi-clock"></i>
+                                {{ item.fecha }}
+                            </div>
+                            <div class="historial-detalle">
+                                <strong>{{ item.accion }}</strong>
+                                <span>{{ item.detalle }}</span>
+                            </div>
+                            <div class="historial-usuario">
+                                <i class="bi bi-person"></i>
+                                {{ item.usuario }}
+                            </div>
+                        </div>
+                        }
+                    </div>
+                    } @else {
+                    <div class="historial-vacio">
+                        <i class="bi bi-clock-history"></i>
+                        <p>Aún no hay actividad registrada</p>
+                        <span>Los cambios de la cita aparecerán aquí</span>
+                    </div>
+                    }
+                </div>
+
+                <!-- ACCIONES DEL HISTORIAL -->
+                <div class="action-footer">
+                    <button class="btn-cancel-premium" (click)="volver()">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+        }
+
     </div>
     }
 </main>

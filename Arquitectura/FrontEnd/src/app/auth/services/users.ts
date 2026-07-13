@@ -78,6 +78,18 @@ export interface DispositivoData {
   activo?: boolean;
 }
 
+// NUEVA INTERFAZ PARA TOMAS
+export interface RegistroToma {
+  id?: number;
+  idTratamiento: number;
+  fechaProgramada: string;
+  fechaRealizada?: string;
+  estado: 'Pendiente' | 'Tomada' | 'Omitida' | 'Retrasada';
+  notas?: string;
+  idAcompanante?: number;
+  nombreAcompanante?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class Users {
   private platformId = inject(PLATFORM_ID);
@@ -430,6 +442,128 @@ export class Users {
 
   getEstadisticasTratamientos(): Observable<any> {
     return this.http.get(`${this.apiUrl}/tratamientos/estadisticas-tratamientos`);
+  }
+
+  // ==========================================================================
+  // --- ✅ NUEVO: GESTIÓN DE TOMAS ---
+  // ==========================================================================
+
+  /**
+   * Obtiene todas las tomas de un tratamiento específico
+   * @param idTratamiento ID del tratamiento
+   * @returns Observable con el listado de tomas
+   */
+  getTomasByTratamiento(idTratamiento: number | string): Observable<RegistroToma[]> {
+    return this.http.get<RegistroToma[]>(`${this.apiUrl}/tomas/tratamiento/${idTratamiento}`);
+  }
+
+  /**
+   * Obtiene estadísticas de tomas de un tratamiento
+   * @param idTratamiento ID del tratamiento
+   * @returns Observable con las estadísticas
+   */
+  getEstadisticasTomas(idTratamiento: number | string): Observable<{
+    totalTomas: number;
+    tomasCompletadas: number;
+    tomasPendientes: number;
+    tomasOmitidas: number;
+    tomasRetrasadas: number;
+    porcentajeCumplimiento: number;
+  }> {
+    return this.http.get<any>(`${this.apiUrl}/tomas/tratamiento/${idTratamiento}/estadisticas`);
+  }
+
+  /**
+   * Registra una nueva toma para un tratamiento
+   * @param data Datos de la toma
+   * @returns Observable con la toma registrada
+   */
+  registrarToma(data: {
+    idTratamiento: number;
+    fechaHoraProgramada: string;
+    idAcompananteQueRegistro?: number;
+    notasTomas?: string;
+  }): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/tomas`, data);
+  }
+
+  /**
+   * Genera tomas programadas automáticamente para un tratamiento
+   * @param data Datos para generar las tomas
+   * @returns Observable con las tomas generadas
+   */
+  generarTomasProgramadas(data: {
+    idTratamiento: number;
+    fechaInicio: string;
+    fechaFin: string;
+    frecuenciaHoras: number;
+  }): Observable<{
+    message: string;
+    totalGeneradas: number;
+    tomas: RegistroToma[];
+  }> {
+    return this.http.post<any>(`${this.apiUrl}/tomas/generar`, data);
+  }
+
+  /**
+   * Actualiza el estado de una toma específica
+   * @param id ID de la toma
+   * @param estado Nuevo estado ('Pendiente' | 'Tomada' | 'Omitida' | 'Retrasada')
+   * @param fechaHoraRealizada Fecha y hora en que se realizó la toma (opcional)
+   * @param notasTomas Notas adicionales (opcional)
+   * @returns Observable con la toma actualizada
+   */
+  actualizarEstadoToma(
+    id: number,
+    estado: string,
+    fechaHoraRealizada?: string,
+    notasTomas?: string
+  ): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/tomas/${id}`, {
+      estado,
+      fechaHoraRealizada,
+      notasTomas
+    });
+  }
+
+  /**
+   * Marca una toma como completada (Tomada)
+   * @param id ID de la toma
+   * @param notas Notas opcionales
+   * @returns Observable con la toma actualizada
+   */
+  marcarTomaComoTomada(id: number, notas?: string): Observable<any> {
+    const fechaRealizada = new Date().toISOString();
+    return this.actualizarEstadoToma(id, 'Tomada', fechaRealizada, notas);
+  }
+
+  /**
+   * Marca una toma como omitida
+   * @param id ID de la toma
+   * @param notas Notas opcionales
+   * @returns Observable con la toma actualizada
+   */
+  marcarTomaComoOmitida(id: number, notas?: string): Observable<any> {
+    return this.actualizarEstadoToma(id, 'Omitida', undefined, notas);
+  }
+
+  /**
+   * Marca una toma como retrasada
+   * @param id ID de la toma
+   * @param notas Notas opcionales
+   * @returns Observable con la toma actualizada
+   */
+  marcarTomaComoRetrasada(id: number, notas?: string): Observable<any> {
+    return this.actualizarEstadoToma(id, 'Retrasada', undefined, notas);
+  }
+
+  /**
+   * Elimina una toma específica
+   * @param id ID de la toma
+   * @returns Observable con la toma eliminada
+   */
+  eliminarToma(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/tomas/${id}`);
   }
 
   // ==========================================================================

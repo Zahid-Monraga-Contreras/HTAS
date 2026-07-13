@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef, PLATFORM_ID, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef, PLATFORM_ID } from '@angular/core';
 import { CommonModule, Location, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -8,6 +8,15 @@ import { Menu } from "../../../template/menu/menu";
 import flatpickr from 'flatpickr';
 import { Spanish } from 'flatpickr/dist/l10n/es.js';
 
+interface HistorialCita {
+  fecha: string;
+  accion: string;
+  detalle: string;
+  usuario: string;
+}
+
+type TabCita = 'detalle' | 'historial';
+
 @Component({
   selector: 'app-cita-detalle',
   standalone: true,
@@ -15,7 +24,7 @@ import { Spanish } from 'flatpickr/dist/l10n/es.js';
   templateUrl: './cita-detalle.html',
   styleUrls: ['./cita-detalle.css']
 })
-export class CitaDetalle implements OnInit, AfterViewInit, OnDestroy {
+export class CitaDetalle implements OnInit, OnDestroy {
   private router = inject(Router);
   private location = inject(Location);
   private usersService = inject(Users);
@@ -25,25 +34,32 @@ export class CitaDetalle implements OnInit, AfterViewInit, OnDestroy {
   citaSeleccionada: any = null;
   isSaving = false;
 
+  // Pestaña activa
+  activeTab: TabCita = 'detalle';
+
+  // Sistema de Notificaciones Premium Toast
   mostrarToast = false;
   mensajeToast = '';
   tipoToast: 'success' | 'error' | 'warning' = 'success';
   private toastTimeout: any = null;
 
+  // Listas para selects
   estadosCita = ['Programada', 'Confirmada', 'Completada', 'Cancelada', 'No Asistió'];
   modalidades = ['Presencial', 'Virtual'];
 
+  // Colores por estado
   estadosConColor = [
-    { value: 'Programada', color: '#FFA726', label: 'Programada' },
-    { value: 'Confirmada', color: '#66BB6A', label: 'Confirmada' },
-    { value: 'Completada', color: '#42A5F5', label: 'Completada' },
-    { value: 'Cancelada', color: '#EF5350', label: 'Cancelada' },
-    { value: 'No Asistió', color: '#AB47BC', label: 'No Asistió' }
+    { value: 'Programada', color: '#FFA726' },
+    { value: 'Confirmada', color: '#66BB6A' },
+    { value: 'Completada', color: '#42A5F5' },
+    { value: 'Cancelada', color: '#EF5350' },
+    { value: 'No Asistió', color: '#AB47BC' }
   ];
 
-  historialCambios: any[] = [];
-  mostrarHistorial = false;
+  // Historial de cambios
+  historialCambios: HistorialCita[] = [];
 
+  // Referencias Flatpickr
   private fpFechaInstance: any = null;
   private fpHoraInstance: any = null;
 
@@ -59,6 +75,7 @@ export class CitaDetalle implements OnInit, AfterViewInit, OnDestroy {
     if (state && state.cita) {
       this.citaSeleccionada = { ...state.cita };
 
+      // Limpiar fechas y horas
       if (this.citaSeleccionada.fechacita) {
         this.citaSeleccionada.fechacita = this.limpiarFecha(this.citaSeleccionada.fechacita);
       }
@@ -66,6 +83,7 @@ export class CitaDetalle implements OnInit, AfterViewInit, OnDestroy {
         this.citaSeleccionada.horacita = this.limpiarHora(this.citaSeleccionada.horacita);
       }
 
+      // Inicializar campos vacíos
       if (!this.citaSeleccionada.notasdoctor) {
         this.citaSeleccionada.notasdoctor = '';
       }
@@ -73,15 +91,17 @@ export class CitaDetalle implements OnInit, AfterViewInit, OnDestroy {
         this.citaSeleccionada.sintomas = '';
       }
 
+      // Inicializar el historial
       this.inicializarHistorial();
+
+      // Inicializar calendarios después de que el DOM esté listo
+      setTimeout(() => {
+        this.inicializarCalendario();
+      }, 500);
 
     } else {
       this.router.navigate(['/citas']);
     }
-  }
-
-  ngAfterViewInit() {
-    this.inicializarCalendario();
   }
 
   ngOnDestroy() {
@@ -91,6 +111,14 @@ export class CitaDetalle implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  // --- CONTROL DE PESTAÑAS ---
+  cambiarTab(tab: TabCita) {
+    if (this.activeTab === tab) return;
+    this.activeTab = tab;
+    this.cdr.detectChanges();
+  }
+
+  // --- MÉTODOS DE UTILIDAD ---
   limpiarFecha(fecha: any): string {
     if (!fecha) return '';
     if (typeof fecha === 'string') {
@@ -117,10 +145,18 @@ export class CitaDetalle implements OnInit, AfterViewInit, OnDestroy {
     this.location.back();
   }
 
+  // --- INICIALIZAR HISTORIAL ---
   inicializarHistorial() {
-    const fechaActual = new Date();
-    const fechaStr = fechaActual.toISOString().replace('T', ' ').slice(0, 16);
+    const ahora = new Date();
+    const fechaStr = ahora.toLocaleString('es-MX', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
 
+    // Evento de creación
     this.historialCambios = [{
       fecha: fechaStr,
       usuario: 'Sistema',
@@ -128,9 +164,16 @@ export class CitaDetalle implements OnInit, AfterViewInit, OnDestroy {
       detalle: `Cita programada para ${this.citaSeleccionada.fechacita} a las ${this.citaSeleccionada.horacita}`
     }];
 
+    // Si la cita tiene un estado diferente al inicial, agregar al historial
     if (this.citaSeleccionada.estado && this.citaSeleccionada.estado !== 'Programada') {
       const fechaEstado = new Date();
-      const fechaEstadoStr = fechaEstado.toISOString().replace('T', ' ').slice(0, 16);
+      const fechaEstadoStr = fechaEstado.toLocaleString('es-MX', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
       this.historialCambios.push({
         fecha: fechaEstadoStr,
         usuario: 'Sistema',
@@ -140,20 +183,42 @@ export class CitaDetalle implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  // --- AGREGAR AL HISTORIAL ---
   agregarHistorialLocal(accion: string, detalle: string) {
     const ahora = new Date();
-    const fechaStr = ahora.toISOString().replace('T', ' ').slice(0, 16);
+    const fechaStr = ahora.toLocaleString('es-MX', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
 
-    const nuevaEntrada = {
+    const nuevaEntrada: HistorialCita = {
       fecha: fechaStr,
-      usuario: 'Sistema',
+      usuario: 'Usuario actual',
       accion: accion,
       detalle: detalle
     };
 
     this.historialCambios.unshift(nuevaEntrada);
+    this.cdr.detectChanges();
   }
 
+  // --- CONTADORES PARA ESTADÍSTICAS ---
+  contarCambiosEstado(): number {
+    return this.historialCambios.filter(h => h.accion.includes('Estado')).length;
+  }
+
+  contarActualizaciones(): number {
+    return this.historialCambios.filter(h =>
+      h.accion.includes('Motivo') ||
+      h.accion.includes('actualizada') ||
+      h.accion.includes('modificada')
+    ).length;
+  }
+
+  // --- TOAST ---
   lanzarNotificacion(mensaje: string, tipo: 'success' | 'error' | 'warning' = 'success') {
     this.mensajeToast = mensaje;
     this.tipoToast = tipo;
@@ -168,11 +233,13 @@ export class CitaDetalle implements OnInit, AfterViewInit, OnDestroy {
     }, 4000);
   }
 
+  // --- COLORES DE ESTADO ---
   getEstadoColor(estado: string): string {
     const found = this.estadosConColor.find(e => e.value === estado);
     return found ? found.color : '#78909C';
   }
 
+  // --- VALIDACIONES DE FECHA ---
   esCitaHoy(): boolean {
     if (!this.citaSeleccionada?.fechacita) return false;
     const hoy = new Date().toISOString().split('T')[0];
@@ -194,6 +261,7 @@ export class CitaDetalle implements OnInit, AfterViewInit, OnDestroy {
     return this.citaSeleccionada.fechacita < hoy;
   }
 
+  // --- VALIDAR CAMPOS ---
   validarCambios(): { valido: boolean; mensaje: string } {
     const cita = this.citaSeleccionada;
 
@@ -216,7 +284,7 @@ export class CitaDetalle implements OnInit, AfterViewInit, OnDestroy {
     return { valido: true, mensaje: '' };
   }
 
-  // ✅ GUARDAR CAMBIOS - AHORA FUNCIONA CON EL BACKEND
+  // --- GUARDAR CAMBIOS ---
   async guardarCambios() {
     if (!this.citaSeleccionada) return;
 
@@ -228,10 +296,7 @@ export class CitaDetalle implements OnInit, AfterViewInit, OnDestroy {
 
     const motivo = (this.citaSeleccionada.motivo || '').trim();
     const estado = (this.citaSeleccionada.estado || '').trim();
-    const fechacita = this.citaSeleccionada.fechacita || '';
-    const horacita = this.citaSeleccionada.horacita || '';
 
-    // Validaciones
     const validacion = this.validarCambios();
     if (!validacion.valido) {
       this.lanzarNotificacion(validacion.mensaje, "warning");
@@ -245,29 +310,27 @@ export class CitaDetalle implements OnInit, AfterViewInit, OnDestroy {
       const estadoAnterior = this.citaSeleccionada.estado;
       const motivoAnterior = this.citaSeleccionada.motivo;
 
-      // ✅ Preparar payload con TODOS los campos
       const payload = {
         nombrePaciente: this.citaSeleccionada.nombrepaciente,
         apPaternoPaciente: this.citaSeleccionada.appaternopaciente,
         apMaternoPaciente: this.citaSeleccionada.apmaternopaciente || null,
         telefonoPaciente: this.citaSeleccionada.telefonopaciente || null,
         correoPaciente: this.citaSeleccionada.correopaciente || null,
-        fechaCita: fechacita,
-        horaCita: horacita,
+        fechaCita: this.citaSeleccionada.fechacita,
+        horaCita: this.citaSeleccionada.horacita,
         motivo: motivo,
         modalidad: this.citaSeleccionada.modalidad || 'Presencial',
         sintomas: (this.citaSeleccionada.sintomas || '').trim(),
         notasDoctor: (this.citaSeleccionada.notasdoctor || '').trim()
       };
 
-      // ✅ Usar actualizarCita con la ruta correcta
       await firstValueFrom(this.usersService.actualizarCita(idCita, payload));
 
       // Registrar cambios en historial
       if (estadoAnterior !== estado) {
         this.agregarHistorialLocal(
-          `Cambio de estado: ${estadoAnterior} → ${estado}`,
-          `Estado actualizado por el sistema`
+          `Estado cambiado: ${estadoAnterior} → ${estado}`,
+          `El estado de la cita fue actualizado`
         );
       }
 
@@ -275,6 +338,14 @@ export class CitaDetalle implements OnInit, AfterViewInit, OnDestroy {
         this.agregarHistorialLocal(
           'Motivo actualizado',
           `Nuevo motivo: ${motivo}`
+        );
+      }
+
+      if ((this.citaSeleccionada.sintomas || '').trim() !== '' &&
+        this.citaSeleccionada.sintomas !== this.citaSeleccionada.sintomasAnterior) {
+        this.agregarHistorialLocal(
+          'Síntomas actualizados',
+          'Se registraron nuevos síntomas del paciente'
         );
       }
 
@@ -294,7 +365,7 @@ export class CitaDetalle implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  // Cancelar cita
+  // --- CANCELAR CITA ---
   async cancelarCita() {
     if (!this.citaSeleccionada) return;
 
@@ -337,7 +408,7 @@ export class CitaDetalle implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  // Marcar como completada
+  // --- MARCAR COMO COMPLETADA ---
   async marcarCompletada() {
     if (!this.citaSeleccionada) return;
 
@@ -359,7 +430,6 @@ export class CitaDetalle implements OnInit, AfterViewInit, OnDestroy {
     this.cdr.detectChanges();
 
     try {
-      // ✅ Usar actualizarCita con todos los campos (manteniendo los existentes)
       await firstValueFrom(this.usersService.actualizarCita(idCita, {
         nombrePaciente: this.citaSeleccionada.nombrepaciente,
         apPaternoPaciente: this.citaSeleccionada.appaternopaciente,
@@ -374,9 +444,11 @@ export class CitaDetalle implements OnInit, AfterViewInit, OnDestroy {
         notasDoctor: this.citaSeleccionada.notasdoctor || 'Cita completada'
       }));
 
+      const estadoAnterior = this.citaSeleccionada.estado;
       this.citaSeleccionada.estado = 'Completada';
+
       this.agregarHistorialLocal(
-        'Cita completada',
+        `Cita completada (estado anterior: ${estadoAnterior})`,
         'Cita marcada como completada por el sistema'
       );
 
@@ -396,21 +468,17 @@ export class CitaDetalle implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  // --- INICIALIZAR CALENDARIOS ---
   inicializarCalendario() {
     if (!isPlatformBrowser(this.platformId)) return;
 
     this.destruirCalendarios();
 
     setTimeout(() => {
-      const hoy = new Date();
-      const fechaMaxima = new Date(hoy.getFullYear(), hoy.getMonth() + 2, hoy.getDate());
-
       const configFecha: any = {
         locale: Spanish,
         dateFormat: "Y-m-d",
         defaultDate: this.citaSeleccionada?.fechacita || null,
-        minDate: "today",
-        maxDate: fechaMaxima,
         appendTo: document.body,
         static: false,
         disableMobile: true,

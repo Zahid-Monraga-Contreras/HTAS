@@ -1,3 +1,4 @@
+<!-- TRATAMIENTO-DETALLE.HTML -->
 <app-menu #sidebar></app-menu>
 
 @if (mostrarToast) {
@@ -14,14 +15,14 @@
 <main class="main-content" [class.menu-collapsed]="sidebar.isCollapsed">
     @if (tratamientoSeleccionado) {
     <div class="container-fluid">
+        <!-- HEADER SECTION -->
         <div class="header-section">
             <div class="title-group">
                 <h2 class="title-page">Editar Tratamiento</h2>
-                <p class="subtitle-page">Actualiza la información y dosificación del tratamiento médico de HTAS.</p>
+                <p class="subtitle-page">Actualiza la información y dosificación del tratamiento médico.</p>
             </div>
 
             <div class="header-controls">
-                <!-- Badge de estado del tratamiento -->
                 <div class="estado-tratamiento" [ngClass]="getEstadoTratamiento().clase">
                     <i class="bi" [ngClass]="getEstadoTratamiento().icono"></i>
                     <span>{{ getEstadoTratamiento().texto }}</span>
@@ -34,228 +35,528 @@
             </div>
         </div>
 
-        <!-- Tarjeta de resumen del tratamiento -->
-        <div class="resumen-tratamiento">
-            <div class="resumen-item">
-                <i class="bi bi-capsule"></i>
-                <div>
-                    <small>Medicamento</small>
-                    <strong>{{ tratamientoSeleccionado.nombremedicamento || 'No especificado' }}</strong>
-                </div>
-            </div>
-            <div class="resumen-item">
-                <i class="bi bi-clock-history"></i>
-                <div>
-                    <small>Frecuencia</small>
-                    <strong>{{ getFrecuenciaTexto() }}</strong>
-                </div>
-            </div>
-            <div class="resumen-item">
-                <i class="bi bi-calendar-range"></i>
-                <div>
-                    <small>Duración</small>
-                    <strong>{{ getDuracionDias() || 0 }} días</strong>
-                </div>
-            </div>
-            @if (estadisticas) {
-            <div class="resumen-item">
-                <i class="bi bi-check2-circle"></i>
-                <div>
-                    <small>Cumplimiento</small>
-                    <strong>{{ estadisticas.porcentajeCumplimiento }}%</strong>
-                </div>
-            </div>
-            }
+        <!-- MENÚ DE NAVEGACIÓN POR PESTAÑAS -->
+        <div class="tabs-nav-wrapper">
+            <nav class="tabs-nav">
+                <button type="button" class="tab-btn" [class.active]="activeTab === 'detalle'"
+                    (click)="cambiarTab('detalle')">
+                    <i class="bi bi-capsule"></i>
+                    <span>Detalle del Tratamiento</span>
+                </button>
+                <button type="button" class="tab-btn" [class.active]="activeTab === 'registro-tomas'"
+                    (click)="cambiarTab('registro-tomas')">
+                    <i class="bi bi-list-check"></i>
+                    <span>Registro de Tomas</span>
+                </button>
+                <button type="button" class="tab-btn" [class.active]="activeTab === 'historial'"
+                    (click)="cambiarTab('historial')">
+                    <i class="bi bi-clock-history"></i>
+                    <span>Historial</span>
+                </button>
+            </nav>
         </div>
 
-        <!-- Sección de estadísticas -->
-        @if (estadisticas) {
-        <div class="estadisticas-section">
-            <h4 class="section-title">
-                <i class="bi bi-graph-up-arrow"></i>
-                Estadísticas del Tratamiento
-            </h4>
-            <div class="stats-grid">
-                <div class="stat-box">
-                    <small>Total Tomas</small>
-                    <div class="stat-value">{{ estadisticas.totalTomas }}</div>
+        <!-- ============================================================ -->
+        <!-- TAB 1: DETALLE DEL TRATAMIENTO                                -->
+        <!-- ============================================================ -->
+        @if (activeTab === 'detalle') {
+        <div class="tab-panel">
+
+            <!-- Tarjeta de resumen del tratamiento -->
+            <div class="resumen-tratamiento">
+                <div class="resumen-item">
+                    <i class="bi bi-capsule"></i>
+                    <div>
+                        <small>Medicamento</small>
+                        <strong>{{ tratamientoSeleccionado.nombremedicamento || 'No especificado' }}</strong>
+                    </div>
                 </div>
-                <div class="stat-box">
-                    <small>Completadas</small>
-                    <div class="stat-value">{{ estadisticas.tomasCompletadas }}</div>
+                <div class="resumen-item">
+                    <i class="bi bi-clock-history"></i>
+                    <div>
+                        <small>Frecuencia</small>
+                        <strong>{{ getFrecuenciaTexto() }}</strong>
+                    </div>
                 </div>
-                <div class="stat-box">
-                    <small>Pendientes</small>
-                    <div class="stat-value">{{ estadisticas.tomasPendientes }}</div>
+                <div class="resumen-item">
+                    <i class="bi bi-calendar-range"></i>
+                    <div>
+                        <small>Duración</small>
+                        <strong>{{ getDuracionDias() || 0 }} días</strong>
+                    </div>
                 </div>
-                <div class="stat-box">
-                    <small>Días Restantes</small>
-                    <div class="stat-value">{{ estadisticas.diasRestantes }}</div>
+                <div class="resumen-item">
+                    <i class="bi bi-person-fill"></i>
+                    <div>
+                        <small>Paciente</small>
+                        <strong>{{ pacienteInfo?.nombre || 'No especificado' }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección de información del paciente y medicamento -->
+            <div class="info-relacionada">
+                @if (pacienteInfo) {
+                <div class="info-card info-card-paciente">
+                    <div class="info-card-header">
+                        <div class="info-card-icon">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                        <h5>Paciente</h5>
+                    </div>
+                    <div class="info-card-body">
+                        <p class="info-nombre">{{ pacienteInfo.nombre }} {{ pacienteInfo.apPaterno }} {{
+                            pacienteInfo.apMaterno }}</p>
+                        <div class="info-detalles">
+                            @if (pacienteInfo.correo) {
+                            <div class="info-detalle-item">
+                                <i class="bi bi-envelope"></i>
+                                <span>{{ pacienteInfo.correo }}</span>
+                            </div>
+                            }
+                            @if (pacienteInfo.telefono) {
+                            <div class="info-detalle-item">
+                                <i class="bi bi-telephone"></i>
+                                <span>{{ pacienteInfo.telefono }}</span>
+                            </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                }
+                @if (medicamentoInfo) {
+                <div class="info-card info-card-medicamento">
+                    <div class="info-card-header">
+                        <div class="info-card-icon">
+                            <i class="bi bi-capsule"></i>
+                        </div>
+                        <h5>Medicamento</h5>
+                    </div>
+                    <div class="info-card-body">
+                        <p class="info-nombre">{{ medicamentoInfo.nombre }}</p>
+                        <div class="info-detalles">
+                            @if (medicamentoInfo.presentacion) {
+                            <div class="info-detalle-item">
+                                <i class="bi bi-box"></i>
+                                <span>{{ medicamentoInfo.presentacion }}</span>
+                            </div>
+                            }
+                            @if (medicamentoInfo.concentracion) {
+                            <div class="info-detalle-item">
+                                <i class="bi bi-droplet"></i>
+                                <span>{{ medicamentoInfo.concentracion }}</span>
+                            </div>
+                            }
+                            @if (medicamentoInfo.laboratorio) {
+                            <div class="info-detalle-item">
+                                <i class="bi bi-building"></i>
+                                <span>{{ medicamentoInfo.laboratorio }}</span>
+                            </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+
+            <div class="detail-card">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Dosis del Medicamento</label>
+                        <input type="text" [(ngModel)]="tratamientoSeleccionado.dosis" maxlength="50"
+                            class="form-control-premium" placeholder="Ej: 1 tableta, 5 ml">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Frecuencia (Cada cuántas horas)</label>
+                        <input type="number" [(ngModel)]="tratamientoSeleccionado.frecuenciahoras"
+                            class="form-control-premium" placeholder="Ej: 8, 12, 24">
+                        <small class="form-text text-muted">{{ getFrecuenciaTexto() }}</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Fecha de Inicio</label>
+                        <div class="input-picker-wrapper">
+                            <input type="text" id="fechaInicioInput" placeholder="Seleccione fecha..." readonly
+                                class="form-control-premium picker-custom">
+                            <i class="bi bi-calendar3 icon-embed"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Fecha de Finalización</label>
+                        <div class="input-picker-wrapper">
+                            <input type="text" id="fechaFinInput" placeholder="Seleccione fecha..." readonly
+                                class="form-control-premium picker-custom">
+                            <i class="bi bi-calendar3 icon-embed"></i>
+                        </div>
+                        <small class="form-text text-muted">
+                            {{ getDiasRestantesTexto() }}
+                        </small>
+                    </div>
+
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>Estado del Tratamiento</label>
+                        <select [(ngModel)]="tratamientoSeleccionado.activo" class="form-control-premium">
+                            <option [value]="true">Activo / En curso</option>
+                            <option [value]="false">Inactivo / Suspendido</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group full-width-group" style="margin-top: 15px;">
+                    <label>Notas e Instrucciones del Tratamiento</label>
+                    <textarea [(ngModel)]="tratamientoSeleccionado.notasinstrucciones" rows="4"
+                        class="form-control-premium"
+                        placeholder="Ej: Tomar después de comer, evitar consumir lácteos..."></textarea>
+                </div>
+
+                <!-- Acciones -->
+                <div class="action-footer">
+                    <button class="btn-cancel-premium" (click)="volver()" [disabled]="isSaving">Cancelar</button>
+                    <button class="btn-save" (click)="guardarCambios()" [disabled]="isSaving">
+                        @if (isSaving) {
+                        <span class="spinner-save"></span>
+                        <span>Guardando...</span>
+                        } @else {
+                        <i class="bi bi-check-lg"></i>
+                        <span>Guardar Cambios</span>
+                        }
+                    </button>
                 </div>
             </div>
         </div>
         }
 
-        <!-- Sección de información del paciente y medicamento -->
-        <div class="info-relacionada">
-            @if (pacienteInfo) {
-            <div class="info-card">
-                <h5><i class="bi bi-person-fill"></i> Paciente</h5>
-                <p>{{ pacienteInfo.nombre }} {{ pacienteInfo.apPaterno }} {{ pacienteInfo.apMaterno }}</p>
-            </div>
-            }
-            @if (medicamentoInfo) {
-            <div class="info-card">
-                <h5><i class="bi bi-capsule"></i> Medicamento</h5>
-                <p>{{ medicamentoInfo.nombre }} {{ medicamentoInfo.presentacion ? '- ' + medicamentoInfo.presentacion :
-                    '' }}</p>
-            </div>
-            }
-        </div>
+        <!-- ============================================================ -->
+        <!-- TAB 2: REGISTRO DE TOMAS                                      -->
+        <!-- ============================================================ -->
+        @if (activeTab === 'registro-tomas') {
+        <div class="tab-panel">
+            <div class="detail-card">
 
-        <!-- Sección de registros de tomas -->
-        @if (registrosTomas.length > 0) {
-        <div class="tomas-section">
-            <div class="tomas-header" (click)="mostrarTomas = !mostrarTomas">
-                <h4 class="section-title" style="cursor: pointer;">
-                    <i class="bi bi-list-check"></i>
-                    Registro de Tomas
-                    <span class="badge-tomas">{{ registrosTomas.length }}</span>
-                    <i class="bi" [ngClass]="mostrarTomas ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
-                </h4>
-            </div>
-
-            @if (mostrarTomas) {
-            <div class="tomas-lista">
-                @for (t of registrosTomas; track t.id) {
-                <div class="toma-item">
-                    <div class="toma-info">
-                        <i class="bi bi-clock"></i>
-                        <span class="toma-fecha">{{ t.fecha }}</span>
+                <!-- Resumen del tratamiento -->
+                <div class="resumen-tratamiento-historial">
+                    <div class="resumen-item">
+                        <i class="bi bi-capsule"></i>
+                        <div>
+                            <small>Medicamento</small>
+                            <strong>{{ tratamientoSeleccionado.nombremedicamento || 'No especificado' }}</strong>
+                        </div>
                     </div>
-                    <div class="toma-detalle">
-                        <span class="toma-estado" [style.color]="getEstadoColor(t.estado)">
-                            <i class="bi" [ngClass]="{
-                                'bi-check-circle-fill': t.estado === 'Tomada',
-                                'bi-clock-fill': t.estado === 'Pendiente',
-                                'bi-x-circle-fill': t.estado === 'Omitida',
-                                'bi-exclamation-triangle-fill': t.estado === 'Retrasada'
-                            }"></i>
-                            {{ t.estado }}
-                        </span>
-                        @if (t.notas) {
-                        <span class="toma-notas">{{ t.notas }}</span>
+                    <div class="resumen-item">
+                        <i class="bi bi-clock-history"></i>
+                        <div>
+                            <small>Frecuencia</small>
+                            <strong>{{ getFrecuenciaTexto() }}</strong>
+                        </div>
+                    </div>
+                    <div class="resumen-item">
+                        <i class="bi bi-calendar-range"></i>
+                        <div>
+                            <small>Duración</small>
+                            <strong>{{ getDuracionDias() || 0 }} días</strong>
+                        </div>
+                    </div>
+                    <div class="resumen-item">
+                        <i class="bi bi-check2-circle"></i>
+                        <div>
+                            <small>Estado</small>
+                            <strong [style.color]="getEstadoTratamientoColor()">{{ getEstadoTratamiento().texto
+                                }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estadísticas completas -->
+                @if (estadisticas) {
+                <div class="estadisticas-section">
+                    <h4 class="section-title">
+                        <i class="bi bi-graph-up-arrow"></i>
+                        Estadísticas del Tratamiento
+                    </h4>
+                    <div class="stats-grid">
+                        <div class="stat-box stat-total">
+                            <small>Total Tomas</small>
+                            <div class="stat-value">{{ estadisticas.totalTomas }}</div>
+                        </div>
+                        <div class="stat-box stat-completadas">
+                            <small>Completadas</small>
+                            <div class="stat-value">{{ estadisticas.tomasCompletadas }}</div>
+                        </div>
+                        <div class="stat-box stat-pendientes">
+                            <small>Pendientes</small>
+                            <div class="stat-value">{{ estadisticas.tomasPendientes }}</div>
+                        </div>
+                        <div class="stat-box stat-omitidas">
+                            <small>Omitidas</small>
+                            <div class="stat-value">{{ estadisticas.tomasOmitidas }}</div>
+                        </div>
+                        <div class="stat-box stat-retrasadas">
+                            <small>Retrasadas</small>
+                            <div class="stat-value">{{ estadisticas.tomasRetrasadas }}</div>
+                        </div>
+                        <div class="stat-box stat-cumplimiento">
+                            <small>Cumplimiento</small>
+                            <div class="stat-value">{{ estadisticas.porcentajeCumplimiento }}%</div>
+                        </div>
+                        <div class="stat-box stat-dias">
+                            <small>Días Restantes</small>
+                            <div class="stat-value">{{ estadisticas.diasRestantes }}</div>
+                        </div>
+                    </div>
+                </div>
+                }
+
+                <hr class="section-divider">
+
+                <!-- Botón para generar tomas -->
+                <div class="tomas-actions">
+                    <button class="btn-generar-tomas" (click)="generarTomasProgramadas()" [disabled]="generandoTomas">
+                        @if (generandoTomas) {
+                        <span class="spinner-save"></span>
+                        <span>Generando...</span>
+                        } @else {
+                        <i class="bi bi-plus-circle"></i>
+                        <span>Generar Tomas Programadas</span>
+                        }
+                    </button>
+                </div>
+
+                <!-- Lista completa de tomas -->
+                <div class="tomas-section-full">
+                    <div class="tomas-header">
+                        <h4 class="section-title">
+                            <i class="bi bi-list-check"></i>
+                            Registro de Tomas
+                            <span class="badge-tomas">{{ registrosTomas.length }}</span>
+                        </h4>
+                    </div>
+
+                    <div class="tomas-lista-full">
+                        @if (registrosTomas.length > 0) {
+                        @for (t of registrosTomas; track t.id) {
+                        <div class="toma-item-full" [ngClass]="{
+                                'toma-completada': t.estado === 'Tomada',
+                                'toma-pendiente': t.estado === 'Pendiente',
+                                'toma-omitida': t.estado === 'Omitida',
+                                'toma-retrasada': t.estado === 'Retrasada'
+                            }">
+                            <div class="toma-info-full">
+                                <div class="toma-fecha-hora">
+                                    <span class="toma-fecha">{{ t.fechaFormateada || t.fechaProgramada }}</span>
+                                    <span class="toma-hora">{{ t.horaFormateada }}</span>
+                                </div>
+                                <span class="toma-estado-badge" [style.background]="getEstadoColor(t.estado)">
+                                    <i class="bi" [ngClass]="getEstadoIcono(t.estado)"></i>
+                                    {{ t.estado }}
+                                </span>
+                            </div>
+                            <div class="toma-actions-full">
+                                @if (t.estado === 'Pendiente') {
+                                <div class="toma-actions-buttons">
+                                    <button class="btn-toma-completar" (click)="actualizarEstadoToma(t.id, 'Tomada')"
+                                        title="Marcar como tomada">
+                                        <i class="bi bi-check-circle"></i>
+                                    </button>
+                                    <button class="btn-toma-omitir" (click)="actualizarEstadoToma(t.id, 'Omitida')"
+                                        title="Marcar como omitida">
+                                        <i class="bi bi-x-circle"></i>
+                                    </button>
+                                    <button class="btn-toma-retrasar" (click)="actualizarEstadoToma(t.id, 'Retrasada')"
+                                        title="Marcar como retrasada">
+                                        <i class="bi bi-clock"></i>
+                                    </button>
+                                </div>
+                                }
+                                @if (t.notas) {
+                                <span class="toma-notas-full">{{ t.notas }}</span>
+                                }
+                            </div>
+                        </div>
+                        }
+                        } @else {
+                        <div class="tomas-vacio">
+                            <i class="bi bi-inbox"></i>
+                            <p>No hay tomas registradas</p>
+                            <span>Genera tomas programadas o regístralas manualmente</span>
+                        </div>
                         }
                     </div>
                 </div>
-                }
+
+                <!-- Acciones -->
+                <div class="action-footer">
+                    <button class="btn-cancel-premium" (click)="volver()">
+                        Cancelar
+                    </button>
+                </div>
             </div>
-            }
         </div>
         }
 
-        <div class="detail-card">
-            <div class="form-grid">
-                <div class="form-group">
-                    <label>Dosis del Medicamento</label>
-                    <input type="text" [(ngModel)]="tratamientoSeleccionado.dosis" maxlength="50"
-                        class="form-control-premium" placeholder="Ej: 1 tableta, 5 ml">
-                </div>
-
-                <div class="form-group">
-                    <label>Frecuencia (Cada cuántas horas)</label>
-                    <input type="number" [(ngModel)]="tratamientoSeleccionado.frecuenciahoras"
-                        class="form-control-premium" placeholder="Ej: 8, 12, 24">
-                    <small class="form-text text-muted">{{ getFrecuenciaTexto() }}</small>
-                </div>
-
-                <div class="form-group">
-                    <label>Fecha de Inicio</label>
-                    <div class="input-picker-wrapper">
-                        <input type="text" id="fechaInicioInput" placeholder="Seleccione fecha..." readonly
-                            class="form-control-premium picker-custom">
-                        <i class="bi bi-calendar3 icon-embed"></i>
+        <!-- MODAL DE CONFIRMACIÓN PERSONALIZADO -->
+        @if (mostrarModalConfirmacion) {
+        <div class="modal-overlay" (click)="cerrarModal()">
+            <div class="modal-container" (click)="$event.stopPropagation()">
+                <div class="modal-header">
+                    <div class="modal-icon">
+                        <i class="bi bi-question-circle-fill"></i>
                     </div>
+                    <h3 class="modal-title">Confirmar acción</h3>
                 </div>
-
-                <div class="form-group">
-                    <label>Fecha de Finalización</label>
-                    <div class="input-picker-wrapper">
-                        <input type="text" id="fechaFinInput" placeholder="Seleccione fecha..." readonly
-                            class="form-control-premium picker-custom">
-                        <i class="bi bi-calendar3 icon-embed"></i>
-                    </div>
-                    <!-- ✅ CORREGIDO: Ya no usa comparación directa -->
-                    <small class="form-text text-muted">
-                        {{ getDiasRestantesTexto() }}
-                    </small>
+                <div class="modal-body">
+                    <p class="modal-mensaje">{{ modalConfirmacionMensaje }}</p>
                 </div>
-
-                <div class="form-group" style="grid-column: span 2;">
-                    <label>Estado del Tratamiento</label>
-                    <select [(ngModel)]="tratamientoSeleccionado.activo" class="form-control-premium">
-                        <option [value]="true">Activo / En curso</option>
-                        <option [value]="false">Inactivo / Suspendido</option>
-                    </select>
+                <div class="modal-footer">
+                    <button class="modal-btn modal-btn-cancel" (click)="cerrarModal()">
+                        Cancelar
+                    </button>
+                    <button class="modal-btn modal-btn-confirm" (click)="confirmarModal()">
+                        <i class="bi bi-check-circle"></i>
+                        Aceptar
+                    </button>
                 </div>
-            </div>
-
-            <div class="form-group full-width-group" style="margin-top: 15px;">
-                <label>Notas e Instrucciones del Tratamiento</label>
-                <textarea [(ngModel)]="tratamientoSeleccionado.notasinstrucciones" rows="4" class="form-control-premium"
-                    placeholder="Ej: Tomar después de comer, evitar consumir lácteos..."></textarea>
-            </div>
-
-            <!-- Historial de cambios -->
-            @if (historialCambios.length > 0) {
-            <div class="historial-section">
-                <hr class="section-divider">
-
-                <div class="historial-header" (click)="mostrarHistorial = !mostrarHistorial">
-                    <h4 class="section-title" style="cursor: pointer;">
-                        <i class="bi bi-clock-history"></i>
-                        Historial del Tratamiento
-                        <i class="bi" [ngClass]="mostrarHistorial ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
-                    </h4>
-                    <span class="historial-count">{{ historialCambios.length }} eventos</span>
-                </div>
-
-                @if (mostrarHistorial) {
-                <div class="historial-lista">
-                    @for (item of historialCambios; track item) {
-                    <div class="historial-item">
-                        <div class="historial-fecha">
-                            <i class="bi bi-clock"></i>
-                            {{ item.fecha }}
-                        </div>
-                        <div class="historial-detalle">
-                            <strong>{{ item.accion }}</strong>
-                            <span>{{ item.detalle }}</span>
-                        </div>
-                        <div class="historial-usuario">
-                            <i class="bi bi-person"></i>
-                            {{ item.usuario }}
-                        </div>
-                    </div>
-                    }
-                </div>
-                }
-            </div>
-            }
-
-            <div class="action-footer">
-                <button class="btn-cancel-premium" (click)="volver()" [disabled]="isSaving">Cancelar</button>
-                <button class="btn-save" (click)="guardarCambios()" [disabled]="isSaving">
-                    @if (isSaving) {
-                    <span class="spinner-save"></span>
-                    <span>Guardando...</span>
-                    } @else {
-                    <i class="bi bi-check-lg"></i>
-                    <span>Guardar Cambios</span>
-                    }
-                </button>
             </div>
         </div>
+        }
+
+        <!-- ============================================================ -->
+        <!-- TAB 3: HISTORIAL                                              -->
+        <!-- ============================================================ -->
+        @if (activeTab === 'historial') {
+        <div class="tab-panel">
+            <div class="detail-card">
+
+                <!-- RESUMEN DEL TRATAMIENTO -->
+                <div class="resumen-tratamiento-historial">
+                    <div class="resumen-item">
+                        <i class="bi bi-capsule"></i>
+                        <div>
+                            <small>Medicamento</small>
+                            <strong>{{ tratamientoSeleccionado.nombremedicamento || 'No especificado' }}</strong>
+                        </div>
+                    </div>
+                    <div class="resumen-item">
+                        <i class="bi bi-calendar3"></i>
+                        <div>
+                            <small>Inicio</small>
+                            <strong>{{ tratamientoSeleccionado.fechainicio | date:'dd/MM/yyyy' }}</strong>
+                        </div>
+                    </div>
+                    <div class="resumen-item">
+                        <i class="bi bi-calendar-range"></i>
+                        <div>
+                            <small>Fin</small>
+                            <strong>{{ tratamientoSeleccionado.fechafin | date:'dd/MM/yyyy' }}</strong>
+                        </div>
+                    </div>
+                    <div class="resumen-item">
+                        <i class="bi bi-tag-fill"></i>
+                        <div>
+                            <small>Estado</small>
+                            <strong [style.color]="getEstadoTratamientoColor()">{{ getEstadoTratamiento().texto
+                                }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ESTADÍSTICAS DEL HISTORIAL -->
+                <div class="estadisticas-section">
+                    <h4 class="section-title">
+                        <i class="bi bi-graph-up-arrow"></i>
+                        Resumen de Actividad
+                    </h4>
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <small>Total Cambios</small>
+                            <div class="stat-value">{{ historialCambios.length }}</div>
+                        </div>
+                        <div class="stat-box">
+                            <small>Cambios de Dosis</small>
+                            <div class="stat-value">{{ contarCambiosDosis() }}</div>
+                        </div>
+                        <div class="stat-box">
+                            <small>Cambios de Estado</small>
+                            <div class="stat-value">{{ contarCambiosEstado() }}</div>
+                        </div>
+                        <div class="stat-box">
+                            <small>Última Modificación</small>
+                            <div class="stat-value" style="font-size: 0.9rem;">
+                                {{ historialCambios.length > 0 ? historialCambios[0].fecha : 'Sin cambios' }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="section-divider">
+
+                <!-- HISTORIAL DE CAMBIOS COMPLETO -->
+                <div class="historial-section">
+                    <div class="historial-header">
+                        <h4 class="section-title">
+                            <i class="bi bi-clock-history"></i>
+                            Historial de Cambios
+                        </h4>
+                        <span class="historial-count">{{ historialCambios.length }} eventos</span>
+                    </div>
+
+                    @if (historialCambios.length > 0) {
+                    <div class="historial-lista">
+                        @for (item of historialCambios; track $index) {
+                        <div class="historial-item" [ngClass]="{
+                            'cambio-estado': item.accion.includes('activado') || item.accion.includes('desactivado'),
+                            'cambio-dosis': item.accion.includes('Dosis'),
+                            'cambio-creacion': item.accion.includes('creado'),
+                            'cambio-info': item.accion.includes('actualizada')
+                        }">
+                            <div class="historial-icono">
+                                @if (item.accion.includes('creado')) {
+                                <i class="bi bi-plus-circle-fill" style="color: #10b981;"></i>
+                                } @else if (item.accion.includes('activado')) {
+                                <i class="bi bi-play-circle-fill" style="color: #10b981;"></i>
+                                } @else if (item.accion.includes('desactivado')) {
+                                <i class="bi bi-stop-circle-fill" style="color: #ef4444;"></i>
+                                } @else if (item.accion.includes('Dosis')) {
+                                <i class="bi bi-pencil-square" style="color: #f59e0b;"></i>
+                                } @else {
+                                <i class="bi bi-pencil-square" style="color: #8a9aa8;"></i>
+                                }
+                            </div>
+                            <div class="historial-fecha">
+                                <i class="bi bi-clock"></i>
+                                {{ item.fecha }}
+                            </div>
+                            <div class="historial-detalle">
+                                <strong>{{ item.accion }}</strong>
+                                <span>{{ item.detalle }}</span>
+                            </div>
+                            <div class="historial-usuario">
+                                <i class="bi bi-person"></i>
+                                {{ item.usuario }}
+                            </div>
+                        </div>
+                        }
+                    </div>
+                    } @else {
+                    <div class="historial-vacio">
+                        <i class="bi bi-clock-history"></i>
+                        <p>Aún no hay actividad registrada</p>
+                        <span>Los cambios del tratamiento aparecerán aquí</span>
+                    </div>
+                    }
+                </div>
+
+                <!-- ACCIONES DEL HISTORIAL -->
+                <div class="action-footer">
+                    <button class="btn-cancel-premium" (click)="volver()">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+        }
+
     </div>
     }
 </main>

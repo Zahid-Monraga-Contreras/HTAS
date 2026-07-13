@@ -7,6 +7,7 @@ export const environment = {
     citasApi: 'http://localhost:3000/api/citas',
     medicamentosApi: 'http://localhost:3000/api/medicamentos',
     tratamientosApi: 'http://localhost:3000/api/tratamientos',
+    tomasApi: 'http://localhost:3000/api/tomas',
     dispositivosApi: 'http://localhost:3000/api/dispositivos',
     medicionesApi: 'http://localhost:3000/api/mediciones',
     iaApi: 'http://localhost:3000/api/ia',

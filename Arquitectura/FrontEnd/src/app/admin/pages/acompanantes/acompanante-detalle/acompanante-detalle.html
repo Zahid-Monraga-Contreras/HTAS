@@ -14,13 +14,19 @@
 <main class="main-content" [class.menu-collapsed]="sidebar.isCollapsed">
     @if (usuarioSeleccionado) {
     <div class="container-fluid">
+        <!-- HEADER SECTION -->
         <div class="header-section">
             <div class="title-group">
                 <h2 class="title-page">Editar Acompañante</h2>
-                <p class="subtitle-page">Actualiza la información del acompañante.</p>
+                <p class="subtitle-page">Actualiza la información y el expediente del acompañante.</p>
             </div>
 
             <div class="header-controls">
+                <div class="estado-acompanante" [ngClass]="getEstadoAcompanante().clase">
+                    <i class="bi" [ngClass]="getEstadoAcompanante().icono"></i>
+                    <span>{{ getEstadoAcompanante().texto }}</span>
+                </div>
+
                 <button class="btn-cancel-premium" (click)="volver()">
                     <i class="bi bi-arrow-left"></i>
                     <span>Volver a la lista</span>
@@ -28,158 +34,487 @@
             </div>
         </div>
 
-        <div class="detail-card">
-            <!-- ========================================== -->
-            <!-- SECCIÓN 1: DATOS PERSONALES                -->
-            <!-- ========================================== -->
-            <div class="form-grid">
-                <div class="form-group">
-                    <label>Nombre(s)</label>
-                    <input type="text" required maxlength="40" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+"
-                        oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g, '')"
-                        [(ngModel)]="usuarioSeleccionado.nombre" class="form-control-premium">
-                </div>
+        <!-- MENÚ DE NAVEGACIÓN POR PESTAÑAS -->
+        <div class="tabs-nav-wrapper">
+            <nav class="tabs-nav">
+                <button type="button" class="tab-btn" [class.active]="activeTab === 'info'"
+                    (click)="cambiarTab('info')">
+                    <i class="bi bi-person-vcard"></i>
+                    <span>Información del Acompañante</span>
+                </button>
+                <button type="button" class="tab-btn" [class.active]="activeTab === 'historial'"
+                    (click)="cambiarTab('historial')">
+                    <i class="bi bi-clock-history"></i>
+                    <span>Historial</span>
+                </button>
+                <button type="button" class="tab-btn" [class.active]="activeTab === 'expediente'"
+                    (click)="cambiarTab('expediente')">
+                    <i class="bi bi-file-earmark-medical"></i>
+                    <span>Expediente</span>
+                </button>
+            </nav>
+        </div>
 
-                <div class="form-group">
-                    <label>Apellido Paterno</label>
-                    <input type="text" required maxlength="30" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+"
-                        oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g, '')"
-                        [(ngModel)]="usuarioSeleccionado.apPaterno" class="form-control-premium">
-                </div>
+        <!-- ============================================================ -->
+        <!-- TAB 1: INFORMACIÓN DEL ACOMPAÑANTE                            -->
+        <!-- ============================================================ -->
+        @if (activeTab === 'info') {
+        <div class="tab-panel">
 
-                <div class="form-group">
-                    <label>Apellido Materno</label>
-                    <input type="text" required maxlength="30" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+"
-                        oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g, '')"
-                        [(ngModel)]="usuarioSeleccionado.apMaterno" class="form-control-premium">
-                </div>
-
-                <div class="form-group">
-                    <label>Correo Electrónico</label>
-                    <input type="email" maxlength="60" [(ngModel)]="usuarioSeleccionado.correo"
-                        class="form-control-premium">
-                </div>
-
-                <div class="form-group">
-                    <label>Teléfono</label>
-                    <input type="text" required maxlength="10" pattern="[0-9]*"
-                        oninput="this.value = this.value.replace(/[^0-9]/g, '')"
-                        [(ngModel)]="usuarioSeleccionado.telefono" placeholder="Ej: 2711234567"
-                        class="form-control-premium">
-                </div>
-
-                <div class="form-group">
-                    <label>Género</label>
-                    <select [(ngModel)]="usuarioSeleccionado.genero" class="form-control-premium">
-                        <option value="Masculino">Masculino</option>
-                        <option value="Femenino">Femenino</option>
-                        <option value="Otro">Otro</option>
-                        <option value="No especificado">No especificado</option>
-                    </select>
-                </div>
-
-                <!-- ✅ CORREGIDO: Fecha de Nacimiento con icono de calendario -->
-                <div class="form-group">
-                    <label>Fecha de Nacimiento</label>
-                    <div class="input-picker-wrapper">
-                        <input type="text" id="fechaNacimientoInput" [(ngModel)]="usuarioSeleccionado.fechaNacimiento"
-                            placeholder="Seleccione fecha de nacimiento" class="form-control-premium picker-custom"
-                            readonly>
-                        <i class="bi bi-calendar3 icon-embed"></i>
+            <!-- RESUMEN DEL ACOMPAÑANTE -->
+            <div class="resumen-acompanante">
+                <div class="resumen-item">
+                    <i class="bi bi-person-fill"></i>
+                    <div>
+                        <small>Nombre completo</small>
+                        <strong>{{ usuarioSeleccionado.nombre }}
+                            {{ usuarioSeleccionado.apPaterno }}
+                            {{ usuarioSeleccionado.apMaterno }}</strong>
                     </div>
                 </div>
-
-                <!-- ✅ CORREGIDO: Fecha de Asignación con icono de calendario -->
-                <div class="form-group">
-                    <label>Fecha de Asignación</label>
-                    <div class="input-picker-wrapper">
-                        <input type="text" id="fechaInput" [(ngModel)]="usuarioSeleccionado.fechaAsignacion"
-                            placeholder="Seleccione fecha" class="form-control-premium picker-custom" readonly>
-                        <i class="bi bi-calendar3 icon-embed"></i>
+                <div class="resumen-item">
+                    <i class="bi bi-envelope-fill"></i>
+                    <div>
+                        <small>Correo</small>
+                        <strong>{{ usuarioSeleccionado.correo }}</strong>
                     </div>
                 </div>
-
-                <!-- CURP -->
-                <div class="form-group">
-                    <label>CURP</label>
-                    <input type="text" maxlength="18" [(ngModel)]="usuarioSeleccionado.curp" (input)="formatearCURP()"
-                        placeholder="Ej: GAML850315HVZRRL01" class="form-control-premium"
-                        title="18 caracteres alfanuméricos">
-                    <small class="form-text text-muted">18 caracteres alfanuméricos</small>
-                </div>
-            </div>
-
-            <!-- ========================================== -->
-            <!-- SECCIÓN 2: DATOS DE UBICACIÓN              -->
-            <!-- ========================================== -->
-            <div class="ubicacion-section">
-                <div class="section-divider">
-                    <span class="section-title">Datos de Ubicación</span>
-                </div>
-
-                <div class="form-grid">
-                    <div class="form-group full-width">
-                        <label>Domicilio</label>
-                        <input type="text" [(ngModel)]="usuarioSeleccionado.domicilio"
-                            (blur)="formatearCampoTexto('domicilio')"
-                            placeholder="Ej: Calle Benito Juárez #123 Col. Centro" class="form-control-premium">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Código Postal</label>
-                        <input type="text" maxlength="5" [(ngModel)]="usuarioSeleccionado.codigoPostal"
-                            (input)="formatearCodigoPostal()" placeholder="Ej: 94500" class="form-control-premium"
-                            title="5 dígitos numéricos">
-                        <small class="form-text text-muted">5 dígitos numéricos</small>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Localidad</label>
-                        <input type="text" [(ngModel)]="usuarioSeleccionado.localidad"
-                            (blur)="formatearCampoTexto('localidad')" placeholder="Ej: Córdoba"
-                            class="form-control-premium">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Municipio</label>
-                        <input type="text" [(ngModel)]="usuarioSeleccionado.municipio"
-                            (blur)="formatearCampoTexto('municipio')" placeholder="Ej: Córdoba"
-                            class="form-control-premium">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Estado</label>
-                        <input type="text" [(ngModel)]="usuarioSeleccionado.estado"
-                            (blur)="formatearCampoTexto('estado')" placeholder="Ej: Veracruz"
-                            class="form-control-premium">
+                <div class="resumen-item">
+                    <i class="bi bi-telephone-fill"></i>
+                    <div>
+                        <small>Teléfono</small>
+                        <strong>{{ usuarioSeleccionado.telefono || 'No registrado' }}</strong>
                     </div>
                 </div>
-
-                <!-- Mostrar ubicación formateada si está completa -->
-                @if (tieneUbicacionCompleta()) {
-                <div class="ubicacion-resumen">
-                    <i class="bi bi-geo-alt-fill"></i>
-                    <span>{{ getUbicacionFormateada() }}</span>
+                @if (estadisticas) {
+                <div class="resumen-item">
+                    <i class="bi bi-calendar3"></i>
+                    <div>
+                        <small>Total Visitas</small>
+                        <strong>{{ estadisticas.totalVisitas }}</strong>
+                    </div>
                 </div>
                 }
             </div>
 
-            <!-- ========================================== -->
-            <!-- SECCIÓN: ACCIONES                          -->
-            <!-- ========================================== -->
-            <div class="action-footer">
-                <button class="btn-cancel-premium" (click)="volver()" [disabled]="isSaving">Cancelar</button>
-                <button class="btn-save" (click)="guardarCambios()" [disabled]="isSaving">
-                    @if (isSaving) {
-                    <span class="spinner-save"></span>
-                    <span>Guardando...</span>
-                    } @else {
-                    <i class="bi bi-check-lg"></i>
-                    <span>Guardar Cambios</span>
+            <!-- FORMULARIO PRINCIPAL -->
+            <div class="detail-card">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nombre(s)</label>
+                        <input type="text" required maxlength="40" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+"
+                            oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g, '')"
+                            [(ngModel)]="usuarioSeleccionado.nombre" class="form-control-premium">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Apellido Paterno</label>
+                        <input type="text" required maxlength="30" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+"
+                            oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g, '')"
+                            [(ngModel)]="usuarioSeleccionado.apPaterno" class="form-control-premium">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Apellido Materno</label>
+                        <input type="text" required maxlength="30" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+"
+                            oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g, '')"
+                            [(ngModel)]="usuarioSeleccionado.apMaterno" class="form-control-premium">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Correo Electrónico</label>
+                        <input type="email" maxlength="60" [(ngModel)]="usuarioSeleccionado.correo"
+                            class="form-control-premium">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Teléfono</label>
+                        <input type="text" required maxlength="10" pattern="[0-9]*"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                            [(ngModel)]="usuarioSeleccionado.telefono" placeholder="Ej: 2711234567"
+                            class="form-control-premium">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Género</label>
+                        <select [(ngModel)]="usuarioSeleccionado.genero" class="form-control-premium">
+                            <option value="Masculino">Masculino</option>
+                            <option value="Femenino">Femenino</option>
+                            <option value="Otro">Otro</option>
+                            <option value="No especificado">No especificado</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Fecha de Nacimiento</label>
+                        <div class="input-picker-wrapper">
+                            <input type="text" id="fechaNacimientoInput"
+                                [(ngModel)]="usuarioSeleccionado.fechaNacimiento"
+                                placeholder="Seleccione fecha de nacimiento" class="form-control-premium picker-custom"
+                                readonly>
+                            <i class="bi bi-calendar3 icon-embed"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Fecha de Asignación</label>
+                        <div class="input-picker-wrapper">
+                            <input type="text" id="fechaInput" [(ngModel)]="usuarioSeleccionado.fechaAsignacion"
+                                placeholder="Seleccione fecha" class="form-control-premium picker-custom" readonly>
+                            <i class="bi bi-calendar3 icon-embed"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>CURP</label>
+                        <input type="text" maxlength="18" [(ngModel)]="usuarioSeleccionado.curp"
+                            (input)="formatearCURP()" placeholder="Ej: GAML850315HVZRRL01" class="form-control-premium">
+                        <small class="form-text text-muted">18 caracteres alfanuméricos</small>
+                    </div>
+                </div>
+
+                <!-- UBICACIÓN - ESTILO MEJORADO -->
+                <div class="ubicacion-section">
+                    <div class="ubicacion-header">
+                        <i class="bi bi-geo-alt-fill"></i>
+                        <span>Datos de Ubicación</span>
+                    </div>
+
+                    <div class="ubicacion-grid">
+                        <div class="ubicacion-item full-width">
+                            <label>Domicilio</label>
+                            <input type="text" [(ngModel)]="usuarioSeleccionado.domicilio"
+                                (blur)="formatearCampoTexto('domicilio')"
+                                placeholder="Ej: Calle Benito Juárez #123 Col. Centro" class="form-control-premium">
+                        </div>
+
+                        <div class="ubicacion-item">
+                            <label>Código Postal</label>
+                            <input type="text" maxlength="5" [(ngModel)]="usuarioSeleccionado.codigoPostal"
+                                (input)="formatearCodigoPostal()" placeholder="Ej: 94500" class="form-control-premium">
+                            <small class="form-text text-muted">5 dígitos numéricos</small>
+                        </div>
+
+                        <div class="ubicacion-item">
+                            <label>Localidad</label>
+                            <input type="text" [(ngModel)]="usuarioSeleccionado.localidad"
+                                (blur)="formatearCampoTexto('localidad')" placeholder="Ej: Córdoba"
+                                class="form-control-premium">
+                        </div>
+
+                        <div class="ubicacion-item">
+                            <label>Municipio</label>
+                            <input type="text" [(ngModel)]="usuarioSeleccionado.municipio"
+                                (blur)="formatearCampoTexto('municipio')" placeholder="Ej: Córdoba"
+                                class="form-control-premium">
+                        </div>
+
+                        <div class="ubicacion-item">
+                            <label>Estado</label>
+                            <input type="text" [(ngModel)]="usuarioSeleccionado.estado"
+                                (blur)="formatearCampoTexto('estado')" placeholder="Ej: Veracruz"
+                                class="form-control-premium">
+                        </div>
+                    </div>
+
+                    @if (tieneUbicacionCompleta()) {
+                    <div class="ubicacion-resumen">
+                        <i class="bi bi-geo-alt-fill"></i>
+                        <span>{{ getUbicacionFormateada() }}</span>
+                    </div>
                     }
-                </button>
+                </div>
+
+                <!-- ACCIONES -->
+                <div class="action-footer">
+                    <div class="footer-buttons">
+                        <button class="btn-cancel-premium" (click)="volver()" [disabled]="isSaving">Cancelar</button>
+                        <button class="btn-save" (click)="guardarCambios()" [disabled]="isSaving">
+                            @if (isSaving) {
+                            <span class="spinner-save"></span>
+                            <span>Guardando...</span>
+                            } @else {
+                            <i class="bi bi-check-lg"></i>
+                            <span>Guardar Cambios</span>
+                            }
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
+        }
+
+        <!-- ============================================================ -->
+        <!-- TAB 2: HISTORIAL                                              -->
+        <!-- ============================================================ -->
+        @if (activeTab === 'historial') {
+        <div class="tab-panel">
+            <div class="detail-card">
+
+                <!-- ESTADÍSTICAS -->
+                @if (estadisticas) {
+                <div class="estadisticas-section" style="margin-top:0; padding-top:0; border-top:none;">
+                    <h4 class="section-title">
+                        <i class="bi bi-graph-up-arrow"></i>
+                        Actividad del Acompañante
+                    </h4>
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <small>Total Visitas</small>
+                            <div class="stat-value">{{ estadisticas.totalVisitas }}</div>
+                        </div>
+                        <div class="stat-box">
+                            <small>Visitas Completadas</small>
+                            <div class="stat-value">{{ estadisticas.visitasCompletadas }}</div>
+                        </div>
+                        <div class="stat-box">
+                            <small>Visitas Pendientes</small>
+                            <div class="stat-value">{{ estadisticas.visitasPendientes }}</div>
+                        </div>
+                        <div class="stat-box">
+                            <small>Última Visita</small>
+                            <div class="stat-value" style="font-size: 0.9rem;">
+                                {{ estadisticas.ultimaVisita | date:'dd/MM/yyyy' }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                }
+
+                <!-- HISTORIAL DE VISITAS -->
+                <div class="visitas-section">
+                    <div class="visitas-header">
+                        <h4 class="section-title">
+                            <i class="bi bi-calendar-event"></i>
+                            Historial de Visitas
+                            <span class="badge-visitas">{{ visitasAcompanante.length }}</span>
+                        </h4>
+                    </div>
+
+                    @if (visitasAcompanante.length > 0) {
+                    <div class="visitas-lista">
+                        @for (v of visitasAcompanante; track v.id) {
+                        <div class="visita-item">
+                            <div class="visita-indicador">
+                                <span class="visita-estado-dot" [ngClass]="{
+                                'estado-completada': v.estado === 'Completada',
+                                'estado-programada': v.estado === 'Programada',
+                                'estado-confirmada': v.estado === 'Confirmada',
+                                'estado-cancelada': v.estado === 'Cancelada',
+                                'estado-no-asistio': v.estado === 'No Asistió'
+                            }"></span>
+                            </div>
+                            <div class="visita-info">
+                                <i class="bi bi-calendar-check"></i>
+                                <span class="visita-fecha-hora">{{ formatearFechaYHora(v.fechavisita, v.horavisita)
+                                    }}</span>
+                            </div>
+                            <div class="visita-detalle">
+                                <span class="visita-motivo">{{ v.motivo || 'Sin motivo' }}</span>
+                                @if (v.estado === 'Completada') {
+                                <span class="badge-completada">Completada</span>
+                                } @else if (v.estado === 'Programada') {
+                                <span class="badge-programada">Programada</span>
+                                } @else if (v.estado === 'Confirmada') {
+                                <span class="badge-confirmada">Confirmada</span>
+                                } @else if (v.estado === 'Cancelada') {
+                                <span class="badge-cancelada">Cancelada</span>
+                                } @else {
+                                <span class="badge-no-asistio">No Asistió</span>
+                                }
+                            </div>
+                        </div>
+                        }
+                    </div>
+                    } @else {
+                    <div class="visitas-lista">
+                        <div class="visitas-vacio">
+                            <i class="bi bi-calendar-plus"></i>
+                            <p>No hay visitas registradas</p>
+                            <span>Las visitas que se agenden aparecerán aquí</span>
+                        </div>
+                    </div>
+                    }
+                </div>
+
+                <!-- HISTORIAL DE CAMBIOS -->
+                <div class="historial-section">
+                    <hr class="section-divider">
+
+                    <div class="historial-header">
+                        <h4 class="section-title">
+                            <i class="bi bi-clock-history"></i>
+                            Historial del Acompañante
+                        </h4>
+                        <span class="historial-count">{{ historialCambios.length }} eventos</span>
+                    </div>
+
+                    @if (historialCambios.length > 0) {
+                    <div class="historial-lista">
+                        @for (item of historialCambios; track item) {
+                        <div class="historial-item">
+                            <div class="historial-fecha">
+                                <i class="bi bi-clock"></i>
+                                {{ item.fecha }}
+                            </div>
+                            <div class="historial-detalle">
+                                <strong>{{ item.accion }}</strong>
+                                <span>{{ item.detalle }}</span>
+                            </div>
+                            <div class="historial-usuario">
+                                <i class="bi bi-person"></i>
+                                {{ item.usuario }}
+                            </div>
+                        </div>
+                        }
+                    </div>
+                    } @else {
+                    <div class="visitas-vacio">
+                        <i class="bi bi-clock-history"></i>
+                        <p>Aún no hay actividad registrada</p>
+                        <span>Los eventos del acompañante aparecerán aquí</span>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+        }
+
+        <!-- ============================================================ -->
+        <!-- TAB 3: EXPEDIENTE DEL ACOMPAÑANTE                             -->
+        <!-- ============================================================ -->
+        @if (activeTab === 'expediente') {
+        <div class="tab-panel">
+
+            <div class="expediente-toolbar">
+                <p><i class="bi bi-info-circle"></i> Vista de solo lectura generada a partir de la información
+                    registrada.</p>
+                <button type="button" class="btn-print-expediente" (click)="imprimirExpediente()">
+                    <i class="bi bi-printer"></i>
+                    <span>Imprimir Expediente</span>
+                </button>
+            </div>
+
+            <div class="expediente-wrapper">
+                <div class="expediente-hoja" id="expedienteImprimible">
+
+                    <!-- MEMBRETE -->
+                    <div class="expediente-membrete">
+                        <div class="membrete-logo">
+                            <i class="bi bi-person-badge-fill"></i>
+                        </div>
+                        <div class="membrete-texto">
+                            <h1>Expediente de Acompañante</h1>
+                            <p>Sistema de Gestión de Acompañantes</p>
+                        </div>
+                        <div class="membrete-folio">
+                            <small>Folio</small>
+                            <strong>#{{ acompananteId || '---' }}</strong>
+                            <small>{{ fechaGeneracion }}</small>
+                        </div>
+                    </div>
+
+                    <div class="expediente-linea-doble"></div>
+
+                    <!-- DATOS DEL ACOMPAÑANTE -->
+                    <div class="expediente-encabezado-acompanante">
+                        <div class="expediente-avatar">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                        <div class="expediente-nombre-bloque">
+                            <span class="expediente-etiqueta">Acompañante</span>
+                            <h2>{{ usuarioSeleccionado.nombre }}
+                                {{ usuarioSeleccionado.apPaterno }}
+                                {{ usuarioSeleccionado.apMaterno }}</h2>
+                            <span class="expediente-subetiqueta">{{ usuarioSeleccionado.correo }}</span>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN: DATOS GENERALES -->
+                    <div class="expediente-seccion">
+                        <h3 class="expediente-titulo-seccion"><i class="bi bi-person-lines-fill"></i> Datos
+                            Generales</h3>
+                        <div class="expediente-grid">
+                            <div class="expediente-campo">
+                                <span>Género</span>
+                                <strong>{{ usuarioSeleccionado.genero || 'No especificado' }}</strong>
+                            </div>
+                            <div class="expediente-campo">
+                                <span>Fecha de Nacimiento</span>
+                                <strong>{{ formatearFechaNacimiento(usuarioSeleccionado.fechaNacimiento) }}</strong>
+                            </div>
+                            <div class="expediente-campo">
+                                <span>Edad</span>
+                                <strong>{{ calcularEdad() !== null ? calcularEdad() + ' años' : 'No disponible'
+                                    }}</strong>
+                            </div>
+                            <div class="expediente-campo">
+                                <span>Teléfono</span>
+                                <strong>{{ usuarioSeleccionado.telefono || 'No registrado' }}</strong>
+                            </div>
+                            <div class="expediente-campo">
+                                <span>CURP</span>
+                                <strong>{{ usuarioSeleccionado.curp || 'No registrado' }}</strong>
+                            </div>
+                            <div class="expediente-campo">
+                                <span>Fecha de Asignación</span>
+                                <strong>{{ formatearFechaNacimiento(usuarioSeleccionado.fechaAsignacion) }}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN: UBICACIÓN -->
+                    <div class="expediente-seccion">
+                        <h3 class="expediente-titulo-seccion"><i class="bi bi-geo-alt"></i> Domicilio</h3>
+                        <p class="expediente-direccion">{{ getUbicacionFormateada() }}</p>
+                    </div>
+
+                    <!-- SECCIÓN: RESUMEN DE VISITAS -->
+                    <div class="expediente-seccion">
+                        <h3 class="expediente-titulo-seccion"><i class="bi bi-calendar3"></i> Resumen de Visitas
+                        </h3>
+                        <table class="expediente-tabla">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Motivo</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (v of visitasAcompanante; track v.id) {
+                                <tr>
+                                    <td>{{ formatearFechaYHora(v.fechavisita, v.horavisita) }}</td>
+                                    <td>{{ v.motivo || 'Sin motivo' }}</td>
+                                    <td>{{ v.estado }}</td>
+                                </tr>
+                                }
+                                @if (visitasAcompanante.length === 0) {
+                                <tr>
+                                    <td colspan="3" class="expediente-tabla-vacia">Sin visitas registradas</td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- PIE DE DOCUMENTO -->
+                    <div class="expediente-pie">
+                        <div class="expediente-firma">
+                            <div class="expediente-linea-firma"></div>
+                            <span>Firma del Responsable</span>
+                        </div>
+                        <div class="expediente-sello">
+                            <i class="bi bi-patch-check-fill"></i>
+                            <span>Documento generado electrónicamente</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        }
+
     </div>
     }
 </main>

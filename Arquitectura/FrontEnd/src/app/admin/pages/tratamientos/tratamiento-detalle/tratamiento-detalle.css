@@ -4,35 +4,30 @@
 .main-content {
     margin-left: 250px;
     padding: 85px 40px 40px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    min-height: 100vh;
     background: #f8fafc;
+    min-height: 100vh;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .main-content.menu-collapsed {
-    margin-left: 80px;
+    margin-left: 70px;
+    padding-left: 30px;
 }
 
 .container-fluid {
-    max-width: 1400px;
+    max-width: 1440px;
     margin: 0 auto;
 }
 
 /* ==========================================================================
-   2. ENCABEZADO DE LA PÁGINA (HEADER)
+   2. HEADER SECTION
    ========================================================================== */
-.header-controls {
-    display: flex;
-    gap: 0.75rem;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
 .header-section {
+    margin-bottom: 1.75rem;
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    margin-bottom: 2.5rem;
+    gap: 30px;
     padding-bottom: 1.25rem;
     border-bottom: 2px solid #e9edf2;
 }
@@ -44,92 +39,30 @@
 }
 
 .title-page {
-    font-size: 2rem;
-    font-weight: 800;
     color: #0a1628;
+    font-weight: 800;
+    font-size: 2.1rem;
     margin: 0;
     letter-spacing: -0.5px;
-}
-
-.title-page::before {
-    font-size: 1.8rem;
+    line-height: 1.2;
 }
 
 .subtitle-page {
     color: #7a8a9e;
-    font-size: 1rem;
+    font-size: 0.95rem;
     margin: 0;
     font-weight: 400;
 }
 
-/* ==========================================================================
-   3. TARJETA DE DETALLE Y FORMULARIO (TRATAMIENTO)
-   ========================================================================== */
-.detail-card {
-    background: #ffffff;
-    border-radius: 20px;
-    padding: 2.5rem;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
-    border: 1px solid #e9edf2;
-    transition: box-shadow 0.3s ease;
-}
-
-.detail-card:hover {
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
-}
-
-/* ==========================================================================
-   4. RESUMEN DEL TRATAMIENTO - MEJORADO
-   ========================================================================== */
-.resumen-tratamiento {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1rem;
-    padding: 1.25rem 1.5rem;
-    background: #fafbfc;
-    border-radius: 14px;
-    margin-bottom: 1.75rem;
-    border: 1px solid #e9edf2;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
-}
-
-.resumen-item {
+.header-controls {
     display: flex;
     align-items: center;
-    gap: 0.9rem;
-    padding: 0.25rem 0;
-}
-
-.resumen-item i {
-    font-size: 1.5rem;
-    color: #b0001e;
-    min-width: 32px;
-    text-align: center;
-    opacity: 0.85;
-}
-
-.resumen-item div {
-    display: flex;
-    flex-direction: column;
-    gap: 0.05rem;
-}
-
-.resumen-item small {
-    font-size: 0.6rem;
-    text-transform: uppercase;
-    color: #8a9aa8;
-    font-weight: 700;
-    letter-spacing: 0.6px;
-}
-
-.resumen-item strong {
-    font-size: 0.95rem;
-    color: #0a1628;
-    font-weight: 600;
+    gap: 16px;
+    flex-wrap: wrap;
 }
 
 /* ==========================================================================
-   5. ESTADO DEL TRATAMIENTO - MEJORADO
+   3. ESTADO DEL TRATAMIENTO
    ========================================================================== */
 .estado-tratamiento {
     display: inline-flex;
@@ -180,55 +113,413 @@
 }
 
 /* ==========================================================================
-   6. INFORMACIÓN RELACIONADA - MEJORADO
+   4. MENÚ DE PESTAÑAS (TABS)
+   ========================================================================== */
+.tabs-nav-wrapper {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 2rem;
+}
+
+.tabs-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #ffffff;
+    border: 1px solid #e9edf2;
+    border-radius: 18px;
+    padding: 6px;
+    box-shadow: 0 2px 10px rgba(10, 22, 40, 0.04);
+}
+
+.tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    border: none;
+    background: transparent;
+    color: #7a8a9e;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 0.7rem 1.4rem;
+    border-radius: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tab-btn i {
+    font-size: 1rem;
+}
+
+.tab-btn:hover:not(.active) {
+    background: #f1f4f8;
+    color: #1a2938;
+}
+
+.tab-btn.active {
+    background: linear-gradient(135deg, #b0001e, #8a0016);
+    color: #ffffff;
+    box-shadow: 0 6px 16px rgba(176, 0, 30, 0.28);
+}
+
+.tab-panel {
+    animation: fadeIn 0.35s ease;
+}
+
+/* ==========================================================================
+   5. BOTONES
+   ========================================================================== */
+.btn-cancel-premium {
+    padding: 0.65rem 1.5rem;
+    background: #ffffff;
+    color: #4a5a6e;
+    border: 1.5px solid #dce1e8;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.btn-cancel-premium:hover:not(:disabled) {
+    background: #f1f4f8;
+    color: #1a2938;
+    transform: translateY(-2px);
+    border-color: #bcc5d0;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+.btn-cancel-premium:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.btn-cancel-premium:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.btn-save {
+    padding: 0.65rem 2rem;
+    background: linear-gradient(135deg, #b0001e, #8a0016);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(176, 0, 30, 0.25);
+}
+
+.btn-save:hover:not(:disabled) {
+    background: linear-gradient(135deg, #8a0016, #6d0012);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(176, 0, 30, 0.35);
+}
+
+.btn-save:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.btn-save:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.spinner-save {
+    width: 18px;
+    height: 18px;
+    border: 2.5px solid rgba(255, 255, 255, 0.25);
+    border-radius: 50%;
+    border-top-color: #ffffff;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ==========================================================================
+   6. RESUMEN DEL TRATAMIENTO
+   ========================================================================== */
+.resumen-tratamiento {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    background: #fafbfc;
+    border-radius: 14px;
+    margin-bottom: 1.75rem;
+    border: 1px solid #e9edf2;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.resumen-tratamiento-historial {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    background: #fafbfc;
+    border-radius: 14px;
+    margin-bottom: 1.75rem;
+    border: 1px solid #e9edf2;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.resumen-item {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.25rem 0;
+}
+
+.resumen-item i {
+    font-size: 1.5rem;
+    color: #b0001e;
+    min-width: 32px;
+    text-align: center;
+    opacity: 0.85;
+}
+
+.resumen-item div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.05rem;
+}
+
+.resumen-item small {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    color: #8a9aa8;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+}
+
+.resumen-item strong {
+    font-size: 0.95rem;
+    color: #0a1628;
+    font-weight: 600;
+}
+
+/* ==========================================================================
+   7. ESTADÍSTICAS
+   ========================================================================== */
+.estadisticas-section {
+    margin-top: 1.75rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid #e9edf2;
+}
+
+.section-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1a2938;
+    margin: 0 0 1.1rem 0;
+    padding-bottom: 0.6rem;
+    border-bottom: 2px solid #f1f4f8;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.section-title i {
+    color: #b0001e;
+    font-size: 1.15rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.stat-box {
+    background: #ffffff;
+    padding: 1.2rem 1rem;
+    border-radius: 14px;
+    border: 1px solid #e9edf2;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.stat-box:hover {
+    transform: translateY(-4px);
+    border-color: #d0d7df;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.stat-box small {
+    display: block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #8a9aa8;
+    margin-bottom: 0.4rem;
+    letter-spacing: 0.4px;
+}
+
+.stat-value {
+    font-size: 1.65rem;
+    font-weight: 800;
+    color: #0a1628;
+    line-height: 1.2;
+}
+
+/* Colores para estadísticas de tomas */
+.stat-total .stat-value {
+    color: #3b82f6;
+}
+
+.stat-completadas .stat-value {
+    color: #10b981;
+}
+
+.stat-pendientes .stat-value {
+    color: #f59e0b;
+}
+
+.stat-omitidas .stat-value {
+    color: #ef4444;
+}
+
+.stat-retrasadas .stat-value {
+    color: #f97316;
+}
+
+.stat-cumplimiento .stat-value {
+    color: #8b5cf6;
+}
+
+.stat-dias .stat-value {
+    color: #8b5cf6;
+}
+
+/* ==========================================================================
+   8. INFORMACIÓN RELACIONADA - ESTILOS MEJORADOS
    ========================================================================== */
 .info-relacionada {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
     margin-bottom: 1.75rem;
 }
 
 .info-card {
     background: #ffffff;
-    padding: 0.85rem 1.15rem;
-    border-radius: 12px;
+    border-radius: 16px;
     border: 1px solid #e9edf2;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 }
 
 .info-card:hover {
+    transform: translateY(-3px);
     border-color: #d0d7df;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.07);
 }
 
-.info-card h5 {
+.info-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.85rem 1.25rem;
+    border-bottom: 1px solid #f1f4f8;
+}
+
+.info-card-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.info-card-paciente .info-card-icon {
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    color: #1e40af;
+}
+
+.info-card-paciente .info-card-header {
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+}
+
+.info-card-medicamento .info-card-icon {
+    background: linear-gradient(135deg, #fce7f3, #fbcfe8);
+    color: #9d174d;
+}
+
+.info-card-medicamento .info-card-header {
+    background: linear-gradient(135deg, #fdf2f8, #fce7f3);
+}
+
+.info-card-header h5 {
     font-size: 0.7rem;
     text-transform: uppercase;
     color: #8a9aa8;
     font-weight: 700;
-    margin: 0 0 0.3rem 0;
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+.info-card-body {
+    padding: 0.85rem 1.25rem 1rem;
+}
+
+.info-card-body .info-nombre {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #0a1628;
+    margin: 0 0 0.6rem 0;
+    line-height: 1.3;
+}
+
+.info-detalles {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.info-detalle-item {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    letter-spacing: 0.3px;
+    gap: 0.6rem;
+    font-size: 0.85rem;
+    color: #4a5a6e;
+    padding: 0.2rem 0;
 }
 
-.info-card h5 i {
-    color: #b0001e;
+.info-detalle-item i {
     font-size: 0.9rem;
+    color: #8a9aa8;
+    width: 18px;
+    text-align: center;
+    flex-shrink: 0;
 }
 
-.info-card p {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: #0a1628;
-    margin: 0;
+.info-detalle-item span {
+    word-break: break-word;
 }
 
 /* ==========================================================================
-   7. TOMAS DEL TRATAMIENTO - MEJORADO
+   9. TOMAS DEL TRATAMIENTO
    ========================================================================== */
 .tomas-section {
     margin-top: 1.75rem;
@@ -238,12 +529,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    cursor: pointer;
-    transition: opacity 0.2s;
-}
-
-.tomas-header:hover {
-    opacity: 0.8;
+    padding: 0.25rem 0;
 }
 
 .tomas-header .section-title {
@@ -315,6 +601,12 @@
     font-size: 0.9rem;
 }
 
+.toma-hora {
+    font-size: 0.85rem;
+    color: #6b7a8a;
+    font-weight: 500;
+}
+
 .toma-detalle {
     display: flex;
     align-items: center;
@@ -339,104 +631,223 @@
 }
 
 /* ==========================================================================
-   8. ESTADÍSTICAS - MEJORADO
+   10. DETALLE CARD Y FORMULARIO
    ========================================================================== */
-.estadisticas-section {
-    margin-top: 1.75rem;
-    padding-top: 1.75rem;
-    border-top: 1px solid #e9edf2;
-}
-
-.section-title {
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: #1a2938;
-    margin: 0 0 1.1rem 0;
-    padding-bottom: 0.6rem;
-    border-bottom: 2px solid #f1f4f8;
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-}
-
-.section-title i {
-    color: #b0001e;
-    font-size: 1.15rem;
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1rem;
-}
-
-.stat-box {
+.detail-card {
     background: #ffffff;
-    padding: 1.2rem 1rem;
-    border-radius: 14px;
+    border-radius: 20px;
+    padding: 2.5rem 2.5rem 2rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
     border: 1px solid #e9edf2;
-    text-align: center;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    transition: box-shadow 0.3s ease;
 }
 
-.stat-box:hover {
-    transform: translateY(-4px);
-    border-color: #d0d7df;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+.detail-card:hover {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
 }
 
-.stat-box small {
-    display: block;
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    max-width: 100%;
+}
+
+.form-group label {
     font-size: 0.7rem;
-    text-transform: uppercase;
     font-weight: 700;
-    color: #8a9aa8;
-    margin-bottom: 0.4rem;
-    letter-spacing: 0.4px;
+    color: #4a5a6e;
+    letter-spacing: 0.2px;
+    text-transform: uppercase;
 }
 
-.stat-value {
-    font-size: 1.65rem;
-    font-weight: 800;
-    color: #0a1628;
-    line-height: 1.2;
-}
-
-.stat-value.small {
+.form-control-premium {
+    padding: 0.7rem 1rem;
+    border: 1.5px solid #e2e7ee;
+    border-radius: 10px;
     font-size: 0.95rem;
+    color: #0a1628;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    background: #fafbfc;
+    width: 100%;
+    box-sizing: border-box;
+    font-family: inherit;
+    max-width: 100%;
+}
+
+.form-control-premium::placeholder {
+    color: #b0bcc8;
+    font-weight: 400;
+}
+
+.form-control-premium:focus {
+    outline: none;
+    border-color: #b0001e;
+    background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(176, 0, 30, 0.08);
+}
+
+.form-control-premium[readonly] {
+    background: #f1f3f5;
+    cursor: pointer;
+}
+
+.form-control-premium[readonly]:focus {
+    border-color: #b0001e;
+    box-shadow: 0 0 0 4px rgba(176, 0, 30, 0.08);
+}
+
+.full-width-group {
+    grid-column: 1 / -1;
+}
+
+/* TEXTAREA FIJO */
+textarea.form-control-premium {
+    min-height: 100px;
+    max-height: 100px;
+    height: 100px;
+    resize: none !important;
+    font-family: inherit;
+    line-height: 1.5;
+    width: 100%;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+.full-width-group textarea.form-control-premium {
+    min-height: 100px;
+    max-height: 100px;
+    height: 100px;
+    resize: none !important;
+}
+
+select.form-control-premium {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a5a6e' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+    cursor: pointer;
+}
+
+select.form-control-premium option {
+    padding: 0.5rem;
+}
+
+select.form-control-premium option:checked {
+    background: #b0001e;
+    color: #ffffff;
+}
+
+.form-text {
+    font-size: 0.7rem;
+    color: #8a9aa8;
+    margin-top: 0.2rem;
+    display: block;
+}
+
+.text-muted {
+    color: #8a9aa8 !important;
 }
 
 /* ==========================================================================
-   9. HISTORIAL - MEJORADO
+   11. INPUT PICKER WRAPPER (FLATPICKR)
+   ========================================================================== */
+.input-picker-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.picker-custom {
+    padding-right: 2.8rem !important;
+    cursor: pointer;
+    background: #fafbfc !important;
+}
+
+.picker-custom:focus {
+    background: #ffffff !important;
+    border-color: #b0001e;
+    box-shadow: 0 0 0 4px rgba(176, 0, 30, 0.08);
+}
+
+.icon-embed {
+    position: absolute;
+    right: 14px;
+    color: #8a9aa8;
+    font-size: 1.1rem;
+    pointer-events: none;
+    transition: all 0.25s ease;
+}
+
+.input-picker-wrapper:focus-within .icon-embed {
+    color: #b0001e;
+    transform: scale(1.05);
+}
+
+.flatpickr-calendar {
+    z-index: 10000 !important;
+    background: #ffffff !important;
+    border-radius: 14px !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15) !important;
+    border: 1px solid #e9edf2 !important;
+    padding: 0.5rem !important;
+    font-family: inherit !important;
+}
+
+.flatpickr-day.selected {
+    background: #b0001e !important;
+    border-color: #b0001e !important;
+    font-weight: 700 !important;
+}
+
+.flatpickr-day.selected:hover {
+    background: #8a0016 !important;
+    border-color: #8a0016 !important;
+}
+
+.flatpickr-day:hover {
+    background: #f1f4f8 !important;
+}
+
+.flatpickr-months .flatpickr-month {
+    color: #0a1628 !important;
+}
+
+.flatpickr-current-month .flatpickr-monthDropdown-months {
+    font-weight: 700 !important;
+}
+
+/* ==========================================================================
+   12. HISTORIAL
    ========================================================================== */
 .historial-section {
-    margin-top: 1.75rem;
+    margin-top: 0.5rem;
+}
+
+.section-divider {
+    border: none;
+    border-top: 2px solid #e9edf2;
+    margin: 1.75rem 0;
 }
 
 .historial-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    cursor: pointer;
     padding: 0.5rem 0;
-    user-select: none;
-    transition: opacity 0.2s;
-}
-
-.historial-header:hover {
-    opacity: 0.8;
 }
 
 .historial-header .section-title {
     margin-bottom: 0;
-}
-
-.historial-header .section-title i:last-child {
-    font-size: 0.8rem;
-    margin-left: 0.5rem;
-    color: #8a9aa8;
-    transition: transform 0.2s ease;
 }
 
 .historial-count {
@@ -450,7 +861,7 @@
 
 .historial-lista {
     margin-top: 1rem;
-    max-height: 350px;
+    max-height: 400px;
     overflow-y: auto;
     border: 1px solid #e9edf2;
     border-radius: 14px;
@@ -475,6 +886,31 @@
 
 .historial-item:hover {
     background: #fafbfc;
+}
+
+.historial-item.cambio-creacion {
+    border-left: 4px solid #10b981;
+}
+
+.historial-item.cambio-estado {
+    border-left: 4px solid #f59e0b;
+}
+
+.historial-item.cambio-dosis {
+    border-left: 4px solid #8b5cf6;
+}
+
+.historial-item.cambio-info {
+    border-left: 4px solid #3b82f6;
+}
+
+.historial-icono {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    font-size: 1.1rem;
+    flex-shrink: 0;
 }
 
 .historial-fecha {
@@ -522,7 +958,31 @@
     color: #8a9aa8;
 }
 
-/* Scroll personalizado - MEJORADO */
+.historial-vacio {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #8a9aa8;
+}
+
+.historial-vacio i {
+    font-size: 2.8rem;
+    color: #dce1e8;
+    margin-bottom: 0.75rem;
+    display: block;
+}
+
+.historial-vacio p {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #4a5a6e;
+    margin: 0 0 0.25rem 0;
+}
+
+.historial-vacio span {
+    font-size: 0.85rem;
+    color: #8a9aa8;
+}
+
 .historial-lista::-webkit-scrollbar {
     width: 6px;
 }
@@ -543,170 +1003,113 @@
 }
 
 /* ==========================================================================
-   10. SECTION DIVIDER - MEJORADO
+   13. TOMAS - VISTA COMPLETA (TAB REGISTRO DE TOMAS)
    ========================================================================== */
-.section-divider {
-    border: none;
-    border-top: 2px solid #e9edf2;
-    margin: 1.75rem 0;
+.tomas-section-full {
+    margin-top: 1.5rem;
 }
 
-/* ==========================================================================
-   11. FORMULARIO - MEJORADO
-   ========================================================================== */
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-}
-
-.full-width-group {
-    margin-bottom: 1.5rem;
-}
-
-.full-width-group textarea {
-    resize: none;
-    font-family: inherit;
-    min-height: 100px;
-}
-
-.form-group label {
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: #4a5a6e;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-}
-
-.form-control-premium {
-    padding: 0.7rem 1rem;
-    border: 1.5px solid #e2e7ee;
-    border-radius: 10px;
-    font-size: 0.95rem;
-    color: #0a1628;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    background: #fafbfc;
-    width: 100%;
-    box-sizing: border-box;
-    font-family: inherit;
-}
-
-.form-control-premium::placeholder {
-    color: #b0bcc8;
-    font-weight: 400;
-}
-
-.form-control-premium:focus {
-    outline: none;
-    border-color: #b0001e;
+.tomas-lista-full {
+    margin-top: 1rem;
+    border: 1px solid #e9edf2;
+    border-radius: 14px;
+    overflow: hidden;
     background: #ffffff;
-    box-shadow: 0 0 0 4px rgba(176, 0, 30, 0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    animation: fadeIn 0.3s ease;
 }
 
-.form-control-premium:disabled {
-    background: #f1f5f9;
-    cursor: not-allowed;
-    opacity: 0.7;
+.toma-item-full {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.9rem 1.5rem;
+    border-bottom: 1px solid #f1f4f8;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    transition: all 0.2s ease;
 }
 
-/* ==========================================================================
-   12. FORM TEXT - MEJORADO
-   ========================================================================== */
-.form-text {
-    font-size: 0.7rem;
-    color: #8a9aa8;
-    margin-top: 0.2rem;
-    display: block;
+.toma-item-full:last-child {
+    border-bottom: none;
 }
 
-.text-muted {
-    color: #8a9aa8 !important;
+.toma-item-full:hover {
+    background: #fafbfc;
 }
 
-/* ==========================================================================
-   13. INPUT PICKER WRAPPER (FLATPICKR) - MEJORADO
-   ========================================================================== */
-.input-picker-wrapper {
-    position: relative;
+.toma-item-full.toma-completada {
+    border-left: 4px solid #10b981;
+}
+
+.toma-item-full.toma-pendiente {
+    border-left: 4px solid #f59e0b;
+}
+
+.toma-item-full.toma-omitida {
+    border-left: 4px solid #ef4444;
+}
+
+.toma-item-full.toma-retrasada {
+    border-left: 4px solid #f97316;
+}
+
+.toma-info-full {
     display: flex;
     align-items: center;
-    width: 100%;
+    gap: 1.5rem;
+    flex-wrap: wrap;
 }
 
-.picker-custom {
-    padding-right: 2.8rem !important;
-    cursor: pointer;
-    background: #fafbfc !important;
+.toma-fecha-hora {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-.picker-custom:focus {
-    background: #ffffff !important;
-    border-color: #b0001e;
-    box-shadow: 0 0 0 4px rgba(176, 0, 30, 0.08);
+.toma-fecha-hora .toma-fecha {
+    font-weight: 600;
+    color: #0a1628;
+    font-size: 0.95rem;
 }
 
-.icon-embed {
-    position: absolute;
-    right: 14px;
-    color: #8a9aa8;
-    font-size: 1.15rem;
-    pointer-events: none;
-    transition: all 0.25s ease;
-    z-index: 2;
-}
-
-.input-picker-wrapper:focus-within .icon-embed {
-    color: #b0001e;
-    transform: scale(1.1);
-}
-
-.input-picker-wrapper:hover .icon-embed {
+.toma-fecha-hora .toma-hora {
+    font-size: 0.85rem;
     color: #6b7a8a;
+    font-weight: 500;
+    background: #f1f4f8;
+    padding: 0.1rem 0.6rem;
+    border-radius: 12px;
 }
 
-/* Flatpickr custom styles */
-.flatpickr-calendar {
-    z-index: 10000 !important;
-    background: #ffffff !important;
-    border-radius: 14px !important;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15) !important;
-    border: 1px solid #e9edf2 !important;
-    padding: 0.5rem !important;
-    font-family: inherit !important;
+.toma-estado-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.8rem;
+    border-radius: 30px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #ffffff;
 }
 
-.flatpickr-day.selected {
-    background: #b0001e !important;
-    border-color: #b0001e !important;
-    font-weight: 700 !important;
+.toma-actions-full {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
 }
 
-.flatpickr-day.selected:hover {
-    background: #8a0016 !important;
-    border-color: #8a0016 !important;
-}
-
-.flatpickr-day:hover {
-    background: #f1f4f8 !important;
-}
-
-.flatpickr-months .flatpickr-month {
-    color: #0a1628 !important;
-}
-
-.flatpickr-current-month .flatpickr-monthDropdown-months {
-    font-weight: 700 !important;
+.toma-notas-full {
+    font-size: 0.75rem;
+    color: #6b7a8a;
+    background: #f1f4f8;
+    padding: 0.15rem 0.7rem;
+    border-radius: 30px;
 }
 
 /* ==========================================================================
-   14. BOTONES Y ACCIONES DEL PIE DE PÁGINA (FOOTER)
+   14. ACCIONES FOOTER
    ========================================================================== */
 .action-footer {
     display: flex;
@@ -717,90 +1120,8 @@
     border-top: 2px solid #e9edf2;
 }
 
-.btn-save {
-    padding: 0.65rem 2rem;
-    background: linear-gradient(135deg, #b0001e, #8a0016);
-    color: #ffffff;
-    border: none;
-    border-radius: 10px;
-    font-weight: 700;
-    font-size: 0.9rem;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6rem;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 12px rgba(176, 0, 30, 0.25);
-}
-
-.btn-save:hover:not(:disabled) {
-    background: linear-gradient(135deg, #8a0016, #6d0012);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(176, 0, 30, 0.35);
-}
-
-.btn-save:active:not(:disabled) {
-    transform: translateY(0);
-}
-
-.btn-save:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
-    transform: none !important;
-    box-shadow: none !important;
-}
-
-.btn-cancel-premium {
-    padding: 0.65rem 1.5rem;
-    background: #ffffff;
-    color: #4a5a6e;
-    border: 1.5px solid #dce1e8;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 0.9rem;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6rem;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-}
-
-.btn-cancel-premium:hover:not(:disabled) {
-    background: #f1f4f8;
-    color: #1a2938;
-    transform: translateY(-2px);
-    border-color: #bcc5d0;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
-}
-
-.btn-cancel-premium:active:not(:disabled) {
-    transform: translateY(0);
-}
-
-.btn-cancel-premium:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
-    transform: none !important;
-}
-
-.spinner-save {
-    width: 18px;
-    height: 18px;
-    border: 2.5px solid rgba(255, 255, 255, 0.25);
-    border-radius: 50%;
-    border-top-color: #ffffff;
-    animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
 /* ==========================================================================
-   15. TOAST NOTIFICACIÓN - MEJORADO
+   15. TOAST NOTIFICACIÓN
    ========================================================================== */
 .toast-premium-container {
     position: fixed;
@@ -861,9 +1182,6 @@
     }
 }
 
-/* ==========================================================================
-   16. ANIMACIONES
-   ========================================================================== */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -877,7 +1195,131 @@
 }
 
 /* ==========================================================================
-   17. RESPONSIVIDAD - MEJORADA
+   16. BOTÓN GENERAR TOMAS Y ACCIONES DE TOMAS
+   ========================================================================== */
+.tomas-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+    gap: 0.75rem;
+}
+
+.btn-generar-tomas {
+    padding: 0.55rem 1.5rem;
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+}
+
+.btn-generar-tomas:hover:not(:disabled) {
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.35);
+}
+
+.btn-generar-tomas:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.btn-generar-tomas:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Botones de acciones en tomas */
+.toma-actions-buttons {
+    display: flex;
+    gap: 0.3rem;
+    align-items: center;
+}
+
+.btn-toma-completar,
+.btn-toma-omitir,
+.btn-toma-retrasar {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+}
+
+.btn-toma-completar {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.btn-toma-completar:hover {
+    background: #10b981;
+    color: #ffffff;
+    transform: scale(1.1);
+}
+
+.btn-toma-omitir {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.btn-toma-omitir:hover {
+    background: #ef4444;
+    color: #ffffff;
+    transform: scale(1.1);
+}
+
+.btn-toma-retrasar {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.btn-toma-retrasar:hover {
+    background: #f59e0b;
+    color: #ffffff;
+    transform: scale(1.1);
+}
+
+/* Tomas vacío */
+.tomas-vacio {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: #8a9aa8;
+}
+
+.tomas-vacio i {
+    font-size: 2.5rem;
+    color: #dce1e8;
+    margin-bottom: 0.75rem;
+    display: block;
+}
+
+.tomas-vacio p {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #4a5a6e;
+    margin: 0 0 0.25rem 0;
+}
+
+.tomas-vacio span {
+    font-size: 0.85rem;
+    color: #8a9aa8;
+}
+
+/* ==========================================================================
+   17. RESPONSIVIDAD
    ========================================================================== */
 @media (max-width: 1200px) {
     .form-grid {
@@ -885,22 +1327,10 @@
     }
 }
 
-@media (max-width: 1024px) {
-    .form-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .form-group[style*="span 2"] {
-        grid-column: span 2 !important;
-    }
-
-    .resumen-tratamiento {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
 @media (max-width: 992px) {
-    .resumen-tratamiento {
+
+    .resumen-tratamiento,
+    .resumen-tratamiento-historial {
         grid-template-columns: repeat(2, 1fr);
     }
 
@@ -913,7 +1343,7 @@
     .main-content {
         margin-left: 0;
         padding: 1.25rem;
-        padding-top: 85px;
+        padding-top: 80px;
     }
 
     .header-section {
@@ -934,33 +1364,46 @@
         justify-content: center;
     }
 
+    .estado-tratamiento {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .tabs-nav-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .tabs-nav {
+        width: 100%;
+    }
+
+    .tab-btn {
+        flex: 1;
+        justify-content: center;
+        padding: 0.65rem 0.9rem;
+        font-size: 0.75rem;
+    }
+
+    .tab-btn span {
+        display: none;
+    }
+
+    .tab-btn i {
+        font-size: 1.15rem;
+    }
+
     .form-grid {
         grid-template-columns: 1fr;
         gap: 1.25rem;
     }
 
-    .form-group[style*="span"] {
-        grid-column: span 1 !important;
+    .full-width-group {
+        grid-column: 1;
     }
 
-    .action-footer {
-        flex-direction: column-reverse;
-        gap: 0.75rem;
-        margin-top: 1.75rem;
-        padding-top: 1.25rem;
-    }
-
-    .action-footer button {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .detail-card {
-        padding: 1.25rem;
-        border-radius: 16px;
-    }
-
-    .resumen-tratamiento {
+    .resumen-tratamiento,
+    .resumen-tratamiento-historial {
         grid-template-columns: 1fr;
         gap: 0.75rem;
         padding: 1rem 1.25rem;
@@ -979,52 +1422,63 @@
         grid-template-columns: 1fr;
     }
 
-    .toma-item {
+    .detail-card {
+        padding: 1.25rem;
+        border-radius: 16px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .toma-item,
+    .toma-item-full {
         flex-direction: column;
         align-items: flex-start;
         gap: 0.5rem;
+        padding: 0.7rem 1rem;
     }
 
-    .toma-detalle {
+    .toma-detalle,
+    .toma-actions-full {
         width: 100%;
         justify-content: flex-start;
         flex-wrap: wrap;
     }
 
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.75rem;
+    .toma-info-full {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.4rem;
+    }
+
+    .toma-fecha-hora {
+        flex-wrap: wrap;
     }
 
     .historial-item {
         flex-direction: column;
         align-items: flex-start;
         gap: 0.3rem;
-        padding: 0.6rem 0.8rem;
+        padding: 0.7rem 1rem;
     }
 
     .historial-fecha {
         min-width: auto;
-        font-size: 0.7rem;
     }
 
     .historial-usuario {
         align-self: flex-start;
-        font-size: 0.7rem;
-    }
-
-    .historial-detalle strong {
-        font-size: 0.8rem;
-    }
-
-    .historial-detalle span {
-        font-size: 0.75rem;
     }
 
     .historial-header {
         flex-direction: column;
         align-items: flex-start;
         gap: 0.5rem;
+    }
+
+    .historial-icono {
+        display: none;
     }
 
     .toast-premium-container {
@@ -1035,13 +1489,41 @@
         border-radius: 12px;
     }
 
-    .estado-tratamiento {
+    .action-footer {
+        flex-direction: column-reverse;
+        gap: 0.75rem;
+        margin-top: 1.75rem;
+        padding-top: 1.25rem;
+    }
+
+    .action-footer button {
         width: 100%;
         justify-content: center;
     }
 
-    .full-width-group textarea {
+    textarea.form-control-premium,
+    .full-width-group textarea.form-control-premium {
         min-height: 80px;
+        max-height: 80px;
+        height: 80px;
+        resize: none !important;
+    }
+
+    .toma-estado-badge {
+        font-size: 0.65rem;
+        padding: 0.15rem 0.6rem;
+    }
+
+    .info-card {
+        border-radius: 14px;
+    }
+
+    .info-card-body .info-nombre {
+        font-size: 0.95rem;
+    }
+
+    .info-detalle-item {
+        font-size: 0.8rem;
     }
 }
 
@@ -1050,29 +1532,8 @@
         font-size: 1.5rem;
     }
 
-    .title-page::before {
-        content: "💊 ";
-        font-size: 1.3rem;
-    }
-
     .subtitle-page {
         font-size: 0.85rem;
-    }
-
-    .detail-card {
-        padding: 1rem;
-        border-radius: 14px;
-    }
-
-    .form-control-premium {
-        font-size: 0.9rem;
-        padding: 0.6rem 0.8rem;
-    }
-
-    .btn-save,
-    .btn-cancel-premium {
-        font-size: 0.85rem;
-        padding: 0.6rem 1.2rem;
     }
 
     .stats-grid {
@@ -1087,8 +1548,15 @@
         font-size: 1.35rem;
     }
 
-    .resumen-tratamiento {
-        padding: 0.75rem 1rem;
+    .form-control-premium {
+        font-size: 0.9rem;
+        padding: 0.6rem 0.8rem;
+    }
+
+    .btn-save,
+    .btn-cancel-premium {
+        font-size: 0.85rem;
+        padding: 0.6rem 1.2rem;
     }
 
     .resumen-item strong {
@@ -1100,66 +1568,86 @@
         min-width: 28px;
     }
 
-    .info-card {
-        padding: 0.65rem 0.9rem;
+    .info-card-body {
+        padding: 0.7rem 1rem;
     }
 
-    .info-card p {
-        font-size: 0.85rem;
+    .info-card-header {
+        padding: 0.65rem 1rem;
     }
 
-    .info-card h5 {
-        font-size: 0.6rem;
+    .info-card-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 0.95rem;
     }
 
-    .toma-item {
-        padding: 0.6rem 0.8rem;
+    .info-card-body .info-nombre {
+        font-size: 0.9rem;
+    }
+
+    .info-detalle-item {
+        font-size: 0.75rem;
+        gap: 0.4rem;
+    }
+
+    .info-detalle-item i {
+        font-size: 0.8rem;
+        width: 16px;
+    }
+
+    .toma-item,
+    .toma-item-full {
+        padding: 0.5rem 0.8rem;
     }
 
     .toma-fecha {
         font-size: 0.8rem;
     }
 
+    .toma-hora {
+        font-size: 0.7rem;
+    }
+
     .toma-estado {
         font-size: 0.7rem;
     }
 
-    .toma-notas {
+    .toma-notas,
+    .toma-notas-full {
         font-size: 0.65rem;
     }
 
-    .historial-item {
-        padding: 0.5rem 0.7rem;
+    textarea.form-control-premium,
+    .full-width-group textarea.form-control-premium {
+        min-height: 60px;
+        max-height: 60px;
+        height: 60px;
+        resize: none !important;
+        font-size: 0.85rem;
     }
 
-    .historial-detalle strong {
+    .toma-actions-buttons .btn-toma-completar,
+    .toma-actions-buttons .btn-toma-omitir,
+    .toma-actions-buttons .btn-toma-retrasar {
+        width: 24px;
+        height: 24px;
         font-size: 0.75rem;
-    }
-
-    .historial-detalle span {
-        font-size: 0.7rem;
-    }
-
-    .section-title {
-        font-size: 0.95rem;
     }
 }
 
 /* ==========================================================================
-   18. UTILIDADES ADICIONALES
+   18. UTILIDADES
    ========================================================================== */
-/* Smooth scroll global */
 html {
     scroll-behavior: smooth;
 }
 
-/* Selección de texto personalizada */
 ::selection {
     background: rgba(176, 0, 30, 0.15);
     color: #b0001e;
 }
 
-/* Enfoque accesible para elementos interactivos */
 button:focus-visible,
 input:focus-visible,
 select:focus-visible,
@@ -1168,41 +1656,168 @@ textarea:focus-visible {
     outline-offset: 2px;
 }
 
-/* Mejora para selects */
-select.form-control-premium {
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a5a6e' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 1rem center;
-    padding-right: 2.5rem;
-    cursor: pointer;
+/* ==========================================================================
+   MODAL DE CONFIRMACIÓN PERSONALIZADO
+   ========================================================================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 10006;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: modalFadeIn 0.3s ease;
 }
 
-select.form-control-premium option {
-    padding: 0.5rem;
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
-select.form-control-premium option:checked {
-    background: #b0001e;
-    color: #ffffff;
+.modal-container {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 2rem;
+    max-width: 450px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: modalSlideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Estilo para inputs de fecha */
-input[type="text"][readonly] {
-    cursor: pointer;
+@keyframes modalSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
-input[type="text"][readonly]:hover {
-    border-color: #b0bcc8;
+.modal-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
 }
 
-/* Estilo para inputs numéricos */
-input[type="number"].form-control-premium {
-    -moz-appearance: textfield;
+.modal-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    color: #d97706;
+    flex-shrink: 0;
 }
 
-input[type="number"].form-control-premium::-webkit-outer-spin-button,
-input[type="number"].form-control-premium::-webkit-inner-spin-button {
-    -webkit-appearance: none;
+.modal-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0a1628;
     margin: 0;
+}
+
+.modal-body {
+    padding: 0.5rem 0 1.5rem 0;
+}
+
+.modal-mensaje {
+    font-size: 0.95rem;
+    color: #4a5a6e;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e9edf2;
+}
+
+.modal-btn {
+    padding: 0.6rem 1.5rem;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modal-btn-cancel {
+    background: #f1f4f8;
+    color: #4a5a6e;
+}
+
+.modal-btn-cancel:hover {
+    background: #e2e7ee;
+    transform: translateY(-2px);
+}
+
+.modal-btn-confirm {
+    background: linear-gradient(135deg, #b0001e, #8a0016);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(176, 0, 30, 0.25);
+}
+
+.modal-btn-confirm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(176, 0, 30, 0.35);
+}
+
+.modal-btn-confirm i {
+    font-size: 1rem;
+}
+
+/* Responsive modal */
+@media (max-width: 480px) {
+    .modal-container {
+        padding: 1.5rem;
+    }
+
+    .modal-footer {
+        flex-direction: column-reverse;
+    }
+
+    .modal-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .modal-icon {
+        width: 34px;
+        height: 34px;
+        font-size: 1.1rem;
+    }
+
+    .modal-title {
+        font-size: 1rem;
+    }
+
+    .modal-mensaje {
+        font-size: 0.9rem;
+    }
 }

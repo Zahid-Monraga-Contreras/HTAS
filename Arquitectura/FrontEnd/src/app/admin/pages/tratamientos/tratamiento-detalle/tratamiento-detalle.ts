@@ -1,3 +1,4 @@
+// TRATAMIENTO-DETALLE.COMPONENT.TS
 import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef, PLATFORM_ID } from '@angular/core';
 import { CommonModule, Location, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -18,10 +19,18 @@ interface HistorialTratamiento {
 
 interface RegistroToma {
   id: number;
-  fecha: string;
-  estado: string;
-  notas: string;
+  idTratamiento: number;
+  fechaProgramada: string;
+  fechaRealizada?: string;
+  estado: 'Pendiente' | 'Tomada' | 'Omitida' | 'Retrasada';
+  notas?: string;
+  idAcompanante?: number;
+  nombreAcompanante?: string;
+  fechaFormateada?: string;
+  horaFormateada?: string;
 }
+
+type TabTratamiento = 'detalle' | 'historial' | 'registro-tomas';
 
 @Component({
   selector: 'app-tratamiento-detalle',
@@ -40,32 +49,52 @@ export class TratamientoDetalle implements OnInit, OnDestroy {
   tratamientoSeleccionado: any = null;
   isSaving = false;
 
+  // Pestaña activa
+  activeTab: TabTratamiento = 'detalle';
+
   private fpInicio: any = null;
   private fpFin: any = null;
 
+  // Sistema de Notificaciones Premium Toast
   mostrarToast = false;
   mensajeToast = '';
   tipoToast: 'success' | 'error' | 'warning' = 'success';
   private toastTimeout: any = null;
 
+  // Modal de confirmación
+  mostrarModalConfirmacion = false;
+  modalConfirmacionMensaje = '';
+  modalConfirmacionAccion: (() => void) | null = null;
+
+  // Historial de cambios
   historialCambios: HistorialTratamiento[] = [];
   mostrarHistorial = false;
 
+  // Registros de tomas
   registrosTomas: RegistroToma[] = [];
   mostrarTomas = false;
 
+  // Estadísticas
   estadisticas: {
     totalTomas: number;
     tomasCompletadas: number;
     tomasPendientes: number;
     porcentajeCumplimiento: number;
     diasRestantes: number;
+    tomasOmitidas: number;
+    tomasRetrasadas: number;
   } | null = null;
 
+  // Información relacionada
   pacienteInfo: any = null;
   medicamentoInfo: any = null;
 
   cargando = false;
+  generandoTomas = false;
+  tomasYaGeneradas = false;
+
+  // Frecuencia texto cache
+  private frecuenciaTextoCache: string = '';
 
   ngOnInit() {
     let state: any = null;
@@ -88,13 +117,25 @@ export class TratamientoDetalle implements OnInit, OnDestroy {
     }
   }
 
+  // --- CONTROL DE PESTAÑAS ---
+  cambiarTab(tab: TabTratamiento) {
+    if (this.activeTab === tab) return;
+    this.activeTab = tab;
+
+    // Si cambiamos a la pestaña de registro de tomas, recargar datos
+    if (tab === 'registro-tomas') {
+      this.cargarRegistrosTomas(this.tratamientoSeleccionado?.idtratamiento);
+    }
+
+    this.cdr.detectChanges();
+  }
+
+  // --- INICIALIZAR CAMPOS ---
   inicializarCampos() {
     if (!this.tratamientoSeleccionado) return;
 
-    // Mapear campos del backend
     const t = this.tratamientoSeleccionado;
 
-    // ID del tratamiento
     this.tratamientoSeleccionado.idtratamiento = t.idtratamiento || t.IdTratamiento || t.id;
 
     // Información del paciente
@@ -136,7 +177,7 @@ export class TratamientoDetalle implements OnInit, OnDestroy {
     return new Date(fecha).toISOString().split('T')[0];
   }
 
-  // ✅ CARGAR DATOS ADICIONALES REALES DESDE EL BACKEND
+  // --- CARGAR DATOS ADICIONALES ---
   async cargarDatosAdicionales() {
     if (!this.tratamientoSeleccionado) return;
 
@@ -145,17 +186,16 @@ export class TratamientoDetalle implements OnInit, OnDestroy {
     try {
       const idTratamiento = this.tratamientoSeleccionado.idtratamiento;
 
-      // ✅ Obtener datos completos del tratamiento desde el backend
+      // ✅ Obtener tratamiento completo
       const tratamientoCompleto = await firstValueFrom(
         this.usersService.getTratamientoById(idTratamiento)
       );
 
       if (tratamientoCompleto) {
-        // Actualizar con los datos completos del backend
         this.tratamientoSeleccionado = { ...this.tratamientoSeleccionado, ...tratamientoCompleto };
         this.inicializarCampos();
 
-        // ✅ Cargar información del paciente
+        // ✅ Información del paciente
         this.pacienteInfo = {
           nombre: tratamientoCompleto.nombrepaciente || tratamientoCompleto.NombrePaciente || '',
           apPaterno: tratamientoCompleto.appaternopaciente || tratamientoCompleto.ApPaternoPaciente || '',
@@ -164,7 +204,7 @@ export class TratamientoDetalle implements OnInit, OnDestroy {
           telefono: tratamientoCompleto.telefonopaciente || tratamientoCompleto.TelefonoPaciente || ''
         };
 
-        // ✅ Cargar información del medicamento
+        // ✅ Información del medicamento
         this.medicamentoInfo = {
           nombre: tratamientoCompleto.nombremedicamento || tratamientoCompleto.NombreMedicamento || '',
           presentacion: tratamientoCompleto.presentacion || tratamientoCompleto.PresentacionMedicamento || '',
@@ -173,18 +213,17 @@ export class TratamientoDetalle implements OnInit, OnDestroy {
         };
       }
 
-      // ✅ Cargar registros de tomas
+      // ✅ Cargar registros de tomas desde el backend
       await this.cargarRegistrosTomas(idTratamiento);
 
       // ✅ Calcular estadísticas
       this.calcularEstadisticas();
 
-      // ✅ Inicializar historial
+      // ✅ Cargar historial
       this.cargarHistorialTratamiento();
 
     } catch (error) {
       console.warn('Error al cargar datos adicionales:', error);
-      // ✅ Fallback: usar datos locales si no se puede conectar
       this.cargarDatosLocales();
     } finally {
       this.cargando = false;
@@ -192,32 +231,193 @@ export class TratamientoDetalle implements OnInit, OnDestroy {
     }
   }
 
-  // ✅ CARGAR REGISTROS DE TOMAS REALES
+  // --- CARGAR REGISTROS DE TOMAS DESDE EL BACKEND ---
   async cargarRegistrosTomas(idTratamiento: number) {
     try {
-      // Intentar obtener registros de tomas del backend
-      // Nota: Necesitarás crear este endpoint en tu backend
-      // Por ahora, simulamos datos
-      this.registrosTomas = [
-        { id: 1, fecha: this.formatearFechaHora(new Date()), estado: 'Tomada', notas: 'Sin novedad' },
-        { id: 2, fecha: this.formatearFechaHora(new Date(Date.now() - 3600000)), estado: 'Pendiente', notas: '' },
-        { id: 3, fecha: this.formatearFechaHora(new Date(Date.now() - 86400000)), estado: 'Tomada', notas: 'Paciente con náuseas' },
-        { id: 4, fecha: this.formatearFechaHora(new Date(Date.now() - 172800000)), estado: 'Omitida', notas: 'Paciente olvidó tomar' }
-      ];
+      // ✅ Obtener tomas del backend
+      const tomas = await firstValueFrom(
+        this.usersService.getTomasByTratamiento(idTratamiento)
+      );
+
+      if (tomas && tomas.length > 0) {
+        // Mapear datos del backend al formato del frontend
+        this.registrosTomas = tomas.map((t: any) => {
+          const fechaProgramada = t.fechaProgramada || t.FechaHoraProgramada;
+          const fechaRealizada = t.fechaRealizada || t.FechaHoraRealizada;
+
+          // Formatear fecha y hora separadamente
+          const { fecha, hora } = this.formatearFechaYHora(fechaProgramada);
+
+          return {
+            id: t.id || t.IdTomar,
+            idTratamiento: t.idTratamiento || t.IdTratamiento,
+            fechaProgramada: fechaProgramada,
+            fechaRealizada: fechaRealizada,
+            estado: t.estado || t.EstadoTomar || 'Pendiente',
+            notas: t.notas || t.NotasTomas || '',
+            idAcompanante: t.idAcompanante || t.IdAcompananteQueRegistro,
+            nombreAcompanante: t.nombreAcompanante || '',
+            fechaFormateada: fecha,
+            horaFormateada: hora
+          };
+        });
+
+        // Ordenar por fecha (más reciente primero)
+        this.registrosTomas.sort((a, b) => {
+          return new Date(b.fechaProgramada).getTime() - new Date(a.fechaProgramada).getTime();
+        });
+
+        this.tomasYaGeneradas = true;
+      } else {
+        this.registrosTomas = [];
+        this.tomasYaGeneradas = false;
+      }
+
+      this.cdr.detectChanges();
+
     } catch (error) {
       console.warn('No se pudieron cargar registros de tomas:', error);
       this.registrosTomas = [];
+      this.tomasYaGeneradas = false;
     }
   }
 
-  // ✅ CALCULAR ESTADÍSTICAS REALES
+  // --- FORMATEAR FECHA Y HORA SEPARADAMENTE ---
+  formatearFechaYHora(fechaStr: string): { fecha: string, hora: string } {
+    if (!fechaStr) return { fecha: 'Fecha no disponible', hora: 'Hora no disponible' };
+
+    try {
+      const fecha = new Date(fechaStr);
+      if (isNaN(fecha.getTime())) return { fecha: fechaStr, hora: '' };
+
+      // Formato fecha: dd/MM/yyyy
+      const dia = String(fecha.getDate()).padStart(2, '0');
+      const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+      const anio = fecha.getFullYear();
+      const fechaFormateada = `${dia}/${mes}/${anio}`;
+
+      // Formato hora: HH:MM (formato 24h)
+      const horas = String(fecha.getHours()).padStart(2, '0');
+      const minutos = String(fecha.getMinutes()).padStart(2, '0');
+      const horaFormateada = `${horas}:${minutos}`;
+
+      return { fecha: fechaFormateada, hora: horaFormateada };
+    } catch (error) {
+      return { fecha: fechaStr, hora: '' };
+    }
+  }
+
+  // --- CALCULAR TOMAS ESTIMADAS BASADO EN FRECUENCIA Y FECHAS ---
+  calcularTomasEstimadas(): number {
+    if (!this.tratamientoSeleccionado) return 0;
+
+    const fechaInicio = this.tratamientoSeleccionado.fechainicio;
+    const fechaFin = this.tratamientoSeleccionado.fechafin;
+    const frecuenciaHoras = parseInt(this.tratamientoSeleccionado.frecuenciahoras) || 8;
+
+    if (!fechaInicio || !fechaFin || !frecuenciaHoras) return 0;
+
+    try {
+      const inicio = new Date(fechaInicio);
+      const fin = new Date(fechaFin);
+
+      if (isNaN(inicio.getTime()) || isNaN(fin.getTime())) return 0;
+
+      // Calcular diferencia en horas
+      const diffMs = fin.getTime() - inicio.getTime();
+      const diffHoras = diffMs / (1000 * 60 * 60);
+
+      // Calcular número de tomas basado en la frecuencia
+      const tomas = Math.ceil(diffHoras / frecuenciaHoras);
+
+      return tomas > 0 ? tomas : 0;
+    } catch (error) {
+      console.warn('Error calculando tomas estimadas:', error);
+      return 0;
+    }
+  }
+
+  // --- CALCULAR ESTADÍSTICAS ---
   calcularEstadisticas() {
     if (!this.tratamientoSeleccionado) return;
 
-    const totalTomas = this.registrosTomas.length || 10;
-    const tomasCompletadas = this.registrosTomas.filter(t => t.estado === 'Tomada').length || 6;
-    const tomasPendientes = this.registrosTomas.filter(t => t.estado === 'Pendiente').length || 3;
-    const porcentajeCumplimiento = totalTomas > 0 ? Math.round((tomasCompletadas / totalTomas) * 100) : 0;
+    // Si hay tomas registradas, usar los datos reales
+    if (this.registrosTomas && this.registrosTomas.length > 0) {
+      const totalTomas = this.registrosTomas.length;
+      const tomasCompletadas = this.registrosTomas.filter(t => t.estado === 'Tomada').length;
+      const tomasPendientes = this.registrosTomas.filter(t => t.estado === 'Pendiente').length;
+      const tomasOmitidas = this.registrosTomas.filter(t => t.estado === 'Omitida').length;
+      const tomasRetrasadas = this.registrosTomas.filter(t => t.estado === 'Retrasada').length;
+
+      const porcentajeCumplimiento = totalTomas > 0 ? Math.round((tomasCompletadas / totalTomas) * 100) : 0;
+
+      let diasRestantes = 0;
+      if (this.tratamientoSeleccionado.fechafin) {
+        const hoy = new Date();
+        const fin = new Date(this.tratamientoSeleccionado.fechafin);
+        const diffTime = fin.getTime() - hoy.getTime();
+        diasRestantes = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+      }
+
+      this.estadisticas = {
+        totalTomas: totalTomas,
+        tomasCompletadas: tomasCompletadas,
+        tomasPendientes: tomasPendientes,
+        tomasOmitidas: tomasOmitidas,
+        tomasRetrasadas: tomasRetrasadas,
+        porcentajeCumplimiento: porcentajeCumplimiento,
+        diasRestantes: diasRestantes
+      };
+
+      this.tomasYaGeneradas = true;
+    } else {
+      // Si no hay tomas registradas, calcular tomas estimadas
+      const totalTomas = this.calcularTomasEstimadas();
+
+      let diasRestantes = 0;
+      if (this.tratamientoSeleccionado.fechafin) {
+        const hoy = new Date();
+        const fin = new Date(this.tratamientoSeleccionado.fechafin);
+        const diffTime = fin.getTime() - hoy.getTime();
+        diasRestantes = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+      }
+
+      this.estadisticas = {
+        totalTomas: totalTomas,
+        tomasCompletadas: 0,
+        tomasPendientes: totalTomas,
+        tomasOmitidas: 0,
+        tomasRetrasadas: 0,
+        porcentajeCumplimiento: 0,
+        diasRestantes: diasRestantes
+      };
+
+      this.tomasYaGeneradas = false;
+    }
+  }
+
+  // --- CARGAR DATOS LOCALES (FALLBACK) ---
+  cargarDatosLocales() {
+    // Paciente info
+    if (this.tratamientoSeleccionado.nombrepaciente) {
+      this.pacienteInfo = {
+        nombre: this.tratamientoSeleccionado.nombrepaciente,
+        apPaterno: this.tratamientoSeleccionado.appaternopaciente || '',
+        apMaterno: this.tratamientoSeleccionado.apmaternopaciente || ''
+      };
+    }
+
+    // Medicamento info
+    if (this.tratamientoSeleccionado.nombremedicamento) {
+      this.medicamentoInfo = {
+        nombre: this.tratamientoSeleccionado.nombremedicamento,
+        presentacion: this.tratamientoSeleccionado.presentacion || '',
+        concentracion: this.tratamientoSeleccionado.concentracion || ''
+      };
+    }
+
+    // Calcular tomas estimadas
+    const totalTomas = this.calcularTomasEstimadas();
 
     let diasRestantes = 0;
     if (this.tratamientoSeleccionado.fechafin) {
@@ -229,55 +429,155 @@ export class TratamientoDetalle implements OnInit, OnDestroy {
 
     this.estadisticas = {
       totalTomas: totalTomas,
-      tomasCompletadas: tomasCompletadas,
-      tomasPendientes: tomasPendientes,
-      porcentajeCumplimiento: porcentajeCumplimiento,
+      tomasCompletadas: 0,
+      tomasPendientes: totalTomas,
+      tomasOmitidas: 0,
+      tomasRetrasadas: 0,
+      porcentajeCumplimiento: 0,
       diasRestantes: diasRestantes
     };
-  }
 
-  // ✅ FORMATEAR FECHA Y HORA PARA REGISTROS
-  formatearFechaHora(fecha: Date): string {
-    const dia = String(fecha.getDate()).padStart(2, '0');
-    const mes = String(fecha.getMonth() + 1).padStart(2, '0');
-    const anio = fecha.getFullYear();
-    const horas = String(fecha.getHours()).padStart(2, '0');
-    const minutos = String(fecha.getMinutes()).padStart(2, '0');
-    return `${dia}/${mes}/${anio} ${horas}:${minutos}`;
-  }
-
-  // ✅ CARGAR DATOS LOCALES (FALLBACK)
-  cargarDatosLocales() {
-    if (this.tratamientoSeleccionado.nombrepaciente) {
-      this.pacienteInfo = {
-        nombre: this.tratamientoSeleccionado.nombrepaciente,
-        apPaterno: this.tratamientoSeleccionado.appaternopaciente || '',
-        apMaterno: this.tratamientoSeleccionado.apmaternopaciente || ''
-      };
-    }
-
-    if (this.tratamientoSeleccionado.nombremedicamento) {
-      this.medicamentoInfo = {
-        nombre: this.tratamientoSeleccionado.nombremedicamento,
-        presentacion: this.tratamientoSeleccionado.presentacion || '',
-        concentracion: this.tratamientoSeleccionado.concentracion || ''
-      };
-    }
-
-    this.estadisticas = {
-      totalTomas: 0,
-      tomasCompletadas: 0,
-      tomasPendientes: 0,
-      porcentajeCumplimiento: 0,
-      diasRestantes: this.getDiasRestantes() || 0
-    };
-
+    this.tomasYaGeneradas = false;
     this.cargarHistorialTratamiento();
   }
 
+  // --- MODAL DE CONFIRMACIÓN ---
+  mostrarModal(mensaje: string, accion: () => void) {
+    this.modalConfirmacionMensaje = mensaje;
+    this.modalConfirmacionAccion = accion;
+    this.mostrarModalConfirmacion = true;
+    this.cdr.detectChanges();
+  }
+
+  cerrarModal() {
+    this.mostrarModalConfirmacion = false;
+    this.modalConfirmacionAccion = null;
+    this.cdr.detectChanges();
+  }
+
+  confirmarModal() {
+    if (this.modalConfirmacionAccion) {
+      this.modalConfirmacionAccion();
+    }
+    this.cerrarModal();
+  }
+
+  // --- GENERAR TOMAS PROGRAMADAS ---
+  async generarTomasProgramadas() {
+    // Verificar si ya hay tomas generadas
+    if (this.tomasYaGeneradas) {
+      this.lanzarNotificacion('Ya existen tomas generadas para este tratamiento.', 'warning');
+      return;
+    }
+
+    if (!this.tratamientoSeleccionado) return;
+
+    const idTratamiento = this.tratamientoSeleccionado.idtratamiento;
+    const fechaInicio = this.tratamientoSeleccionado.fechainicio;
+    const fechaFin = this.tratamientoSeleccionado.fechafin;
+    const frecuenciaHoras = this.tratamientoSeleccionado.frecuenciahoras;
+
+    if (!fechaInicio || !fechaFin || !frecuenciaHoras) {
+      this.lanzarNotificacion('Faltan datos para generar las tomas.', 'warning');
+      return;
+    }
+
+    // Calcular tomas estimadas para mostrar en el modal
+    const tomasEstimadas = this.calcularTomasEstimadas();
+
+    // Mostrar modal personalizado
+    this.mostrarModal(
+      `¿Generar ${tomasEstimadas} tomas programadas para este tratamiento?`,
+      async () => {
+        await this.ejecutarGeneracionTomas();
+      }
+    );
+  }
+
+  async ejecutarGeneracionTomas() {
+    if (!this.tratamientoSeleccionado) return;
+
+    const idTratamiento = this.tratamientoSeleccionado.idtratamiento;
+    const fechaInicio = this.tratamientoSeleccionado.fechainicio;
+    const fechaFin = this.tratamientoSeleccionado.fechafin;
+    const frecuenciaHoras = this.tratamientoSeleccionado.frecuenciahoras;
+
+    this.generandoTomas = true;
+    this.cdr.detectChanges();
+
+    try {
+      const response = await firstValueFrom(
+        this.usersService.generarTomasProgramadas({
+          idTratamiento: idTratamiento,
+          fechaInicio: fechaInicio,
+          fechaFin: fechaFin,
+          frecuenciaHoras: frecuenciaHoras
+        })
+      );
+
+      this.lanzarNotificacion(
+        `¡${response.totalGeneradas} tomas generadas exitosamente!`,
+        'success'
+      );
+
+      // Recargar tomas
+      await this.cargarRegistrosTomas(idTratamiento);
+      this.calcularEstadisticas();
+      this.cdr.detectChanges();
+
+    } catch (error: any) {
+      console.error('Error al generar tomas:', error);
+      this.lanzarNotificacion('Error al generar las tomas programadas.', 'error');
+    } finally {
+      this.generandoTomas = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  // --- VERIFICAR SI EL BOTÓN DE GENERAR TOMAS DEBE ESTAR DESHABILITADO ---
+  isGenerarTomasDisabled(): boolean {
+    return this.tomasYaGeneradas || this.generandoTomas || !this.tratamientoSeleccionado;
+  }
+
+  // --- ACTUALIZAR ESTADO DE UNA TOMA ---
+  async actualizarEstadoToma(id: number, estado: string, notas?: string) {
+    try {
+      const fechaRealizada = estado === 'Tomada' ? new Date().toISOString() : undefined;
+
+      const response = await firstValueFrom(
+        this.usersService.actualizarEstadoToma(id, estado, fechaRealizada, notas)
+      );
+
+      const estadoTexto = {
+        'Tomada': 'completada',
+        'Pendiente': 'pendiente',
+        'Omitida': 'omitida',
+        'Retrasada': 'retrasada'
+      }[estado] || estado;
+
+      this.lanzarNotificacion(`Toma marcada como ${estadoTexto}.`, 'success');
+
+      // Recargar tomas
+      await this.cargarRegistrosTomas(this.tratamientoSeleccionado.idtratamiento);
+      this.calcularEstadisticas();
+      this.cdr.detectChanges();
+
+    } catch (error: any) {
+      console.error('Error al actualizar estado:', error);
+      this.lanzarNotificacion('Error al actualizar el estado de la toma.', 'error');
+    }
+  }
+
+  // --- CARGAR HISTORIAL ---
   cargarHistorialTratamiento() {
     const ahora = new Date();
-    const fechaStr = ahora.toISOString().replace('T', ' ').slice(0, 16);
+    const fechaStr = ahora.toLocaleString('es-MX', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
 
     this.historialCambios = [
       {
@@ -287,11 +587,38 @@ export class TratamientoDetalle implements OnInit, OnDestroy {
         usuario: 'Sistema'
       }
     ];
+
+    // Agregar eventos de tomas al historial
+    this.registrosTomas.forEach(toma => {
+      if (toma.estado === 'Tomada' && toma.fechaRealizada) {
+        const { fecha, hora } = this.formatearFechaYHora(toma.fechaRealizada);
+        this.historialCambios.push({
+          fecha: `${fecha} ${hora}`,
+          accion: 'Toma completada',
+          detalle: `Toma del tratamiento ${this.tratamientoSeleccionado.nombremedicamento || ''}`,
+          usuario: 'Paciente'
+        });
+      }
+    });
+
+    // Ordenar por fecha
+    this.historialCambios.sort((a, b) => {
+      const fechaA = new Date(a.fecha);
+      const fechaB = new Date(b.fecha);
+      return fechaB.getTime() - fechaA.getTime();
+    });
   }
 
+  // --- AGREGAR AL HISTORIAL ---
   agregarHistorial(accion: string, detalle: string) {
     const ahora = new Date();
-    const fechaStr = ahora.toISOString().replace('T', ' ').slice(0, 16);
+    const fechaStr = ahora.toLocaleString('es-MX', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
     this.historialCambios.unshift({
       fecha: fechaStr,
       accion: accion,
@@ -300,7 +627,19 @@ export class TratamientoDetalle implements OnInit, OnDestroy {
     });
   }
 
-  // ✅ OBTENER ESTADO DEL TRATAMIENTO
+  // --- CONTADORES PARA ESTADÍSTICAS DEL HISTORIAL ---
+  contarCambiosDosis(): number {
+    return this.historialCambios.filter(h => h.accion.includes('Dosis')).length;
+  }
+
+  contarCambiosEstado(): number {
+    return this.historialCambios.filter(h =>
+      h.accion.includes('activado') ||
+      h.accion.includes('desactivado')
+    ).length;
+  }
+
+  // --- ESTADO DEL TRATAMIENTO ---
   getEstadoTratamiento(): { texto: string; clase: string; icono: string } {
     if (!this.tratamientoSeleccionado) {
       return { texto: 'Sin datos', clase: 'estado-sin-datos', icono: 'bi-question-circle' };
@@ -324,6 +663,19 @@ export class TratamientoDetalle implements OnInit, OnDestroy {
     return { texto: 'Activo', clase: 'estado-activo', icono: 'bi-check-circle-fill' };
   }
 
+  getEstadoTratamientoColor(): string {
+    const estado = this.getEstadoTratamiento();
+    const colores: { [key: string]: string } = {
+      'Activo': '#10b981',
+      'Inactivo': '#ef4444',
+      'Finalizado': '#3b82f6',
+      'Bajo cumplimiento': '#f59e0b',
+      'Sin datos': '#6c757d'
+    };
+    return colores[estado.texto] || '#6c757d';
+  }
+
+  // --- COLORES PARA TOMAS ---
   getEstadoColor(estado: string): string {
     const colores: { [key: string]: string } = {
       'Tomada': '#10b981',
@@ -334,6 +686,17 @@ export class TratamientoDetalle implements OnInit, OnDestroy {
     return colores[estado] || '#6c757d';
   }
 
+  getEstadoIcono(estado: string): string {
+    const iconos: { [key: string]: string } = {
+      'Tomada': 'bi-check-circle-fill',
+      'Pendiente': 'bi-clock-fill',
+      'Omitida': 'bi-x-circle-fill',
+      'Retrasada': 'bi-exclamation-triangle-fill'
+    };
+    return iconos[estado] || 'bi-question-circle';
+  }
+
+  // --- CÁLCULOS DE FECHAS ---
   getDiasRestantes(): number | null {
     if (!this.tratamientoSeleccionado?.fechafin) return null;
     const hoy = new Date();
@@ -371,6 +734,7 @@ export class TratamientoDetalle implements OnInit, OnDestroy {
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   }
 
+  // --- VALIDAR FECHAS ---
   validarFechas(): { valido: boolean; mensaje: string } {
     const inicio = this.tratamientoSeleccionado.fechainicio;
     const fin = this.tratamientoSeleccionado.fechafin;
@@ -396,22 +760,102 @@ export class TratamientoDetalle implements OnInit, OnDestroy {
     return { valido: true, mensaje: '' };
   }
 
-  ngOnDestroy() {
-    if (this.toastTimeout) clearTimeout(this.toastTimeout);
-    if (this.fpInicio) {
-      try { this.fpInicio.destroy(); } catch (e) { }
-      this.fpInicio = null;
+  // --- GUARDAR CAMBIOS ---
+  async guardarCambios() {
+    if (!this.tratamientoSeleccionado) return;
+
+    const id = this.tratamientoSeleccionado.idtratamiento;
+    if (!id) {
+      this.lanzarNotificacion("Error: No se encontró el identificador del tratamiento.", "error");
+      return;
     }
-    if (this.fpFin) {
-      try { this.fpFin.destroy(); } catch (e) { }
-      this.fpFin = null;
+
+    const dosis = (this.tratamientoSeleccionado.dosis || '').trim();
+    const frecuenciaHoras = parseInt(this.tratamientoSeleccionado.frecuenciahoras, 10);
+    const fechaInicio = this.tratamientoSeleccionado.fechainicio;
+    const fechaFin = this.tratamientoSeleccionado.fechafin;
+
+    if (!dosis || isNaN(frecuenciaHoras) || !fechaInicio || !fechaFin) {
+      this.lanzarNotificacion("La dosis, frecuencia, fecha de inicio y fin son requeridas.", "warning");
+      return;
+    }
+
+    const validacionFechas = this.validarFechas();
+    if (!validacionFechas.valido) {
+      this.lanzarNotificacion(validacionFechas.mensaje, "warning");
+      return;
+    }
+
+    const dosisAnterior = this.tratamientoSeleccionado.dosis || '';
+    const estadoAnterior = this.tratamientoSeleccionado.activo;
+    const frecuenciaAnterior = this.tratamientoSeleccionado.frecuenciahoras;
+
+    this.isSaving = true;
+    this.cdr.detectChanges();
+
+    try {
+      const estadoActivo = this.tratamientoSeleccionado.activo === true ||
+        this.tratamientoSeleccionado.activo === 'true';
+
+      const payload = {
+        dosis: dosis,
+        frecuenciaHoras: frecuenciaHoras,
+        fechaInicio: fechaInicio,
+        fechaFin: fechaFin,
+        notasInstrucciones: (this.tratamientoSeleccionado.notasinstrucciones || '').trim(),
+        activo: estadoActivo
+      };
+
+      await firstValueFrom(this.usersService.actualizarTratamiento(id, payload));
+
+      // Registrar cambios en historial
+      if (dosisAnterior !== dosis) {
+        this.agregarHistorial(
+          `Dosis actualizada`,
+          `De: "${dosisAnterior}" → "${dosis}"`
+        );
+      }
+
+      if (frecuenciaAnterior !== frecuenciaHoras) {
+        this.agregarHistorial(
+          `Frecuencia actualizada`,
+          `De: ${frecuenciaAnterior} horas → ${frecuenciaHoras} horas`
+        );
+      }
+
+      if (estadoAnterior !== estadoActivo) {
+        this.agregarHistorial(
+          `Tratamiento ${estadoActivo ? 'activado' : 'desactivado'}`,
+          `El tratamiento fue ${estadoActivo ? 'activado' : 'desactivado'}`
+        );
+      }
+
+      if (dosisAnterior === dosis && estadoAnterior === estadoActivo && frecuenciaAnterior === frecuenciaHoras) {
+        this.agregarHistorial(
+          'Información actualizada',
+          'Datos del tratamiento actualizados'
+        );
+      }
+
+      await this.cargarDatosAdicionales();
+
+      this.lanzarNotificacion("¡Éxito! El tratamiento ha sido actualizado correctamente.", "success");
+
+      setTimeout(() => {
+        this.router.navigate(['/tratamientos']);
+      }, 2000);
+
+    } catch (error: any) {
+      console.error("Error al guardar cambios:", error);
+      const msgErr = error.error?.error || error.message || "Error interno del servidor";
+      this.lanzarNotificacion(`No se pudo guardar: ${msgErr}`, "error");
+    } finally {
+      this.isSaving = false;
+      this.cdr.detectChanges();
     }
   }
 
-  volver() {
-    this.location.back();
-  }
-
+  // --- TOAST ---
   lanzarNotificacion(mensaje: string, tipo: 'success' | 'error' | 'warning' = 'success') {
     this.mensajeToast = mensaje;
     this.tipoToast = tipo;
@@ -426,6 +870,7 @@ export class TratamientoDetalle implements OnInit, OnDestroy {
     }, 4000);
   }
 
+  // --- CALENDARIOS ---
   inicializarCalendario() {
     if (!isPlatformBrowser(this.platformId)) return;
 
@@ -488,90 +933,24 @@ export class TratamientoDetalle implements OnInit, OnDestroy {
     }
   }
 
-  // ✅ GUARDAR CAMBIOS EN EL BACKEND
-  async guardarCambios() {
-    if (!this.tratamientoSeleccionado) return;
+  // --- OBTENER ESTADÍSTICAS PARA MOSTRAR EN REGISTRO DE TOMAS ---
+  getEstadisticasParaRegistro() {
+    return this.estadisticas;
+  }
 
-    const id = this.tratamientoSeleccionado.idtratamiento;
-    if (!id) {
-      this.lanzarNotificacion("Error: No se encontró el identificador del tratamiento.", "error");
-      return;
+  volver() {
+    this.location.back();
+  }
+
+  ngOnDestroy() {
+    if (this.toastTimeout) clearTimeout(this.toastTimeout);
+    if (this.fpInicio) {
+      try { this.fpInicio.destroy(); } catch (e) { }
+      this.fpInicio = null;
     }
-
-    const dosis = (this.tratamientoSeleccionado.dosis || '').trim();
-    const frecuenciaHoras = parseInt(this.tratamientoSeleccionado.frecuenciahoras, 10);
-    const fechaInicio = this.tratamientoSeleccionado.fechainicio;
-    const fechaFin = this.tratamientoSeleccionado.fechafin;
-
-    if (!dosis || isNaN(frecuenciaHoras) || !fechaInicio || !fechaFin) {
-      this.lanzarNotificacion("La dosis, frecuencia, fecha de inicio y fin son requeridas.", "warning");
-      return;
-    }
-
-    const validacionFechas = this.validarFechas();
-    if (!validacionFechas.valido) {
-      this.lanzarNotificacion(validacionFechas.mensaje, "warning");
-      return;
-    }
-
-    const dosisAnterior = this.tratamientoSeleccionado.dosis || '';
-    const estadoAnterior = this.tratamientoSeleccionado.activo;
-
-    this.isSaving = true;
-    this.cdr.detectChanges();
-
-    try {
-      const estadoActivo = this.tratamientoSeleccionado.activo === true ||
-        this.tratamientoSeleccionado.activo === 'true';
-
-      const payload = {
-        dosis: dosis,
-        frecuenciaHoras: frecuenciaHoras,
-        fechaInicio: fechaInicio,
-        fechaFin: fechaFin,
-        notasInstrucciones: (this.tratamientoSeleccionado.notasinstrucciones || '').trim(),
-        activo: estadoActivo
-      };
-
-      // ✅ Guardar en el backend
-      await firstValueFrom(this.usersService.actualizarTratamiento(id, payload));
-
-      // Registrar en historial
-      if (dosisAnterior !== dosis) {
-        this.agregarHistorial(
-          `Dosis actualizada`,
-          `De: "${dosisAnterior}" → "${dosis}"`
-        );
-      } else {
-        this.agregarHistorial(
-          'Información actualizada',
-          'Datos del tratamiento actualizados'
-        );
-      }
-
-      if (estadoAnterior !== estadoActivo) {
-        this.agregarHistorial(
-          `Estado ${estadoActivo ? 'activado' : 'desactivado'}`,
-          `Tratamiento ${estadoActivo ? 'activado' : 'desactivado'}`
-        );
-      }
-
-      // ✅ Recargar datos actualizados
-      await this.cargarDatosAdicionales();
-
-      this.lanzarNotificacion("¡Éxito! El tratamiento ha sido actualizado correctamente.", "success");
-
-      setTimeout(() => {
-        this.router.navigate(['/tratamientos']);
-      }, 2000);
-
-    } catch (error: any) {
-      console.error("Error al guardar cambios:", error);
-      const msgErr = error.error?.error || error.message || "Error interno del servidor";
-      this.lanzarNotificacion(`No se pudo guardar: ${msgErr}`, "error");
-    } finally {
-      this.isSaving = false;
-      this.cdr.detectChanges();
+    if (this.fpFin) {
+      try { this.fpFin.destroy(); } catch (e) { }
+      this.fpFin = null;
     }
   }
 }
