@@ -14,6 +14,8 @@
 <main class="main-content" [class.menu-collapsed]="sidebar.isCollapsed">
     @if (medicamentoSeleccionado) {
     <div class="container-fluid">
+
+        <!-- HEADER SECTION -->
         <div class="header-section">
             <div class="title-group">
                 <h2 class="title-page">Editar Medicamento</h2>
@@ -21,7 +23,6 @@
             </div>
 
             <div class="header-controls">
-                <!-- ✅ NUEVO: Badge de estado del medicamento -->
                 <div class="estado-medicamento" [ngClass]="getEstadoMedicamento().clase">
                     <i class="bi" [ngClass]="getEstadoMedicamento().icono"></i>
                     <span>{{ getEstadoMedicamento().texto }}</span>
@@ -34,8 +35,29 @@
             </div>
         </div>
 
-        <div class="detail-card">
-            <!-- ✅ NUEVO: Tarjeta de resumen del medicamento -->
+        <!-- MENÚ DE NAVEGACIÓN POR PESTAÑAS -->
+        <div class="tabs-nav-wrapper">
+            <nav class="tabs-nav">
+                <button type="button" class="tab-btn" [class.active]="activeTab === 'detalle'"
+                    (click)="cambiarTab('detalle')">
+                    <i class="bi bi-capsule"></i>
+                    <span>Detalle del Medicamento</span>
+                </button>
+                <button type="button" class="tab-btn" [class.active]="activeTab === 'historial'"
+                    (click)="cambiarTab('historial')">
+                    <i class="bi bi-clock-history"></i>
+                    <span>Historial</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- TAB 1: DETALLE DEL MEDICAMENTO                                -->
+        <!-- ============================================================ -->
+        @if (activeTab === 'detalle') {
+        <div class="tab-panel">
+
+            <!-- Tarjeta de resumen del medicamento -->
             <div class="resumen-medicamento">
                 <div class="resumen-item">
                     <i class="bi bi-capsule"></i>
@@ -70,165 +92,230 @@
                 }
             </div>
 
-            <!-- ✅ NUEVO: Sección de estadísticas -->
-            @if (estadisticas) {
-            <div class="estadisticas-section">
-                <h4 class="section-title">
-                    <i class="bi bi-graph-up-arrow"></i>
-                    Estadísticas de Uso
-                </h4>
-                <div class="stats-grid">
-                    <div class="stat-box">
-                        <small>Total Tratamientos</small>
-                        <div class="stat-value">{{ estadisticas.totalTratamientos }}</div>
+            <div class="detail-card">
+                <div class="form-grid">
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>Nombre Comercial</label>
+                        <input type="text" [(ngModel)]="medicamentoSeleccionado.nombrecomercial" maxlength="100"
+                            class="form-control-premium" placeholder="Ej: Amoxicilina, Ibuprofeno...">
                     </div>
-                    <div class="stat-box">
-                        <small>Tratamientos Activos</small>
-                        <div class="stat-value">{{ estadisticas.tratamientosActivos }}</div>
+
+                    <div class="form-group">
+                        <label>Sustancia Activa</label>
+                        <input type="text" [(ngModel)]="medicamentoSeleccionado.sustanciaactiva" maxlength="100"
+                            class="form-control-premium" placeholder="Ej: Paracetamol...">
                     </div>
-                    <div class="stat-box">
-                        <small>Pacientes Activos</small>
-                        <div class="stat-value">{{ estadisticas.pacientesActivos }}</div>
+
+                    <div class="form-group">
+                        <label>Presentación</label>
+                        <input type="text" [(ngModel)]="medicamentoSeleccionado.presentacion" maxlength="50"
+                            class="form-control-premium" placeholder="Ej: Caja, Jarabe, Ampolletas...">
                     </div>
-                    <div class="stat-box">
-                        <small>Último Uso</small>
-                        <div class="stat-value" style="font-size: 0.9rem;">{{ estadisticas.ultimoUso | date:'dd/MM/yyyy'
-                            }}</div>
+
+                    <div class="form-group">
+                        <label>Concentración</label>
+                        <input type="text" [(ngModel)]="medicamentoSeleccionado.concentracion" maxlength="50"
+                            class="form-control-premium" placeholder="Ej: 500 mg, 10 ml...">
+                        <small class="form-text text-muted">Formato: 500 mg, 10 ml, 50%</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Laboratorio</label>
+                        <input type="text" [(ngModel)]="medicamentoSeleccionado.laboratorio" maxlength="100"
+                            class="form-control-premium" placeholder="Ej: Bayer, Genomma Lab...">
                     </div>
                 </div>
-            </div>
-            }
 
-            <!-- ✅ NUEVO: Sección de tratamientos asociados -->
-            @if (tratamientosAsociados.length > 0) {
-            <div class="tratamientos-section">
-                <div class="tratamientos-header" (click)="mostrarTratamientos = !mostrarTratamientos">
-                    <h4 class="section-title" style="cursor: pointer;">
-                        <i class="bi bi-prescription"></i>
-                        Tratamientos Asociados
-                        <span class="badge-tratamientos">{{ getTotalTratamientos() }}</span>
-                        <i class="bi" [ngClass]="mostrarTratamientos ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
-                    </h4>
+                <div class="form-group full-width-group" style="margin-top: 15px;">
+                    <label>Indicaciones Generales</label>
+                    <textarea [(ngModel)]="medicamentoSeleccionado.indicacionesgenerales" rows="4"
+                        class="form-control-premium" placeholder="Describe el uso del medicamento e indicaciones..."
+                        (blur)="medicamentoSeleccionado.indicacionesgenerales = formatearIndicaciones(medicamentoSeleccionado.indicacionesgenerales)"></textarea>
+                    <small class="form-text text-muted">Las indicaciones se formatearán automáticamente</small>
                 </div>
 
-                @if (mostrarTratamientos) {
-                <div class="tratamientos-lista">
-                    @for (t of tratamientosAsociados; track t.id) {
-                    <div class="tratamiento-item">
-                        <div class="tratamiento-info">
-                            <i class="bi bi-person-fill"></i>
-                            <span class="paciente-nombre">{{ t.paciente }}</span>
-                        </div>
-                        <div class="tratamiento-detalle">
-                            <span class="dosis-info">{{ t.dosis }}</span>
-                            <span class="fecha-info">
-                                <i class="bi bi-calendar"></i>
-                                {{ t.fechaInicio }} - {{ t.fechaFin }}
-                            </span>
-                            @if (t.activo) {
-                            <span class="badge-activo">Activo</span>
-                            } @else {
-                            <span class="badge-inactivo">Inactivo</span>
-                            }
-                        </div>
-                    </div>
-                    }
+                <!-- Acciones -->
+                <div class="action-footer">
+                    <button class="btn-cancel-premium" (click)="volver()" [disabled]="isSaving">Cancelar</button>
+                    <button class="btn-save" (click)="guardarCambios()" [disabled]="isSaving">
+                        @if (isSaving) {
+                        <span class="spinner-save"></span>
+                        <span>Guardando...</span>
+                        } @else {
+                        <i class="bi bi-check-lg"></i>
+                        <span>Guardar Cambios</span>
+                        }
+                    </button>
                 </div>
-                }
-            </div>
-            }
-
-            <div class="form-grid">
-                <div class="form-group" style="grid-column: span 2;">
-                    <label>Nombre Comercial</label>
-                    <input type="text" [(ngModel)]="medicamentoSeleccionado.nombrecomercial" maxlength="100"
-                        class="form-control-premium" placeholder="Ej: Amoxicilina, Ibuprofeno...">
-                </div>
-
-                <div class="form-group">
-                    <label>Sustancia Activa</label>
-                    <input type="text" [(ngModel)]="medicamentoSeleccionado.sustanciaactiva" maxlength="100"
-                        class="form-control-premium" placeholder="Ej: Paracetamol...">
-                </div>
-
-                <div class="form-group">
-                    <label>Presentación</label>
-                    <input type="text" [(ngModel)]="medicamentoSeleccionado.presentacion" maxlength="50"
-                        class="form-control-premium" placeholder="Ej: Caja, Jarabe, Ampolletas...">
-                </div>
-
-                <div class="form-group">
-                    <label>Concentración</label>
-                    <input type="text" [(ngModel)]="medicamentoSeleccionado.concentracion" maxlength="50"
-                        class="form-control-premium" placeholder="Ej: 500 mg, 10 ml...">
-                    <small class="form-text text-muted">Formato: 500 mg, 10 ml, 50%</small>
-                </div>
-
-                <div class="form-group">
-                    <label>Laboratorio</label>
-                    <input type="text" [(ngModel)]="medicamentoSeleccionado.laboratorio" maxlength="100"
-                        class="form-control-premium" placeholder="Ej: Bayer, Genomma Lab...">
-                </div>
-            </div>
-
-            <div class="form-group full-width-group" style="margin-top: 15px;">
-                <label>Indicaciones Generales</label>
-                <textarea [(ngModel)]="medicamentoSeleccionado.indicacionesgenerales" rows="4"
-                    class="form-control-premium" placeholder="Describe el uso del medicamento e indicaciones..."
-                    (blur)="medicamentoSeleccionado.indicacionesgenerales = formatearIndicaciones(medicamentoSeleccionado.indicacionesgenerales)"></textarea>
-                <small class="form-text text-muted">Las indicaciones se formatearán automáticamente</small>
-            </div>
-
-            <!-- ✅ NUEVO: Historial de cambios -->
-            @if (historialCambios.length > 0) {
-            <div class="historial-section">
-                <hr class="section-divider">
-
-                <div class="historial-header" (click)="mostrarHistorial = !mostrarHistorial">
-                    <h4 class="section-title" style="cursor: pointer;">
-                        <i class="bi bi-clock-history"></i>
-                        Historial del Medicamento
-                        <i class="bi" [ngClass]="mostrarHistorial ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
-                    </h4>
-                    <span class="historial-count">{{ historialCambios.length }} eventos</span>
-                </div>
-
-                @if (mostrarHistorial) {
-                <div class="historial-lista">
-                    @for (item of historialCambios; track item) {
-                    <div class="historial-item">
-                        <div class="historial-fecha">
-                            <i class="bi bi-clock"></i>
-                            {{ item.fecha }}
-                        </div>
-                        <div class="historial-detalle">
-                            <strong>{{ item.accion }}</strong>
-                            <span>{{ item.detalle }}</span>
-                        </div>
-                        <div class="historial-usuario">
-                            <i class="bi bi-person"></i>
-                            {{ item.usuario }}
-                        </div>
-                    </div>
-                    }
-                </div>
-                }
-            </div>
-            }
-
-            <div class="action-footer">
-                <button class="btn-cancel-premium" (click)="volver()" [disabled]="isSaving">Cancelar</button>
-                <button class="btn-save" (click)="guardarCambios()" [disabled]="isSaving">
-                    @if (isSaving) {
-                    <span class="spinner-save"></span>
-                    <span>Guardando...</span>
-                    } @else {
-                    <i class="bi bi-check-lg"></i>
-                    <span>Guardar Cambios</span>
-                    }
-                </button>
             </div>
         </div>
+        }
+
+        <!-- ============================================================ -->
+        <!-- TAB 2: HISTORIAL                                              -->
+        <!-- ============================================================ -->
+        @if (activeTab === 'historial') {
+        <div class="tab-panel">
+            <div class="detail-card">
+
+                <!-- RESUMEN DEL MEDICAMENTO -->
+                <div class="resumen-medicamento-historial">
+                    <div class="resumen-item">
+                        <i class="bi bi-capsule"></i>
+                        <div>
+                            <small>Nombre</small>
+                            <strong>{{ getNombreFormateado() }}</strong>
+                        </div>
+                    </div>
+                    <div class="resumen-item">
+                        <i class="bi bi-box-seam"></i>
+                        <div>
+                            <small>Presentación</small>
+                            <strong>{{ getInfoPresentacion() || 'Sin especificar' }}</strong>
+                        </div>
+                    </div>
+                    <div class="resumen-item">
+                        <i class="bi bi-building"></i>
+                        <div>
+                            <small>Laboratorio</small>
+                            <strong>{{ medicamentoSeleccionado.laboratorio || 'No especificado' }}</strong>
+                        </div>
+                    </div>
+                    <div class="resumen-item">
+                        <i class="bi bi-tag-fill"></i>
+                        <div>
+                            <small>Estado</small>
+                            <strong [style.color]="getEstadoMedicamentoColor()">{{ getEstadoMedicamento().texto
+                                }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ESTADÍSTICAS DE USO -->
+                @if (estadisticas) {
+                <div class="estadisticas-section">
+                    <h4 class="section-title">
+                        <i class="bi bi-graph-up-arrow"></i>
+                        Estadísticas de Uso
+                    </h4>
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <small>Total Tratamientos</small>
+                            <div class="stat-value">{{ estadisticas.totalTratamientos }}</div>
+                        </div>
+                        <div class="stat-box">
+                            <small>Tratamientos Activos</small>
+                            <div class="stat-value">{{ estadisticas.tratamientosActivos }}</div>
+                        </div>
+                        <div class="stat-box">
+                            <small>Pacientes Activos</small>
+                            <div class="stat-value">{{ estadisticas.pacientesActivos }}</div>
+                        </div>
+                        <div class="stat-box">
+                            <small>Último Uso</small>
+                            <div class="stat-value" style="font-size: 0.9rem;">
+                                {{ estadisticas.ultimoUso ? (estadisticas.ultimoUso | date:'dd/MM/yyyy') : 'Sin
+                                registros' }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                }
+
+                <hr class="section-divider">
+
+                <!-- TRATAMIENTOS ASOCIADOS -->
+                <div class="tratamientos-section">
+                    <div class="tratamientos-header">
+                        <h4 class="section-title">
+                            <i class="bi bi-prescription"></i>
+                            Tratamientos Asociados
+                            <span class="badge-tratamientos">{{ getTotalTratamientos() }}</span>
+                        </h4>
+                    </div>
+
+                    @if (tratamientosAsociados.length > 0) {
+                    <div class="tratamientos-lista">
+                        @for (t of tratamientosAsociados; track t.id) {
+                        <div class="tratamiento-item">
+                            <div class="tratamiento-info">
+                                <i class="bi bi-person-fill"></i>
+                                <span class="paciente-nombre">{{ t.paciente }}</span>
+                            </div>
+                            <div class="tratamiento-detalle">
+                                <span class="dosis-info">{{ t.dosis }}</span>
+                                <span class="fecha-info">
+                                    <i class="bi bi-calendar"></i>
+                                    {{ t.fechaInicio }} - {{ t.fechaFin }}
+                                </span>
+                                @if (t.activo) {
+                                <span class="badge-activo">Activo</span>
+                                } @else {
+                                <span class="badge-inactivo">Inactivo</span>
+                                }
+                            </div>
+                        </div>
+                        }
+                    </div>
+                    } @else {
+                    <div class="tratamientos-vacio">
+                        <i class="bi bi-inbox"></i>
+                        <p>Sin tratamientos asociados</p>
+                        <span>Este medicamento aún no se ha usado en ningún tratamiento</span>
+                    </div>
+                    }
+                </div>
+
+                <hr class="section-divider">
+
+                <!-- HISTORIAL DE CAMBIOS -->
+                <div class="historial-section">
+                    <div class="historial-header">
+                        <h4 class="section-title">
+                            <i class="bi bi-clock-history"></i>
+                            Historial del Medicamento
+                        </h4>
+                        <span class="historial-count">{{ historialCambios.length }} eventos</span>
+                    </div>
+
+                    @if (historialCambios.length > 0) {
+                    <div class="historial-lista">
+                        @for (item of historialCambios; track $index) {
+                        <div class="historial-item">
+                            <div class="historial-fecha">
+                                <i class="bi bi-clock"></i>
+                                {{ item.fecha }}
+                            </div>
+                            <div class="historial-detalle">
+                                <strong>{{ item.accion }}</strong>
+                                <span>{{ item.detalle }}</span>
+                            </div>
+                            <div class="historial-usuario">
+                                <i class="bi bi-person"></i>
+                                {{ item.usuario }}
+                            </div>
+                        </div>
+                        }
+                    </div>
+                    } @else {
+                    <div class="historial-vacio">
+                        <i class="bi bi-clock-history"></i>
+                        <p>Aún no hay actividad registrada</p>
+                        <span>Los cambios del medicamento aparecerán aquí</span>
+                    </div>
+                    }
+                </div>
+
+                <!-- ACCIONES -->
+                <div class="action-footer">
+                    <button class="btn-cancel-premium" (click)="volver()">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+        }
+
     </div>
     }
 </main>

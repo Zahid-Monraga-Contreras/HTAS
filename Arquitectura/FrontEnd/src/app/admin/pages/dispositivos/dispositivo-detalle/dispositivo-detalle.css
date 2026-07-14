@@ -19,22 +19,16 @@
 }
 
 /* ==========================================================================
-   2. ENCABEZADO DE LA PÁGINA (HEADER)
+   2. HEADER SECTION
    ========================================================================== */
 .header-section {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    margin-bottom: 2.5rem;
+    gap: 30px;
+    margin-bottom: 1.75rem;
     padding-bottom: 1.25rem;
     border-bottom: 2px solid #e9edf2;
-}
-
-.header-controls {
-    display: flex;
-    gap: 0.75rem;
-    align-items: center;
-    flex-wrap: wrap;
 }
 
 .title-group {
@@ -44,22 +38,85 @@
 }
 
 .title-page {
-    font-size: 2rem;
+    font-size: 2.1rem;
     font-weight: 800;
     color: #0a1628;
     margin: 0;
     letter-spacing: -0.5px;
+    line-height: 1.2;
 }
 
 .subtitle-page {
     color: #7a8a9e;
-    font-size: 1rem;
+    font-size: 0.95rem;
     margin: 0;
     font-weight: 400;
 }
 
+.header-controls {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
 /* ==========================================================================
-   3. TARJETA DE DETALLE
+   3. MENÚ DE PESTAÑAS (TABS)
+   ========================================================================== */
+.tabs-nav-wrapper {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 2rem;
+}
+
+.tabs-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #ffffff;
+    border: 1px solid #e9edf2;
+    border-radius: 18px;
+    padding: 6px;
+    box-shadow: 0 2px 10px rgba(10, 22, 40, 0.04);
+}
+
+.tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    border: none;
+    background: transparent;
+    color: #7a8a9e;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 0.7rem 1.4rem;
+    border-radius: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tab-btn i {
+    font-size: 1rem;
+}
+
+.tab-btn:hover:not(.active) {
+    background: #f1f4f8;
+    color: #1a2938;
+}
+
+.tab-btn.active {
+    background: linear-gradient(135deg, #b0001e, #8a0016);
+    color: #ffffff;
+    box-shadow: 0 6px 16px rgba(176, 0, 30, 0.28);
+}
+
+.tab-panel {
+    animation: fadeIn 0.35s ease;
+}
+
+/* ==========================================================================
+   4. TARJETA DE DETALLE
    ========================================================================== */
 .detail-card {
     background: #ffffff;
@@ -75,11 +132,63 @@
 }
 
 /* ==========================================================================
-   4. FORMULARIO
+   5. RESUMEN DEL DISPOSITIVO
+   ========================================================================== */
+.resumen-dispositivo,
+.resumen-dispositivo-historial,
+.resumen-dispositivo-mediciones {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    background: #fafbfc;
+    border-radius: 14px;
+    margin-bottom: 1.75rem;
+    border: 1px solid #e9edf2;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.resumen-item {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.25rem 0;
+}
+
+.resumen-item i {
+    font-size: 1.5rem;
+    color: #b0001e;
+    min-width: 32px;
+    text-align: center;
+    opacity: 0.85;
+}
+
+.resumen-item div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.05rem;
+}
+
+.resumen-item small {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    color: #8a9aa8;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+}
+
+.resumen-item strong {
+    font-size: 0.95rem;
+    color: #0a1628;
+    font-weight: 600;
+}
+
+/* ==========================================================================
+   6. FORMULARIO
    ========================================================================== */
 .form-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
     margin-bottom: 1.5rem;
 }
@@ -88,12 +197,11 @@
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
-    position: relative;
-    /* ✅ AÑADIDO: refuerzo por si algún dropdown queda a este nivel */
+    max-width: 100%;
 }
 
 .full-width-group {
-    grid-column: span 2;
+    grid-column: 1 / -1;
 }
 
 .form-group label {
@@ -105,7 +213,7 @@
 }
 
 .form-control-premium {
-    padding: 0.7rem 2.5rem 0.7rem 1rem;
+    padding: 0.7rem 1rem;
     border: 1.5px solid #e2e7ee;
     border-radius: 10px;
     font-size: 0.95rem;
@@ -135,18 +243,50 @@
     opacity: 0.7;
 }
 
+/* ==========================================================================
+   6.1 ESTILOS ESPECÍFICOS PARA EL CAMPO MAC
+   ========================================================================== */
 .mono-text {
-    font-family: 'Courier New', Courier, monospace;
+    font-family: 'Courier New', Courier, monospace !important;
     font-weight: 600;
     letter-spacing: 0.5px;
+    background: #f8fafc !important;
+    text-transform: uppercase;
+}
+
+.mono-text:focus {
+    border-color: #b0001e !important;
+    background: #ffffff !important;
+    box-shadow: 0 0 0 4px rgba(176, 0, 30, 0.08) !important;
+}
+
+.form-text.text-muted {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.7rem;
+    color: #8a9aa8;
+    margin-top: 0.4rem;
+    padding: 0.25rem 0.5rem;
+    background: #f8fafc;
+    border-radius: 6px;
+}
+
+.form-text.text-muted i {
+    font-size: 0.8rem;
+    color: #b0001e;
+    flex-shrink: 0;
+}
+
+.text-muted {
+    color: #8a9aa8 !important;
 }
 
 /* ==========================================================================
-   5. BUSCADOR DE PACIENTES - MEJORADO CON 5 RESULTADOS
+   7. BUSCADOR DE PACIENTES
    ========================================================================== */
 .search-patient-container {
     position: relative;
-    /* ✅ Este es el ancla real del dropdown */
     width: 100%;
 }
 
@@ -160,28 +300,24 @@
     font-size: 1.1rem;
 }
 
-/* ✅ DROPDOWN DE PACIENTES - AHORA ANCLADO CORRECTAMENTE DEBAJO DEL INPUT */
 .dropdown-list {
     position: absolute;
     top: calc(100% + 6px);
     left: 0;
     right: 0;
     max-height: 340px;
-    /* ↑ antes 280px, un poco más grande */
     overflow-y: auto;
     background: #ffffff;
     border: 1.5px solid #e2e7ee;
     border-radius: 12px;
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.14);
     z-index: 2000;
-    /* ↑ subido para que siempre quede por encima de otras secciones */
     padding: 4px 0;
     min-width: 0;
     width: 100%;
     animation: dropdownSlideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Scrollbar del dropdown */
 .dropdown-list::-webkit-scrollbar {
     width: 4px;
 }
@@ -196,22 +332,15 @@
     border-radius: 10px;
 }
 
-.dropdown-list::-webkit-scrollbar-thumb:hover {
-    background: #bcc5d0;
-}
-
-/* ✅ ITEMS DEL DROPDOWN - un poco más grandes y legibles */
 .dropdown-item {
     display: flex;
     align-items: center;
     gap: 0.7rem;
     padding: 0.6rem 1rem;
-    /* ↑ antes 0.4rem 0.9rem */
     cursor: pointer;
     transition: all 0.15s ease;
     border-bottom: 1px solid #f1f4f8;
     font-size: 0.9rem;
-    /* ↑ antes 0.85rem */
     color: #1a2938;
     background: #ffffff;
 }
@@ -222,10 +351,6 @@
 
 .dropdown-item:hover {
     background: #f8fafc;
-}
-
-.dropdown-item:active {
-    background: #f1f4f8;
 }
 
 .dropdown-item i {
@@ -255,7 +380,6 @@
     flex-shrink: 0;
 }
 
-/* ✅ MENSAJE "MOSTRANDO 5 DE N" */
 .dropdown-more {
     display: flex;
     align-items: center;
@@ -270,12 +394,6 @@
     border-radius: 0 0 12px 12px;
 }
 
-.dropdown-more i {
-    font-size: 0.8rem;
-    color: #b0bcc8;
-}
-
-/* ✅ ESTADO VACÍO DEL DROPDOWN */
 .dropdown-empty {
     display: flex;
     align-items: center;
@@ -287,13 +405,8 @@
     font-weight: 500;
 }
 
-.dropdown-empty i {
-    font-size: 1.1rem;
-    color: #b0bcc8;
-}
-
 /* ==========================================================================
-   6. PACIENTE VINCULADO
+   8. PACIENTE VINCULADO
    ========================================================================== */
 .patient-badge-container {
     display: flex;
@@ -337,11 +450,6 @@
     flex: 1;
 }
 
-.text-muted {
-    color: #8a9aa8 !important;
-    font-size: 0.85rem;
-}
-
 .btn-desasignar {
     background: none;
     border: none;
@@ -373,214 +481,11 @@
     font-weight: 500;
 }
 
-.ubicacion-paciente i {
-    font-size: 0.8rem;
-}
-
-/* ==========================================================================
-   7. BANNER DE ESTADO
-   ========================================================================== */
-.estado-banner {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.75rem 1.5rem;
-    background: #fafbfc;
-    border-radius: 14px;
-    margin-bottom: 1.75rem;
-    flex-wrap: wrap;
-    border: 1px solid #e9edf2;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
-}
-
-.estado-badge-conexion {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6rem;
-    padding: 0.4rem 1.2rem;
-    border-radius: 50px;
-    font-weight: 700;
-    font-size: 0.82rem;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-}
-
-.estado-conectado {
-    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-    color: #065f46;
-    border: 1px solid #6ee7b7;
-}
-
-.estado-desconectado {
-    background: linear-gradient(135deg, #fee2e2, #fecaca);
-    color: #991b1b;
-    border: 1px solid #fca5a5;
-}
-
-.estado-sincronizando {
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
-    color: #92400e;
-    border: 1px solid #fcd34d;
-    animation: pulse 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse {
-
-    0%,
-    100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.6;
-    }
-}
-
-.info-sincronizacion {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.85rem;
-    color: #4a5a6e;
-}
-
-.info-sincronizacion i {
-    font-size: 0.9rem;
-    color: #8a9aa8;
-}
-
-.estado-activo {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    color: #10b981;
-    font-weight: 600;
-    font-size: 0.85rem;
-}
-
-.estado-activo i {
-    font-size: 0.9rem;
-}
-
-.estado-inactivo {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    color: #ef4444;
-    font-weight: 600;
-    font-size: 0.85rem;
-}
-
-.estado-inactivo i {
-    font-size: 0.9rem;
-}
-
-/* ==========================================================================
-   8. BOTONES DE ACCIÓN
-   ========================================================================== */
-.header-controls {
-    display: flex;
-    gap: 0.75rem;
-    align-items: center;
-    flex-wrap: nowrap;
-}
-
-.btn-action,
-.btn-cancel-premium {
-    padding: 0.55rem 1.2rem;
-    border: none;
-    border-radius: 10px;
-    font-weight: 700;
-    font-size: 0.82rem;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-    white-space: nowrap;
-    flex-shrink: 0;
-}
-
-.btn-action i,
-.btn-cancel-premium i {
-    font-size: 1rem;
-}
-
-.btn-sincronizar {
-    background: linear-gradient(135deg, #0ea5e9, #0284c7);
-    color: #ffffff;
-    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25);
-}
-
-.btn-sincronizar:hover:not(:disabled) {
-    background: linear-gradient(135deg, #0284c7, #0369a1);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(14, 165, 233, 0.35);
-}
-
-.btn-activar {
-    background: linear-gradient(135deg, #10b981, #059669);
-    color: #ffffff;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
-}
-
-.btn-activar:hover:not(:disabled) {
-    background: linear-gradient(135deg, #059669, #047857);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35);
-}
-
-.btn-desactivar {
-    background: linear-gradient(135deg, #ef4444, #dc2626);
-    color: #ffffff;
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
-}
-
-.btn-desactivar:hover:not(:disabled) {
-    background: linear-gradient(135deg, #dc2626, #b91c1c);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(239, 68, 68, 0.35);
-}
-
-.btn-cancel-premium {
-    background: #ffffff;
-    color: #4a5a6e;
-    border: 1.5px solid #dce1e8;
-}
-
-.btn-cancel-premium:hover:not(:disabled) {
-    background: #f1f4f8;
-    color: #1a2938;
-    transform: translateY(-2px);
-    border-color: #bcc5d0;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
-}
-
-.btn-action:disabled,
-.btn-cancel-premium:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
-    transform: none !important;
-    box-shadow: none !important;
-}
-
 /* ==========================================================================
    9. ESTADÍSTICAS
    ========================================================================== */
 .estadisticas-section {
-    margin-top: 1.75rem;
-    padding-top: 1.75rem;
-    border-top: 1px solid #e9edf2;
-}
-
-.ultima-medicion-section {
-    margin-top: 1.75rem;
-    padding-top: 1.75rem;
-    border-top: 1px solid #e9edf2;
+    margin-top: 0.5rem;
 }
 
 .section-title {
@@ -600,10 +505,15 @@
     font-size: 1.15rem;
 }
 
+.section-title.small {
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+}
+
 .stats-grid {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 1rem;
-    padding: 0.5rem 0;
 }
 
 .stat-box {
@@ -612,7 +522,6 @@
     border-radius: 14px;
     border: 1px solid #e9edf2;
     text-align: center;
-    flex: 1;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 }
@@ -648,85 +557,27 @@
 }
 
 /* ==========================================================================
-   10. SIN MEDICIONES
-   ========================================================================== */
-.sin-mediciones {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem 1.25rem;
-    background: #fef3c7;
-    border-radius: 12px;
-    margin-top: 1rem;
-    flex-wrap: wrap;
-    border: 1px solid #fde68a;
-}
-
-.sin-mediciones i {
-    color: #f59e0b;
-    font-size: 1.3rem;
-}
-
-.sin-mediciones span {
-    color: #92400e;
-    font-weight: 500;
-    font-size: 0.95rem;
-}
-
-.btn-sincronizar-mediciones {
-    padding: 0.4rem 1.2rem;
-    background: linear-gradient(135deg, #f59e0b, #d97706);
-    color: #ffffff;
-    border: none;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: 0.82rem;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: all 0.25s ease;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25);
-}
-
-.btn-sincronizar-mediciones:hover {
-    background: linear-gradient(135deg, #d97706, #b45309);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35);
-}
-
-/* ==========================================================================
-   11. HISTORIAL
+   10. HISTORIAL
    ========================================================================== */
 .historial-section {
-    margin-top: 1.75rem;
+    margin-top: 0.5rem;
+}
+
+.section-divider {
+    border: none;
+    border-top: 2px solid #e9edf2;
+    margin: 1.75rem 0;
 }
 
 .historial-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    cursor: pointer;
     padding: 0.5rem 0;
-    user-select: none;
-    transition: opacity 0.2s;
-}
-
-.historial-header:hover {
-    opacity: 0.8;
 }
 
 .historial-header .section-title {
     margin-bottom: 0;
-}
-
-.historial-header .section-title i:last-child {
-    font-size: 0.8rem;
-    margin-left: 0.5rem;
-    color: #8a9aa8;
-    transition: transform 0.2s ease;
 }
 
 .historial-count {
@@ -740,7 +591,7 @@
 
 .historial-lista {
     margin-top: 1rem;
-    max-height: 350px;
+    max-height: 400px;
     overflow-y: auto;
     border: 1px solid #e9edf2;
     border-radius: 14px;
@@ -816,166 +667,127 @@
     white-space: nowrap;
 }
 
-/* ==========================================================================
-   12. BOTONES DEL PIE DE PÁGINA
-   ========================================================================== */
-.action-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    margin-top: 2.5rem;
-    padding-top: 1.75rem;
-    border-top: 2px solid #e9edf2;
+.historial-vacio {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #8a9aa8;
 }
 
-.btn-save {
-    padding: 0.65rem 2rem;
-    background: linear-gradient(135deg, #b0001e, #8a0016);
-    color: #ffffff;
-    border: none;
-    border-radius: 10px;
-    font-weight: 700;
-    font-size: 0.9rem;
-    cursor: pointer;
+.historial-vacio i {
+    font-size: 2.8rem;
+    color: #dce1e8;
+    margin-bottom: 0.75rem;
+    display: block;
+}
+
+.historial-vacio p {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #4a5a6e;
+    margin: 0 0 0.25rem 0;
+}
+
+/* ==========================================================================
+   11. BANNER DE ESTADO - MEDICIONES
+   ========================================================================== */
+.estado-banner-mediciones {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1.5rem;
+    background: #fafbfc;
+    border-radius: 14px;
+    margin-bottom: 1.75rem;
+    flex-wrap: wrap;
+    border: 1px solid #e9edf2;
+}
+
+.estado-badge-conexion {
     display: inline-flex;
     align-items: center;
     gap: 0.6rem;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 12px rgba(176, 0, 30, 0.25);
+    padding: 0.4rem 1.2rem;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
-.btn-save:hover:not(:disabled) {
-    background: linear-gradient(135deg, #8a0016, #6d0012);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(176, 0, 30, 0.35);
+.estado-conectado {
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    color: #065f46;
+    border: 1px solid #6ee7b7;
 }
 
-.btn-save:disabled {
+.estado-desconectado {
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+}
+
+.estado-sincronizando {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    color: #92400e;
+    border: 1px solid #fcd34d;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
+}
+
+.info-sincronizacion {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #4a5a6e;
+}
+
+.btn-sincronizar-mediciones {
+    padding: 0.4rem 1.2rem;
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.82rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.25s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    box-shadow: 0 2px 8px rgba(14, 165, 233, 0.25);
+}
+
+.btn-sincronizar-mediciones:hover:not(:disabled) {
+    background: linear-gradient(135deg, #0284c7, #0369a1);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(14, 165, 233, 0.35);
+}
+
+.btn-sincronizar-mediciones:disabled {
     opacity: 0.55;
     cursor: not-allowed;
-    transform: none !important;
-    box-shadow: none !important;
-}
-
-.spinner-save {
-    width: 18px;
-    height: 18px;
-    border: 2.5px solid rgba(255, 255, 255, 0.25);
-    border-radius: 50%;
-    border-top-color: #ffffff;
-    animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
 }
 
 /* ==========================================================================
-   13. TOAST NOTIFICACIÓN
-   ========================================================================== */
-.toast-premium-container {
-    position: fixed;
-    top: 30px;
-    right: 30px;
-    z-index: 10005;
-    padding: 1rem 1.5rem;
-    border-radius: 14px;
-    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12);
-    display: flex;
-    align-items: center;
-    max-width: 420px;
-    animation: slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    color: #ffffff;
-    backdrop-filter: blur(4px);
-}
-
-.toast-premium-container.success {
-    background: linear-gradient(135deg, #10b981, #059669);
-    border-left: 4px solid #047857;
-}
-
-.toast-premium-container.error {
-    background: linear-gradient(135deg, #ef4444, #dc2626);
-    border-left: 4px solid #b91c1c;
-}
-
-.toast-premium-container.warning {
-    background: linear-gradient(135deg, #f59e0b, #d97706);
-    border-left: 4px solid #b45309;
-}
-
-.toast-content {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-}
-
-.icon-toast {
-    font-size: 1.4rem;
-}
-
-.toast-message {
-    font-weight: 600;
-    font-size: 0.95rem;
-    line-height: 1.4;
-}
-
-@keyframes slideInRight {
-    from {
-        transform: translateX(120%) scale(0.95);
-        opacity: 0;
-    }
-
-    to {
-        transform: translateX(0) scale(1);
-        opacity: 1;
-    }
-}
-
-/* ==========================================================================
-   14. ANIMACIONES
-   ========================================================================== */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-8px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes dropdownSlideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-6px);
-        scale: 0.98;
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-        scale: 1;
-    }
-}
-
-/* ==========================================================================
-   15. SECCIÓN TENSIÓMETRO
+   12. SECCIÓN TENSIÓMETRO
    ========================================================================== */
 .tensiometro-section {
-    margin-top: 2rem;
-    padding-top: 1.5rem;
-    border-top: 2px solid #e9edf2;
-}
-
-.section-divider {
-    border: none;
-    border-top: 2px solid #e9edf2;
-    margin: 0 0 1.5rem 0;
+    margin-top: 1.5rem;
 }
 
 .tensiometro-header {
@@ -1022,14 +834,18 @@
     opacity: 0.55;
     cursor: not-allowed;
     transform: none !important;
-    box-shadow: none !important;
 }
 
 .spin {
     animation: spin 1s linear infinite;
 }
 
-/* Estado Bluetooth */
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 .bluetooth-status {
     display: flex;
     align-items: center;
@@ -1054,16 +870,8 @@
     color: #059669;
 }
 
-.status-indicator.conectado i {
-    color: #10b981;
-}
-
 .status-indicator.desconectado {
     color: #dc2626;
-}
-
-.status-indicator.desconectado i {
-    color: #ef4444;
 }
 
 .status-indicator.sincronizando {
@@ -1071,7 +879,6 @@
 }
 
 .status-indicator.sincronizando i {
-    color: #f59e0b;
     animation: spin 1s linear infinite;
 }
 
@@ -1084,7 +891,9 @@
     font-family: 'Courier New', Courier, monospace;
 }
 
-/* Mediciones del tensiómetro */
+/* ==========================================================================
+   13. MEDICIONES DEL TENSIÓMETRO
+   ========================================================================== */
 .medicion-tensiometro {
     background: linear-gradient(135deg, #f8fafc, #f1f5f9);
     border-radius: 16px;
@@ -1117,7 +926,7 @@
 }
 
 .medicion-item.pulso {
-    border-left: 4px solid #10b981;
+    border-left: 4px solid #b0001e;
 }
 
 .medicion-label {
@@ -1150,7 +959,6 @@
     color: #6b7a8a;
 }
 
-/* Sin mediciones */
 .sin-mediciones-tensiometro {
     display: flex;
     flex-direction: column;
@@ -1175,7 +983,47 @@
     font-size: 1rem;
 }
 
-/* Historial de mediciones */
+/* ==========================================================================
+   14. ÚLTIMA LECTURA DEL PACIENTE
+   ========================================================================== */
+.ultima-lectura-section {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e9edf2;
+}
+
+.lectura-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+}
+
+.lectura-item {
+    background: #fafbfc;
+    padding: 0.75rem;
+    border-radius: 10px;
+    text-align: center;
+    border: 1px solid #e9edf2;
+}
+
+.lectura-label {
+    display: block;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #8a9aa8;
+    letter-spacing: 0.3px;
+}
+
+.lectura-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0a1628;
+}
+
+/* ==========================================================================
+   15. HISTORIAL DE MEDICIONES
+   ========================================================================== */
 .mediciones-historial {
     margin-top: 1.25rem;
 }
@@ -1251,7 +1099,7 @@
 }
 
 .medicion-valores-historial .pulse {
-    color: #10b981;
+    color: #b0001e;
     margin-left: 0.5rem;
 }
 
@@ -1260,44 +1108,284 @@
 }
 
 /* ==========================================================================
-   16. RESPONSIVIDAD
+   16. PROGRESO DE CONEXIÓN
    ========================================================================== */
-@media (max-width: 1200px) {
-    .header-controls {
-        gap: 0.5rem;
+.progreso-conexion-panel {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+    border: 1.5px solid #e9edf2;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.progreso-header {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    color: #4a5a6e;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 2px solid #f1f4f8;
+}
+
+.progreso-header i {
+    font-size: 1rem;
+    color: #b0001e;
+}
+
+.progreso-log {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    max-height: 220px;
+    overflow-y: auto;
+    padding-right: 0.25rem;
+}
+
+.progreso-log::-webkit-scrollbar {
+    width: 4px;
+}
+
+.progreso-log::-webkit-scrollbar-track {
+    background: #f1f4f8;
+    border-radius: 3px;
+}
+
+.progreso-log::-webkit-scrollbar-thumb {
+    background: #d0d7df;
+    border-radius: 10px;
+}
+
+.progreso-linea {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.4rem 0.75rem;
+    background: #fafbfc;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: #1a2938;
+    animation: slideInLine 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-left: 3px solid transparent;
+}
+
+.progreso-linea:last-child {
+    border-left-color: #b0001e;
+    background: #fef2f2;
+    font-weight: 600;
+}
+
+@keyframes slideInLine {
+    from {
+        opacity: 0;
+        transform: translateX(-8px);
     }
 
-    .btn-action,
-    .btn-cancel-premium {
-        padding: 0.4rem 0.9rem;
-        font-size: 0.75rem;
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* ==========================================================================
+   17. BOTONES DE ACCIÓN FOOTER
+   ========================================================================== */
+.action-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2.5rem;
+    padding-top: 1.75rem;
+    border-top: 2px solid #e9edf2;
+}
+
+.btn-save {
+    padding: 0.65rem 2rem;
+    background: linear-gradient(135deg, #b0001e, #8a0016);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(176, 0, 30, 0.25);
+}
+
+.btn-save:hover:not(:disabled) {
+    background: linear-gradient(135deg, #8a0016, #6d0012);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(176, 0, 30, 0.35);
+}
+
+.btn-save:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.btn-cancel-premium {
+    padding: 0.65rem 1.5rem;
+    background: #ffffff;
+    color: #4a5a6e;
+    border: 1.5px solid #dce1e8;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.btn-cancel-premium:hover:not(:disabled) {
+    background: #f1f4f8;
+    color: #1a2938;
+    transform: translateY(-2px);
+    border-color: #bcc5d0;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+.btn-cancel-premium:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.spinner-save {
+    width: 18px;
+    height: 18px;
+    border: 2.5px solid rgba(255, 255, 255, 0.25);
+    border-radius: 50%;
+    border-top-color: #ffffff;
+    animation: spin 0.8s linear infinite;
+}
+
+/* ==========================================================================
+   18. TOAST NOTIFICACIÓN
+   ========================================================================== */
+.toast-premium-container {
+    position: fixed;
+    top: 30px;
+    right: 30px;
+    z-index: 10005;
+    padding: 1rem 1.5rem;
+    border-radius: 14px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12);
+    display: flex;
+    align-items: center;
+    max-width: 420px;
+    animation: slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    color: #ffffff;
+    backdrop-filter: blur(4px);
+}
+
+.toast-premium-container.success {
+    background: linear-gradient(135deg, #10b981, #059669);
+    border-left: 4px solid #047857;
+}
+
+.toast-premium-container.error {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    border-left: 4px solid #b91c1c;
+}
+
+.toast-premium-container.warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border-left: 4px solid #b45309;
+}
+
+.toast-content {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.icon-toast {
+    font-size: 1.4rem;
+}
+
+.toast-message {
+    font-weight: 600;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(120%) scale(0.95);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes dropdownSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+        scale: 0.98;
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        scale: 1;
+    }
+}
+
+/* ==========================================================================
+   19. RESPONSIVIDAD
+   ========================================================================== */
+@media (max-width: 1200px) {
+    .form-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
 @media (max-width: 1024px) {
-    .stats-grid {
-        flex-wrap: wrap;
+    .form-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 
-    .stat-box {
-        flex: 1 1 calc(50% - 0.5rem);
-        min-width: 140px;
+    .resumen-dispositivo,
+    .resumen-dispositivo-historial,
+    .resumen-dispositivo-mediciones {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
-@media (max-width: 900px) {
-    .header-controls {
-        flex-wrap: wrap;
-        gap: 0.5rem;
-    }
+@media (max-width: 992px) {
 
-    .btn-action,
-    .btn-cancel-premium {
-        flex: 1;
-        min-width: 0;
-        justify-content: center;
-        padding: 0.4rem 0.8rem;
-        font-size: 0.7rem;
+    .resumen-dispositivo,
+    .resumen-dispositivo-historial,
+    .resumen-dispositivo-mediciones {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
@@ -1317,19 +1405,37 @@
 
     .header-controls {
         width: 100%;
-        flex-direction: row !important;
-        flex-wrap: wrap;
-        justify-content: stretch;
-        gap: 0.5rem;
+        flex-direction: column;
+        align-items: stretch;
     }
 
-    .header-controls .btn-action,
-    .header-controls .btn-cancel-premium {
-        flex: 1;
-        min-width: 0;
+    .header-controls button {
+        width: 100%;
         justify-content: center;
-        padding: 0.5rem 0.8rem;
+    }
+
+    .tabs-nav-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .tabs-nav {
+        width: 100%;
+    }
+
+    .tab-btn {
+        flex: 1;
+        justify-content: center;
+        padding: 0.65rem 0.9rem;
         font-size: 0.75rem;
+    }
+
+    .tab-btn span {
+        display: none;
+    }
+
+    .tab-btn i {
+        font-size: 1.15rem;
     }
 
     .form-grid {
@@ -1358,7 +1464,24 @@
         border-radius: 16px;
     }
 
-    .estado-banner {
+    .resumen-dispositivo,
+    .resumen-dispositivo-historial,
+    .resumen-dispositivo-mediciones {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+        padding: 1rem 1.25rem;
+    }
+
+    .resumen-item {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e9edf2;
+    }
+
+    .resumen-item:last-child {
+        border-bottom: none;
+    }
+
+    .estado-banner-mediciones {
         flex-direction: column;
         align-items: flex-start;
         gap: 0.5rem;
@@ -1368,6 +1491,11 @@
     .estado-badge-conexion {
         width: 100%;
         justify-content: center;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
     }
 
     .historial-item {
@@ -1387,14 +1515,6 @@
         font-size: 0.7rem;
     }
 
-    .historial-detalle strong {
-        font-size: 0.8rem;
-    }
-
-    .historial-detalle span {
-        font-size: 0.75rem;
-    }
-
     .historial-header {
         flex-direction: column;
         align-items: flex-start;
@@ -1407,99 +1527,6 @@
         left: 15px;
         max-width: none;
         border-radius: 12px;
-    }
-
-    .stats-grid {
-        flex-direction: column;
-        gap: 0.75rem;
-    }
-
-    .stat-box {
-        flex: 1;
-        text-align: left;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.9rem 1rem;
-    }
-
-    .stat-box small {
-        margin-bottom: 0;
-    }
-
-    .dropdown-list {
-        max-height: 260px;
-        border-radius: 10px;
-        top: calc(100% + 4px);
-    }
-
-    .dropdown-item {
-        padding: 0.5rem 0.8rem;
-        font-size: 0.85rem;
-        gap: 0.5rem;
-    }
-
-    .dropdown-item i {
-        font-size: 0.85rem;
-    }
-
-    .dropdown-item .badge-paciente {
-        font-size: 0.55rem;
-        padding: 0.1rem 0.55rem;
-    }
-
-    .dropdown-more {
-        font-size: 0.72rem;
-        padding: 0.4rem 0.7rem;
-    }
-
-    .dropdown-empty {
-        font-size: 0.78rem;
-        padding: 0.7rem;
-    }
-
-    .patient-badge-container {
-        padding: 0.65rem 0.8rem;
-    }
-
-    .patient-info {
-        gap: 0.5rem;
-    }
-
-    .patient-name {
-        font-size: 0.85rem;
-    }
-
-    .icon-patient {
-        font-size: 1rem;
-    }
-
-    .btn-desasignar {
-        font-size: 0.9rem;
-    }
-
-    .ubicacion-paciente {
-        font-size: 0.7rem;
-        padding: 0.15rem 0.6rem;
-    }
-
-    .sin-mediciones {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .tensiometro-header {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .tensiometro-controls {
-        justify-content: stretch;
-    }
-
-    .tensiometro-controls button {
-        flex: 1;
-        justify-content: center;
     }
 
     .medicion-grid {
@@ -1537,6 +1564,36 @@
         align-items: flex-start;
         gap: 0.5rem;
     }
+
+    .tensiometro-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .tensiometro-controls {
+        justify-content: stretch;
+    }
+
+    .tensiometro-controls button {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .lectura-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dropdown-list {
+        max-height: 260px;
+        border-radius: 10px;
+        top: calc(100% + 4px);
+    }
+
+    .dropdown-item {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.85rem;
+        gap: 0.5rem;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1555,77 +1612,48 @@
 
     .form-control-premium {
         font-size: 0.9rem;
-        padding: 0.6rem 2rem 0.6rem 0.8rem;
+        padding: 0.6rem 0.8rem;
     }
 
     .btn-save,
-    .btn-cancel-premium,
-    .btn-action {
-        font-size: 0.8rem;
-        padding: 0.5rem 0.8rem;
+    .btn-cancel-premium {
+        font-size: 0.85rem;
+        padding: 0.6rem 1.2rem;
     }
 
-    .header-controls .btn-action,
-    .header-controls .btn-cancel-premium {
-        font-size: 0.7rem;
-        padding: 0.4rem 0.6rem;
+    .stats-grid {
+        grid-template-columns: 1fr;
     }
 
-    .estado-banner {
-        padding: 0.5rem 0.75rem;
-    }
-
-    .estado-badge-conexion {
-        font-size: 0.7rem;
-        padding: 0.3rem 0.8rem;
-    }
-
-    .info-sincronizacion {
-        font-size: 0.75rem;
+    .stat-box {
+        padding: 0.9rem;
     }
 
     .stat-value {
         font-size: 1.35rem;
     }
 
-    .stat-box {
-        padding: 0.7rem 0.8rem;
+    .resumen-dispositivo,
+    .resumen-dispositivo-historial,
+    .resumen-dispositivo-mediciones {
+        padding: 0.75rem 1rem;
     }
 
-    .stat-box small {
-        font-size: 0.6rem;
+    .resumen-item strong {
+        font-size: 0.85rem;
+    }
+
+    .resumen-item i {
+        font-size: 1.2rem;
+        min-width: 28px;
     }
 
     .historial-item {
         padding: 0.5rem 0.7rem;
     }
 
-    .historial-detalle strong {
-        font-size: 0.75rem;
-    }
-
-    .historial-detalle span {
-        font-size: 0.7rem;
-    }
-
     .section-title {
         font-size: 0.95rem;
-    }
-
-    .btn-desasignar {
-        font-size: 0.8rem;
-    }
-
-    .icon-patient {
-        font-size: 0.9rem;
-    }
-
-    .patient-name {
-        font-size: 0.8rem;
-    }
-
-    .sin-mediciones span {
-        font-size: 0.85rem;
     }
 
     .dropdown-list {
@@ -1661,10 +1689,89 @@
     .patient-badge-container {
         padding: 0.5rem 0.7rem;
     }
+
+    .patient-name {
+        font-size: 0.8rem;
+    }
+
+    .icon-patient {
+        font-size: 0.9rem;
+    }
+
+    .btn-desasignar {
+        font-size: 0.8rem;
+    }
+
+    .ubicacion-paciente {
+        font-size: 0.7rem;
+        padding: 0.15rem 0.6rem;
+    }
+
+    .sin-mediciones-tensiometro {
+        padding: 1.5rem 1rem;
+    }
+
+    .sin-mediciones-tensiometro i {
+        font-size: 2rem;
+    }
+
+    .sin-mediciones-tensiometro span {
+        font-size: 0.85rem;
+    }
+
+    .estado-banner-mediciones {
+        padding: 0.5rem 0.75rem;
+    }
+
+    .estado-badge-conexion {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.8rem;
+    }
+
+    .info-sincronizacion {
+        font-size: 0.75rem;
+    }
+
+    .btn-sincronizar-mediciones {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.8rem;
+    }
+
+    .progreso-conexion-panel {
+        padding: 0.75rem;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+    }
+
+    .progreso-log {
+        max-height: 150px;
+        gap: 0.3rem;
+    }
+
+    .progreso-linea {
+        font-size: 0.72rem;
+        padding: 0.25rem 0.5rem;
+        gap: 0.4rem;
+    }
+
+    .progreso-header {
+        font-size: 0.6rem;
+        gap: 0.4rem;
+        margin-bottom: 0.5rem;
+        padding-bottom: 0.4rem;
+    }
+
+    .medicion-value {
+        font-size: 1.5rem;
+    }
+
+    .medicion-item {
+        padding: 0.4rem 0.6rem;
+    }
 }
 
 /* ==========================================================================
-   17. UTILIDADES ADICIONALES
+   20. UTILIDADES ADICIONALES
    ========================================================================== */
 html {
     scroll-behavior: smooth;
@@ -1714,179 +1821,40 @@ select.form-control-premium option:checked {
     margin-bottom: 0.75rem;
 }
 
-.text-muted.small {
-    margin-top: 1rem;
-    color: #8a9aa8 !important;
+.medicion-valores-historial .pulse i {
     font-size: 0.8rem;
-    text-align: right;
-    font-style: italic;
-}
-
-/* ==========================================================================
-   18. PANEL DE PROGRESO DE CONEXIÓN (estilo integrado)
-   ========================================================================== */
-.progreso-conexion-panel {
-    background: #ffffff;
-    border-radius: 14px;
-    padding: 1.25rem 1.5rem;
-    margin-bottom: 1.25rem;
-    border: 1.5px solid #e9edf2;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.progreso-conexion-panel:hover {
-    border-color: #d0d7df;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-}
-
-.progreso-header {
-    display: flex;
-    align-items: center;
-    gap: 0.65rem;
-    color: #4a5a6e;
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-    font-weight: 700;
-    margin-bottom: 0.75rem;
-    padding-bottom: 0.6rem;
-    border-bottom: 2px solid #f1f4f8;
-}
-
-.progreso-header i {
-    font-size: 1rem;
+    margin-right: 2px;
     color: #b0001e;
 }
 
-.progreso-log {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    max-height: 220px;
-    overflow-y: auto;
-    padding-right: 0.25rem;
-}
-
-/* Scrollbar personalizada */
-.progreso-log::-webkit-scrollbar {
-    width: 4px;
-}
-
-.progreso-log::-webkit-scrollbar-track {
-    background: #f1f4f8;
-    border-radius: 3px;
-}
-
-.progreso-log::-webkit-scrollbar-thumb {
-    background: #d0d7df;
-    border-radius: 10px;
-}
-
-.progreso-log::-webkit-scrollbar-thumb:hover {
-    background: #bcc5d0;
-}
-
-.progreso-linea {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    padding: 0.4rem 0.75rem;
-    background: #fafbfc;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    color: #1a2938;
-    animation: slideInLine 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border-left: 3px solid transparent;
-    transition: all 0.2s ease;
-}
-
-.progreso-linea:hover {
-    background: #f1f4f8;
-}
-
-.progreso-linea i {
-    font-size: 0.65rem;
-    color: #8a9aa8;
-    flex-shrink: 0;
-}
-
-/* Última línea destacada */
-.progreso-linea:last-child {
-    border-left-color: #b0001e;
-    background: #fef2f2;
-    font-weight: 600;
-}
-
-.progreso-linea:last-child i {
+/* Si quieres que el icono lata (animación) */
+.medicion-valores-historial .pulse i {
+    font-size: 0.8rem;
+    margin-right: 2px;
     color: #b0001e;
-    font-size: 0.7rem;
+    animation: heartBeat 1.5s ease-in-out infinite;
 }
 
-/* Animación para nuevas líneas */
-@keyframes slideInLine {
-    from {
-        opacity: 0;
-        transform: translateX(-8px);
+@keyframes heartBeat {
+
+    0%,
+    100% {
+        transform: scale(1);
     }
 
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .progreso-conexion-panel {
-        padding: 1rem;
-        border-radius: 12px;
+    14% {
+        transform: scale(1.2);
     }
 
-    .progreso-log {
-        max-height: 180px;
+    28% {
+        transform: scale(1);
     }
 
-    .progreso-linea {
-        font-size: 0.78rem;
-        padding: 0.3rem 0.6rem;
+    42% {
+        transform: scale(1.2);
     }
 
-    .progreso-header {
-        font-size: 0.65rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .progreso-conexion-panel {
-        padding: 0.75rem;
-        border-radius: 10px;
-        margin-bottom: 1rem;
-    }
-
-    .progreso-log {
-        max-height: 150px;
-        gap: 0.3rem;
-    }
-
-    .progreso-linea {
-        font-size: 0.72rem;
-        padding: 0.25rem 0.5rem;
-        gap: 0.4rem;
-    }
-
-    .progreso-linea i {
-        font-size: 0.55rem;
-    }
-
-    .progreso-header {
-        font-size: 0.6rem;
-        gap: 0.4rem;
-        margin-bottom: 0.5rem;
-        padding-bottom: 0.4rem;
-    }
-
-    .progreso-header i {
-        font-size: 0.85rem;
+    70% {
+        transform: scale(1);
     }
 }

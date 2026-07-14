@@ -27,6 +27,8 @@ interface TratamientoAsociado {
   idMedicamento: number;
 }
 
+type TabMedicamento = 'detalle' | 'historial';
+
 @Component({
   selector: 'app-medicamento-detalle',
   standalone: true,
@@ -44,13 +46,15 @@ export class MedicamentoDetalle implements OnInit, OnDestroy {
   medicamentoSeleccionado: any = null;
   isSaving = false;
 
+  // Pestaña activa
+  activeTab: TabMedicamento = 'detalle';
+
   mostrarToast = false;
   mensajeToast = '';
   tipoToast: 'success' | 'error' | 'warning' = 'success';
   private toastTimeout: any = null;
 
   historialCambios: HistorialMedicamento[] = [];
-  mostrarHistorial = false;
 
   estadisticas: {
     totalTratamientos: number;
@@ -60,7 +64,6 @@ export class MedicamentoDetalle implements OnInit, OnDestroy {
   } | null = null;
 
   tratamientosAsociados: TratamientoAsociado[] = [];
-  mostrarTratamientos = false;
 
   cargandoEstadisticas = false;
   cargandoTratamientos = false;
@@ -102,6 +105,23 @@ export class MedicamentoDetalle implements OnInit, OnDestroy {
     }
   }
 
+  // --- CONTROL DE PESTAÑAS ---
+  cambiarTab(tab: TabMedicamento) {
+    if (this.activeTab === tab) return;
+    this.activeTab = tab;
+
+    // Si cambiamos a la pestaña de historial, refrescar estadísticas y tratamientos
+    if (tab === 'historial') {
+      const idMedicamento = this.medicamentoSeleccionado?.idmedicamento;
+      if (idMedicamento) {
+        this.cargarEstadisticasReales(idMedicamento);
+        this.cargarTratamientosReales(idMedicamento);
+      }
+    }
+
+    this.cdr.detectChanges();
+  }
+
   inicializarCampos() {
     if (!this.medicamentoSeleccionado) return;
     if (!this.medicamentoSeleccionado.sustanciaactiva) {
@@ -118,7 +138,7 @@ export class MedicamentoDetalle implements OnInit, OnDestroy {
     }
   }
 
-  // ✅ CARGAR ESTADÍSTICAS REALES
+  // --- CARGAR ESTADÍSTICAS REALES ---
   async cargarEstadisticasReales(idMedicamento: number) {
     if (!idMedicamento) return;
 
@@ -177,7 +197,7 @@ export class MedicamentoDetalle implements OnInit, OnDestroy {
     };
   }
 
-  // ✅ CARGAR TRATAMIENTOS ASOCIADOS REALES - CORREGIDO
+  // --- CARGAR TRATAMIENTOS ASOCIADOS REALES ---
   async cargarTratamientosReales(idMedicamento: number) {
     if (!idMedicamento) return;
 
@@ -197,13 +217,11 @@ export class MedicamentoDetalle implements OnInit, OnDestroy {
       if (tratamientosFiltrados && tratamientosFiltrados.length > 0) {
         this.tratamientosAsociados = tratamientosFiltrados.map((t: any) => ({
           id: t.idtratamiento || t.IdTratamiento || t.id || 0,
-          // ✅ NOMBRE COMPLETO DEL PACIENTE
           paciente: this.getNombreCompletoPaciente(t),
           nombre: t.nombre || t.Nombre || t.nombrepaciente || t.NombrePaciente || '',
           apPaterno: t.appaterno || t.ApPaterno || t.appaternopaciente || t.ApPaternoPaciente || '',
           apMaterno: t.apmaterno || t.ApMaterno || t.apmaternopaciente || t.ApMaternoPaciente || '',
           idPaciente: t.idpaciente || t.IdPaciente || 0,
-          // ✅ FORMATEAR FECHAS
           fechaInicio: this.formatearFecha(t.fechainicio || t.FechaInicio || ''),
           fechaFin: this.formatearFecha(t.fechafin || t.FechaFin || ''),
           activo: t.activo !== undefined ? t.activo : true,
@@ -232,23 +250,20 @@ export class MedicamentoDetalle implements OnInit, OnDestroy {
     }
   }
 
-  // ✅ OBTENER NOMBRE COMPLETO DEL PACIENTE
+  // --- OBTENER NOMBRE COMPLETO DEL PACIENTE ---
   getNombreCompletoPaciente(t: any): string {
     const nombre = t.nombre || t.Nombre || t.nombrepaciente || t.NombrePaciente || '';
     const apPaterno = t.appaterno || t.ApPaterno || t.appaternopaciente || t.ApPaternoPaciente || '';
     const apMaterno = t.apmaterno || t.ApMaterno || t.apmaternopaciente || t.ApMaternoPaciente || '';
 
-    // Si tiene nombre y apellidos, concatenar
     if (nombre && apPaterno) {
       return `${nombre} ${apPaterno} ${apMaterno || ''}`.trim();
     }
 
-    // Si solo tiene nombre
     if (nombre) {
       return nombre;
     }
 
-    // Si tiene nombrepaciente (como viene del backend)
     if (t.nombrepaciente || t.NombrePaciente) {
       return t.nombrepaciente || t.NombrePaciente;
     }
@@ -256,12 +271,11 @@ export class MedicamentoDetalle implements OnInit, OnDestroy {
     return 'Paciente sin nombre';
   }
 
-  // ✅ FORMATEAR FECHA (eliminar el formato ISO y dejar solo DD/MM/YYYY)
+  // --- FORMATEAR FECHA ---
   formatearFecha(fecha: string): string {
     if (!fecha) return '';
 
     try {
-      // Si la fecha viene en formato ISO (2026-07-10T06:00:00.000Z)
       if (fecha.includes('T')) {
         const fechaObj = new Date(fecha);
         if (!isNaN(fechaObj.getTime())) {
@@ -272,7 +286,6 @@ export class MedicamentoDetalle implements OnInit, OnDestroy {
         }
       }
 
-      // Si ya viene en formato YYYY-MM-DD
       if (fecha.includes('-')) {
         const partes = fecha.split('-');
         if (partes.length === 3) {
@@ -288,7 +301,13 @@ export class MedicamentoDetalle implements OnInit, OnDestroy {
 
   inicializarHistorial() {
     const ahora = new Date();
-    const fechaStr = ahora.toISOString().replace('T', ' ').slice(0, 16);
+    const fechaStr = ahora.toLocaleString('es-MX', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
 
     this.historialCambios = [
       {
@@ -311,7 +330,13 @@ export class MedicamentoDetalle implements OnInit, OnDestroy {
 
   agregarHistorial(accion: string, detalle: string) {
     const ahora = new Date();
-    const fechaStr = ahora.toISOString().replace('T', ' ').slice(0, 16);
+    const fechaStr = ahora.toLocaleString('es-MX', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
     this.historialCambios.unshift({
       fecha: fechaStr,
       accion: accion,
@@ -320,6 +345,7 @@ export class MedicamentoDetalle implements OnInit, OnDestroy {
     });
   }
 
+  // --- ESTADO DEL MEDICAMENTO ---
   getEstadoMedicamento(): { texto: string; clase: string; icono: string } {
     if (!this.estadisticas) {
       return { texto: 'Sin datos', clase: 'estado-sin-datos', icono: 'bi-question-circle' };
@@ -344,6 +370,17 @@ export class MedicamentoDetalle implements OnInit, OnDestroy {
         icono: 'bi-plus-circle'
       };
     }
+  }
+
+  getEstadoMedicamentoColor(): string {
+    const estado = this.getEstadoMedicamento();
+    const colores: { [key: string]: string } = {
+      'En uso activo': '#10b981',
+      'Sin uso activo': '#f59e0b',
+      'Sin tratamientos': '#6c757d',
+      'Sin datos': '#6c757d'
+    };
+    return colores[estado.texto] || '#6c757d';
   }
 
   formatearIndicaciones(texto: string): string {
@@ -391,7 +428,7 @@ export class MedicamentoDetalle implements OnInit, OnDestroy {
     }, 4000);
   }
 
-  // ✅ GUARDAR CAMBIOS
+  // --- GUARDAR CAMBIOS ---
   async guardarCambios() {
     if (!this.medicamentoSeleccionado) return;
 
@@ -442,8 +479,8 @@ export class MedicamentoDetalle implements OnInit, OnDestroy {
         );
       }
 
-      this.cargarEstadisticasReales(id);
-      this.cargarTratamientosReales(id);
+      await this.cargarEstadisticasReales(id);
+      await this.cargarTratamientosReales(id);
 
       this.lanzarNotificacion("¡Éxito! El medicamento ha sido actualizado correctamente.", "success");
 

@@ -36,16 +36,7 @@
                 }
 
                 <div class="action-buttons-group" [class.visible]="dispositivoSeleccionado">
-                    <!-- ✅ VER - Todos los roles -->
-                    @if (verificarPermiso('ver')) {
-                    <button class="btn-action btn-view-premium" (click)="irADetalle(dispositivoSeleccionado)"
-                        title="Ver dispositivo" [disabled]="!dispositivoSeleccionado">
-                        <i class="bi bi-eye-fill"></i>
-                        <span>Ver</span>
-                    </button>
-                    }
-
-                    <!-- ✅ MEDIR - Paciente, Médico y Admin (NO Acompañante) -->
+                    <!-- ✅ MEDIR - SOLO Paciente y Acompañante -->
                     @if (verificarPermiso('medir')) {
                     <button class="btn-action btn-measure-premium" (click)="irADetalle(dispositivoSeleccionado)"
                         title="Tomar medición" [disabled]="!dispositivoSeleccionado">
@@ -54,7 +45,7 @@
                     </button>
                     }
 
-                    <!-- ✅ EDITAR - Médico, Admin y Acompañante -->
+                    <!-- ✅ EDITAR - SOLO Admin y Médico (incluye ver y editar) -->
                     @if (verificarPermiso('editar')) {
                     <button class="btn-action btn-edit-premium" (click)="irADetalle(dispositivoSeleccionado)"
                         title="Editar dispositivo" [disabled]="!dispositivoSeleccionado">
@@ -63,7 +54,7 @@
                     </button>
                     }
 
-                    <!-- ✅ ELIMINAR - Solo Médico y Admin -->
+                    <!-- ✅ ELIMINAR - Solo Admin y Médico -->
                     @if (verificarPermiso('eliminar')) {
                     <button class="btn-action btn-delete-premium" (click)="abrirEliminar()"
                         title="Eliminar dispositivo">

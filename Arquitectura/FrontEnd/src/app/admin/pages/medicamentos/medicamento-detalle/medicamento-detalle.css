@@ -19,13 +19,14 @@
 }
 
 /* ==========================================================================
-   2. HEADER SECTION - MEJORADO
+   2. HEADER SECTION
    ========================================================================== */
 .header-section {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    margin-bottom: 2.5rem;
+    gap: 30px;
+    margin-bottom: 1.75rem;
     padding-bottom: 1.25rem;
     border-bottom: 2px solid #e9edf2;
 }
@@ -37,36 +38,88 @@
 }
 
 .title-page {
-    font-size: 2rem;
+    font-size: 2.1rem;
     font-weight: 800;
     color: #0a1628;
     margin: 0;
     letter-spacing: -0.5px;
-}
-
-.title-page::before {
-    font-size: 1.8rem;
+    line-height: 1.2;
 }
 
 .subtitle-page {
     color: #7a8a9e;
-    font-size: 1rem;
+    font-size: 0.95rem;
     margin: 0;
     font-weight: 400;
 }
 
 /* ==========================================================================
-   3. HEADER CONTROLS - MEJORADO
+   3. HEADER CONTROLS
    ========================================================================== */
 .header-controls {
     display: flex;
-    gap: 0.75rem;
+    gap: 16px;
     align-items: center;
     flex-wrap: wrap;
 }
 
 /* ==========================================================================
-   4. TARJETA DE DETALLE - MEJORADA
+   4. MENÚ DE PESTAÑAS (TABS)
+   ========================================================================== */
+.tabs-nav-wrapper {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 2rem;
+}
+
+.tabs-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #ffffff;
+    border: 1px solid #e9edf2;
+    border-radius: 18px;
+    padding: 6px;
+    box-shadow: 0 2px 10px rgba(10, 22, 40, 0.04);
+}
+
+.tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    border: none;
+    background: transparent;
+    color: #7a8a9e;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 0.7rem 1.4rem;
+    border-radius: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tab-btn i {
+    font-size: 1rem;
+}
+
+.tab-btn:hover:not(.active) {
+    background: #f1f4f8;
+    color: #1a2938;
+}
+
+.tab-btn.active {
+    background: linear-gradient(135deg, #b0001e, #8a0016);
+    color: #ffffff;
+    box-shadow: 0 6px 16px rgba(176, 0, 30, 0.28);
+}
+
+.tab-panel {
+    animation: fadeIn 0.35s ease;
+}
+
+/* ==========================================================================
+   5. TARJETA DE DETALLE
    ========================================================================== */
 .detail-card {
     background: #ffffff;
@@ -82,9 +135,21 @@
 }
 
 /* ==========================================================================
-   5. RESUMEN DEL MEDICAMENTO - MEJORADO
+   6. RESUMEN DEL MEDICAMENTO
    ========================================================================== */
 .resumen-medicamento {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    background: #fafbfc;
+    border-radius: 14px;
+    margin-bottom: 1.75rem;
+    border: 1px solid #e9edf2;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.resumen-medicamento-historial {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1rem;
@@ -132,7 +197,7 @@
 }
 
 /* ==========================================================================
-   6. ESTADO DEL MEDICAMENTO - MEJORADO
+   7. ESTADO DEL MEDICAMENTO
    ========================================================================== */
 .estado-medicamento {
     display: inline-flex;
@@ -171,22 +236,16 @@
 }
 
 /* ==========================================================================
-   7. TRATAMIENTOS ASOCIADOS - MEJORADO
+   8. TRATAMIENTOS ASOCIADOS
    ========================================================================== */
 .tratamientos-section {
-    margin-top: 1.75rem;
+    margin-top: 0.5rem;
 }
 
 .tratamientos-header {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    cursor: pointer;
-    transition: opacity 0.2s;
-}
-
-.tratamientos-header:hover {
-    opacity: 0.8;
 }
 
 .tratamientos-header .section-title {
@@ -283,7 +342,6 @@
     font-size: 0.8rem;
 }
 
-/* Badges - MEJORADOS */
 .badge-activo {
     background: #d1fae5;
     color: #065f46;
@@ -306,8 +364,34 @@
     letter-spacing: 0.3px;
 }
 
+.tratamientos-vacio {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: #8a9aa8;
+    margin-bottom: 1rem;
+}
+
+.tratamientos-vacio i {
+    font-size: 2.5rem;
+    color: #dce1e8;
+    margin-bottom: 0.75rem;
+    display: block;
+}
+
+.tratamientos-vacio p {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #4a5a6e;
+    margin: 0 0 0.25rem 0;
+}
+
+.tratamientos-vacio span {
+    font-size: 0.85rem;
+    color: #8a9aa8;
+}
+
 /* ==========================================================================
-   8. ESTADÍSTICAS - MEJORADO
+   9. ESTADÍSTICAS
    ========================================================================== */
 .estadisticas-section {
     margin-top: 1.75rem;
@@ -376,7 +460,7 @@
 }
 
 /* ==========================================================================
-   9. FORMULARIO - MEJORADO
+   10. FORMULARIO
    ========================================================================== */
 .form-grid {
     display: grid;
@@ -389,9 +473,11 @@
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
+    max-width: 100%;
 }
 
 .full-width-group {
+    grid-column: 1 / -1;
     margin-bottom: 1.5rem;
 }
 
@@ -440,8 +526,21 @@
     opacity: 0.7;
 }
 
+/* TEXTAREA FIJO */
+textarea.form-control-premium {
+    min-height: 100px;
+    max-height: 100px;
+    height: 100px;
+    resize: none !important;
+    font-family: inherit;
+    line-height: 1.5;
+    width: 100%;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
 /* ==========================================================================
-   10. FORM TEXT - MEJORADO
+   11. FORM TEXT
    ========================================================================== */
 .form-text {
     font-size: 0.7rem;
@@ -455,24 +554,23 @@
 }
 
 /* ==========================================================================
-   11. HISTORIAL - MEJORADO
+   12. HISTORIAL
    ========================================================================== */
 .historial-section {
-    margin-top: 1.5rem;
+    margin-top: 0.5rem;
+}
+
+.section-divider {
+    border: none;
+    border-top: 2px solid #e9edf2;
+    margin: 1.75rem 0;
 }
 
 .historial-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    cursor: pointer;
     padding: 0.5rem 0;
-    user-select: none;
-    transition: opacity 0.2s;
-}
-
-.historial-header:hover {
-    opacity: 0.8;
 }
 
 .historial-header .section-title {
@@ -497,7 +595,7 @@
 
 .historial-lista {
     margin-top: 1rem;
-    max-height: 350px;
+    max-height: 400px;
     overflow-y: auto;
     border: 1px solid #e9edf2;
     border-radius: 14px;
@@ -569,7 +667,32 @@
     color: #8a9aa8;
 }
 
-/* Scroll personalizado - MEJORADO */
+.historial-vacio {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #8a9aa8;
+    margin-bottom: 1rem;
+}
+
+.historial-vacio i {
+    font-size: 2.8rem;
+    color: #dce1e8;
+    margin-bottom: 0.75rem;
+    display: block;
+}
+
+.historial-vacio p {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #4a5a6e;
+    margin: 0 0 0.25rem 0;
+}
+
+.historial-vacio span {
+    font-size: 0.85rem;
+    color: #8a9aa8;
+}
+
 .historial-lista::-webkit-scrollbar {
     width: 6px;
 }
@@ -590,16 +713,7 @@
 }
 
 /* ==========================================================================
-   12. SECTION DIVIDER - MEJORADO
-   ========================================================================== */
-.section-divider {
-    border: none;
-    border-top: 2px solid #e9edf2;
-    margin: 1.75rem 0;
-}
-
-/* ==========================================================================
-   13. ACCIONES FOOTER - MEJORADO
+   13. ACCIONES FOOTER
    ========================================================================== */
 .action-footer {
     display: flex;
@@ -611,7 +725,7 @@
 }
 
 /* ==========================================================================
-   14. BOTONES PREMIUM - MEJORADOS
+   14. BOTONES PREMIUM
    ========================================================================== */
 .btn-save {
     padding: 0.65rem 2rem;
@@ -696,7 +810,7 @@
 }
 
 /* ==========================================================================
-   15. TOAST NOTIFICACIÓN - MEJORADO
+   15. TOAST NOTIFICACIÓN
    ========================================================================== */
 .toast-premium-container {
     position: fixed;
@@ -757,9 +871,6 @@
     }
 }
 
-/* ==========================================================================
-   16. ANIMACIONES
-   ========================================================================== */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -773,7 +884,7 @@
 }
 
 /* ==========================================================================
-   17. RESPONSIVIDAD - MEJORADA
+   16. RESPONSIVIDAD
    ========================================================================== */
 @media (max-width: 1200px) {
     .form-grid {
@@ -790,13 +901,16 @@
         grid-column: span 2 !important;
     }
 
-    .resumen-medicamento {
+    .resumen-medicamento,
+    .resumen-medicamento-historial {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
 @media (max-width: 992px) {
-    .resumen-medicamento {
+
+    .resumen-medicamento,
+    .resumen-medicamento-historial {
         grid-template-columns: repeat(2, 1fr);
     }
 }
@@ -826,6 +940,35 @@
         justify-content: center;
     }
 
+    .estado-medicamento {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .tabs-nav-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .tabs-nav {
+        width: 100%;
+    }
+
+    .tab-btn {
+        flex: 1;
+        justify-content: center;
+        padding: 0.65rem 0.9rem;
+        font-size: 0.75rem;
+    }
+
+    .tab-btn span {
+        display: none;
+    }
+
+    .tab-btn i {
+        font-size: 1.15rem;
+    }
+
     .form-grid {
         grid-template-columns: 1fr;
         gap: 1.25rem;
@@ -833,6 +976,10 @@
 
     .form-group[style*="span"] {
         grid-column: span 1 !important;
+    }
+
+    .full-width-group {
+        grid-column: 1;
     }
 
     .action-footer {
@@ -852,7 +999,8 @@
         border-radius: 16px;
     }
 
-    .resumen-medicamento {
+    .resumen-medicamento,
+    .resumen-medicamento-historial {
         grid-template-columns: 1fr;
         gap: 0.75rem;
         padding: 1rem 1.25rem;
@@ -923,24 +1071,18 @@
         border-radius: 12px;
     }
 
-    .estado-medicamento {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .full-width-group textarea {
+    .full-width-group textarea,
+    textarea.form-control-premium {
         min-height: 80px;
+        max-height: 80px;
+        height: 80px;
+        resize: none !important;
     }
 }
 
 @media (max-width: 480px) {
     .title-page {
         font-size: 1.5rem;
-    }
-
-    .title-page::before {
-        content: "💊 ";
-        font-size: 1.3rem;
     }
 
     .subtitle-page {
@@ -975,7 +1117,8 @@
         font-size: 1.35rem;
     }
 
-    .resumen-medicamento {
+    .resumen-medicamento,
+    .resumen-medicamento-historial {
         padding: 0.75rem 1rem;
     }
 
@@ -1028,20 +1171,17 @@
 }
 
 /* ==========================================================================
-   18. UTILIDADES ADICIONALES
+   17. UTILIDADES ADICIONALES
    ========================================================================== */
-/* Smooth scroll global */
 html {
     scroll-behavior: smooth;
 }
 
-/* Selección de texto personalizada */
 ::selection {
     background: rgba(176, 0, 30, 0.15);
     color: #b0001e;
 }
 
-/* Enfoque accesible para elementos interactivos */
 button:focus-visible,
 input:focus-visible,
 select:focus-visible,
@@ -1050,7 +1190,6 @@ textarea:focus-visible {
     outline-offset: 2px;
 }
 
-/* Mejora para selects */
 select.form-control-premium {
     appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a5a6e' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
@@ -1069,7 +1208,6 @@ select.form-control-premium option:checked {
     color: #ffffff;
 }
 
-/* Estilo para inputs de fecha */
 input[type="text"][readonly] {
     cursor: pointer;
 }

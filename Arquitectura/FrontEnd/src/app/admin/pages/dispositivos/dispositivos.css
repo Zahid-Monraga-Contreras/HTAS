@@ -5,7 +5,6 @@
     margin-left: 250px;
     padding: 90px 40px 40px;
     background-color: #f8fafc;
-    /* Un gris sutil más moderno que resalta las tarjetas blancas */
     min-height: 100vh;
     transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -88,6 +87,7 @@
     transform: translateY(5px);
     transition: all 0.3s ease;
     pointer-events: none;
+    flex-wrap: wrap;
 }
 
 .action-buttons-group.visible {
@@ -109,6 +109,29 @@
     transition: all 0.2s ease;
 }
 
+.btn-action:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ==========================================================================
+   3. BOTONES POR ROL
+   ========================================================================== */
+
+/* Botón MEDIR - Paciente y Acompañante */
+.btn-measure-premium {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.btn-measure-premium:hover:not(:disabled) {
+    background: #15803d;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(21, 128, 61, 0.2);
+}
+
+/* Botón EDITAR - Admin y Médico */
 .btn-edit-premium {
     background: #eff6ff;
     color: #2563eb;
@@ -121,6 +144,7 @@
     box-shadow: 0 4px 12px rgba(37, 99, 219, 0.2);
 }
 
+/* Botón ELIMINAR - Admin y Médico */
 .btn-delete-premium {
     background: #fef2f2;
     color: #dc2626;
@@ -155,7 +179,7 @@
 }
 
 /* ==========================================================================
-   3. TABLA DE DISPOSITIVOS PREMIUM
+   4. TABLA DE DISPOSITIVOS PREMIUM
    ========================================================================== */
 .table-card {
     background: white;
@@ -217,7 +241,6 @@
     width: 38px;
     height: 38px;
     border-radius: 10px;
-    /* Estilo cuadrado redondeado moderno */
     background: linear-gradient(135deg, #fee2e2, #fecaca);
     display: flex;
     align-items: center;
@@ -236,6 +259,11 @@
     font-weight: 600;
     color: #0f172a;
     font-size: 0.95rem;
+}
+
+.text-muted {
+    color: #94a3b8;
+    font-size: 0.75rem;
 }
 
 .mono-text {
@@ -275,29 +303,6 @@
     color: #b91c1c;
 }
 
-/* Botón de edición en línea de la fila */
-.btn-inline-edit {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
-    background: white;
-    color: #64748b;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-size: 0.9rem;
-}
-
-.btn-inline-edit:hover {
-    background: #b0001e;
-    color: white;
-    border-color: #b0001e;
-    transform: scale(1.05);
-}
-
 /* Empty State */
 .empty-state {
     text-align: center;
@@ -318,7 +323,7 @@
 }
 
 /* ==========================================================================
-   4. BARRA DE PAGINACIÓN
+   5. BARRA DE PAGINACIÓN
    ========================================================================== */
 .pagination-bar {
     padding: 16px 24px;
@@ -357,7 +362,10 @@
     color: #0f172a;
 }
 
-
+.nav-arrows button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
 
 .page-num {
     font-weight: 700;
@@ -368,7 +376,7 @@
 }
 
 /* ==========================================================================
-   5. MODALES (REGISTRO / EDICIÓN / ELIMINACIÓN)
+   6. MODALES (REGISTRO / EDICIÓN / ELIMINACIÓN)
    ========================================================================== */
 .modal-overlay {
     backdrop-filter: blur(4px);
@@ -390,7 +398,6 @@
     border-radius: 16px;
     width: 92%;
     max-width: 540px;
-    /* Ajuste óptimo para formularios de dispositivos */
     max-height: calc(100vh - 40px);
     display: flex;
     flex-direction: column;
@@ -441,7 +448,7 @@
     margin-bottom: 1.25rem;
 }
 
-/* Elementos que ocupan toda la fila (como el Select de Vinculación) */
+/* Elementos que ocupan toda la fila */
 .full-width-modal {
     grid-column: span 2;
     margin-bottom: 0.25rem;
@@ -551,13 +558,6 @@
     margin: 0.5rem 0;
 }
 
-.text-muted-danger {
-    color: #64748b;
-    margin: 0 0 1.5rem;
-    font-size: 0.9rem;
-    line-height: 1.4;
-}
-
 .warning-icon-circle {
     width: 56px;
     height: 56px;
@@ -613,7 +613,7 @@
 }
 
 /* ==========================================================================
-   6. TOAST NOTIFICACIONES PREMIUM
+   7. TOAST NOTIFICACIONES PREMIUM
    ========================================================================== */
 .toast-premium-container {
     position: fixed;
@@ -658,7 +658,7 @@
 }
 
 /* ==========================================================================
-   7. ANIMACIONES Y MEDIA QUERIES
+   8. ANIMACIONES
    ========================================================================== */
 .spinner-save {
     width: 16px;
@@ -699,14 +699,146 @@
     }
 }
 
+/* ==========================================================================
+   9. DROPDOWN DE BÚSQUEDA (PACIENTES)
+   ========================================================================== */
+.custom-dropdown-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    margin-top: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 250px;
+    padding-right: 4px;
+}
+
+.custom-dropdown-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #334155;
+    transition: all 0.2s;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.custom-dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.custom-dropdown-item:hover {
+    background-color: #f8fafc;
+    color: #b0001e;
+    font-weight: 500;
+}
+
+/* Scrollbar del dropdown */
+.custom-dropdown-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-dropdown-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-dropdown-list::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.custom-dropdown-list::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* ==========================================================================
+   10. PACIENTE VINCULADO BADGE
+   ========================================================================== */
+.patient-badge-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border: 1.5px solid #e2e7ee;
+    border-radius: 12px;
+    background: #fafbfc;
+    transition: all 0.2s ease;
+}
+
+.patient-badge-container:hover {
+    border-color: #d0d7df;
+}
+
+.patient-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.icon-patient {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.icon-patient.active {
+    color: #b0001e;
+}
+
+.icon-patient.unlinked {
+    color: #8a9aa8;
+}
+
+.patient-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #0a1628;
+    flex: 1;
+}
+
+.btn-desasignar {
+    background: none;
+    border: none;
+    color: #ef4444;
+    cursor: pointer;
+    padding: 0.2rem 0.4rem;
+    font-size: 1rem;
+    transition: all 0.25s ease;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+.btn-desasignar:hover {
+    background: #fee2e2;
+    transform: scale(1.1);
+    color: #dc2626;
+}
+
+/* ==========================================================================
+   11. RESPONSIVE
+   ========================================================================== */
+@media (max-width: 1200px) {
+    .search-box-pill {
+        width: 250px;
+    }
+}
+
 @media (max-width: 992px) {
     .form-grid-modal {
         grid-template-columns: 1fr;
-        /* Columna única en pantallas medianas */
     }
 
     .full-width-modal {
         grid-column: span 1;
+    }
+
+    .search-box-pill {
+        width: 200px;
     }
 }
 
@@ -738,181 +870,242 @@
     }
 
     .action-buttons-group {
-        justify-content: space-between;
-        width: 100%;
-    }
-}
-
-/* ==========================================================================
-   8. ESTILOS PARA DROPDOWN DE BÚSQUEDA (PACIENTES)
-   ========================================================================== */
-
-/* Contenedor relativo para que el dropdown se posicione correctamente bajo el input */
-.search-box-pill {
-    /* Mantenemos tu estilo actual, solo aseguramos el z-index */
-    z-index: 10;
-}
-
-/* El contenedor de la lista de resultados */
-.custom-dropdown-list {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: white;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    margin-top: 8px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-
-    /* CAMBIO AQUÍ: Eliminamos el hidden y aseguramos el scroll vertical */
-    overflow-y: auto;
-    overflow-x: hidden;
-    max-height: 250px;
-
-    /* Agregamos un pequeño padding derecho para que el contenido no pegue con el scroll */
-    padding-right: 4px;
-}
-
-/* Cada item dentro del dropdown */
-.custom-dropdown-item {
-    padding: 12px 16px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    color: #334155;
-    transition: all 0.2s;
-    border-bottom: 1px solid #f1f5f9;
-}
-
-.custom-dropdown-item:last-child {
-    border-bottom: none;
-}
-
-/* Efecto hover al pasar el ratón */
-.custom-dropdown-item:hover {
-    background-color: #f8fafc;
-    color: #b0001e;
-    font-weight: 500;
-}
-
-/* Ajuste específico para cuando el buscador está vacío */
-.custom-dropdown-item:empty {
-    padding: 10px;
-    color: #94a3b8;
-    cursor: default;
-}
-
-/* ==========================================================================
-   ESTILO DE SCROLLBAR PARA EL DROPDOWN (Igual a Tratamientos)
-   ========================================================================== */
-
-/* 1. Definir el ancho del scrollbar */
-.custom-dropdown-list::-webkit-scrollbar {
-    width: 6px;
-}
-
-/* 2. El track (la pista de fondo) debe ser transparente para integrarse */
-.custom-dropdown-list::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-/* 3. La "manija" o barra debe tener el color gris suave y bordes redondeados */
-.custom-dropdown-list::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    /* Color gris premium */
-    border-radius: 10px;
-    /* Bordes redondeados como en image_82092d.png */
-}
-
-/* 4. Efecto sutil al pasar el mouse por encima */
-.custom-dropdown-list::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
-}
-
-/* ==========================================================================
-   NUEVOS BOTONES PARA ROLES
-   ========================================================================== */
-
-/* Botón VER - Para todos los roles */
-.btn-view-premium {
-    background: #eff6ff;
-    color: #2563eb;
-}
-
-.btn-view-premium:hover:not(:disabled) {
-    background: #2563eb;
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(37, 99, 219, 0.2);
-}
-
-/* Botón MEDIR - Para pacientes, médicos y admin */
-.btn-measure-premium {
-    background: #dcfce7;
-    color: #15803d;
-}
-
-.btn-measure-premium:hover:not(:disabled) {
-    background: #15803d;
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(21, 128, 61, 0.2);
-}
-
-/* Botón EDITAR - Solo admin y médicos */
-.btn-edit-premium {
-    background: #eff6ff;
-    color: #2563eb;
-}
-
-.btn-edit-premium:hover:not(:disabled) {
-    background: #2563eb;
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(37, 99, 219, 0.2);
-}
-
-/* Botón ELIMINAR - Solo admin y médicos */
-.btn-delete-premium {
-    background: #fef2f2;
-    color: #dc2626;
-}
-
-.btn-delete-premium:hover:not(:disabled) {
-    background: #dc2626;
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
-}
-
-/* Ajuste para el grupo de botones */
-.action-buttons-group {
-    display: flex;
-    gap: 10px;
-    opacity: 0;
-    transform: translateY(5px);
-    transition: all 0.3s ease;
-    pointer-events: none;
-    flex-wrap: wrap;
-}
-
-.action-buttons-group.visible {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-}
-
-/* Responsive para botones */
-@media (max-width: 768px) {
-    .action-buttons-group {
-        flex-wrap: wrap;
         justify-content: stretch;
+        width: 100%;
     }
 
     .action-buttons-group button {
         flex: 1;
         min-width: 80px;
         justify-content: center;
+        padding: 8px 12px;
+        font-size: 0.78rem;
+    }
+
+    .btn-save {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .modal-premium-card {
+        width: 95%;
+        max-width: 100%;
+        border-radius: 12px;
+    }
+
+    .modal-body {
+        padding: 1.25rem;
+    }
+
+    .modal-header {
+        padding: 1rem 1.25rem;
+    }
+
+    .modal-footer-premium {
+        padding: 1rem 1.25rem;
+        flex-direction: column-reverse;
+    }
+
+    .modal-footer-premium button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .custom-table th {
+        padding: 12px 16px;
+        font-size: 0.65rem;
+    }
+
+    .user-row td {
+        padding: 12px 16px;
+        font-size: 0.82rem;
+    }
+
+    .pagination-bar {
+        flex-direction: column;
+        gap: 10px;
+        padding: 12px 16px;
+        font-size: 0.8rem;
+    }
+
+    .nav-arrows {
+        gap: 8px;
+    }
+
+    .name-cell-premium {
+        gap: 8px;
+    }
+
+    .avatar-icon-circle {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+    }
+
+    .user-name-main {
+        font-size: 0.85rem;
+    }
+
+    .status-chip {
+        font-size: 0.7rem;
+        padding: 3px 8px;
+    }
+
+    .mono-text {
+        font-size: 0.7rem;
+        padding: 1px 4px;
+    }
+}
+
+@media (max-width: 480px) {
+    .title-page {
+        font-size: 1.4rem;
+    }
+
+    .subtitle-page {
+        font-size: 0.8rem;
+    }
+
+    .header-controls {
+        gap: 8px;
+    }
+
+    .action-buttons-group button {
+        font-size: 0.7rem;
+        padding: 6px 10px;
+        min-width: 60px;
+    }
+
+    .btn-action i {
+        font-size: 0.8rem;
+    }
+
+    .btn-action span {
+        font-size: 0.65rem;
+    }
+
+    .btn-save {
+        font-size: 0.8rem;
+        padding: 8px 16px;
+    }
+
+    .btn-save i {
+        font-size: 0.8rem;
+    }
+
+    .search-box-pill {
+        padding: 0px 0px 0px 14px;
+    }
+
+    .search-box-pill input {
+        font-size: 0.8rem;
+        padding: 8px 10px;
+    }
+
+    .search-box-pill i {
+        font-size: 0.8rem;
+    }
+
+    .modal-premium-card {
+        max-height: calc(100vh - 20px);
+        border-radius: 10px;
+    }
+
+    .modal-header h3 {
+        font-size: 1.05rem;
+    }
+
+    .form-group label {
+        font-size: 0.75rem;
+    }
+
+    .form-control-premium {
+        font-size: 0.82rem;
+        padding: 0.5rem 0.8rem;
+    }
+
+    .custom-table {
+        font-size: 0.7rem;
+    }
+
+    .custom-table th {
+        padding: 8px 10px;
+        font-size: 0.55rem;
+    }
+
+    .user-row td {
+        padding: 8px 10px;
+        font-size: 0.75rem;
+    }
+
+    .user-name-main {
+        font-size: 0.78rem;
+    }
+
+    .mono-text {
+        font-size: 0.65rem;
+    }
+
+    .status-chip {
+        font-size: 0.6rem;
+        padding: 2px 6px;
+    }
+
+    .pagination-bar {
+        font-size: 0.7rem;
+    }
+
+    .page-num {
+        font-size: 0.7rem;
+        padding: 2px 8px;
+    }
+
+    .nav-arrows button {
+        width: 28px;
+        height: 28px;
+        font-size: 0.7rem;
+    }
+
+    .modal-footer-premium button {
+        font-size: 0.8rem;
+        padding: 8px 16px;
+    }
+
+    .btn-danger-confirm,
+    .btn-outline-cancel {
+        font-size: 0.8rem;
+        padding: 8px 16px;
+    }
+
+    .warning-icon-circle {
+        width: 44px;
+        height: 44px;
+        font-size: 1.2rem;
+    }
+
+    .modal-content {
+        padding: 20px;
+        max-width: 95%;
+    }
+
+    .modal-danger h3 {
+        font-size: 1.1rem;
+    }
+
+    .toast-premium-container {
+        top: 15px;
+        right: 15px;
+        left: 15px;
+        max-width: none;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+    }
+
+    .toast-message {
+        font-size: 0.8rem;
+    }
+
+    .icon-toast {
+        font-size: 1rem;
     }
 }

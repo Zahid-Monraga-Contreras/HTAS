@@ -67,6 +67,10 @@ export class Dispositivos implements OnInit, OnDestroy {
 
   /**
    * ✅ VERIFICAR PERMISOS SEGÚN ROL
+   * - Admin: Todo
+   * - Médico: Crear, Editar, Eliminar
+   * - Paciente: Solo Medir
+   * - Acompañante: Solo Medir
    */
   verificarPermiso(accion: 'crear' | 'editar' | 'eliminar' | 'ver' | 'medir' | 'editarPaciente'): boolean {
     if (!this.currentUser || !this.currentUser.rol) return false;
@@ -81,18 +85,17 @@ export class Dispositivos implements OnInit, OnDestroy {
       case 'crear':
         return esAdmin || esMedico;
       case 'editar':
-        // Acompañante puede editar nombre y datos básicos, pero no el paciente vinculado
-        return esAdmin || esMedico || esAcompanante;
+        return esAdmin || esMedico;
       case 'editarPaciente':
-        // Solo admin y médico pueden cambiar el paciente vinculado
         return esAdmin || esMedico;
       case 'eliminar':
         return esAdmin || esMedico;
       case 'ver':
-        return esAdmin || esMedico || esPaciente || esAcompanante;
+        // Admin y médico pueden ver el detalle completo
+        return esAdmin || esMedico;
       case 'medir':
-        // Paciente, médico y admin pueden medir, acompañante NO
-        return esAdmin || esMedico || esPaciente;
+        // Paciente y acompañante SOLO pueden medir
+        return esPaciente || esAcompanante;
       default:
         return false;
     }
@@ -138,7 +141,6 @@ export class Dispositivos implements OnInit, OnDestroy {
   }
 
   desvincularPaciente() {
-    // Solo admin y médico pueden desvincular
     if (!this.verificarPermiso('editarPaciente')) {
       this.lanzarNotificacion('No tienes permiso para modificar el paciente vinculado.', 'error');
       return;
@@ -220,23 +222,14 @@ export class Dispositivos implements OnInit, OnDestroy {
       return;
     }
 
-    // Si es paciente, solo puede ver y medir
-    if (this.currentUser?.rol?.toLowerCase() === 'paciente') {
-      this.router.navigate(['/dispositivos/editar', dispositivo.iddispositivo], {
-        state: {
-          dispositivo: dispositivo,
-          modo: 'paciente'  // Modo solo lectura + botón medir
-        }
-      });
-      return;
-    }
+    const rol = this.currentUser?.rol?.toLowerCase().trim() || '';
 
-    // Si es acompañante, puede ver y editar (pero no cambiar paciente vinculado)
-    if (this.currentUser?.rol?.toLowerCase() === 'acompañante') {
+    // Si es paciente o acompañante: SOLO modo medición
+    if (rol === 'paciente' || rol === 'acompañante') {
       this.router.navigate(['/dispositivos/editar', dispositivo.iddispositivo], {
         state: {
           dispositivo: dispositivo,
-          modo: 'acompanante'  // Modo edición limitada
+          modo: 'medir'  // Modo solo medición
         }
       });
       return;
@@ -252,7 +245,6 @@ export class Dispositivos implements OnInit, OnDestroy {
   }
 
   seleccionarPacienteModal(p: any) {
-    // Solo admin y médico pueden seleccionar paciente
     if (!this.verificarPermiso('editarPaciente')) {
       this.lanzarNotificacion('No tienes permiso para vincular pacientes.', 'error');
       return;
