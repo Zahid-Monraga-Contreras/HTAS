@@ -1,12 +1,12 @@
 import { Routes } from '@angular/router';
-import { Landing } from './landing/landing';
+import { Landing } from './landing/landing/landing';
 import { Login } from './auth/containers/login/login';
 import { Register } from './auth/containers/register/register';
-import { Nosotros } from './pages/nosotros/nosotros';
-import { Recursos } from './pages/recursos/recursos';
-import { Contacto } from './pages/contacto/contacto';
-import { Pagos } from './pages/pagos/pagos';
-import { Error404 } from './pages/error-404/error-404';
+import { Nosotros } from './landing/pages/nosotros/nosotros';
+import { Recursos } from './landing/pages/recursos/recursos';
+import { Contacto } from './landing/pages/contacto/contacto';
+import { Pagos } from './landing/pages/pagos/pagos';
+import { Error404 } from './landing/pages/error-404/error-404';
 import { Menu } from './admin/template/menu/menu';
 import { Inicio } from './admin/pages/inicio/inicio';
 import { Usuarios } from './admin/pages/usuarios/usuarios';
@@ -18,7 +18,7 @@ import { PacienteDetalle } from './admin/pages/pacientes/paciente-detalle/pacien
 import { Medicos } from './admin/pages/medicos/medicos';
 import { MedicoDetalle } from './admin/pages/medicos/medico-detalle/medico-detalle';
 import { Notificaciones } from './admin/template/notificaciones/notificaciones';
-import { Success } from './pages/success/success';
+import { Success } from './landing/pages/success/success';
 import { Citas } from './admin/pages/citas/citas';
 import { CitaDetalle } from './admin/pages/citas/cita-detalle/cita-detalle';
 import { Tratamientos } from './admin/pages/tratamientos/tratamientos';

@@ -1,6 +1,6 @@
 import { Component, AfterViewInit, ViewChildren, QueryList, ElementRef, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { StripeService } from '../../auth/services/stripe';
+import { StripeService } from '../../../auth/services/stripe';
 
 @Component({
   selector: 'app-pagos',

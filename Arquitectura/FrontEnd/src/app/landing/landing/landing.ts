@@ -2,11 +2,11 @@ import { Component, HostListener, AfterViewInit, ElementRef, QueryList, ViewChil
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Headermenu } from "../template/headermenu/headermenu";
 import { Footer } from "../template/footer/footer";
-import { Pagos } from "../pages/pagos/pagos";
-import { Contacto } from "../pages/contacto/contacto";
-import { Nosotros } from "../pages/nosotros/nosotros";
-import { Recursos } from "../pages/recursos/recursos";
-import { ElectricWavesComponent } from '../shared/components/electric-waves/electric-waves.component';
+import { Pagos } from "../../landing/pages/pagos/pagos";
+import { Contacto } from "../../landing/pages/contacto/contacto";
+import { Nosotros } from "../../landing/pages/nosotros/nosotros";
+import { Recursos } from "../../landing/pages/recursos/recursos";
+import { ElectricWavesComponent } from '../../shared/components/electric-waves/electric-waves.component';
 
 @Component({
   selector: 'app-landing',

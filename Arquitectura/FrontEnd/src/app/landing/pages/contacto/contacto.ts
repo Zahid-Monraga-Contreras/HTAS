@@ -1,6 +1,6 @@
 import { Component, AfterViewInit, ViewChildren, QueryList, ElementRef, Inject, PLATFORM_ID, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { ShaderBackgroundComponent } from '../../shared/components/shader-background/shader-background.component';
+import { ShaderBackgroundComponent } from '../../../shared/components/shader-background/shader-background.component';
 import { HttpClient, HttpClientModule } from '@angular/common/http'; // Importa HttpClientModule
 import { FormsModule } from '@angular/forms';
 
