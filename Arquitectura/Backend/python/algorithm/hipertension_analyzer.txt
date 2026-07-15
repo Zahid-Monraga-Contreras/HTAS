@@ -1,0 +1,753 @@
+# ==============================================================================
+#                      SISTEMA TECNOLÓGICO PREDICTIVO "HTAS-MÉXICO"
+# ==============================================================================
+# NOMBRE DEL SOFTWARE: Aún por definir el nombre del módulo
+#                      
+# CLASIFICACIÓN INDAUTOR: Programa de Computación (Software de Aplicación Médica).
+# AUTORÍA Y TITULARIDAD: UTCV
+García Peralta Fátima
+Monraga Contreras Zahid
+Radilla Partida Eleonor Guadalupe
+Suárez Rodríguez Saúl
+Castro Valdivia Ricardo
+# VERSIÓN DE COMPILACIÓN: 3.0.0 (Edición de Arquitectura Persistente y Lectura PDF)
+#
+# DESCRIPCIÓN GENERAL:
+# Este sistema representa una suite integrada de software orientada al sector salud.
+# Implementa un pipeline predictivo de aprendizaje automático (Machine Learning) basado
+# en la competencia directa y simultánea de tres paradigmas matemáticos:
+#   1. Regresión Logística (Ajuste lineal optimizado por función sigmoide).
+#   2. Random Forest (Ensamble jerárquico no lineal basado en Bagging).
+#   3. XGBoost (Ensamble secuencial basado en Gradient Boosting con regularización).
+#
+# Adicionalmente, el sistema integra una capa de seguridad y cumplimiento legal
+# que automatiza la ingesta, decodificación y análisis sintáctico-semántico de
+# expedientes en formato PDF (Cédulas Profesionales y Dictámenes de Hipertensión)
+# mediante algoritmos de parsing y vectorización de palabras clave. Todo evento
+# de cálculo e inferencia es registrado físicamente en una base de datos relacional
+# SQLite local bajo un esquema de integridad referencial de doble tabla.
+# ==============================================================================
+
+import os
+import io
+import re
+import base64
+import logging
+import sqlite3
+import numpy as np
+import pandas as pd
+from typing import Dict, Any, Optional, Tuple, List
+from pydantic import BaseModel, Field, validator
+
+# Dependencias Científicas y Algorítmicas de Inteligencia Artificial
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from xgboost import XGBClassifier
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+
+# Dependencia de Terceros para Procesamiento de Flujos Binarios PDF
+import pypdf
+
+# Framework de Conectividad y Publicación de Endpoints REST
+from fastapi import FastAPI, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
+
+# ==============================================================================
+# SUB-SISTEMA DE CONFIGURACIÓN DEL ENGINE DE LOGS (TRAZABILIDAD AUDITABLE)
+# ==============================================================================
+# Configuración del formateador para el registro cronológico y funcional del sistema.
+# Es indispensable para auditorías clínicas y comprobación de ejecución del software.
+FORMATO_LOGS = "%(asctime)s [%(levelname)s] [PROCESO: %(name)s] [HILO: %(threadName)s] -> %(message)s"
+logging.basicConfig(
+    level=logging.INFO,
+    format=FORMATO_LOGS,
+    datefmt="%Y-%m-%d %H:%M:%S"
+)
+logger = logging.getLogger("HTAS_MEXICO_CORE")
+
+# Definición de Constantes de Infraestructura Física de Almacenamiento
+DB_NAME = "clinica_htas_mexico.db"
+CSV_NAME = "Hipertension_Arterial_Mexico.csv"
+
+
+# ==============================================================================
+# CAPÍTULO I: CAPA DE GESTIÓN DE EXCEPCIONES PERSONALIZADAS (EXCEPTIONS)
+# ==============================================================================
+# Se definen clases de error especializadas para garantizar que el sistema
+# mapee y detenga el flujo ante anomalías físicas, matemáticas o lógicas.
+
+class HTASException(Exception):
+    """Clase base para el control de anomalías dentro de la suite HTAS-México."""
+    def _init_(self, mensaje: str, codigo_error: str):
+        super()._init_(mensaje)
+        self.mensaje = mensaje
+        self.codigo_error = codigo_error
+
+
+class PDFParsingException(HTASException):
+    """Excepción arrojada cuando el procesamiento binario o la decodificación Base64 de un PDF falla."""
+    def _init_(self, mensaje: str):
+        super()._init_(mensaje, "ERR_PDF_PARSING_FAILED")
+
+
+class SemanticValidationException(HTASException):
+    """Excepción arrojada cuando los PDFs no contienen los tokens o patrones de validación esperados."""
+    def _init_(self, mensaje: str):
+        super()._init_(mensaje, "ERR_SEMANTIC_VALIDATION_FAILED")
+
+
+class DatabaseConnectionException(HTASException):
+    """Excepción arrojada ante fallas de escritura, lectura o integridad referencial en SQLite."""
+    def _init_(self, mensaje: str):
+        super()._init_(mensaje, "ERR_DATABASE_TRANSACTION_FAILED")
+
+
+class MLModelException(HTASException):
+    """Excepción arrojada ante inconsistencias en el entrenamiento o inferencia matemática de los modelos."""
+    def _init_(self, mensaje: str):
+        super()._init_(mensaje, "ERR_ML_CORE_CRITICAL")
+
+
+# ==============================================================================
+# CAPÍTULO II: MOTOR DE BASE DE DATOS RELACIONAL (DATA ACCESS OBJECT)
+# ==============================================================================
+class GestorBaseDatosRelacional:
+    """
+    Abstrae y controla toda la interacción con el motor de base de datos SQLite.
+    Aplica principios ACID (Atomicidad, Consistencia, Aislamiento y Durabilidad)
+    mediante un esquema estructurado de dos tablas con llaves foráneas.
+    """
+    
+    @staticmethod
+    def conectar() -> sqlite3.Connection:
+        """Establece una conexión directa con el archivo de base de datos relacional."""
+        try:
+            return sqlite3.connect(DB_NAME)
+        except sqlite3.Error as e:
+            logger.critical(f"[SQLITE_CONN] Error crítico de conexión al archivo {DB_NAME}: {str(e)}")
+            raise DatabaseConnectionException(f"No se pudo conectar a la base de datos: {str(e)}")
+
+    @classmethod
+    def inicializar_esquema(cls):
+        """
+        Crea las tablas de la base de datos aplicando restricciones de integridad.
+        Tabla 1: 'medicos' (Catálogo de médicos con registro validado).
+        Tabla 2: 'expedientes' (Registros clínicos vinculados al médico).
+        """
+        logger.info("[DB_INIT] Iniciando la creación física del esquema relacional...")
+        conn = cls.conectar()
+        cursor = conn.cursor()
+        
+        try:
+            # Habilitar el soporte de llaves foráneas en el motor SQLite
+            cursor.execute("PRAGMA foreign_keys = ON;")
+            
+            # Creación de Tabla de Médicos Validada
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS medicos (
+                    cedula TEXT PRIMARY KEY,
+                    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    estatus_activo INTEGER NOT NULL DEFAULT 1,
+                    token_autenticacion_pdf TEXT
+                );
+            """)
+            
+            # Creación de Tabla de Expedientes Clínicos (Llave foránea hacia Médicos)
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS expedientes (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    fecha_consulta TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    cedula_medico_fk TEXT NOT NULL,
+                    edad INTEGER NOT NULL,
+                    sistolica INTEGER NOT NULL,
+                    diastolica INTEGER NOT NULL,
+                    toma_medicamento INTEGER NOT NULL,
+                    prediccion_crisis INTEGER NOT NULL,
+                    probabilidad_porcentual REAL NOT NULL,
+                    nivel_riesgo TEXT NOT NULL,
+                    motor_utilizado TEXT NOT NULL,
+                    pdf_cedula_valido INTEGER NOT NULL,
+                    pdf_diagnostico_valido INTEGER NOT NULL,
+                    FOREIGN KEY (cedula_medico_fk) REFERENCES medicos(cedula)
+                        ON DELETE CASCADE ON UPDATE CASCADE
+                );
+            """)
+            
+            conn.commit()
+            logger.info("[DB_INIT] Esquema relacional de doble tabla creado e instanciado exitosamente.")
+        except sqlite3.Error as e:
+            conn.rollback()
+            logger.error(f"[DB_INIT] Error durante la construcción de tablas: {str(e)}")
+            raise DatabaseConnectionException(f"Fallo de inicialización DDL: {str(e)}")
+        finally:
+            conn.close()
+
+    @classmethod
+    def registrar_o_actualizar_medico(cls, cedula: str, texto_cedula_token: str):
+        """Registra un médico en el catálogo o actualiza su estado si ya existía."""
+        conn = cls.conectar()
+        cursor = conn.cursor()
+        try:
+            cursor.execute("PRAGMA foreign_keys = ON;")
+            # Tomamos una muestra de texto del PDF de la cédula como token de firma
+            token_muestra = texto_cedula_token[:200].replace("\n", " ")
+            
+            cursor.execute("""
+                INSERT INTO medicos (cedula, estatus_activo, token_autenticacion_pdf)
+                VALUES (?, 1, ?)
+                ON CONFLICT(cedula) DO UPDATE SET
+                    fecha_registro = CURRENT_TIMESTAMP,
+                    token_autenticacion_pdf = excluded.token_autenticacion_pdf;
+            """, (cedula, token_muestra))
+            conn.commit()
+            logger.info(f"[DB_DAO] Médico con Cédula '{cedula}' persistido/actualizado en catálogo.")
+        except sqlite3.Error as e:
+            conn.rollback()
+            logger.error(f"[DB_DAO] Error al registrar médico '{cedula}': {str(e)}")
+            raise DatabaseConnectionException(f"Fallo al insertar en catálogo médico: {str(e)}")
+        finally:
+            conn.close()
+
+    @classmethod
+    def registrar_expediente_completo(cls, datos: Dict[str, Any]) -> int:
+        """Inserta el registro de evaluación clínica vinculándolo a la cédula del médico."""
+        conn = cls.conectar()
+        cursor = conn.cursor()
+        try:
+            cursor.execute("PRAGMA foreign_keys = ON;")
+            
+            query = """
+                INSERT INTO expedientes (
+                    cedula_medico_fk, edad, sistolica, diastolica, toma_medicamento,
+                    prediccion_crisis, probabilidad_porcentual, nivel_riesgo,
+                    motor_utilizado, pdf_cedula_valido, pdf_diagnostico_valido
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+            """
+            
+            valores = (
+                datos["cedula_medico"],
+                datos["edad"],
+                datos["sistolica"],
+                datos["diastolica"],
+                datos["toma_medicamento"],
+                datos["prediccion_crisis"],
+                datos["probabilidad_porcentual"],
+                datos["nivel_riesgo_clinico"],
+                datos["motor_inferencia_usado"],
+                1 if datos["cedula_pdf_valida"] else 0,
+                1 if datos["diagnostico_pdf_valido"] else 0
+            )
+            
+            cursor.execute(query, valores)
+            conn.commit()
+            nuevo_folio = cursor.lastrowid
+            logger.info(f"[DB_DAO] Expediente Clínico guardado con éxito. Folio de registro: #{nuevo_folio}")
+            return nuevo_folio
+        except sqlite3.Error as e:
+            conn.rollback()
+            logger.error(f"[DB_DAO] Error al guardar el expediente del paciente: {str(e)}")
+            raise DatabaseConnectionException(f"Fallo de transacción DML en tabla 'expedientes': {str(e)}")
+        finally:
+            conn.close()
+
+
+# ==============================================================================
+# CAPÍTULO III: ANALIZADOR DE DOCUMENTOS PDF (PARSING & SEMANTIC ANALYSIS)
+# ==============================================================================
+class ProcesadorDocumentosPDF:
+    """
+    Motor encargado de la ingesta, limpieza, parsing y análisis semántico
+    de documentos médicos codificados en formato Base64.
+    """
+
+    @staticmethod
+    def extraer_texto_de_base64(string_base64: str) -> str:
+        """
+        Decodifica la cadena en Base64, la transforma en un flujo binario en memoria,
+        lee el archivo PDF y extrae recursivamente el texto de cada página.
+        """
+        logger.info("[PDF_PARSER] Decodificando secuencia Base64 entrante...")
+        try:
+            # Limpieza estructural de la cabecera del DataURI si está presente
+            if "," in string_base64:
+                string_base64 = string_base64.split(",")[1]
+            
+            # Conversión de texto plano codificado a bytes físicos
+            pdf_bytes = base64.b64decode(string_base64)
+            # Creación de un buffer de entrada/salida virtual en memoria RAM
+            buffer_memoria = io.BytesIO(pdf_bytes)
+            
+            # Instanciación del parser de pypdf
+            lector_pdf = pypdf.PdfReader(buffer_memoria)
+            texto_acumulado = []
+            
+            # Recorrido de páginas para extracción de caracteres unicode
+            for indice, pagina in enumerate(lector_pdf.pages):
+                texto_extraido = pagina.extract_text()
+                if texto_extraido:
+                    texto_acumulado.append(texto_extraido)
+            
+            texto_unificado = "\n".join(texto_acumulado).strip()
+            
+            if not texto_unificado:
+                logger.warning("[PDF_PARSER] Archivo PDF vacío o compuesto puramente por imágenes escaneadas.")
+                raise PDFParsingException("El PDF está vacío o requiere reconocimiento óptico de caracteres (OCR).")
+            
+            logger.info(f"[PDF_PARSER] Procesamiento completado. Caracteres extraídos: {len(texto_unificado)}")
+            return texto_unificado
+        except Exception as e:
+            logger.error(f"[PDF_PARSER] Error crítico durante la decodificación del PDF: {str(e)}")
+            raise PDFParsingException(f"Error estructural en el archivo PDF binario: {str(e)}")
+
+    @classmethod
+    def validar_documento_cedula(cls, pdf_base64: str, cedula_esperada: str) -> Tuple[bool, str]:
+        """
+        Aplica reglas de negocio de reconocimiento semántico sobre el PDF de la cédula.
+        Verifica que contenga el número exacto de cédula y palabras institucionales.
+        """
+        logger.info(f"[PDF_VAL] Verificando legitimidad del PDF para la cédula: {cedula_esperada}")
+        texto_pdf = cls.extraer_texto_de_base64(pdf_base64)
+        texto_normalizado = texto_pdf.lower()
+        
+        # Validación del número de cédula (limpiando espacios o guiones)
+        cedula_limpia = cedula_esperada.strip()
+        contiene_cedula_id = cedula_limpia in texto_normalizado or cedula_limpia.replace(" ", "") in texto_normalizado
+        
+        # Patrón de coincidencia lingüística institucional
+        lexicon_institucional = ["cédula", "profesional", "registro", "médico", "educación", "sep", "dirección", "profesiones", "folio"]
+        coincidencias = sum(1 for token in lexicon_institucional if token in texto_normalizado)
+        
+        # Umbral de validación semántica
+        if contiene_cedula_id and coincidencias >= 2:
+            logger.info("[PDF_VAL] El documento contiene la firma semántica oficial de una Cédula Profesional.")
+            return True, texto_pdf
+            
+        logger.warning(f"[PDF_VAL] Cédula Profesional inválida. No coincide con '{cedula_esperada}' o no es oficial.")
+        return False, texto_pdf
+
+    @classmethod
+    def validar_documento_hipertension(cls, pdf_base64: str) -> Tuple[bool, str]:
+        """
+        Analiza el PDF clínico buscando palabras clave médicas relacionadas con
+        hipertensión, presión arterial u otros marcadores cardiovasculares.
+        """
+        logger.info("[PDF_VAL] Analizando diagnóstico clínico de confirmación de hipertensión...")
+        texto_pdf = cls.extraer_texto_de_base64(pdf_base64)
+        texto_normalizado = texto_pdf.lower()
+        
+        # Diccionario clínico de términos de referencia
+        lexicon_medico = [
+            "hipertensión", "hipertenso", "sistólica", "diastólica", "presión arterial",
+            "tensión", "cardiaco", "diagnóstico", "clínica", "tratamiento", "médico", "paciente"
+        ]
+        
+        coincidencias = sum(1 for token in lexicon_medico if token in texto_normalizado)
+        
+        # Umbral estricto de coincidencia diagnóstica (requiere al menos 3 conceptos médicos)
+        if coincidencias >= 3:
+            logger.info("[PDF_VAL] Confirmación diagnóstica corroborada semánticamente en el PDF.")
+            return True, texto_pdf
+            
+        logger.warning("[PDF_VAL] El expediente presentado no cuenta con suficientes marcadores clínicos de hipertensión.")
+        return False, texto_pdf
+
+
+# ==============================================================================
+# CAPÍTULO IV: ARQUITECTURA PIPELINE DE MACHINE LEARNING COMPETITIVO (IA)
+# ==============================================================================
+class PipelineInteligenciaArtificial:
+    """
+    Controla el flujo de vida analítico de la Inteligencia Artificial del sistema.
+    Entrena, valida y hace competir a tres algoritmos de ML distintos,
+    seleccionando de manera automatizada al mejor modelo.
+    """
+    def _init_(self, datos_entrada: pd.DataFrame):
+        self.df = datos_entrada
+        self.scaler = StandardScaler()
+        
+        # Instanciación lógica de los tres contenedores de algoritmos
+        self.modelo_logistic_regression = None
+        self.modelo_random_forest = None
+        self.modelo_xgboost = None
+        
+        # Atributos para el modelo ganador
+        self.mejor_modelo = None
+        self.nombre_ganador = "Ninguno"
+        
+        # Definición del esquema dimensional de variables
+        self.variables_predictoras = ['Edad', 'Sistolica', 'Diastolica', 'Toma_Medicamento']
+        self.variable_clase = 'Crisis_Hipertensiva'
+
+    def ejecutar_entrenamiento_y_competencia(self) -> str:
+        """
+        Prepara las matrices de entrada, separa en conjuntos de entrenamiento y
+        prueba, entrena simultáneamente los 3 clasificadores y evalúa su rendimiento.
+        """
+        logger.info("[ML_CORE] Iniciando pipeline de entrenamiento tri-algorítmico competitivo...")
+        
+        # Extracción de variables dependientes e independientes
+        X = self.df[self.variables_predictoras]
+        y = self.df[self.variable_clase]
+        
+        # División de datos (80% entrenamiento, 20% evaluación) con estratificación
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.2, random_state=42, stratify=y
+        )
+        
+        # Escalado y normalización z-score de variables continuas
+        X_train_scaled = self.scaler.fit_transform(X_train)
+        X_test_scaled = self.scaler.transform(X_test)
+        
+        # ----------------------------------------------------------------------
+        # ALGORITMO 1: REGRESIÓN LOGÍSTICA (Optimización Convexa Lineal)
+        # ----------------------------------------------------------------------
+        logger.info("[ML_CORE] Entrenando Clasificador 1: Regresión Logística...")
+        self.modelo_logistic_regression = LogisticRegression(class_weight='balanced', random_state=42, max_iter=500)
+        self.modelo_logistic_regression.fit(X_train_scaled, y_train)
+        preds_lr = self.modelo_logistic_regression.predict(X_test_scaled)
+        
+        # Extracción de métricas de rendimiento para el Algoritmo 1
+        acc_lr = accuracy_score(y_test, preds_lr)
+        prec_lr = precision_score(y_test, preds_lr, zero_division=0)
+        rec_lr = recall_score(y_test, preds_lr, zero_division=0)
+        f1_lr = f1_score(y_test, preds_lr, zero_division=0)
+        logger.info(f"[ML_MÉTRICAS] Regresión Logística -> Acc: {acc_lr:.4f} | F1: {f1_lr:.4f}")
+
+        # ----------------------------------------------------------------------
+        # ALGORITMO 2: RANDOM FOREST (Ensamble Homogéneo de Árboles Paralelos)
+        # ----------------------------------------------------------------------
+        logger.info("[ML_CORE] Entrenando Clasificador 2: Random Forest Classifier...")
+        self.modelo_random_forest = RandomForestClassifier(
+            n_estimators=200, max_depth=8, class_weight='balanced', random_state=42
+        )
+        self.modelo_random_forest.fit(X_train_scaled, y_train)
+        preds_rf = self.modelo_random_forest.predict(X_test_scaled)
+        
+        # Extracción de métricas de rendimiento para el Algoritmo 2
+        acc_rf = accuracy_score(y_test, preds_rf)
+        prec_rf = precision_score(y_test, preds_rf, zero_division=0)
+        rec_rf = recall_score(y_test, preds_rf, zero_division=0)
+        f1_rf = f1_score(y_test, preds_rf, zero_division=0)
+        logger.info(f"[ML_MÉTRICAS] Random Forest -> Acc: {acc_rf:.4f} | F1: {f1_rf:.4f}")
+
+        # ----------------------------------------------------------------------
+        # ALGORITMO 3: XGBOOST (Optimizador Secuencial por Gradiente Descendente)
+        # ----------------------------------------------------------------------
+        logger.info("[ML_CORE] Entrenando Clasificador 3: XGBoost Classifier...")
+        conteo_clases = np.bincount(y_train)
+        ratio_balanceo = conteo_clases[0] / conteo_clases[1] if len(conteo_clases) > 1 else 1.0
+        
+        self.modelo_xgboost = XGBClassifier(
+            n_estimators=150, max_depth=5, scale_pos_weight=ratio_balanceo,
+            eval_metric='logloss', random_state=42
+        )
+        self.modelo_xgboost.fit(X_train_scaled, y_train)
+        preds_xgb = self.modelo_xgboost.predict(X_test_scaled)
+        
+        # Extracción de métricas de rendimiento para el Algoritmo 3
+        acc_xgb = accuracy_score(y_test, preds_xgb)
+        prec_xgb = precision_score(y_test, preds_xgb, zero_division=0)
+        rec_xgb = recall_score(y_test, preds_xgb, zero_division=0)
+        f1_xgb = f1_score(y_test, preds_xgb, zero_division=0)
+        logger.info(f"[ML_MÉTRICAS] XGBoost -> Acc: {acc_xgb:.4f} | F1: {f1_xgb:.4f}")
+
+        # ----------------------------------------------------------------------
+        # PROCESO DE EVALUACIÓN Y CORONACIÓN DEL ALGORITMO GANADOR
+        # ----------------------------------------------------------------------
+        # Evaluamos bajo el criterio del F1-Score (idóneo para datos clínicos balanceados/desbalanceados)
+        tabla_competencia = {
+            "Regresion Logistica": (self.modelo_logistic_regression, f1_lr),
+            "Random Forest": (self.modelo_random_forest, f1_rf),
+            "XGBoost": (self.modelo_xgboost, f1_xgb)
+        }
+        
+        # Búsqueda del mejor modelo según métrica F1
+        self.nombre_ganador = max(tabla_competencia, key=lambda clave: tabla_competencia[clave][1])
+        self.mejor_modelo = tabla_competencia[self.nombre_ganador][0]
+        
+        logger.info("=====================================================================")
+        logger.info(f"   🏆 ALGORITMO GANADOR PARA PRODUCCIÓN: {self.nombre_ganador.upper()} 🏆")
+        logger.info(f"   Métrica F1 lograda: {tabla_competencia[self.nombre_ganador][1]:.4%}")
+        logger.info("=====================================================================")
+        
+        return self.nombre_ganador
+
+    def inferencia_paciente(self, edad: int, sistolica: int, diastolica: int, medicamento: int) -> Dict[str, Any]:
+        """
+        Ejecuta la predicción sobre un nuevo paciente a partir de sus parámetros,
+        usando exclusivamente el mejor de los tres modelos de la competencia.
+        """
+        if self.mejor_modelo is None:
+            logger.critical("[INFERENCIA] Se intentó consultar el modelo sin haber entrenado los algoritmos.")
+            raise MLModelException("El pipeline no se ha inicializado o entrenado correctamente.")
+
+        # Construcción y estructuración del vector unidimensional de entrada
+        vector_entrada = pd.DataFrame([[edad, sistolica, diastolica, medicamento]], columns=self.variables_predictoras)
+        # Escalado equivalente al entrenamiento
+        vector_escalado = self.scaler.transform(vector_entrada)
+
+        # Cálculo de probabilidades clínicas
+        probabilidades = self.mejor_modelo.predict_proba(vector_escalado)
+        probabilidad_crisis = float(probabilidades[0][1])
+        prediccion_binaria = int(self.mejor_modelo.predict(vector_escalado)[0])
+
+        # Regla de Negocio / Semáforo de Riesgo (Guías Internacionales de Cardiología)
+        if prediccion_binaria == 1 or sistolica >= 180 or diastolica >= 120:
+            riesgo = "CRÍTICO (URGENCIA HIPERTENSIVA)"
+            protocolo = "Riesgo severo inminente. El paciente requiere traslado urgente a una clínica médica o administración inmediata de fármacos de rescate."
+            prediccion_binaria = 1
+        elif sistolica >= 140 or diastolica >= 90:
+            riesgo = "MODERADO (HIPERTENSIÓN ESTADIO 2)"
+            protocolo = "Estadío clínico elevado. Se aconseja reposar 15 minutos, re-evaluar la presión y concertar una cita médica en menos de 24 horas."
+        else:
+            riesgo = "ESTABLE / CONTROLADO"
+            protocolo = "Presión arterial dentro de los límites esperados o bajo adecuado control farmacológico. Continuar con monitoreo preventivo."
+
+        return {
+            "prediccion_crisis": prediccion_binaria,
+            "probabilidad_porcentual": round(probabilidad_crisis * 100, 2),
+            "nivel_riesgo_clinico": riesgo,
+            "protocolo_sugerido": protocolo,
+            "motor_inferencia_usado": self.nombre_ganador
+        }
+
+
+# ==============================================================================
+# CAPÍTULO V: CAPA DE VALIDACIÓN Y TRANSFERENCIA DE DATOS (PYDANTIC SCHEMAS)
+# ==============================================================================
+class SolicitudEvaluacionCompleta(BaseModel):
+    """
+    Mapeador estricto para validar los datos que recibe la API desde el exterior (Mobile o Web).
+    Previene inyecciones de datos y errores de formato.
+    """
+    edad: int = Field(..., ge=0, le=120, description="Edad del paciente evaluado")
+    sistolica: int = Field(..., ge=40, le=260, description="Presión sistólica medida en mmHg")
+    diastolica: int = Field(..., ge=30, le=180, description="Presión diastólica medida en mmHg")
+    toma_medicamento: int = Field(..., ge=0, le=1, description="Indicador binario de adherencia farmacológica (1=Sí, 0=No)")
+    
+    cedula_medico: str = Field(..., min_length=7, max_length=10, description="Número identificador de la Cédula")
+    cedula_pdf_base64: str = Field(..., description="Documento de Cédula Profesional en formato Base64")
+    diagnostico_pdf_base64: str = Field(..., description="Expediente de confirmación de hipertensión en Base64")
+
+    @validator('cedula_medico')
+    def normalizar_cedula(cls, valor: str):
+        """Remueve espacios en blanco innecesarios de la cédula profesional."""
+        return valor.strip()
+
+
+class RespuestaEvaluacionClinica(BaseModel):
+    """Estructura de respuesta HTTP para el cliente móvil."""
+    folio_expediente_db: int
+    cedula_pdf_valida: bool
+    diagnostico_pdf_valido: bool
+    prediccion_crisis: int
+    probabilidad_porcentual: float
+    nivel_riesgo_clinico: str
+    protocolo_sugerido: str
+    motor_inferencia_usado: str
+    mensaje_almacenamiento: str
+
+
+# ==============================================================================
+# CAPÍTULO VI: EXPOSICIÓN DE SERVICIOS WEB Y ROUTING (FASTAPI CONTROLLER)
+# ==============================================================================
+app = FastAPI(
+    title="Core Predictivo Tri-Algorítmico Persistente - HTAS México",
+    description="Motor de Inferencia clínica con validación sintáctica de expedientes y catálogo relacional de médicos.",
+    version="3.0.0"
+)
+
+# Configuración del puente CORS para permitir interacciones seguras entre dominios
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Variable de almacenamiento global en RAM para la instancia activa del pipeline de IA
+instancia_ia_global: Optional[PipelineInteligenciaArtificial] = None
+
+
+@app.on_event("startup")
+def arrancar_servicios_sistema():
+    """
+    Evento de inicialización automática al arrancar el servidor web.
+    Configura la base de datos y entrena los 3 modelos de IA para competir.
+    """
+    global instancia_ia_global
+    logger.info("=====================================================================")
+    logger.info("   INICIALIZANDO MOTOR PRINCIPAL DE PERSISTENCIA E INTELIGENCIA ARTIFICIAL  ")
+    logger.info("=====================================================================")
+    
+    # 1. Configurar Base de Datos SQLite Relacional
+    GestorBaseDatosRelacional.inicializar_esquema()
+    
+    # 2. Intentar cargar el archivo histórico para el entrenamiento de los 3 modelos
+    try:
+        if not os.path.exists(CSV_NAME):
+            raise FileNotFoundError("El dataset histórico de entrenamiento clínico no fue localizado.")
+            
+        logger.info(f"[STARTUP] Extrayendo variables de entrenamiento desde: {CSV_NAME}")
+        df_historico = pd.read_csv(CSV_NAME).dropna()
+        
+        instancia_ia_global = PipelineInteligenciaArtificial(datos_entrada=df_historico)
+        instancia_ia_global.ejecutar_entrenamiento_y_competencia()
+        logger.info("[STARTUP] Pipeline de competencia tri-algorítmica cargado y listo en producción.")
+        
+    except Exception as e:
+        logger.critical(f"[STARTUP_CRITICAL] No se pudo leer el CSV. Iniciando con matriz sintética de contingencia: {str(e)}")
+        
+        # Creación de matriz de emergencia para garantizar que el servidor levante sin caídas de producción
+        datos_emergencia = pd.DataFrame([
+            [55, 120, 80, 1, 0], [67, 185, 115, 0, 1],
+            [40, 130, 85, 1, 0], [78, 190, 120, 0, 1],
+            [35, 115, 75, 1, 0], [62, 175, 110, 0, 1],
+            [48, 140, 90, 1, 0], [80, 200, 130, 0, 1],
+            [50, 120, 80, 1, 0], [66, 180, 100, 0, 1]
+        ], columns=['Edad', 'Sistolica', 'Diastolica', 'Toma_Medicamento', 'Crisis_Hipertensiva'])
+        
+        instancia_ia_global = PipelineInteligenciaArtificial(datos_entrada=datos_emergencia)
+        instancia_ia_global.ejecutar_entrenamiento_y_competencia()
+
+
+@app.get("/api/ia/salud-sistema", status_code=status.HTTP_200_OK)
+def verificar_salud_servidor():
+    """Endpoint de monitoreo y verificación de estatus."""
+    global instancia_ia_global
+    return {
+        "estatus_servicio": "Operando en Línea",
+        "motor_ia_activo": instancia_ia_global.nombre_ganador if instancia_ia_global else "Ninguno",
+        "persistencia_db": "Activa (SQLite)",
+        "seguridad_pdf": "Activo (Reconocimiento Semántico)"
+    }
+
+
+@app.post("/api/ia/evaluar-paciente-completo", response_model=RespuestaEvaluacionClinica, status_code=status.HTTP_200_OK)
+def evaluar_expediente_completo(payload: SolicitudEvaluacionCompleta):
+    """
+    ENDPOINT REY DE LA ARQUITECTURA.
+    
+    Ejecuta en secuencia lineal:
+      1. Parsing y validación semántica del PDF de la Cédula del médico.
+      2. Parsing y validación de marcadores cardiovasculares del PDF de Hipertensión del Paciente.
+      3. Registro del médico en el catálogo de base de datos.
+      4. Inferencia probabilística con el mejor de los 3 modelos de ML.
+      5. Consolidación relacional del expediente y devolución del folio único.
+    """
+    global instancia_ia_global
+    if not instancia_ia_global:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="El motor analítico predictivo no se encuentra instanciado en el servidor."
+        )
+
+    # ----------------------------------------------------------------------
+    # PASO 1: EXTRACCIÓN Y VALIDACIÓN DE CÉDULA PROFESIONAL EN PDF
+    # ----------------------------------------------------------------------
+    try:
+        pdf_cedula_valido, texto_cedula_extraido = ProcesadorDocumentosPDF.validar_documento_cedula(
+            payload.cedula_pdf_base64, payload.cedula_medico
+        )
+    except PDFParsingException as e:
+        logger.error(f"[API_ENDPOINT] Fallo al parsear Cédula: {e.mensaje}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.mensaje)
+        
+    if not pdf_cedula_valido:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Fallo de credencial. El PDF no contiene el identificador de Cédula Profesional solicitado."
+        )
+
+    # ----------------------------------------------------------------------
+    # PASO 2: EXTRACCIÓN Y VALIDACIÓN DE EXPEDIENTE DE HIPERTENSIÓN EN PDF
+    # ----------------------------------------------------------------------
+    try:
+        pdf_diagnostico_valido, texto_diagnostico_extraido = ProcesadorDocumentosPDF.validar_documento_hipertension(
+            payload.diagnostico_pdf_base64
+        )
+    except PDFParsingException as e:
+        logger.error(f"[API_ENDPOINT] Fallo al parsear el diagnóstico: {e.mensaje}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.mensaje)
+        
+    if not pdf_diagnostico_valido:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Fallo clínico. El PDF de soporte no contiene el diagnóstico clínico requerido de hipertensión."
+        )
+
+    # ----------------------------------------------------------------------
+    # PASO 3: REGISTRO/ACTUALIZACIÓN DE ENTIDAD MÉDICO EN BASE DE DATOS
+    # ----------------------------------------------------------------------
+    try:
+        GestorBaseDatosRelacional.registrar_o_actualizar_medico(
+            cedula=payload.cedula_medico,
+            texto_cedula_token=texto_cedula_extraido
+        )
+    except DatabaseConnectionException as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=e.mensaje)
+
+    # ----------------------------------------------------------------------
+    # PASO 4: CÁCULO DE INFERENCIA PREDICTIVA CON EL ALGORITMO CAMPEÓN
+    # ----------------------------------------------------------------------
+    try:
+        resultado_inferencia = instancia_ia_global.inferencia_paciente(
+            edad=payload.edad,
+            sistolica=payload.sistolica,
+            diastolica=payload.diastolica,
+            medicamento=payload.toma_medicamento
+        )
+    except MLModelException as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=e.mensaje)
+
+    # ----------------------------------------------------------------------
+    # PASO 5: PERSISTENCIA COMPLETA DEL EXPEDIENTE ASOCIADO AL MÉDICO
+    # ----------------------------------------------------------------------
+    try:
+        # Preparamos el payload consolidado para almacenamiento físico
+        datos_para_base_datos = {
+            "cedula_medico": payload.cedula_medico,
+            "edad": payload.edad,
+            "sistolica": payload.sistolica,
+            "diastolica": payload.diastolica,
+            "toma_medicamento": payload.toma_medicamento,
+            "prediccion_crisis": resultado_inferencia["prediccion_crisis"],
+            "probabilidad_porcentual": resultado_inferencia["probabilidad_porcentual"],
+            "nivel_riesgo_clinico": resultado_inferencia["nivel_riesgo_clinico"],
+            "motor_inferencia_usado": resultado_inferencia["motor_inferencia_usado"],
+            "cedula_pdf_valida": pdf_cedula_valido,
+            "diagnostico_pdf_valido": pdf_diagnostico_valido
+        }
+        
+        folio_transaccion = GestorBaseDatosRelacional.registrar_expediente_completo(datos_para_base_datos)
+        
+    except DatabaseConnectionException as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=e.mensaje)
+
+    # ----------------------------------------------------------------------
+    # PASO 6: EMISIÓN DEL EXPEDIENTE DIGITALIZADO DE RESPUESTA
+    # ----------------------------------------------------------------------
+    return {
+        "folio_expediente_db": folio_transaccion,
+        "cedula_pdf_valida": pdf_cedula_valido,
+        "diagnostico_pdf_valido": pdf_diagnostico_valido,
+        "prediccion_crisis": resultado_inferencia["prediccion_crisis"],
+        "probabilidad_porcentual": resultado_inferencia["probabilidad_porcentual"],
+        "nivel_riesgo_clinico": resultado_inferencia["nivel_riesgo_clinico"],
+        "protocolo_sugerido": resultado_inferencia["protocolo_sugerido"],
+        "motor_inferencia_usado": resultado_inferencia["motor_inferencia_usado"],
+        "mensaje_almacenamiento": f"Expediente persistido exitosamente en SQLite. Folio de control asignado #{folio_transaccion}."
+    }
+
+
+# ==============================================================================
+# HILO DE CONTROL DE INICIO DE LA COMPILACIÓN (ENTRYPOINT)
+# ==============================================================================
+if _name_ == "_main_":
+    logger.info("[SISTEMA_HOST] Lanzando el bucle de eventos del servidor ASGI Uvicorn...")
+    # Corre la API FastAPI en el puerto 8000 con recarga automática para desarrollo clínico
+    uvicorn.run("core_ia_api_persistent.py:app", host="0.0.0.0", port=8000, reload=True)

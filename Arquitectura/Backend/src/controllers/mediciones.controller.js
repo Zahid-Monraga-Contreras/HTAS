@@ -478,7 +478,7 @@ const medicionesController = {
             }
 
             // 2. Ruta al script Python - CORREGIDO
-            const scriptPath = path.join(__dirname, '../../Dispositivo/monitoreo_wearable.py');
+            const scriptPath = path.join(__dirname, '../../python/dispositivo/monitoreo_wearable.py');
 
             console.log('Script path:', scriptPath);
             console.log('Existe?', fs.existsSync(scriptPath));
