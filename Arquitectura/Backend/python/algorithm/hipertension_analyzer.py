@@ -874,6 +874,13 @@ def procesar_desde_json(payload: Dict[str, Any]) -> Dict[str, Any]:
                 "motor_inferencia_usado": "Reglas Basicas"
             }
         
+        # ============================================================
+        # REGISTRAR MEDICO PRIMERO (para evitar FOREIGN KEY constraint)
+        # ============================================================
+        logger.info(f"[NODE] Registrando medico con cedula: {cedula_medico}")
+        texto_token = texto_cedula if texto_cedula else "Token generado para medico"
+        GestorBaseDatosRelacional.registrar_o_actualizar_medico(cedula_medico, texto_token)
+        
         # Guardar en base de datos
         valores_texto = ""
         if valores_pdf:
@@ -921,6 +928,19 @@ def procesar_desde_json(payload: Dict[str, Any]) -> Dict[str, Any]:
         return {
             "exitoso": False,
             "error": str(e)
+        }
+
+
+def procesar_desde_stdin() -> Dict[str, Any]:
+    """Procesa datos desde stdin (para payloads grandes)"""
+    try:
+        data = sys.stdin.read()
+        payload = json.loads(data)
+        return procesar_desde_json(payload)
+    except Exception as e:
+        return {
+            "exitoso": False,
+            "error": f"Error al procesar stdin: {str(e)}"
         }
 
 
@@ -1127,6 +1147,11 @@ if __name__ == "__main__":
     # Verificar si se ejecuta con argumentos JSON desde Node.js
     if len(sys.argv) > 1 and sys.argv[1] == '--json':
         try:
+            # Inicializar base de datos antes de procesar
+            logger.info("[NODE] Inicializando esquema de base de datos...")
+            GestorBaseDatosRelacional.inicializar_esquema()
+            logger.info("[NODE] Esquema de base de datos inicializado.")
+            
             payload = json.loads(sys.argv[2])
             resultado = procesar_desde_json(payload)
             print(json.dumps(resultado))
@@ -1135,6 +1160,20 @@ if __name__ == "__main__":
                 "exitoso": False,
                 "error": f"Error al decodificar JSON: {str(e)}"
             }))
+        except Exception as e:
+            print(json.dumps({
+                "exitoso": False,
+                "error": str(e)
+            }))
+    elif len(sys.argv) > 1 and sys.argv[1] == '--stdin':
+        try:
+            # Inicializar base de datos antes de procesar
+            logger.info("[NODE] Inicializando esquema de base de datos...")
+            GestorBaseDatosRelacional.inicializar_esquema()
+            logger.info("[NODE] Esquema de base de datos inicializado.")
+            
+            resultado = procesar_desde_stdin()
+            print(json.dumps(resultado))
         except Exception as e:
             print(json.dumps({
                 "exitoso": False,

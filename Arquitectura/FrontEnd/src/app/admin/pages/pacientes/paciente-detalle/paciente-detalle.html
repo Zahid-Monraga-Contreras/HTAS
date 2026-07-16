@@ -1,3 +1,5 @@
+<!-- src/app/components/paciente-detalle/paciente-detalle.html -->
+
 <app-menu #sidebar></app-menu>
 
 @if (mostrarToast) {
@@ -18,7 +20,7 @@
         <div class="header-section">
             <div class="title-group">
                 <h2 class="title-page">Editar Paciente</h2>
-                <p class="subtitle-page">Actualiza la información y el expediente del paciente.</p>
+                <p class="subtitle-page">Actualiza la informacion y el expediente del paciente.</p>
             </div>
 
             <div class="header-controls">
@@ -34,13 +36,13 @@
             </div>
         </div>
 
-        <!-- MENÚ DE NAVEGACIÓN POR PESTAÑAS -->
+        <!-- MENU DE NAVEGACION POR PESTAÑAS -->
         <div class="tabs-nav-wrapper">
             <nav class="tabs-nav">
                 <button type="button" class="tab-btn" [class.active]="activeTab === 'info'"
                     (click)="cambiarTab('info')">
                     <i class="bi bi-person-vcard"></i>
-                    <span>Información del Paciente</span>
+                    <span>Informacion del Paciente</span>
                 </button>
                 <button type="button" class="tab-btn" [class.active]="activeTab === 'historial'"
                     (click)="cambiarTab('historial')">
@@ -52,11 +54,16 @@
                     <i class="bi bi-file-earmark-medical"></i>
                     <span>Expediente</span>
                 </button>
+                <button type="button" class="tab-btn" [class.active]="activeTab === 'analisis'"
+                    (click)="cambiarTab('analisis')">
+                    <i class="bi bi-heart-pulse"></i>
+                    <span>Analisis HTAS</span>
+                </button>
             </nav>
         </div>
 
         <!-- ============================================================ -->
-        <!-- TAB 1: INFORMACIÓN DEL PACIENTE                               -->
+        <!-- TAB 1: INFORMACION DEL PACIENTE                               -->
         <!-- ============================================================ -->
         @if (activeTab === 'info') {
         <div class="tab-panel">
@@ -108,34 +115,34 @@
                     <div class="form-group">
                         <label>Apellido Paterno</label>
                         <input type="text" required maxlength="30" [(ngModel)]="usuarioSeleccionado.tempApellidoPaterno"
-                            class="form-control-premium" placeholder="Ej: Pérez">
+                            class="form-control-premium" placeholder="Ej: Perez">
                     </div>
                     <div class="form-group">
                         <label>Apellido Materno</label>
                         <input type="text" required maxlength="30" [(ngModel)]="usuarioSeleccionado.tempApellidoMaterno"
-                            class="form-control-premium" placeholder="Ej: García">
+                            class="form-control-premium" placeholder="Ej: Garcia">
                     </div>
                     <div class="form-group">
-                        <label>Correo Electrónico</label>
+                        <label>Correo Electronico</label>
                         <input type="email" maxlength="60" [(ngModel)]="usuarioSeleccionado.correo"
                             class="form-control-premium" placeholder="Ej: paciente@email.com">
                     </div>
                     <div class="form-group">
-                        <label>Teléfono</label>
+                        <label>Telefono</label>
                         <input type="text" maxlength="10" [(ngModel)]="usuarioSeleccionado.telefono"
                             class="form-control-premium" placeholder="Ej: 2711234567">
                     </div>
                     <div class="form-group">
                         <label>NSS (Seguro Social)</label>
-                        <input type="text" maxlength="11" placeholder="Ingrese 11 dígitos"
+                        <input type="text" maxlength="11" placeholder="Ingrese 11 digitos"
                             oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                             [(ngModel)]="usuarioSeleccionado.nss" class="form-control-premium">
                     </div>
 
                     <div class="form-group">
-                        <label>Género</label>
+                        <label>Genero</label>
                         <select [(ngModel)]="usuarioSeleccionado.genero" class="form-control-premium">
-                            <option [ngValue]="null" disabled selected>Seleccione género...</option>
+                            <option [ngValue]="null" disabled selected>Seleccione genero...</option>
                             <option value="Masculino">Masculino</option>
                             <option value="Femenino">Femenino</option>
                             <option value="Otro">Otro</option>
@@ -185,15 +192,15 @@
                         <label>CURP</label>
                         <input type="text" [(ngModel)]="usuarioSeleccionado.curp" (input)="formatearCURP()"
                             maxlength="18" class="form-control-premium" placeholder="Ej: GAML850315HVZRRL01">
-                        <small class="form-text text-muted">18 caracteres alfanuméricos</small>
+                        <small class="form-text text-muted">18 caracteres alfanumericos</small>
                     </div>
                 </div>
 
-                <!-- UBICACIÓN - ESTILO MEJORADO -->
+                <!-- UBICACION - ESTILO MEJORADO -->
                 <div class="ubicacion-section">
                     <div class="ubicacion-header">
                         <i class="bi bi-geo-alt-fill"></i>
-                        <span>Datos de Ubicación</span>
+                        <span>Datos de Ubicacion</span>
                     </div>
 
                     <div class="ubicacion-grid">
@@ -201,29 +208,29 @@
                             <label>Domicilio</label>
                             <input type="text" [(ngModel)]="usuarioSeleccionado.domicilio"
                                 (blur)="formatearCampoTexto('domicilio')" class="form-control-premium"
-                                placeholder="Ej: Calle Benito Juárez #123 Col. Centro">
+                                placeholder="Ej: Calle Benito Juarez #123 Col. Centro">
                         </div>
 
                         <div class="ubicacion-item">
-                            <label>Código Postal</label>
+                            <label>Codigo Postal</label>
                             <input type="text" [(ngModel)]="usuarioSeleccionado.codigoPostal"
                                 (input)="formatearCodigoPostal()" maxlength="5" class="form-control-premium"
                                 placeholder="Ej: 94500">
-                            <small class="form-text text-muted">5 dígitos numéricos</small>
+                            <small class="form-text text-muted">5 digitos numericos</small>
                         </div>
 
                         <div class="ubicacion-item">
                             <label>Localidad</label>
                             <input type="text" [(ngModel)]="usuarioSeleccionado.localidad"
                                 (blur)="formatearCampoTexto('localidad')" class="form-control-premium"
-                                placeholder="Ej: Córdoba">
+                                placeholder="Ej: Cordoba">
                         </div>
 
                         <div class="ubicacion-item">
                             <label>Municipio</label>
                             <input type="text" [(ngModel)]="usuarioSeleccionado.municipio"
                                 (blur)="formatearCampoTexto('municipio')" class="form-control-premium"
-                                placeholder="Ej: Córdoba">
+                                placeholder="Ej: Cordoba">
                         </div>
 
                         <div class="ubicacion-item">
@@ -245,7 +252,7 @@
                 <div class="form-group" style="margin-top: 15px; padding: 0 15px;">
                     <label>Antecedentes Familiares</label>
                     <textarea [(ngModel)]="usuarioSeleccionado.antecedentesFamiliares" rows="3"
-                        placeholder="Describa antecedentes médicos familiares relevantes..."
+                        placeholder="Describa antecedentes medicos familiares relevantes..."
                         class="form-control-premium"></textarea>
                 </div>
 
@@ -281,7 +288,7 @@
         <div class="tab-panel">
             <div class="detail-card">
 
-                <!-- ESTADÍSTICAS -->
+                <!-- ESTADISTICAS -->
                 @if (estadisticas) {
                 <div class="estadisticas-section" style="margin-top:0; padding-top:0; border-top:none;">
                     <h4 class="section-title">
@@ -302,7 +309,7 @@
                             <div class="stat-value">{{ estadisticas.citasPendientes }}</div>
                         </div>
                         <div class="stat-box">
-                            <small>Última Cita</small>
+                            <small>Ultima Cita</small>
                             <div class="stat-value" style="font-size: 0.9rem;">
                                 {{ estadisticas.ultimaCita | date:'dd/MM/yyyy' }}</div>
                         </div>
@@ -330,7 +337,7 @@
                                 'estado-programada': c.estado === 'Programada',
                                 'estado-confirmada': c.estado === 'Confirmada',
                                 'estado-cancelada': c.estado === 'Cancelada',
-                                'estado-no-asistio': c.estado === 'No Asistió'
+                                'estado-no-asistio': c.estado === 'No Asistio'
                             }"></span>
                             </div>
                             <div class="cita-info">
@@ -349,7 +356,7 @@
                                 } @else if (c.estado === 'Cancelada') {
                                 <span class="badge-cancelada">Cancelada</span>
                                 } @else {
-                                <span class="badge-no-asistio">No Asistió</span>
+                                <span class="badge-no-asistio">No Asistio</span>
                                 }
                             </div>
                         </div>
@@ -360,7 +367,7 @@
                         <div class="citas-vacio">
                             <i class="bi bi-calendar-plus"></i>
                             <p>No hay citas registradas</p>
-                            <span>Las citas que se agenden aparecerán aquí</span>
+                            <span>Las citas que se agenden apareceran aqui</span>
                         </div>
                     </div>
                     }
@@ -400,8 +407,8 @@
                     } @else {
                     <div class="citas-vacio">
                         <i class="bi bi-clock-history"></i>
-                        <p>Aún no hay actividad registrada</p>
-                        <span>Los eventos del paciente aparecerán aquí</span>
+                        <p>Aun no hay actividad registrada</p>
+                        <span>Los eventos del paciente apareceran aqui</span>
                     </div>
                     }
                 </div>
@@ -416,7 +423,7 @@
         <div class="tab-panel">
 
             <div class="expediente-toolbar">
-                <p><i class="bi bi-info-circle"></i> Vista de solo lectura generada a partir de la información
+                <p><i class="bi bi-info-circle"></i> Vista de solo lectura generada a partir de la informacion
                     registrada.</p>
                 <button type="button" class="btn-print-expediente" (click)="imprimirExpediente()">
                     <i class="bi bi-printer"></i>
@@ -433,8 +440,8 @@
                             <i class="bi bi-heart-pulse-fill"></i>
                         </div>
                         <div class="membrete-texto">
-                            <h1>Expediente Clínico</h1>
-                            <p>Sistema de Gestión de Pacientes</p>
+                            <h1>Expediente Clinico</h1>
+                            <p>Sistema de Gestion de Pacientes</p>
                         </div>
                         <div class="membrete-folio">
                             <small>Folio</small>
@@ -459,13 +466,13 @@
                         </div>
                     </div>
 
-                    <!-- SECCIÓN: DATOS GENERALES -->
+                    <!-- SECCION: DATOS GENERALES -->
                     <div class="expediente-seccion">
                         <h3 class="expediente-titulo-seccion"><i class="bi bi-person-lines-fill"></i> Datos
                             Generales</h3>
                         <div class="expediente-grid">
                             <div class="expediente-campo">
-                                <span>Género</span>
+                                <span>Genero</span>
                                 <strong>{{ usuarioSeleccionado.genero || 'No especificado' }}</strong>
                             </div>
                             <div class="expediente-campo">
@@ -478,7 +485,7 @@
                                     }}</strong>
                             </div>
                             <div class="expediente-campo">
-                                <span>Teléfono</span>
+                                <span>Telefono</span>
                                 <strong>{{ usuarioSeleccionado.telefono || 'No registrado' }}</strong>
                             </div>
                             <div class="expediente-campo">
@@ -492,9 +499,9 @@
                         </div>
                     </div>
 
-                    <!-- SECCIÓN: DATOS MÉDICOS -->
+                    <!-- SECCION: DATOS MEDICOS -->
                     <div class="expediente-seccion">
-                        <h3 class="expediente-titulo-seccion"><i class="bi bi-clipboard2-pulse"></i> Datos Médicos
+                        <h3 class="expediente-titulo-seccion"><i class="bi bi-clipboard2-pulse"></i> Datos Medicos
                         </h3>
                         <div class="expediente-grid">
                             <div class="expediente-campo">
@@ -513,7 +520,7 @@
                                     registrada' }}</strong>
                             </div>
                             <div class="expediente-campo">
-                                <span>Índice de Masa Corporal</span>
+                                <span>Indice de Masa Corporal</span>
                                 <strong>{{ calcularIMC().valor !== null ? calcularIMC().valor + ' (' +
                                     calcularIMC().categoria + ')' : 'No disponible' }}</strong>
                             </div>
@@ -526,13 +533,13 @@
                         </div>
                     </div>
 
-                    <!-- SECCIÓN: UBICACIÓN -->
+                    <!-- SECCION: UBICACION -->
                     <div class="expediente-seccion">
                         <h3 class="expediente-titulo-seccion"><i class="bi bi-geo-alt"></i> Domicilio</h3>
                         <p class="expediente-direccion">{{ getUbicacionFormateada() }}</p>
                     </div>
 
-                    <!-- SECCIÓN: RESUMEN DE CITAS -->
+                    <!-- SECCION: RESUMEN DE CITAS -->
                     <div class="expediente-seccion">
                         <h3 class="expediente-titulo-seccion"><i class="bi bi-calendar3"></i> Resumen de Consultas
                         </h3>
@@ -565,15 +572,239 @@
                     <div class="expediente-pie">
                         <div class="expediente-firma">
                             <div class="expediente-linea-firma"></div>
-                            <span>Firma del Médico Responsable</span>
+                            <span>Firma del Medico Responsable</span>
                         </div>
                         <div class="expediente-sello">
                             <i class="bi bi-patch-check-fill"></i>
-                            <span>Documento generado electrónicamente</span>
+                            <span>Documento generado electronicamente</span>
                         </div>
                     </div>
 
                 </div>
+            </div>
+        </div>
+        }
+
+        <!-- ============================================================ -->
+        <!-- TAB 4: ANALISIS HTAS                                          -->
+        <!-- ============================================================ -->
+        @if (activeTab === 'analisis') {
+        <div class="tab-panel">
+            <div class="detail-card">
+
+                <div class="analisis-header">
+                    <div class="analisis-title-group">
+                        <h3 class="section-title">
+                            <i class="bi bi-heart-pulse-fill"></i>
+                            Analisis de Hipertension Arterial
+                        </h3>
+                        <p class="analisis-subtitle">
+                            Sistema de prediccion HTAS-Mexico. Sube el expediente medico en PDF para analizar la presion
+                            arterial del paciente. El sistema extraera automaticamente los valores del documento.
+                        </p>
+                    </div>
+                    <div class="analisis-estado-sistema">
+                        <span class="estado-indicador"
+                            [ngClass]="{'activo': sistemaActivo, 'inactivo': !sistemaActivo}">
+                            <i class="bi bi-circle-fill"></i>
+                            {{ sistemaActivo ? 'Sistema activo' : 'Sistema desconectado' }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="analisis-form-container">
+                    <div class="analisis-form-grid" style="grid-template-columns: 1fr;">
+                        <div class="analisis-formulario" style="max-width: 600px; margin: 0 auto;">
+
+                            <h4 style="text-align: center;">
+                                <i class="bi bi-file-earmark-pdf-fill"></i>
+                                Subir Expediente Medico
+                            </h4>
+
+                            <div class="form-group">
+                                <label>PDF del Expediente *</label>
+                                <div class="file-upload-wrapper" (dragover)="onDragOver($event)"
+                                    (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
+                                    <input type="file" id="pdfFile" accept=".pdf"
+                                        (change)="onAnalisisFileSelected($event)" hidden>
+                                    <label for="pdfFile" class="file-upload-label">
+                                        <i class="bi bi-cloud-upload"></i>
+                                        <span>{{ analisisArchivoNombre || 'Selecciona o arrastra un PDF' }}</span>
+                                        <small>Maximo 10MB</small>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem;">
+                                <button type="button" class="btn-analizar" (click)="ejecutarAnalisis()"
+                                    [disabled]="!analisisArchivo || isAnalizando"
+                                    style="width: auto; padding: 0.75rem 3rem;">
+                                    @if (isAnalizando) {
+                                    <span class="spinner-save"></span>
+                                    <span>Analizando...</span>
+                                    } @else {
+                                    <i class="bi bi-search-heart"></i>
+                                    <span>Analizar Paciente</span>
+                                    }
+                                </button>
+                            </div>
+
+                            <div style="margin-top: 1rem; text-align: center; font-size: 0.8rem; color: #8a9aa8;">
+                                <i class="bi bi-info-circle"></i>
+                                El sistema extraera automaticamente la presion arterial, edad y otros datos del PDF.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @if (resultadoAnalisis) {
+                <div class="analisis-resultados">
+                    <div class="resultados-header">
+                        <h4><i class="bi bi-clipboard2-data"></i> Resultados del Analisis</h4>
+                        <span class="folio-resultado">Folio #{{ resultadoAnalisis.folio_expediente_db }}</span>
+                    </div>
+
+                    <!-- BANNER DE RIESGO PRINCIPAL -->
+                    <div class="resultado-banner" [ngClass]="getRiesgoClase(resultadoAnalisis.nivel_riesgo_clinico)">
+                        <div class="banner-bloque banner-riesgo">
+                            <div class="banner-icono">
+                                <i class="bi" [ngClass]="getRiesgoIcono(resultadoAnalisis.nivel_riesgo_clinico)"></i>
+                            </div>
+                            <div class="banner-texto">
+                                <span class="banner-label">Nivel de Riesgo Clinico</span>
+                                <strong class="banner-valor">{{ resultadoAnalisis.nivel_riesgo_clinico }}</strong>
+                            </div>
+                        </div>
+                        <div class="banner-divisor"></div>
+                        <div class="banner-bloque banner-presion">
+                            <span class="banner-label">Presion Arterial</span>
+                            <strong class="banner-valor-simple">{{ resultadoAnalisis.sistolica_usada }}/{{
+                                resultadoAnalisis.diastolica_usada }} <small>mmHg</small></strong>
+                        </div>
+                    </div>
+
+                    <div class="resultados-grid">
+                        <div class="resultado-card prediccion-card"
+                            [ngClass]="resultadoAnalisis.prediccion_crisis ? 'crisis' : 'normal'">
+                            <div class="card-icono">
+                                <i class="bi"
+                                    [ngClass]="resultadoAnalisis.prediccion_crisis ? 'bi-exclamation-triangle-fill' : 'bi-check-circle-fill'"></i>
+                            </div>
+                            <div class="card-contenido">
+                                <span class="card-label">Prediccion de Crisis</span>
+                                <strong class="card-valor">{{ resultadoAnalisis.prediccion_crisis ? 'Positiva' :
+                                    'Negativa' }}</strong>
+                            </div>
+                        </div>
+
+                        <div class="resultado-card probabilidad-card">
+                            <div class="card-icono">
+                                <i class="bi bi-percent"></i>
+                            </div>
+                            <div class="card-contenido">
+                                <span class="card-label">Probabilidad</span>
+                                <strong class="card-valor">{{ resultadoAnalisis.probabilidad_porcentual }}%</strong>
+                                <div class="barra-probabilidad">
+                                    <div class="barra-progreso"
+                                        [style.width.%]="resultadoAnalisis.probabilidad_porcentual" [ngClass]="{
+                                            'baja': resultadoAnalisis.probabilidad_porcentual < 30,
+                                            'media': resultadoAnalisis.probabilidad_porcentual >= 30 && resultadoAnalisis.probabilidad_porcentual < 70,
+                                            'alta': resultadoAnalisis.probabilidad_porcentual >= 70
+                                        }">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="resultado-card motor-card">
+                            <div class="card-icono">
+                                <i class="bi bi-cpu"></i>
+                            </div>
+                            <div class="card-contenido">
+                                <span class="card-label">Motor IA</span>
+                                <strong class="card-valor">{{ resultadoAnalisis.motor_inferencia_usado }}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="protocolo-container">
+                        <h5><i class="bi bi-file-medical"></i> Protocolo Sugerido</h5>
+                        <p>{{ resultadoAnalisis.protocolo_sugerido }}</p>
+                    </div>
+
+                    <div class="detalles-analisis">
+                        <div class="detalle-item">
+                            <span class="detalle-label">Presion usada</span>
+                            <span class="detalle-valor">{{ resultadoAnalisis.sistolica_usada }}/{{
+                                resultadoAnalisis.diastolica_usada }} mmHg</span>
+                            <span class="detalle-fuente badge bg-secondary">Fuente: {{ resultadoAnalisis.valores_usados
+                                }}</span>
+                        </div>
+                        <div class="detalle-item">
+                            <span class="detalle-label">PDF Cedula</span>
+                            <span class="detalle-valor">
+                                <i class="bi"
+                                    [ngClass]="resultadoAnalisis.cedula_pdf_valida ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger'"></i>
+                                {{ resultadoAnalisis.cedula_pdf_valida ? 'Valida' : 'Invalida' }}
+                            </span>
+                        </div>
+                        <div class="detalle-item">
+                            <span class="detalle-label">PDF Diagnostico</span>
+                            <span class="detalle-valor">
+                                <i class="bi"
+                                    [ngClass]="resultadoAnalisis.diagnostico_pdf_valido ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger'"></i>
+                                {{ resultadoAnalisis.diagnostico_pdf_valido ? 'Valido' : 'Invalido' }}
+                            </span>
+                        </div>
+                        <div class="detalle-item" *ngIf="resultadoAnalisis.doctorId">
+                            <span class="detalle-label">Doctor</span>
+                            <span class="detalle-valor">ID: {{ resultadoAnalisis.doctorId }} {{
+                                resultadoAnalisis.doctorNombre ? '- ' + resultadoAnalisis.doctorNombre : '' }}</span>
+                        </div>
+                    </div>
+
+                    <div class="analisis-actions">
+                        <button type="button" class="btn-nuevo-analisis" (click)="limpiarAnalisis()">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                            Nuevo Analisis
+                        </button>
+                        <button type="button" class="btn-print-analisis" (click)="descargarResultadosPDF()">
+                            <i class="bi bi-file-earmark-arrow-down"></i>
+                            Descargar PDF
+                        </button>
+                    </div>
+                </div>
+                }
+
+                @if (historialAnalisis.length > 0) {
+                <div class="historial-analisis">
+                    <div class="historial-analisis-header">
+                        <h4><i class="bi bi-clock-history"></i> Historial de Analisis</h4>
+                        <span class="historial-count">{{ historialAnalisis.length }} analisis</span>
+                    </div>
+                    <div class="historial-analisis-lista">
+                        @for (item of historialAnalisis; track item.folio_expediente_db) {
+                        <div class="historial-analisis-item">
+                            <div class="ha-fecha">
+                                <i class="bi bi-clock"></i>
+                                {{ formatearFechaAnalisis(item.fecha_analisis) }}
+                            </div>
+                            <div class="ha-resultado">
+                                <span class="ha-riesgo" [ngClass]="getRiesgoClase(item.nivel_riesgo_clinico)">
+                                    <i class="bi" [ngClass]="getRiesgoIcono(item.nivel_riesgo_clinico)"></i>
+                                    {{ item.nivel_riesgo_clinico }}
+                                </span>
+                                <span class="ha-presion">{{ item.sistolica_usada }}/{{ item.diastolica_usada }}
+                                    mmHg</span>
+                            </div>
+                            <div class="ha-folio">
+                                <span class="badge bg-secondary">Folio #{{ item.folio_expediente_db }}</span>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                </div>
+                }
             </div>
         </div>
         }
@@ -583,18 +814,16 @@
 </main>
 
 <!-- ============================================================ -->
-<!-- ✅ MODAL DE CITAS - FUERA DEL MAIN-CONTENT                   -->
+<!-- MODAL DE CITAS - FUERA DEL MAIN-CONTENT                      -->
 <!-- ============================================================ -->
 @if (mostrarModalCita) {
 <div class="modal-overlay" (click)="cerrarModalCita()">
     <div class="modal-premium-card" (click)="$event.stopPropagation()">
-        <!-- HEADER -->
         <div class="modal-header">
-            <h3>Agendar Cita Médica</h3>
+            <h3>Agendar Cita Medica</h3>
             <button type="button" class="btn-close-modal" (click)="cerrarModalCita()">&times;</button>
         </div>
 
-        <!-- BODY -->
         <div class="modal-body">
             <p class="modal-patient-info">
                 <i class="bi bi-person-fill" style="color: #b0001e;"></i>
@@ -637,18 +866,17 @@
             <div class="form-group full-width-modal">
                 <label>Motivo de la Consulta</label>
                 <input type="text" [(ngModel)]="nuevaCita.motivo"
-                    placeholder="Ej: Control de rutina, revisión de presión arterial" class="form-control-premium">
+                    placeholder="Ej: Control de rutina, revision de presion arterial" class="form-control-premium">
             </div>
 
             <div class="form-group full-width-modal">
-                <label>Síntomas actuales</label>
+                <label>Sintomas actuales</label>
                 <textarea [(ngModel)]="nuevaCita.sintomas" rows="3"
-                    placeholder="Escribe aquí si el paciente presenta malestares..."
+                    placeholder="Escribe aqui si el paciente presenta malestares..."
                     class="form-control-premium"></textarea>
             </div>
         </div>
 
-        <!-- FOOTER -->
         <div class="modal-footer-premium">
             <button type="button" class="btn-cancel-premium" (click)="cerrarModalCita()" [disabled]="isSavingCita">
                 <i class="bi bi-x-lg"></i>

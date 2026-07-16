@@ -1,3 +1,5 @@
+// src/app/components/paciente-detalle/paciente-detalle.ts
+
 import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef, PLATFORM_ID } from '@angular/core';
 import { CommonModule, Location, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -8,8 +10,11 @@ import { Users } from '../../../../auth/services/users';
 import { firstValueFrom } from 'rxjs';
 import { Menu } from "../../../template/menu/menu";
 
+import { AlgorithmService, AnalisisResponse } from '../../../../auth/services/algorithm';
+
 import flatpickr from 'flatpickr';
 import { Spanish } from 'flatpickr/dist/l10n/es.js';
+import jsPDF from 'jspdf';
 
 interface HistorialPaciente {
   fecha: string;
@@ -18,7 +23,18 @@ interface HistorialPaciente {
   usuario: string;
 }
 
-type TabPaciente = 'info' | 'historial' | 'expediente';
+type TabPaciente = 'info' | 'historial' | 'expediente' | 'analisis';
+
+interface AnalisisHistorial {
+  folio_expediente_db: number;
+  fecha_analisis: string;
+  nivel_riesgo_clinico: string;
+  sistolica_usada: number;
+  diastolica_usada: number;
+  probabilidad_porcentual: number;
+  prediccion_crisis: number;
+  motor_inferencia_usado: string;
+}
 
 @Component({
   selector: 'app-paciente-detalle',
@@ -35,14 +51,13 @@ export class PacienteDetalle implements OnInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
   private platformId = inject(PLATFORM_ID);
   private titleService = inject(Title);
+  private algorithmService = inject(AlgorithmService);
 
   usuarioSeleccionado: any = null;
   isSaving = false;
 
-  // Pestaña activa del panel del paciente
   activeTab: TabPaciente = 'info';
 
-  // Control de estado para el modal de citas
   mostrarModalCita = false;
   isSavingCita = false;
 
@@ -54,24 +69,18 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     modalidad: 'Presencial'
   };
 
-  // Sistema de Notificaciones Premium
   mostrarToast = false;
   mensajeToast = '';
   tipoToast: 'success' | 'error' | 'warning' = 'success';
   private toastTimeout: any = null;
 
-  // Referencias para destruir las instancias al cerrar el modal o salir del componente
   private fpFechaInstance: any = null;
   private fpHoraInstance: any = null;
   private fpNacimientoInstance: any = null;
 
-  // Historial de cambios del paciente
   historialCambios: HistorialPaciente[] = [];
-
-  // Lista de citas del paciente
   citasPaciente: any[] = [];
 
-  // Estadísticas del paciente
   estadisticas: {
     totalCitas: number;
     citasCompletadas: number;
@@ -83,12 +92,15 @@ export class PacienteDetalle implements OnInit, OnDestroy {
 
   citasCargadas = false;
   cargandoCitas = false;
-
-  // ID del paciente para cargar datos desde la API
   pacienteId: number | null = null;
-
-  // Fecha en la que se generó el expediente (para el membrete)
   fechaGeneracion = '';
+
+  sistemaActivo = false;
+  isAnalizando = false;
+  analisisArchivo: File | null = null;
+  analisisArchivoNombre: string = '';
+  resultadoAnalisis: any = null;
+  historialAnalisis: AnalisisHistorial[] = [];
 
   ngOnInit() {
     let state: any = null;
@@ -111,14 +123,14 @@ export class PacienteDetalle implements OnInit, OnDestroy {
       this.usuarioSeleccionado = { ...state.usuario };
       this.inicializarCampos();
 
-      // Cargar datos completos del paciente
       this.cargarDatosCompletosPaciente();
       this.cargarDatosReales();
 
-      // Inicializar calendario con Flatpickr (DESPUÉS de que el DOM esté listo)
       setTimeout(() => {
         this.inicializarCalendarioNacimiento();
       }, 500);
+
+      this.verificarEstadoSistema();
 
     } else {
       if (isPlatformBrowser(this.platformId)) {
@@ -127,38 +139,34 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     }
   }
 
-  // --- CONTROL DE PESTAÑAS ---
   cambiarTab(tab: TabPaciente) {
     if (this.activeTab === tab) return;
     this.activeTab = tab;
     this.cdr.detectChanges();
 
-    // El input de fecha de nacimiento solo existe en el DOM cuando la
-    // pestaña "info" está activa, así que hay que reinicializar Flatpickr
-    // cada vez que se regresa a esa pestaña.
     if (tab === 'info') {
       setTimeout(() => this.inicializarCalendarioNacimiento(), 100);
     }
+
+    if (tab === 'analisis') {
+      this.verificarEstadoSistema();
+    }
   }
 
-  // Inicializar calendario de fecha de nacimiento con Flatpickr
   inicializarCalendarioNacimiento() {
     if (!isPlatformBrowser(this.platformId)) return;
 
-    // Destruir instancia previa si existe
     if (this.fpNacimientoInstance) {
       try { this.fpNacimientoInstance.destroy(); } catch (e) { }
       this.fpNacimientoInstance = null;
     }
 
-    // Buscar el elemento y asegurarse de que exista
     const elemento = document.querySelector('#fechaNacimientoInput') as HTMLInputElement;
 
     if (!elemento) {
       return;
     }
 
-    // Configuración de Flatpickr
     const configNacimiento: any = {
       locale: Spanish,
       dateFormat: "Y-m-d",
@@ -182,7 +190,6 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     }
   }
 
-  // Cargar datos completos del paciente desde la API
   async cargarDatosCompletosPaciente() {
     if (!this.pacienteId) return;
 
@@ -205,7 +212,6 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     }
   }
 
-  // Inicializar todos los campos correctamente
   inicializarCampos() {
     if (!this.usuarioSeleccionado) return;
 
@@ -242,7 +248,6 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  // Cargar datos reales desde la API
   async cargarDatosReales() {
     if (!this.usuarioSeleccionado?.correo) return;
 
@@ -289,7 +294,6 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     }
   }
 
-  // Calcular estadísticas reales desde las citas
   calcularEstadisticas(citas: any[]) {
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
@@ -298,7 +302,7 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     const pendientes = citas.filter(c =>
       c.estado === 'Programada' || c.estado === 'Confirmada'
     );
-    const canceladas = citas.filter(c => c.estado === 'Cancelada' || c.estado === 'No Asistió');
+    const canceladas = citas.filter(c => c.estado === 'Cancelada' || c.estado === 'No Asistio');
 
     const citasOrdenadas = [...citas].sort((a, b) => {
       const fechaA = new Date(`${a.fechacita}T${a.horacita || '00:00'}`);
@@ -327,7 +331,6 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     };
   }
 
-  // Generar historial desde citas reales con formato de fecha correcto
   generarHistorialDesdeCitas(citas: any[]) {
     const historial: HistorialPaciente[] = [];
 
@@ -358,9 +361,9 @@ export class PacienteDetalle implements OnInit, OnDestroy {
           accion = 'Cita cancelada';
           detalle = `Cita del ${fechaFormateada} - Cancelada`;
           break;
-        case 'No Asistió':
-          accion = 'No asistió';
-          detalle = `No asistió a cita del ${fechaFormateada}`;
+        case 'No Asistio':
+          accion = 'No asistio';
+          detalle = `No asistio a cita del ${fechaFormateada}`;
           break;
         default:
           accion = 'Cita registrada';
@@ -395,7 +398,6 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     this.historialCambios = historial;
   }
 
-  // Método para formatear fecha y hora correctamente
   formatearFechaYHora(fecha: string, hora: string): string {
     if (!fecha) return 'Fecha no disponible';
 
@@ -436,7 +438,32 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     }
   }
 
-  // Agregar entrada al historial
+  /**
+   * Formatea una fecha ISO (con hora incluida, ej. la de fecha_analisis)
+   * a un formato legible dd/mm/aaaa hh:mm.
+   */
+  formatearFechaAnalisis(fechaISO: string): string {
+    if (!fechaISO) return 'Fecha no disponible';
+
+    try {
+      const fechaObj = new Date(fechaISO);
+
+      if (isNaN(fechaObj.getTime())) {
+        return fechaISO;
+      }
+
+      return fechaObj.toLocaleString('es-MX', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (error) {
+      return fechaISO;
+    }
+  }
+
   agregarHistorial(accion: string, detalle: string) {
     const ahora = new Date();
     const fechaStr = ahora.toLocaleString('es-MX', {
@@ -454,7 +481,6 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     });
   }
 
-  // Obtener estado del paciente
   getEstadoPaciente(): { texto: string; clase: string; icono: string } {
     if (!this.usuarioSeleccionado) {
       return { texto: 'Sin datos', clase: 'estado-sin-datos', icono: 'bi-question-circle' };
@@ -475,7 +501,6 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     return { texto: 'Activo', clase: 'estado-activo', icono: 'bi-check-circle-fill' };
   }
 
-  // Formatear CURP
   formatearCURP() {
     if (this.usuarioSeleccionado && this.usuarioSeleccionado.curp) {
       this.usuarioSeleccionado.curp = this.usuarioSeleccionado.curp.toUpperCase().trim();
@@ -483,7 +508,6 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     }
   }
 
-  // Formatear código postal
   formatearCodigoPostal() {
     if (this.usuarioSeleccionado && this.usuarioSeleccionado.codigoPostal) {
       const cp = this.usuarioSeleccionado.codigoPostal.replace(/\D/g, '').slice(0, 5);
@@ -492,7 +516,6 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     }
   }
 
-  // Capitalizar texto
   capitalizarTexto(texto: string): string {
     if (!texto) return '';
     return texto.split(' ').map(palabra =>
@@ -500,7 +523,6 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     ).join(' ');
   }
 
-  // Formatear campo de texto
   formatearCampoTexto(campo: string) {
     if (this.usuarioSeleccionado && this.usuarioSeleccionado[campo]) {
       this.usuarioSeleccionado[campo] = this.capitalizarTexto(this.usuarioSeleccionado[campo]);
@@ -508,7 +530,6 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     }
   }
 
-  // Obtener ubicación formateada
   getUbicacionFormateada(): string {
     const u = this.usuarioSeleccionado;
     if (!u) return '';
@@ -519,19 +540,15 @@ export class PacienteDetalle implements OnInit, OnDestroy {
       u.estado,
       u.codigoPostal ? `CP ${u.codigoPostal}` : ''
     ].filter(Boolean);
-    return partes.length ? partes.join(', ') : 'Sin ubicación registrada';
+    return partes.length ? partes.join(', ') : 'Sin ubicacion registrada';
   }
 
-  // Verificar si tiene ubicación completa
   tieneUbicacionCompleta(): boolean {
     const u = this.usuarioSeleccionado;
     if (!u) return false;
     return !!(u.domicilio && u.localidad && u.municipio && u.estado && u.codigoPostal);
   }
 
-  // --- CÁLCULOS PARA EL EXPEDIENTE ---
-
-  // Calcula la edad del paciente a partir de su fecha de nacimiento
   calcularEdad(): number | null {
     const fechaNacimiento = this.usuarioSeleccionado?.fechaNacimiento;
     if (!fechaNacimiento) return null;
@@ -548,8 +565,6 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     return edad >= 0 ? edad : null;
   }
 
-  // Formatea la fecha de nacimiento como dd/mm/aaaa para el expediente
-  // (usa componentes UTC para no perder/ganar un día por la zona horaria)
   formatearFechaNacimiento(fecha: string): string {
     if (!fecha) return 'No registrada';
 
@@ -567,7 +582,6 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     }
   }
 
-  // Calcula el Índice de Masa Corporal y su categoría
   calcularIMC(): { valor: number | null; categoria: string } {
     const peso = this.usuarioSeleccionado?.peso;
     const altura = this.usuarioSeleccionado?.altura;
@@ -587,7 +601,6 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     return { valor, categoria };
   }
 
-  // Imprime únicamente la hoja del expediente sin encabezados del navegador
   imprimirExpediente() {
     if (!isPlatformBrowser(this.platformId)) return;
 
@@ -606,13 +619,11 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     };
     window.addEventListener('afterprint', restaurarTitulo);
 
-    // Usamos setTimeout para asegurar que el título se haya actualizado antes de imprimir
     setTimeout(() => {
       window.print();
     }, 50);
   }
 
-  // Validar campos antes de guardar
   validarCampos(): { valido: boolean; mensaje: string } {
     const u = this.usuarioSeleccionado;
 
@@ -625,20 +636,20 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     }
 
     if (!u.correo || !u.correo.includes('@')) {
-      return { valido: false, mensaje: 'El correo electrónico no es válido' };
+      return { valido: false, mensaje: 'El correo electronico no es valido' };
     }
 
     if (u.curp && u.curp.length > 0) {
       const curpRegex = /^[A-Z]{4}[0-9]{6}[A-Z]{6}[0-9]{2}$/;
       if (!curpRegex.test(u.curp.toUpperCase())) {
-        return { valido: false, mensaje: 'El formato de CURP no es válido' };
+        return { valido: false, mensaje: 'El formato de CURP no es valido' };
       }
     }
 
     if (u.codigoPostal && u.codigoPostal.length > 0) {
       const cpRegex = /^[0-9]{5}$/;
       if (!cpRegex.test(u.codigoPostal)) {
-        return { valido: false, mensaje: 'El código postal debe tener 5 dígitos numéricos' };
+        return { valido: false, mensaje: 'El codigo postal debe tener 5 digitos numericos' };
       }
     }
 
@@ -666,7 +677,6 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     this.location.back();
   }
 
-  // --- CONTROL DEL TOAST NOTIFICACIÓN PREMIUM ---
   lanzarNotificacion(mensaje: string, tipo: 'success' | 'error' | 'warning' = 'success') {
     this.mensajeToast = mensaje;
     this.tipoToast = tipo;
@@ -681,7 +691,6 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     }, 4000);
   }
 
-  // --- CONTROL DEL MODAL Y FLATPICKR ---
   abrirModalCita() {
     const hoy = new Date();
     const anio = hoy.getFullYear();
@@ -699,7 +708,6 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     this.mostrarModalCita = true;
     this.cdr.detectChanges();
 
-    // Inicializar los calendarios después de que el DOM se actualice
     setTimeout(() => {
       this.inicializarCalendariosCita();
     }, 100);
@@ -772,7 +780,7 @@ export class PacienteDetalle implements OnInit, OnDestroy {
 
   async registrarCita() {
     if (!this.nuevaCita.fechaCita || !this.nuevaCita.horaCita || !this.nuevaCita.motivo.trim()) {
-      this.lanzarNotificacion("⚠️ Por favor rellene los campos obligatorios para agendar la cita.", "warning");
+      this.lanzarNotificacion("Por favor rellene los campos obligatorios para agendar la cita.", "warning");
       return;
     }
 
@@ -791,7 +799,7 @@ export class PacienteDetalle implements OnInit, OnDestroy {
         fechaCita: this.nuevaCita.fechaCita,
         horaCita: this.nuevaCita.horaCita.length === 5 ? `${this.nuevaCita.horaCita}:00` : this.nuevaCita.horaCita,
         motivo: this.nuevaCita.motivo.trim(),
-        sintomas: this.nuevaCita.sintomas.trim() || 'Sin síntomas',
+        sintomas: this.nuevaCita.sintomas.trim() || 'Sin sintomas',
         modalidad: this.nuevaCita.modalidad,
         estado: 'Programada'
       };
@@ -800,11 +808,11 @@ export class PacienteDetalle implements OnInit, OnDestroy {
       await this.cargarDatosReales();
 
       this.cerrarModalCita();
-      this.lanzarNotificacion("¡Cita asignada! Se registró la cita médica correctamente.", "success");
+      this.lanzarNotificacion("Cita asignada. Se registro la cita medica correctamente.", "success");
 
     } catch (error: any) {
       console.error("Error al registrar la cita:", error);
-      this.lanzarNotificacion("❌ Hubo un error al registrar la cita médica.", "error");
+      this.lanzarNotificacion("Hubo un error al registrar la cita medica.", "error");
     } finally {
       this.isSavingCita = false;
       this.cdr.detectChanges();
@@ -819,13 +827,13 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     const apMaterno = (this.usuarioSeleccionado.tempApellidoMaterno || '').trim();
 
     if (!nombre || !apPaterno || !this.usuarioSeleccionado.correo) {
-      this.lanzarNotificacion("⚠️ El nombre, apellido paterno y correo son obligatorios.", "warning");
+      this.lanzarNotificacion("El nombre, apellido paterno y correo son obligatorios.", "warning");
       return;
     }
 
     const validacion = this.validarCampos();
     if (!validacion.valido) {
-      this.lanzarNotificacion(`⚠️ ${validacion.mensaje}`, "warning");
+      this.lanzarNotificacion(`${validacion.mensaje}`, "warning");
       return;
     }
 
@@ -880,11 +888,11 @@ export class PacienteDetalle implements OnInit, OnDestroy {
       this.usuarioSeleccionado.peso = pesoFinal;
       this.usuarioSeleccionado.altura = alturaFinal;
 
-      this.lanzarNotificacion("¡Éxito! Los datos del paciente se actualizaron correctamente.", "success");
+      this.lanzarNotificacion("Los datos del paciente se actualizaron correctamente.", "success");
 
       this.agregarHistorial(
         'Datos actualizados',
-        `Información del paciente actualizada por el usuario`
+        'Informacion del paciente actualizada por el usuario'
       );
 
       setTimeout(() => {
@@ -893,10 +901,333 @@ export class PacienteDetalle implements OnInit, OnDestroy {
 
     } catch (error: any) {
       console.error('Error al actualizar:', error);
-      this.lanzarNotificacion("❌ No se pudieron guardar los cambios en el servidor.", "error");
+      this.lanzarNotificacion("No se pudieron guardar los cambios en el servidor.", "error");
     } finally {
       this.isSaving = false;
       this.cdr.detectChanges();
     }
+  }
+
+  verificarEstadoSistema() {
+    this.algorithmService.verificarEstado().subscribe({
+      next: (response) => {
+        this.sistemaActivo = true;
+        console.log('[HTAS] Sistema activo:', response);
+      },
+      error: (error) => {
+        this.sistemaActivo = false;
+        console.warn('[HTAS] Sistema no disponible:', error);
+        this.lanzarNotificacion('El sistema de analisis no esta disponible. Asegurate de que el backend este corriendo.', 'warning');
+      }
+    });
+  }
+
+  onAnalisisFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file && file.type === 'application/pdf') {
+      if (file.size > 10 * 1024 * 1024) {
+        this.lanzarNotificacion('El archivo es demasiado grande. Maximo 10MB.', 'error');
+        return;
+      }
+      this.analisisArchivo = file;
+      this.analisisArchivoNombre = file.name;
+      this.lanzarNotificacion('PDF cargado correctamente.', 'success');
+    } else {
+      this.lanzarNotificacion('Solo se permiten archivos PDF.', 'error');
+      this.analisisArchivo = null;
+      this.analisisArchivoNombre = '';
+    }
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    const target = event.currentTarget as HTMLElement;
+    target.classList.add('dragover');
+  }
+
+  onDragLeave(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    const target = event.currentTarget as HTMLElement;
+    target.classList.remove('dragover');
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    const target = event.currentTarget as HTMLElement;
+    target.classList.remove('dragover');
+
+    const files = event.dataTransfer?.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      if (file.type === 'application/pdf') {
+        if (file.size > 10 * 1024 * 1024) {
+          this.lanzarNotificacion('El archivo es demasiado grande. Maximo 10MB.', 'error');
+          return;
+        }
+        this.analisisArchivo = file;
+        this.analisisArchivoNombre = file.name;
+        this.lanzarNotificacion('PDF cargado correctamente.', 'success');
+      } else {
+        this.lanzarNotificacion('Solo se permiten archivos PDF.', 'error');
+      }
+    }
+  }
+
+  ejecutarAnalisis() {
+    if (!this.analisisArchivo) {
+      this.lanzarNotificacion('Por favor, seleccione un archivo PDF.', 'warning');
+      return;
+    }
+
+    if (!this.sistemaActivo) {
+      this.lanzarNotificacion('El sistema de analisis no esta disponible. Contacte al administrador.', 'error');
+      return;
+    }
+
+    this.isAnalizando = true;
+    this.resultadoAnalisis = null;
+
+    const request = {
+      edad: this.calcularEdad() || 50,
+      sistolica: 120,
+      diastolica: 80,
+      tomaMedicamento: 0,
+      cedulaMedico: this.usuarioSeleccionado?.cedulaMedico || '1234567',
+      pdf: this.analisisArchivo
+    };
+
+    this.algorithmService.analizarConPDF(request).subscribe({
+      next: (response) => {
+        this.isAnalizando = false;
+        if (response.success && response.data) {
+          this.resultadoAnalisis = response.data;
+
+          const historialItem: AnalisisHistorial = {
+            folio_expediente_db: response.data.folio_expediente_db,
+            fecha_analisis: new Date().toISOString(),
+            nivel_riesgo_clinico: response.data.nivel_riesgo_clinico,
+            sistolica_usada: response.data.sistolica_usada || 0,
+            diastolica_usada: response.data.diastolica_usada || 0,
+            probabilidad_porcentual: response.data.probabilidad_porcentual,
+            prediccion_crisis: response.data.prediccion_crisis,
+            motor_inferencia_usado: response.data.motor_inferencia_usado
+          };
+          this.historialAnalisis.unshift(historialItem);
+
+          this.lanzarNotificacion('Analisis completado exitosamente.', 'success');
+          this.cdr.detectChanges();
+        }
+      },
+      error: (error) => {
+        this.isAnalizando = false;
+        console.error('[HTAS] Error en analisis:', error);
+        this.lanzarNotificacion(error.error?.error || 'Error al analizar el paciente.', 'error');
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  limpiarAnalisis() {
+    this.resultadoAnalisis = null;
+    this.analisisArchivo = null;
+    this.analisisArchivoNombre = '';
+    const fileInput = document.getElementById('pdfFile') as HTMLInputElement;
+    if (fileInput) fileInput.value = '';
+  }
+
+  /**
+   * Genera un PDF profesional con los resultados del analisis y lo descarga
+   * directamente, sin pasar por el dialogo de impresion del navegador
+   * (evita el encabezado/pie de pagina que agrega Chrome al imprimir).
+   */
+  descargarResultadosPDF() {
+    if (!isPlatformBrowser(this.platformId) || !this.resultadoAnalisis) return;
+
+    const r = this.resultadoAnalisis;
+
+    const nombreCompleto = [
+      this.usuarioSeleccionado?.nombre,
+      this.usuarioSeleccionado?.tempApellidoPaterno || this.usuarioSeleccionado?.apPaterno,
+      this.usuarioSeleccionado?.tempApellidoMaterno || this.usuarioSeleccionado?.apMaterno
+    ].filter(Boolean).join(' ').trim() || 'Paciente no especificado';
+
+    // Paleta de colores acorde a la identidad visual del sistema
+    const colorPrimary: [number, number, number] = [176, 0, 30];
+    const colorDark: [number, number, number] = [10, 22, 40];
+    const colorGray: [number, number, number] = [122, 138, 158];
+    const colorTextMuted: [number, number, number] = [74, 90, 110];
+    const colorLight: [number, number, number] = [250, 251, 252];
+    const colorBorder: [number, number, number] = [230, 233, 237];
+
+    let riesgoColor: [number, number, number] = [217, 119, 6];
+    const nivelRiesgo: string = r.nivel_riesgo_clinico || 'No disponible';
+    if (nivelRiesgo.includes('CRITICO')) riesgoColor = [220, 38, 38];
+    else if (nivelRiesgo.includes('ESTABLE')) riesgoColor = [5, 150, 105];
+    else if (nivelRiesgo.includes('MODERADO')) riesgoColor = [217, 119, 6];
+
+    const doc = new jsPDF({ unit: 'mm', format: 'letter' });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const marginX = 16;
+    let y = 0;
+
+    // Franja superior de color
+    doc.setFillColor(colorPrimary[0], colorPrimary[1], colorPrimary[2]);
+    doc.rect(0, 0, pageWidth, 4, 'F');
+
+    // Titulo
+    y = 17;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(17);
+    doc.setTextColor(colorDark[0], colorDark[1], colorDark[2]);
+    doc.text('Resultados del Analisis HTAS', marginX, y);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(colorGray[0], colorGray[1], colorGray[2]);
+    const fechaGen = new Date().toLocaleString('es-MX', {
+      day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
+    doc.text(`Folio #${r.folio_expediente_db ?? '---'}   |   Generado: ${fechaGen}`, marginX, y + 6);
+
+    y += 13;
+    doc.setDrawColor(colorBorder[0], colorBorder[1], colorBorder[2]);
+    doc.setLineWidth(0.3);
+    doc.line(marginX, y, pageWidth - marginX, y);
+    y += 8;
+
+    // Bloque de datos del paciente
+    doc.setFillColor(colorLight[0], colorLight[1], colorLight[2]);
+    doc.setDrawColor(colorBorder[0], colorBorder[1], colorBorder[2]);
+    doc.roundedRect(marginX, y, pageWidth - marginX * 2, 15, 2, 2, 'FD');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7.5);
+    doc.setTextColor(colorGray[0], colorGray[1], colorGray[2]);
+    doc.text('PACIENTE', marginX + 4, y + 6);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(colorDark[0], colorDark[1], colorDark[2]);
+    doc.text(nombreCompleto, marginX + 4, y + 12);
+
+    if (this.usuarioSeleccionado?.correo) {
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8.5);
+      doc.setTextColor(colorGray[0], colorGray[1], colorGray[2]);
+      doc.text(this.usuarioSeleccionado.correo, pageWidth - marginX - 4, y + 9, { align: 'right' });
+    }
+    y += 23;
+
+    // Banner de riesgo + presion
+    const bannerH = 22;
+    doc.setFillColor(riesgoColor[0], riesgoColor[1], riesgoColor[2]);
+    doc.roundedRect(marginX, y, pageWidth - marginX * 2, bannerH, 3, 3, 'F');
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.text('NIVEL DE RIESGO CLINICO', marginX + 6, y + 8);
+    doc.setFontSize(14);
+    doc.text(nivelRiesgo, marginX + 6, y + 17);
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.text('PRESION ARTERIAL', pageWidth - marginX - 6, y + 8, { align: 'right' });
+    doc.setFontSize(14);
+    doc.text(`${r.sistolica_usada}/${r.diastolica_usada} mmHg`, pageWidth - marginX - 6, y + 17, { align: 'right' });
+
+    y += bannerH + 10;
+
+    // Tarjetas: prediccion / probabilidad / motor
+    const gap = 5;
+    const colWidth = (pageWidth - marginX * 2 - gap * 2) / 3;
+    const boxH = 22;
+
+    const drawInfoBox = (x: number, label: string, value: string) => {
+      doc.setDrawColor(colorBorder[0], colorBorder[1], colorBorder[2]);
+      doc.setFillColor(colorLight[0], colorLight[1], colorLight[2]);
+      doc.roundedRect(x, y, colWidth, boxH, 2, 2, 'FD');
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7);
+      doc.setTextColor(colorGray[0], colorGray[1], colorGray[2]);
+      doc.text(label.toUpperCase(), x + 4, y + 8);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(colorDark[0], colorDark[1], colorDark[2]);
+      const valorLineas = doc.splitTextToSize(value, colWidth - 8);
+      doc.text(valorLineas, x + 4, y + 16);
+    };
+
+    drawInfoBox(marginX, 'Prediccion de Crisis', r.prediccion_crisis ? 'Positiva' : 'Negativa');
+    drawInfoBox(marginX + colWidth + gap, 'Probabilidad', `${r.probabilidad_porcentual}%`);
+    drawInfoBox(marginX + (colWidth + gap) * 2, 'Motor IA', r.motor_inferencia_usado || 'No disponible');
+
+    y += boxH + 12;
+
+    // Protocolo sugerido
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10.5);
+    doc.setTextColor(colorDark[0], colorDark[1], colorDark[2]);
+    doc.text('Protocolo Sugerido', marginX, y);
+    y += 3;
+    doc.setDrawColor(colorBorder[0], colorBorder[1], colorBorder[2]);
+    doc.line(marginX, y, pageWidth - marginX, y);
+    y += 6;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9.5);
+    doc.setTextColor(colorTextMuted[0], colorTextMuted[1], colorTextMuted[2]);
+    const protocoloLineas = doc.splitTextToSize(r.protocolo_sugerido || 'No disponible', pageWidth - marginX * 2);
+    doc.text(protocoloLineas, marginX, y);
+    y += protocoloLineas.length * 5 + 10;
+
+    // Detalles del analisis
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10.5);
+    doc.setTextColor(colorDark[0], colorDark[1], colorDark[2]);
+    doc.text('Detalles del Analisis', marginX, y);
+    y += 3;
+    doc.setDrawColor(colorBorder[0], colorBorder[1], colorBorder[2]);
+    doc.line(marginX, y, pageWidth - marginX, y);
+    y += 8;
+
+    const detalles: Array<[string, string]> = [
+      ['Fuente de valores', r.valores_usados || 'No disponible'],
+      ['PDF Cedula', r.cedula_pdf_valida ? 'Valida' : 'Invalida'],
+      ['PDF Diagnostico', r.diagnostico_pdf_valido ? 'Valido' : 'Invalido']
+    ];
+    if (r.doctorId) {
+      detalles.push(['Doctor', `ID: ${r.doctorId}${r.doctorNombre ? ' - ' + r.doctorNombre : ''}`]);
+    }
+
+    doc.setFontSize(9.5);
+    detalles.forEach(([label, value]) => {
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(colorGray[0], colorGray[1], colorGray[2]);
+      doc.text(`${label}:`, marginX, y);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(colorDark[0], colorDark[1], colorDark[2]);
+      doc.text(String(value), marginX + 45, y);
+      y += 6.5;
+    });
+
+    doc.save(`Analisis_HTAS_Folio_${r.folio_expediente_db ?? 'sin_folio'}.pdf`);
+  }
+
+  getRiesgoClase(nivel: string): string {
+    if (!nivel) return '';
+    if (nivel.includes('CRITICO')) return 'riesgo-critico';
+    if (nivel.includes('MODERADO')) return 'riesgo-moderado';
+    if (nivel.includes('ESTABLE')) return 'riesgo-estable';
+    return '';
+  }
+
+  getRiesgoIcono(nivel: string): string {
+    if (!nivel) return 'bi-circle';
+    if (nivel.includes('CRITICO')) return 'bi-exclamation-octagon-fill';
+    if (nivel.includes('MODERADO')) return 'bi-exclamation-triangle-fill';
+    if (nivel.includes('ESTABLE')) return 'bi-check-circle-fill';
+    return 'bi-circle';
   }
 }

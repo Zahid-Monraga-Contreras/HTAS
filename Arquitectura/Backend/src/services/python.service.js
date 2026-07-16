@@ -25,7 +25,7 @@ class PythonService {
                 return;
             }
 
-            console.log('[PythonService] Ejecutando análisis...');
+            console.log('[PythonService] Ejecutando analisis...');
             console.log(`[PythonService] Script: ${this.scriptPath}`);
 
             // Crear payload para Python
@@ -40,12 +40,29 @@ class PythonService {
                 diagnostico_pdf_base64: datosPaciente.diagnosticoPdfBase64
             };
 
-            // Ejecutar Python con el payload como JSON
-            const pythonProcess = spawn(this.pythonPath, [
-                this.scriptPath,
-                '--json',
-                JSON.stringify(payload)
-            ]);
+            // Convertir payload a JSON string
+            const payloadJson = JSON.stringify(payload);
+
+            // Si el payload es muy grande (mas de 10000 caracteres), usar stdin
+            const useStdin = payloadJson.length > 10000;
+
+            let pythonProcess;
+
+            if (useStdin) {
+                console.log('[PythonService] Usando stdin para enviar datos (payload grande)');
+                pythonProcess = spawn(this.pythonPath, [this.scriptPath, '--stdin']);
+
+                // Enviar el payload por stdin
+                pythonProcess.stdin.write(payloadJson);
+                pythonProcess.stdin.end();
+            } else {
+                console.log('[PythonService] Usando argumentos para enviar datos (payload pequeno)');
+                pythonProcess = spawn(this.pythonPath, [
+                    this.scriptPath,
+                    '--json',
+                    payloadJson
+                ]);
+            }
 
             let output = '';
             let errorOutput = '';
@@ -61,7 +78,7 @@ class PythonService {
             });
 
             pythonProcess.on('close', (code) => {
-                console.log(`[PythonService] Proceso finalizado con código: ${code}`);
+                console.log(`[PythonService] Proceso finalizado con codigo: ${code}`);
 
                 if (code === 0) {
                     try {
@@ -74,7 +91,7 @@ class PythonService {
                             // Si no es JSON, devolver la salida como texto
                             resolve({
                                 exitoso: true,
-                                mensaje: 'Análisis completado',
+                                mensaje: 'Analisis completado',
                                 salida: output
                             });
                         }
@@ -89,7 +106,7 @@ class PythonService {
             // Timeout de 60 segundos
             const timeout = setTimeout(() => {
                 pythonProcess.kill();
-                reject(new Error('Timeout: El análisis tardó demasiado tiempo'));
+                reject(new Error('Timeout: El analisis tardo demasiado tiempo'));
             }, 60000);
 
             pythonProcess.on('exit', () => {
