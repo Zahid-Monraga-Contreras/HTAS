@@ -196,7 +196,7 @@
                     </div>
                 </div>
 
-                <!-- UBICACION - ESTILO MEJORADO -->
+                <!-- UBICACION -->
                 <div class="ubicacion-section">
                     <div class="ubicacion-header">
                         <i class="bi bi-geo-alt-fill"></i>
@@ -311,7 +311,8 @@
                         <div class="stat-box">
                             <small>Ultima Cita</small>
                             <div class="stat-value" style="font-size: 0.9rem;">
-                                {{ estadisticas.ultimaCita | date:'dd/MM/yyyy' }}</div>
+                                {{ estadisticas.ultimaCita | date:'dd/MM/yyyy' }}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -329,7 +330,7 @@
 
                     @if (citasPaciente.length > 0) {
                     <div class="citas-lista">
-                        @for (c of citasPaciente; track c.id) {
+                        @for (c of citasPaciente; track c.idcita) {
                         <div class="cita-item">
                             <div class="cita-indicador">
                                 <span class="cita-estado-dot" [ngClass]="{
@@ -420,14 +421,14 @@
         <!-- TAB 3: EXPEDIENTE DEL PACIENTE                                -->
         <!-- ============================================================ -->
         @if (activeTab === 'expediente') {
-        <div class="tab-panel">
+        <div class="tab-panel tab-panel-expediente">
 
             <div class="expediente-toolbar">
                 <p><i class="bi bi-info-circle"></i> Vista de solo lectura generada a partir de la informacion
                     registrada.</p>
-                <button type="button" class="btn-print-expediente" (click)="imprimirExpediente()">
-                    <i class="bi bi-printer"></i>
-                    <span>Imprimir Expediente</span>
+                <button type="button" class="btn-download-expediente" (click)="descargarExpedientePDF()">
+                    <i class="bi bi-file-earmark-arrow-down"></i>
+                    <span>Descargar Expediente PDF</span>
                 </button>
             </div>
 
@@ -468,8 +469,8 @@
 
                     <!-- SECCION: DATOS GENERALES -->
                     <div class="expediente-seccion">
-                        <h3 class="expediente-titulo-seccion"><i class="bi bi-person-lines-fill"></i> Datos
-                            Generales</h3>
+                        <h3 class="expediente-titulo-seccion"><i class="bi bi-person-lines-fill"></i> Datos Generales
+                        </h3>
                         <div class="expediente-grid">
                             <div class="expediente-campo">
                                 <span>Genero</span>
@@ -481,7 +482,7 @@
                             </div>
                             <div class="expediente-campo">
                                 <span>Edad</span>
-                                <strong>{{ calcularEdad() !== null ? calcularEdad() + ' años' : 'No disponible'
+                                <strong>{{ calcularEdad() !== null ? calcularEdad() + ' anos' : 'No disponible'
                                     }}</strong>
                             </div>
                             <div class="expediente-campo">
@@ -501,8 +502,7 @@
 
                     <!-- SECCION: DATOS MEDICOS -->
                     <div class="expediente-seccion">
-                        <h3 class="expediente-titulo-seccion"><i class="bi bi-clipboard2-pulse"></i> Datos Medicos
-                        </h3>
+                        <h3 class="expediente-titulo-seccion"><i class="bi bi-clipboard2-pulse"></i> Datos Medicos</h3>
                         <div class="expediente-grid">
                             <div class="expediente-campo">
                                 <span>Tipo de Sangre</span>
@@ -533,6 +533,37 @@
                         </div>
                     </div>
 
+                    <!-- SECCION: ULTIMA MEDICION -->
+                    <div class="expediente-seccion">
+                        <h3 class="expediente-titulo-seccion"><i class="bi bi-heart-pulse-fill"></i> Ultima Medicion
+                        </h3>
+                        @if (ultimaMedicion) {
+                        <div class="expediente-medicion-grid">
+                            <div class="expediente-medicion-item">
+                                <span>Presion Sistolica</span>
+                                <strong class="valor-sistolica">{{ ultimaMedicion.sistolica }} mmHg</strong>
+                            </div>
+                            <div class="expediente-medicion-item">
+                                <span>Presion Diastolica</span>
+                                <strong class="valor-diastolica">{{ ultimaMedicion.diastolica }} mmHg</strong>
+                            </div>
+                            <div class="expediente-medicion-item">
+                                <span>Pulso</span>
+                                <strong class="valor-pulso">{{ ultimaMedicion.pulso }} bpm</strong>
+                            </div>
+                            <div class="expediente-medicion-item full-width">
+                                <span>Fecha de Medicion</span>
+                                <strong>{{ ultimaMedicion.fechahoralectura }}</strong>
+                            </div>
+                        </div>
+                        } @else {
+                        <p class="expediente-sin-medicion">
+                            <i class="bi bi-info-circle"></i>
+                            No hay mediciones registradas para este paciente.
+                        </p>
+                        }
+                    </div>
+
                     <!-- SECCION: UBICACION -->
                     <div class="expediente-seccion">
                         <h3 class="expediente-titulo-seccion"><i class="bi bi-geo-alt"></i> Domicilio</h3>
@@ -541,8 +572,7 @@
 
                     <!-- SECCION: RESUMEN DE CITAS -->
                     <div class="expediente-seccion">
-                        <h3 class="expediente-titulo-seccion"><i class="bi bi-calendar3"></i> Resumen de Consultas
-                        </h3>
+                        <h3 class="expediente-titulo-seccion"><i class="bi bi-calendar3"></i> Resumen de Consultas</h3>
                         <table class="expediente-tabla">
                             <thead>
                                 <tr>
@@ -552,7 +582,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @for (c of citasPaciente; track c.id) {
+                                @for (c of citasPaciente; track c.idcita) {
                                 <tr>
                                     <td>{{ formatearFechaYHora(c.fechacita, c.horacita) }}</td>
                                     <td>{{ c.motivo || 'Sin motivo' }}</td>

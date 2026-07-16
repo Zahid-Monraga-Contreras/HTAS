@@ -5,7 +5,7 @@ const fs = require('fs');
 
 const medicionesController = {
     // ==========================================================================
-    // REGISTRAR UNA NUEVA MEDICIÓN
+    // REGISTRAR UNA NUEVA MEDICIÓN - CORREGIDO
     // ==========================================================================
     registrarMedicion: async (req, res) => {
         const {
@@ -39,7 +39,7 @@ const medicionesController = {
                 });
             }
 
-            // ✅ Validar rangos fisiológicos (pulso puede ser 0)
+            // Validar rangos fisiológicos
             const pulsoValido = (pulso === 0) || (30 <= pulso && pulso <= 220);
 
             if (
@@ -58,7 +58,6 @@ const medicionesController = {
                 });
             }
 
-            // INSERTAR SOLO LAS COLUMNAS QUE EXISTEN EN LA TABLA
             const query = `
             INSERT INTO MEDICIONES_PRESION (
                 IdPaciente, 
@@ -73,14 +72,16 @@ const medicionesController = {
                 idPaciente,
                 sistolica,
                 diastolica,
-                pulso || 0,  // Si es null o undefined, usar 0
+                pulso || 0,
                 metodoSincronizacion || "Bluetooth"
             ]);
 
-            // Obtener la medición completa con información del paciente
+            // Obtener la medición completa con fecha formateada
             const medicionCompleta = await db.query(
                 `SELECT 
                 m.*,
+                TO_CHAR(m.FechaHoraLectura, 'DD/MM/YYYY HH24:MI:SS') AS FechaHoraLectura,
+                TO_CHAR(m.created_at, 'DD/MM/YYYY HH24:MI:SS') AS created_at,
                 u.Nombre AS NombrePaciente,
                 u.ApPaterno AS ApPaternoPaciente,
                 u.ApMaterno AS ApMaternoPaciente
@@ -103,7 +104,7 @@ const medicionesController = {
     },
 
     // ==========================================================================
-    // OBTENER TODAS LAS MEDICIONES DE UN PACIENTE
+    // OBTENER TODAS LAS MEDICIONES DE UN PACIENTE - CORREGIDO
     // ==========================================================================
     getMedicionesPaciente: async (req, res) => {
         const { idPaciente } = req.params;
@@ -113,7 +114,7 @@ const medicionesController = {
             // Verificar que el paciente existe
             const pacienteExists = await db.query(
                 `SELECT IdUsuario FROM USUARIOS 
-                 WHERE IdUsuario = $1 AND deleted_at IS NULL`,
+             WHERE IdUsuario = $1 AND deleted_at IS NULL`,
                 [idPaciente]
             );
 
@@ -124,30 +125,30 @@ const medicionesController = {
             }
 
             let query = `
-                SELECT 
-                    m.IdMedicion,
-                    m.Sistolica,
-                    m.Diastolica,
-                    m.Pulso,
-                    m.Unidad,
-                    m.MetodoSincronizacion,
-                    m.FechaHoraLectura,
-                    m.created_at,
-                    u.Nombre AS NombrePaciente,
-                    u.ApPaterno AS ApPaternoPaciente,
-                    u.ApMaterno AS ApMaternoPaciente,
-                    CASE 
-                        WHEN m.Sistolica < 120 AND m.Diastolica < 80 THEN 'Normal'
-                        WHEN m.Sistolica BETWEEN 120 AND 129 AND m.Diastolica < 80 THEN 'Elevada'
-                        WHEN m.Sistolica BETWEEN 130 AND 139 OR m.Diastolica BETWEEN 80 AND 89 THEN 'Hipertensión Grado 1'
-                        WHEN m.Sistolica >= 140 OR m.Diastolica >= 90 THEN 'Hipertensión Grado 2'
-                        ELSE 'Crisis Hipertensiva'
-                    END AS ClasificacionPresion
-                FROM MEDICIONES_PRESION m
-                JOIN USUARIOS u ON m.IdPaciente = u.IdUsuario
-                WHERE m.IdPaciente = $1
-                ORDER BY m.FechaHoraLectura DESC
-            `;
+            SELECT 
+                m.IdMedicion,
+                m.Sistolica,
+                m.Diastolica,
+                m.Pulso,
+                m.Unidad,
+                m.MetodoSincronizacion,
+                TO_CHAR(m.FechaHoraLectura, 'DD/MM/YYYY HH24:MI:SS') AS FechaHoraLectura,
+                TO_CHAR(m.created_at, 'DD/MM/YYYY HH24:MI:SS') AS created_at,
+                u.Nombre AS NombrePaciente,
+                u.ApPaterno AS ApPaternoPaciente,
+                u.ApMaterno AS ApMaternoPaciente,
+                CASE 
+                    WHEN m.Sistolica < 120 AND m.Diastolica < 80 THEN 'Normal'
+                    WHEN m.Sistolica BETWEEN 120 AND 129 AND m.Diastolica < 80 THEN 'Elevada'
+                    WHEN m.Sistolica BETWEEN 130 AND 139 OR m.Diastolica BETWEEN 80 AND 89 THEN 'Hipertensión Grado 1'
+                    WHEN m.Sistolica >= 140 OR m.Diastolica >= 90 THEN 'Hipertensión Grado 2'
+                    ELSE 'Crisis Hipertensiva'
+                END AS ClasificacionPresion
+            FROM MEDICIONES_PRESION m
+            JOIN USUARIOS u ON m.IdPaciente = u.IdUsuario
+            WHERE m.IdPaciente = $1
+            ORDER BY m.FechaHoraLectura DESC
+        `;
 
             const params = [idPaciente];
 
@@ -172,7 +173,7 @@ const medicionesController = {
                         sistolicaPromedio: Math.round(sistolicaPromedio),
                         diastolicaPromedio: Math.round(diastolicaPromedio),
                         pulsoPromedio: Math.round(pulsoPromedio),
-                        ultimaMedicion: result.rows[0]?.FechaHoraLectura || null
+                        ultimaMedicion: result.rows[0]?.fechahoralectura || null
                     }
                 });
             } else {
@@ -196,37 +197,37 @@ const medicionesController = {
     },
 
     // ==========================================================================
-    // OBTENER LA ÚLTIMA MEDICIÓN DE UN PACIENTE
+    // OBTENER LA ÚLTIMA MEDICIÓN DE UN PACIENTE - CORREGIDO
     // ==========================================================================
     getUltimaMedicionPaciente: async (req, res) => {
         const { idPaciente } = req.params;
 
         try {
             const query = `
-                SELECT 
-                    m.IdMedicion,
-                    m.Sistolica,
-                    m.Diastolica,
-                    m.Pulso,
-                    m.Unidad,
-                    m.MetodoSincronizacion,
-                    m.FechaHoraLectura,
-                    m.created_at,
-                    u.Nombre AS NombrePaciente,
-                    u.ApPaterno AS ApPaternoPaciente,
-                    u.ApMaterno AS ApMaternoPaciente,
-                    CASE 
-                        WHEN m.Sistolica < 120 AND m.Diastolica < 80 THEN 'Normal'
-                        WHEN m.Sistolica BETWEEN 120 AND 129 AND m.Diastolica < 80 THEN 'Elevada'
-                        WHEN m.Sistolica BETWEEN 130 AND 139 OR m.Diastolica BETWEEN 80 AND 89 THEN 'Hipertensión Grado 1'
-                        WHEN m.Sistolica >= 140 OR m.Diastolica >= 90 THEN 'Hipertensión Grado 2'
-                        ELSE 'Crisis Hipertensiva'
-                    END AS ClasificacionPresion
-                FROM MEDICIONES_PRESION m
-                JOIN USUARIOS u ON m.IdPaciente = u.IdUsuario
-                WHERE m.IdPaciente = $1
-                ORDER BY m.FechaHoraLectura DESC
-                LIMIT 1`;
+            SELECT 
+                m.IdMedicion,
+                m.Sistolica,
+                m.Diastolica,
+                m.Pulso,
+                m.Unidad,
+                m.MetodoSincronizacion,
+                TO_CHAR(m.FechaHoraLectura, 'DD/MM/YYYY HH24:MI:SS') AS FechaHoraLectura,
+                m.created_at,
+                u.Nombre AS NombrePaciente,
+                u.ApPaterno AS ApPaternoPaciente,
+                u.ApMaterno AS ApMaternoPaciente,
+                CASE 
+                    WHEN m.Sistolica < 120 AND m.Diastolica < 80 THEN 'Normal'
+                    WHEN m.Sistolica BETWEEN 120 AND 129 AND m.Diastolica < 80 THEN 'Elevada'
+                    WHEN m.Sistolica BETWEEN 130 AND 139 OR m.Diastolica BETWEEN 80 AND 89 THEN 'Hipertensión Grado 1'
+                    WHEN m.Sistolica >= 140 OR m.Diastolica >= 90 THEN 'Hipertensión Grado 2'
+                    ELSE 'Crisis Hipertensiva'
+                END AS ClasificacionPresion
+            FROM MEDICIONES_PRESION m
+            JOIN USUARIOS u ON m.IdPaciente = u.IdUsuario
+            WHERE m.IdPaciente = $1
+            ORDER BY m.FechaHoraLectura DESC
+            LIMIT 1`;
 
             const result = await db.query(query, [idPaciente]);
 
@@ -236,7 +237,23 @@ const medicionesController = {
                 });
             }
 
-            res.json(result.rows[0]);
+            // ✅ Asegurar que la fecha sea un string limpio
+            const medicion = result.rows[0];
+            // Si por alguna razón la fecha sigue siendo un objeto Date, formatearla
+            if (medicion.fechahoralectura && typeof medicion.fechahoralectura !== 'string') {
+                const fecha = new Date(medicion.fechahoralectura);
+                if (!isNaN(fecha.getTime())) {
+                    const dia = String(fecha.getDate()).padStart(2, '0');
+                    const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+                    const anio = fecha.getFullYear();
+                    const horas = String(fecha.getHours()).padStart(2, '0');
+                    const minutos = String(fecha.getMinutes()).padStart(2, '0');
+                    const segundos = String(fecha.getSeconds()).padStart(2, '0');
+                    medicion.fechahoralectura = `${dia}/${mes}/${anio} ${horas}:${minutos}:${segundos}`;
+                }
+            }
+
+            res.json(medicion);
         } catch (error) {
             console.error("Error al obtener la última medición:", error);
             res.status(500).json({
@@ -246,7 +263,7 @@ const medicionesController = {
     },
 
     // ==========================================================================
-    // OBTENER MEDICIONES POR RANGO DE FECHAS
+    // OBTENER MEDICIONES POR RANGO DE FECHAS - CORREGIDO
     // ==========================================================================
     getMedicionesPorRango: async (req, res) => {
         const { idPaciente } = req.params;
@@ -260,30 +277,30 @@ const medicionesController = {
 
         try {
             const query = `
-                SELECT 
-                    m.IdMedicion,
-                    m.Sistolica,
-                    m.Diastolica,
-                    m.Pulso,
-                    m.Unidad,
-                    m.MetodoSincronizacion,
-                    m.FechaHoraLectura,
-                    m.created_at,
-                    u.Nombre AS NombrePaciente,
-                    u.ApPaterno AS ApPaternoPaciente,
-                    u.ApMaterno AS ApMaternoPaciente,
-                    CASE 
-                        WHEN m.Sistolica < 120 AND m.Diastolica < 80 THEN 'Normal'
-                        WHEN m.Sistolica BETWEEN 120 AND 129 AND m.Diastolica < 80 THEN 'Elevada'
-                        WHEN m.Sistolica BETWEEN 130 AND 139 OR m.Diastolica BETWEEN 80 AND 89 THEN 'Hipertensión Grado 1'
-                        WHEN m.Sistolica >= 140 OR m.Diastolica >= 90 THEN 'Hipertensión Grado 2'
-                        ELSE 'Crisis Hipertensiva'
-                    END AS ClasificacionPresion
-                FROM MEDICIONES_PRESION m
-                JOIN USUARIOS u ON m.IdPaciente = u.IdUsuario
-                WHERE m.IdPaciente = $1 
-                    AND m.FechaHoraLectura BETWEEN $2 AND $3
-                ORDER BY m.FechaHoraLectura DESC`;
+            SELECT 
+                m.IdMedicion,
+                m.Sistolica,
+                m.Diastolica,
+                m.Pulso,
+                m.Unidad,
+                m.MetodoSincronizacion,
+                TO_CHAR(m.FechaHoraLectura, 'DD/MM/YYYY HH24:MI:SS') AS FechaHoraLectura,
+                TO_CHAR(m.created_at, 'DD/MM/YYYY HH24:MI:SS') AS created_at,
+                u.Nombre AS NombrePaciente,
+                u.ApPaterno AS ApPaternoPaciente,
+                u.ApMaterno AS ApMaternoPaciente,
+                CASE 
+                    WHEN m.Sistolica < 120 AND m.Diastolica < 80 THEN 'Normal'
+                    WHEN m.Sistolica BETWEEN 120 AND 129 AND m.Diastolica < 80 THEN 'Elevada'
+                    WHEN m.Sistolica BETWEEN 130 AND 139 OR m.Diastolica BETWEEN 80 AND 89 THEN 'Hipertensión Grado 1'
+                    WHEN m.Sistolica >= 140 OR m.Diastolica >= 90 THEN 'Hipertensión Grado 2'
+                    ELSE 'Crisis Hipertensiva'
+                END AS ClasificacionPresion
+            FROM MEDICIONES_PRESION m
+            JOIN USUARIOS u ON m.IdPaciente = u.IdUsuario
+            WHERE m.IdPaciente = $1 
+                AND m.FechaHoraLectura BETWEEN $2 AND $3
+            ORDER BY m.FechaHoraLectura DESC`;
 
             const result = await db.query(query, [idPaciente, fechaInicio, fechaFin]);
             res.json(result.rows);
@@ -294,7 +311,6 @@ const medicionesController = {
             });
         }
     },
-
     // ==========================================================================
     // OBTENER ESTADÍSTICAS DE MEDICIONES POR PERÍODO
     // ==========================================================================
@@ -703,13 +719,15 @@ const medicionesController = {
             // 9. Obtener la medicion completa
             const medicionCompleta = await db.query(
                 `SELECT 
-                m.*,
-                u.Nombre AS NombrePaciente,
-                u.ApPaterno AS ApPaternoPaciente,
-                u.ApMaterno AS ApMaternoPaciente
-            FROM MEDICIONES_PRESION m
-            JOIN USUARIOS u ON m.IdPaciente = u.IdUsuario
-            WHERE m.IdMedicion = $1`,
+        m.*,
+        TO_CHAR(m.FechaHoraLectura, 'DD/MM/YYYY HH24:MI:SS') AS FechaHoraLectura,
+        TO_CHAR(m.created_at, 'DD/MM/YYYY HH24:MI:SS') AS created_at,
+        u.Nombre AS NombrePaciente,
+        u.ApPaterno AS ApPaternoPaciente,
+        u.ApMaterno AS ApMaternoPaciente 
+    FROM MEDICIONES_PRESION m 
+    JOIN USUARIOS u ON m.IdPaciente = u.IdUsuario 
+    WHERE m.IdMedicion = $1`,
                 [result.rows[0].idmedicion]
             );
 

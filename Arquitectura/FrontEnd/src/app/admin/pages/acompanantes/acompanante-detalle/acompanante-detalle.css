@@ -226,6 +226,32 @@
     box-shadow: none !important;
 }
 
+.btn-download-expediente {
+    padding: 0.6rem 1.5rem;
+    background: linear-gradient(135deg, #0a1628, #1a2938);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(10, 22, 40, 0.18);
+}
+
+.btn-download-expediente:hover {
+    background: linear-gradient(135deg, #1a2938, #0a1628);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(10, 22, 40, 0.24);
+}
+
+.btn-download-expediente i {
+    font-size: 1.1rem;
+}
+
 .spinner-save {
     width: 18px;
     height: 18px;
@@ -377,7 +403,6 @@
     box-shadow: 0 0 0 4px rgba(176, 0, 30, 0.08);
 }
 
-/* TEXTAREA FIJO */
 textarea.form-control-premium {
     min-height: 80px;
     max-height: 80px;
@@ -738,7 +763,6 @@ select.form-control-premium option:checked {
     color: #4a5a6e;
 }
 
-/* Badges de estado */
 .badge-completada,
 .badge-programada,
 .badge-confirmada,
@@ -1019,7 +1043,7 @@ select.form-control-premium option:checked {
 }
 
 /* ==========================================================================
-   15. EXPEDIENTE DEL ACOMPAÑANTE
+   15. EXPEDIENTE DEL ACOMPAÑANTE - ESTILOS ACTUALIZADOS
    ========================================================================== */
 .expediente-toolbar {
     display: flex;
@@ -1041,28 +1065,6 @@ select.form-control-premium option:checked {
 
 .expediente-toolbar p i {
     color: #b0001e;
-}
-
-.btn-print-expediente {
-    padding: 0.6rem 1.5rem;
-    background: #0a1628;
-    color: #ffffff;
-    border: none;
-    border-radius: 10px;
-    font-weight: 700;
-    font-size: 0.85rem;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6rem;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 12px rgba(10, 22, 40, 0.18);
-}
-
-.btn-print-expediente:hover {
-    background: #1a2938;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(10, 22, 40, 0.24);
 }
 
 .expediente-wrapper {
@@ -1681,7 +1683,7 @@ select.form-control-premium option:checked {
         align-items: stretch;
     }
 
-    .btn-print-expediente {
+    .btn-download-expediente {
         justify-content: center;
     }
 
@@ -1726,7 +1728,8 @@ select.form-control-premium option:checked {
     }
 
     .btn-save,
-    .btn-cancel-premium {
+    .btn-cancel-premium,
+    .btn-download-expediente {
         font-size: 0.85rem;
         padding: 0.6rem 1.2rem;
     }

@@ -1,5 +1,3 @@
-// src/app/components/paciente-detalle/paciente-detalle.ts
-
 import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef, PLATFORM_ID } from '@angular/core';
 import { CommonModule, Location, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -95,6 +93,9 @@ export class PacienteDetalle implements OnInit, OnDestroy {
   pacienteId: number | null = null;
   fechaGeneracion = '';
 
+  ultimaMedicion: any = null;
+  cargandoUltimaMedicion = false;
+
   sistemaActivo = false;
   isAnalizando = false;
   analisisArchivo: File | null = null;
@@ -125,6 +126,7 @@ export class PacienteDetalle implements OnInit, OnDestroy {
 
       this.cargarDatosCompletosPaciente();
       this.cargarDatosReales();
+      this.cargarUltimaMedicionExpediente();
 
       setTimeout(() => {
         this.inicializarCalendarioNacimiento();
@@ -137,6 +139,781 @@ export class PacienteDetalle implements OnInit, OnDestroy {
         this.router.navigate(['/pacientes']);
       }
     }
+  }
+
+  ngOnDestroy() {
+    this.destruirCalendariosCita();
+    if (this.fpNacimientoInstance) {
+      try { this.fpNacimientoInstance.destroy(); } catch (e) { }
+      this.fpNacimientoInstance = null;
+    }
+    if (this.toastTimeout) clearTimeout(this.toastTimeout);
+  }
+
+  /**
+   * Formatea una fecha de manera segura - AHORA EL BACKEND YA LA DEVUELVE FORMATEADA
+   */
+  private formatearFechaSegura(fecha: any): string {
+    if (!fecha) return 'No disponible';
+
+    if (typeof fecha === 'string' && /^\d{2}\/\d{2}\/\d{4}/.test(fecha)) {
+      return fecha;
+    }
+
+    if (typeof fecha === 'string') {
+      try {
+        const date = new Date(fecha);
+        if (!isNaN(date.getTime())) {
+          const dia = String(date.getDate()).padStart(2, '0');
+          const mes = String(date.getMonth() + 1).padStart(2, '0');
+          const anio = date.getFullYear();
+          return `${dia}/${mes}/${anio}`;
+        }
+      } catch (e) { }
+    }
+
+    if (fecha instanceof Date && !isNaN(fecha.getTime())) {
+      const dia = String(fecha.getDate()).padStart(2, '0');
+      const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+      const anio = fecha.getFullYear();
+      return `${dia}/${mes}/${anio}`;
+    }
+
+    return String(fecha) || 'No disponible';
+  }
+
+  /**
+   * Extrae solo la fecha de un string (fallback)
+   */
+  private extraerSoloFecha(fechaStr: string): string {
+    if (!fechaStr) return 'Fecha no disponible';
+
+    if (/^\d{2}\/\d{2}\/\d{4}/.test(fechaStr)) {
+      return fechaStr;
+    }
+
+    try {
+      const date = new Date(fechaStr);
+      if (!isNaN(date.getTime())) {
+        const dia = String(date.getDate()).padStart(2, '0');
+        const mes = String(date.getMonth() + 1).padStart(2, '0');
+        const anio = date.getFullYear();
+        return `${dia}/${mes}/${anio}`;
+      }
+    } catch (e) { }
+
+    const match = fechaStr.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+    if (match) {
+      return `${match[1]}/${match[2]}/${match[3]}`;
+    }
+
+    return 'Fecha no disponible';
+  }
+
+  async cargarUltimaMedicionExpediente() {
+    if (!this.pacienteId) return;
+
+    this.cargandoUltimaMedicion = true;
+    try {
+      const medicion = await firstValueFrom(
+        this.usersService.getUltimaMedicionPaciente(this.pacienteId)
+      );
+      if (medicion && Object.keys(medicion).length > 0) {
+        const fechaFormateada = medicion.fechahoralectura || medicion.FechaHoraLectura || 'Fecha no disponible';
+
+        this.ultimaMedicion = {
+          sistolica: medicion.sistolica || medicion.Sistolica || 0,
+          diastolica: medicion.diastolica || medicion.Diastolica || 0,
+          pulso: medicion.pulso || medicion.Pulso || 0,
+          fechahoralectura: this.extraerSoloFecha(String(fechaFormateada))
+        };
+      } else {
+        this.ultimaMedicion = null;
+      }
+    } catch (error) {
+      console.warn('No se pudo cargar la ultima medicion:', error);
+      this.ultimaMedicion = null;
+    } finally {
+      this.cargandoUltimaMedicion = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  descargarExpedientePDF() {
+    if (!isPlatformBrowser(this.platformId) || !this.usuarioSeleccionado) return;
+
+    const u = this.usuarioSeleccionado;
+    const nombreCompleto = [
+      u.nombre || '',
+      u.tempApellidoPaterno || u.apPaterno || '',
+      u.tempApellidoMaterno || u.apMaterno || ''
+    ].filter(Boolean).join(' ').trim() || 'Paciente no especificado';
+
+    const colorPrimary: [number, number, number] = [176, 0, 30];
+    const colorDark: [number, number, number] = [10, 22, 40];
+    const colorGray: [number, number, number] = [122, 138, 158];
+    const colorTextMuted: [number, number, number] = [74, 90, 110];
+    const colorLight: [number, number, number] = [248, 249, 250];
+    const colorBorder: [number, number, number] = [230, 233, 237];
+    const colorWhite: [number, number, number] = [255, 255, 255];
+
+    const doc = new jsPDF({ unit: 'mm', format: 'letter' });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const marginX = 20;
+    const marginY = 20;
+    let y = marginY;
+
+    doc.setFillColor(colorPrimary[0], colorPrimary[1], colorPrimary[2]);
+    doc.rect(0, 0, pageWidth, 4, 'F');
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(22);
+    doc.setTextColor(colorDark[0], colorDark[1], colorDark[2]);
+    doc.text('Expediente Clinico', marginX, y + 10);
+
+    doc.setDrawColor(colorPrimary[0], colorPrimary[1], colorPrimary[2]);
+    doc.setLineWidth(0.8);
+    doc.line(marginX, y + 14, marginX + 55, y + 14);
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(colorGray[0], colorGray[1], colorGray[2]);
+    doc.text(`Folio #${this.pacienteId || '---'}`, pageWidth - marginX, y + 10, { align: 'right' });
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.text(`Generado: ${this.fechaGeneracion}`, pageWidth - marginX, y + 16, { align: 'right' });
+
+    y += 28;
+
+    doc.setDrawColor(colorBorder[0], colorBorder[1], colorBorder[2]);
+    doc.setLineWidth(0.3);
+    doc.line(marginX, y, pageWidth - marginX, y);
+    y += 8;
+
+    doc.setFillColor(colorLight[0], colorLight[1], colorLight[2]);
+    doc.setDrawColor(colorBorder[0], colorBorder[1], colorBorder[2]);
+    doc.roundedRect(marginX, y, pageWidth - marginX * 2, 20, 3, 3, 'FD');
+
+    // CIRCULO ROJO CON INICIAL - CENTRADO CORRECTAMENTE
+    doc.setFillColor(colorPrimary[0], colorPrimary[1], colorPrimary[2]);
+    const circleX = marginX + 11;
+    const circleY = y + 10;
+    const circleRadius = 7;
+    doc.circle(circleX, circleY, circleRadius, 'F');
+
+    // INICIAL CENTRADA DENTRO DEL CIRCULO
+    // DESPUES
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(colorWhite[0], colorWhite[1], colorWhite[2]);
+    const primeraLetra = nombreCompleto.charAt(0).toUpperCase() || 'P';
+    doc.text(primeraLetra, circleX, circleY, { align: 'center', baseline: 'middle' });
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
+    doc.setTextColor(colorDark[0], colorDark[1], colorDark[2]);
+    doc.text(nombreCompleto, marginX + 25, y + 9);
+
+    if (u.correo) {
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8.5);
+      doc.setTextColor(colorGray[0], colorGray[1], colorGray[2]);
+      doc.text(u.correo, marginX + 25, y + 17);
+    }
+
+    // BADGE ACTIVO - CENTRADO VERTICALMENTE
+    if (u.activo !== false) {
+      const badgeWidth = 26;
+      const badgeHeight = 7;
+      const badgeX = pageWidth - marginX - badgeWidth - 6;
+      const badgeY = y + 6.5;
+
+      doc.setFillColor(16, 185, 129);
+      doc.roundedRect(badgeX, badgeY, badgeWidth, badgeHeight, 3, 3, 'F');
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(6);
+      doc.setTextColor(colorWhite[0], colorWhite[1], colorWhite[2]);
+      const badgeText = 'ACTIVO';
+      const badgeTextWidth = doc.getStringUnitWidth(badgeText) * 6 / doc.internal.scaleFactor;
+      const badgeTextX = badgeX + (badgeWidth / 2) - (badgeTextWidth / 2);
+      const badgeTextY = badgeY + 4.5;
+      doc.text(badgeText, badgeTextX, badgeTextY);
+    }
+
+    y += 28;
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(colorPrimary[0], colorPrimary[1], colorPrimary[2]);
+    doc.text('Datos Generales', marginX, y);
+    y += 4;
+    doc.setDrawColor(colorPrimary[0], colorPrimary[1], colorPrimary[2]);
+    doc.setLineWidth(0.5);
+    doc.line(marginX, y, marginX + 42, y);
+    y += 6;
+
+    const fechaNacimientoFormateada = this.formatearFechaSegura(u.fechaNacimiento);
+
+    const datosGenerales = [
+      ['Genero', u.genero || 'No especificado'],
+      ['Fecha de Nacimiento', fechaNacimientoFormateada],
+      ['Edad', this.calcularEdad() !== null ? this.calcularEdad() + ' anos' : 'No disponible'],
+      ['Telefono', u.telefono || 'No registrado'],
+      ['CURP', u.curp || 'No registrado'],
+      ['NSS', u.nss || 'No registrado']
+    ];
+
+    const colWidth = (pageWidth - marginX * 2) / 2;
+    doc.setFontSize(9.5);
+    datosGenerales.forEach(([label, value], index) => {
+      const col = index % 2;
+      const row = Math.floor(index / 2);
+      const x = marginX + col * colWidth;
+      const yPos = y + row * 7.5;
+
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(colorGray[0], colorGray[1], colorGray[2]);
+      doc.text(label + ':', x, yPos);
+
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(colorDark[0], colorDark[1], colorDark[2]);
+      doc.text(String(value), x + 38, yPos);
+    });
+    y += datosGenerales.length > 2 ? 24 : 16;
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(colorPrimary[0], colorPrimary[1], colorPrimary[2]);
+    doc.text('Datos Medicos', marginX, y);
+    y += 4;
+    doc.setDrawColor(colorPrimary[0], colorPrimary[1], colorPrimary[2]);
+    doc.setLineWidth(0.5);
+    doc.line(marginX, y, marginX + 37, y);
+    y += 6;
+
+    const datosMedicos = [
+      ['Tipo de Sangre', u.tipoSangre || 'No especificado'],
+      ['Peso', u.peso ? u.peso + ' kg' : 'No registrado'],
+      ['Altura', u.altura ? u.altura + ' m' : 'No registrada'],
+      ['IMC', this.calcularIMC().valor !== null ? this.calcularIMC().valor + ' (' + this.calcularIMC().categoria + ')' : 'No disponible']
+    ];
+
+    doc.setFontSize(9.5);
+    datosMedicos.forEach(([label, value], index) => {
+      const col = index % 2;
+      const row = Math.floor(index / 2);
+      const x = marginX + col * colWidth;
+      const yPos = y + row * 7.5;
+
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(colorGray[0], colorGray[1], colorGray[2]);
+      doc.text(label + ':', x, yPos);
+
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(colorDark[0], colorDark[1], colorDark[2]);
+      doc.text(String(value), x + 38, yPos);
+    });
+    y += 18;
+
+    if (u.antecedentesFamiliares) {
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8.5);
+      doc.setTextColor(colorGray[0], colorGray[1], colorGray[2]);
+      doc.text('Antecedentes Familiares:', marginX, y);
+      y += 5;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(colorTextMuted[0], colorTextMuted[1], colorTextMuted[2]);
+      const antecedentes = doc.splitTextToSize(u.antecedentesFamiliares, pageWidth - marginX * 2 - 8);
+      doc.text(antecedentes, marginX + 4, y);
+      y += antecedentes.length * 5 + 6;
+    } else {
+      y += 4;
+    }
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(colorPrimary[0], colorPrimary[1], colorPrimary[2]);
+    doc.text('Ultima Medicion', marginX, y);
+    y += 4;
+    doc.setDrawColor(colorPrimary[0], colorPrimary[1], colorPrimary[2]);
+    doc.setLineWidth(0.5);
+    doc.line(marginX, y, marginX + 39, y);
+    y += 6;
+
+    if (this.ultimaMedicion) {
+      const m = this.ultimaMedicion;
+      const fechaMedicion = this.extraerSoloFecha(m.fechahoralectura);
+
+      doc.setFillColor(colorLight[0], colorLight[1], colorLight[2]);
+      doc.setDrawColor(colorBorder[0], colorBorder[1], colorBorder[2]);
+      doc.roundedRect(marginX, y, pageWidth - marginX * 2, 20, 4, 4, 'FD');
+
+      const medItems = [
+        ['Sistolica', m.sistolica + ' mmHg'],
+        ['Diastolica', m.diastolica + ' mmHg'],
+        ['Pulso', m.pulso + ' bpm']
+      ];
+
+      const medColWidth = (pageWidth - marginX * 2) / 3;
+      medItems.forEach(([label, value], index) => {
+        const x = marginX + index * medColWidth;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(6.5);
+        doc.setTextColor(colorGray[0], colorGray[1], colorGray[2]);
+        doc.text(label.toUpperCase(), x + 4, y + 5);
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(11);
+        doc.setTextColor(colorDark[0], colorDark[1], colorDark[2]);
+        doc.text(value, x + 4, y + 15);
+      });
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7.5);
+      doc.setTextColor(colorGray[0], colorGray[1], colorGray[2]);
+      doc.text('Fecha: ' + fechaMedicion, pageWidth - marginX - 4, y + 17, { align: 'right' });
+
+      y += 28;
+    } else {
+      doc.setFont('helvetica', 'italic');
+      doc.setFontSize(9.5);
+      doc.setTextColor(colorGray[0], colorGray[1], colorGray[2]);
+      doc.text('No hay mediciones registradas para este paciente.', marginX + 4, y + 6);
+      y += 14;
+    }
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(colorPrimary[0], colorPrimary[1], colorPrimary[2]);
+    doc.text('Domicilio', marginX, y);
+    y += 4;
+    doc.setDrawColor(colorPrimary[0], colorPrimary[1], colorPrimary[2]);
+    doc.setLineWidth(0.5);
+    doc.line(marginX, y, marginX + 26, y);
+    y += 6;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9.5);
+    doc.setTextColor(colorTextMuted[0], colorTextMuted[1], colorTextMuted[2]);
+    const direccion = this.getUbicacionFormateada() || 'Sin ubicacion registrada';
+    const direccionLineas = doc.splitTextToSize(direccion, pageWidth - marginX * 2 - 8);
+    doc.text(direccionLineas, marginX + 4, y);
+    y += direccionLineas.length * 5 + 10;
+
+    if (this.citasPaciente.length > 0) {
+      if (y > pageHeight - 60) {
+        doc.addPage();
+        y = marginY;
+        doc.setFillColor(colorPrimary[0], colorPrimary[1], colorPrimary[2]);
+        doc.rect(0, 0, pageWidth, 4, 'F');
+      }
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(colorPrimary[0], colorPrimary[1], colorPrimary[2]);
+      doc.text('Resumen de Consultas', marginX, y);
+      y += 4;
+      doc.setDrawColor(colorPrimary[0], colorPrimary[1], colorPrimary[2]);
+      doc.setLineWidth(0.5);
+      doc.line(marginX, y, marginX + 47, y);
+      y += 8;
+
+      const tableCols = [50, 65, 40];
+      const tableWidth = tableCols.reduce((a, b) => a + b, 0);
+      const startX = (pageWidth - tableWidth) / 2;
+
+      doc.setFillColor(colorPrimary[0], colorPrimary[1], colorPrimary[2]);
+      doc.roundedRect(startX, y - 2, tableWidth, 8, 2, 2, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7.5);
+      doc.setTextColor(colorWhite[0], colorWhite[1], colorWhite[2]);
+      doc.text('Fecha', startX + 6, y + 3);
+      doc.text('Motivo', startX + 6 + tableCols[0], y + 3);
+      doc.text('Estado', startX + tableCols[0] + tableCols[1] + (tableCols[2] / 2), y + 3, { align: 'center' });
+      y += 10;
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8.5);
+      doc.setTextColor(colorDark[0], colorDark[1], colorDark[2]);
+
+      const citasMostrar = this.citasPaciente.slice(0, 6);
+      citasMostrar.forEach((c, index) => {
+        const fecha = this.formatearFechaYHora(c.fechacita, c.horacita);
+        const motivo = (c.motivo || 'Sin motivo').length > 20 ? (c.motivo || 'Sin motivo').slice(0, 18) + '...' : (c.motivo || 'Sin motivo');
+        const estado = c.estado || 'Programada';
+
+        if (index % 2 === 0) {
+          doc.setFillColor(colorLight[0], colorLight[1], colorLight[2]);
+          doc.rect(startX, y - 2, tableWidth, 6.5, 'F');
+        }
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8.5);
+        doc.setTextColor(colorDark[0], colorDark[1], colorDark[2]);
+        doc.text(fecha, startX + 6, y + 3.5);
+        doc.text(motivo, startX + 6 + tableCols[0], y + 3.5);
+
+        let estadoColor: [number, number, number] = [100, 100, 100];
+        let estadoBg: [number, number, number] = [240, 240, 245];
+        if (estado === 'Completada') { estadoColor = [16, 185, 129]; estadoBg = [209, 250, 229]; }
+        else if (estado === 'Cancelada' || estado === 'No Asistio') { estadoColor = [239, 68, 68]; estadoBg = [254, 226, 226]; }
+        else if (estado === 'Programada' || estado === 'Confirmada') { estadoColor = [59, 130, 246]; estadoBg = [219, 234, 254]; }
+
+        // Badge centrado dentro del ancho real de la columna "Estado"
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(7);
+        const estadoColX = startX + tableCols[0] + tableCols[1];
+        const estadoColCenterX = estadoColX + (tableCols[2] / 2);
+        const estadoTextWidth = doc.getStringUnitWidth(estado) * 7 / doc.internal.scaleFactor;
+        const pillWidth = Math.min(estadoTextWidth + 6, tableCols[2] - 4);
+        const pillX = estadoColCenterX - (pillWidth / 2);
+
+        doc.setFillColor(estadoBg[0], estadoBg[1], estadoBg[2]);
+        doc.roundedRect(pillX, y - 1.5, pillWidth, 5.5, 3, 3, 'F');
+        doc.setTextColor(estadoColor[0], estadoColor[1], estadoColor[2]);
+        doc.text(estado, estadoColCenterX, y + 1.3, { align: 'center', baseline: 'middle' });
+
+        y += 7.5;
+        if (y > pageHeight - 25) {
+          doc.addPage();
+          y = marginY;
+          doc.setFillColor(colorPrimary[0], colorPrimary[1], colorPrimary[2]);
+          doc.rect(0, 0, pageWidth, 4, 'F');
+        }
+      });
+
+      if (this.citasPaciente.length > 6) {
+        doc.setFont('helvetica', 'italic');
+        doc.setFontSize(7.5);
+        doc.setTextColor(colorGray[0], colorGray[1], colorGray[2]);
+        doc.text('... y ' + (this.citasPaciente.length - 6) + ' citas mas', startX + 6, y + 3.5);
+        y += 8;
+      }
+      y += 4;
+    }
+
+    // DESPUES
+    y = Math.max(y, pageHeight - 30);
+    doc.setDrawColor(colorBorder[0], colorBorder[1], colorBorder[2]);
+    doc.setLineWidth(0.3);
+    doc.line(marginX, y, pageWidth - marginX, y);
+
+    const footerY = y + 10;
+
+    // Izquierda: sello "Documento generado electronicamente"
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7);
+    doc.setTextColor(colorGray[0], colorGray[1], colorGray[2]);
+    doc.text('Documento generado electronicamente', marginX, footerY, { baseline: 'middle' });
+
+    const selloX = marginX + 64;
+    doc.setFillColor(16, 185, 129);
+    doc.circle(selloX, footerY, 4, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(5);
+    doc.setTextColor(colorWhite[0], colorWhite[1], colorWhite[2]);
+    doc.text('OK', selloX, footerY, { align: 'center', baseline: 'middle' });
+
+    // Derecha: bloque de firma (linea arriba, etiqueta abajo, sin tocar el sello)
+    const firmaLineWidth = 48;
+    const firmaLineX1 = pageWidth - marginX - firmaLineWidth;
+    const firmaLineX2 = pageWidth - marginX;
+    const firmaLineY = footerY - 3;
+
+    doc.setDrawColor(colorGray[0], colorGray[1], colorGray[2]);
+    doc.setLineWidth(0.3);
+    doc.line(firmaLineX1, firmaLineY, firmaLineX2, firmaLineY);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7);
+    doc.setTextColor(colorGray[0], colorGray[1], colorGray[2]);
+    doc.text('Firma del Medico Responsable', firmaLineX1 + (firmaLineWidth / 2), firmaLineY + 4, { align: 'center' });
+
+    doc.save(`Expediente_${nombreCompleto.replace(/\s+/g, '_')}_${this.pacienteId || 'sin_folio'}.pdf`);
+  }
+
+  descargarResultadosPDF() {
+    if (!isPlatformBrowser(this.platformId) || !this.resultadoAnalisis) return;
+
+    const r = this.resultadoAnalisis;
+
+    const nombreCompleto = [
+      this.usuarioSeleccionado?.nombre || '',
+      this.usuarioSeleccionado?.tempApellidoPaterno || this.usuarioSeleccionado?.apPaterno || '',
+      this.usuarioSeleccionado?.tempApellidoMaterno || this.usuarioSeleccionado?.apMaterno || ''
+    ].filter(Boolean).join(' ').trim() || 'Paciente no especificado';
+
+    const colorPrimary: [number, number, number] = [176, 0, 30];
+    const colorDark: [number, number, number] = [10, 22, 40];
+    const colorGray: [number, number, number] = [122, 138, 158];
+    const colorTextMuted: [number, number, number] = [74, 90, 110];
+    const colorLight: [number, number, number] = [248, 249, 250];
+    const colorBorder: [number, number, number] = [230, 233, 237];
+    const colorWhite: [number, number, number] = [255, 255, 255];
+
+    let riesgoColor: [number, number, number] = [217, 119, 6];
+    const nivelRiesgo: string = r.nivel_riesgo_clinico || 'No disponible';
+    if (nivelRiesgo.includes('CRITICO')) riesgoColor = [220, 38, 38];
+    else if (nivelRiesgo.includes('ESTABLE')) riesgoColor = [5, 150, 105];
+    else if (nivelRiesgo.includes('MODERADO')) riesgoColor = [217, 119, 6];
+
+    const doc = new jsPDF({ unit: 'mm', format: 'letter' });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const marginX = 20;
+    const marginY = 20;
+    let y = marginY;
+
+    doc.setFillColor(colorPrimary[0], colorPrimary[1], colorPrimary[2]);
+    doc.rect(0, 0, pageWidth, 4, 'F');
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(20);
+    doc.setTextColor(colorDark[0], colorDark[1], colorDark[2]);
+    doc.text('Resultados del Analisis HTAS', marginX, y + 10);
+
+    doc.setDrawColor(colorPrimary[0], colorPrimary[1], colorPrimary[2]);
+    doc.setLineWidth(0.8);
+    doc.line(marginX, y + 14, marginX + 62, y + 14);
+
+    const fechaGen = new Date().toLocaleString('es-MX', {
+      day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(colorGray[0], colorGray[1], colorGray[2]);
+    doc.text(`Folio #${r.folio_expediente_db ?? '---'}`, pageWidth - marginX, y + 10, { align: 'right' });
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.text(`Generado: ${fechaGen}`, pageWidth - marginX, y + 16, { align: 'right' });
+
+    y += 28;
+
+    doc.setDrawColor(colorBorder[0], colorBorder[1], colorBorder[2]);
+    doc.setLineWidth(0.3);
+    doc.line(marginX, y, pageWidth - marginX, y);
+    y += 8;
+
+    doc.setFillColor(colorLight[0], colorLight[1], colorLight[2]);
+    doc.setDrawColor(colorBorder[0], colorBorder[1], colorBorder[2]);
+    doc.roundedRect(marginX, y, pageWidth - marginX * 2, 18, 3, 3, 'FD');
+
+    doc.setFillColor(colorPrimary[0], colorPrimary[1], colorPrimary[2]);
+    const circleX = marginX + 11;
+    const circleY = y + 9;
+    const circleRadius = 6.5;
+    doc.circle(circleX, circleY, circleRadius, 'F');
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(colorWhite[0], colorWhite[1], colorWhite[2]);
+    const primeraLetra = nombreCompleto.charAt(0).toUpperCase() || 'P';
+    doc.text(primeraLetra, circleX, circleY, { align: 'center', baseline: 'middle' });
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(colorDark[0], colorDark[1], colorDark[2]);
+    doc.text(nombreCompleto, marginX + 24, y + 8);
+
+    if (this.usuarioSeleccionado?.correo) {
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(colorGray[0], colorGray[1], colorGray[2]);
+      doc.text(this.usuarioSeleccionado.correo, marginX + 24, y + 15);
+    }
+
+    doc.setFillColor(59, 130, 246);
+    const badgeX = pageWidth - marginX - 32;
+    const badgeY = y + 2;
+    doc.roundedRect(badgeX, badgeY, 26, 7, 3, 3, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(5.5);
+    doc.setTextColor(colorWhite[0], colorWhite[1], colorWhite[2]);
+    const badgeText = 'HTAS';
+    const badgeTextWidth = doc.getStringUnitWidth(badgeText) * 5.5 / doc.internal.scaleFactor;
+    const badgeTextX = badgeX + (26 / 2) - (badgeTextWidth / 2);
+    const badgeTextY = badgeY + 4.5;
+    doc.text(badgeText, badgeTextX, badgeTextY);
+
+    y += 26;
+
+    // Ajuste automatico del texto del nivel de riesgo para que nunca se encime
+    // con el bloque de presion arterial, sin importar que tan largo sea el texto.
+    const iconAreaWidth = 32;   // espacio reservado para el circulo + icono
+    const presionBlockWidth = 55; // espacio reservado para el bloque de presion arterial (derecha)
+    const nivelMaxWidth = pageWidth - marginX * 2 - iconAreaWidth - presionBlockWidth;
+
+    let nivelFontSize = 16;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(nivelFontSize);
+    let nivelLineas = doc.splitTextToSize(nivelRiesgo, nivelMaxWidth);
+
+    // Si no cabe en una linea, reduce el tamano de letra progresivamente
+    while (nivelLineas.length > 1 && nivelFontSize > 10) {
+      nivelFontSize -= 0.5;
+      doc.setFontSize(nivelFontSize);
+      nivelLineas = doc.splitTextToSize(nivelRiesgo, nivelMaxWidth);
+    }
+
+    // Si aun con letra chica no entra en una linea, el banner crece para dar espacio a 2 lineas
+    const bannerH = nivelLineas.length > 1 ? 36 : 30;
+    const bannerCircleY = y + bannerH / 2;
+
+    doc.setFillColor(riesgoColor[0], riesgoColor[1], riesgoColor[2]);
+    doc.roundedRect(marginX, y, pageWidth - marginX * 2, bannerH, 5, 5, 'F');
+
+    doc.setFillColor(colorWhite[0], colorWhite[1], colorWhite[2]);
+    doc.circle(marginX + 16, bannerCircleY, 10, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.setTextColor(riesgoColor[0], riesgoColor[1], riesgoColor[2]);
+
+    let icono = '!';
+    if (nivelRiesgo.includes('CRITICO')) icono = 'X';
+    else if (nivelRiesgo.includes('ESTABLE')) icono = 'OK';
+    else if (nivelRiesgo.includes('MODERADO')) icono = '!';
+    doc.text(icono, marginX + 16, bannerCircleY, { align: 'center', baseline: 'middle' });
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7);
+    doc.setTextColor(colorWhite[0], colorWhite[1], colorWhite[2]);
+    doc.text('NIVEL DE RIESGO CLINICO', marginX + 32, y + 8);
+    doc.setFontSize(nivelFontSize);
+    doc.text(nivelLineas, marginX + 32, y + 17);
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7);
+    doc.text('PRESION ARTERIAL', pageWidth - marginX - 6, y + 8, { align: 'right' });
+    doc.setFontSize(16);
+    doc.text(`${r.sistolica_usada}/${r.diastolica_usada} mmHg`, pageWidth - marginX - 6, y + bannerH - 7, { align: 'right' });
+    doc.setFontSize(7.5);
+    doc.text('Sistolica / Diastolica', pageWidth - marginX - 6, y + bannerH - 3, { align: 'right' });
+
+    y += bannerH + 12;
+
+    const gap = 6;
+    const colWidth = (pageWidth - marginX * 2 - gap * 2) / 3;
+    const boxH = 26;
+
+    const drawInfoBox = (x: number, label: string, value: string, icon: string, bgColor: [number, number, number]) => {
+      doc.setFillColor(colorWhite[0], colorWhite[1], colorWhite[2]);
+      doc.setDrawColor(colorBorder[0], colorBorder[1], colorBorder[2]);
+      doc.roundedRect(x, y, colWidth, boxH, 4, 4, 'FD');
+
+      doc.setFillColor(bgColor[0], bgColor[1], bgColor[2]);
+      const innerCircleX = x + 11;
+      const innerCircleY = y + 13;
+      const innerCircleR = 9;
+      doc.circle(innerCircleX, innerCircleY, innerCircleR, 'F');
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(11);
+      doc.setTextColor(colorWhite[0], colorWhite[1], colorWhite[2]);
+      doc.text(icon, innerCircleX, innerCircleY, { align: 'center', baseline: 'middle' });
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(6.5);
+      doc.setTextColor(colorGray[0], colorGray[1], colorGray[2]);
+      doc.text(label.toUpperCase(), x + 26, y + 7);
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(colorDark[0], colorDark[1], colorDark[2]);
+      const valorLineas = doc.splitTextToSize(value, colWidth - 30);
+      doc.text(valorLineas, x + 26, y + 18);
+    };
+
+    drawInfoBox(marginX, 'Prediccion de Crisis', r.prediccion_crisis ? 'Positiva' : 'Negativa', r.prediccion_crisis ? '!' : 'OK', r.prediccion_crisis ? [239, 68, 68] : [16, 185, 129]);
+    drawInfoBox(marginX + colWidth + gap, 'Probabilidad', `${r.probabilidad_porcentual}%`, '%', [59, 130, 246]);
+    drawInfoBox(marginX + (colWidth + gap) * 2, 'Motor IA', r.motor_inferencia_usado || 'No disponible', 'G', [100, 100, 120]);
+
+    y += boxH + 12;
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10.5);
+    doc.setTextColor(colorPrimary[0], colorPrimary[1], colorPrimary[2]);
+    doc.text('Protocolo Sugerido', marginX, y);
+    y += 3;
+    doc.setDrawColor(colorPrimary[0], colorPrimary[1], colorPrimary[2]);
+    doc.setLineWidth(0.5);
+    doc.line(marginX, y, marginX + 42, y);
+    y += 6;
+
+    doc.setFillColor(colorLight[0], colorLight[1], colorLight[2]);
+    doc.setDrawColor(colorBorder[0], colorBorder[1], colorBorder[2]);
+    doc.roundedRect(marginX, y, pageWidth - marginX * 2, 18, 4, 4, 'FD');
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(colorTextMuted[0], colorTextMuted[1], colorTextMuted[2]);
+    const protocoloLineas = doc.splitTextToSize(r.protocolo_sugerido || 'No disponible', pageWidth - marginX * 2 - 8);
+    doc.text(protocoloLineas, marginX + 4, y + 5);
+    y += 26;
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10.5);
+    doc.setTextColor(colorPrimary[0], colorPrimary[1], colorPrimary[2]);
+    doc.text('Detalles del Analisis', marginX, y);
+    y += 3;
+    doc.setDrawColor(colorPrimary[0], colorPrimary[1], colorPrimary[2]);
+    doc.setLineWidth(0.5);
+    doc.line(marginX, y, marginX + 47, y);
+    y += 6;
+
+    const detalles: Array<[string, string]> = [
+      ['Fuente de valores', r.valores_usados || 'No disponible'],
+      ['PDF Cedula', r.cedula_pdf_valida ? 'Valida' : 'Invalida'],
+      ['PDF Diagnostico', r.diagnostico_pdf_valido ? 'Valido' : 'Invalido']
+    ];
+    if (r.doctorId) {
+      detalles.push(['Doctor', `ID: ${r.doctorId}${r.doctorNombre ? ' - ' + r.doctorNombre : ''}`]);
+    }
+
+    const detColWidth = (pageWidth - marginX * 2) / 2;
+    doc.setFontSize(9);
+    detalles.forEach(([label, value], index) => {
+      const col = index % 2;
+      const row = Math.floor(index / 2);
+      const x = marginX + col * detColWidth;
+      const yPos = y + row * 7.5;
+
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(colorGray[0], colorGray[1], colorGray[2]);
+      doc.text(label + ':', x, yPos);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(colorDark[0], colorDark[1], colorDark[2]);
+      doc.text(String(value), x + 33, yPos);
+    });
+    y += 20;
+
+    y = Math.max(y, pageHeight - 30);
+    doc.setDrawColor(colorBorder[0], colorBorder[1], colorBorder[2]);
+    doc.setLineWidth(0.3);
+    doc.line(marginX, y, pageWidth - marginX, y);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7);
+    doc.setTextColor(colorGray[0], colorGray[1], colorGray[2]);
+    doc.text('Documento generado electronicamente', marginX, y + 5);
+
+    doc.setFillColor(16, 185, 129);
+    const selloX = pageWidth - marginX - 6;
+    const selloY = y + 5;
+    doc.circle(selloX, selloY, 4, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(5);
+    doc.setTextColor(colorWhite[0], colorWhite[1], colorWhite[2]);
+    doc.text('OK', selloX, selloY, { align: 'center', baseline: 'middle' });
+
+    doc.text('Firma del Medico Responsable', pageWidth - marginX - 52, y + 5);
+    doc.setDrawColor(colorGray[0], colorGray[1], colorGray[2]);
+    doc.setLineWidth(0.3);
+    doc.line(pageWidth - marginX - 48, y + 7, pageWidth - marginX - 10, y + 7);
+
+    doc.save(`Analisis_HTAS_Folio_${r.folio_expediente_db ?? 'sin_folio'}.pdf`);
   }
 
   cambiarTab(tab: TabPaciente) {
@@ -438,10 +1215,6 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Formatea una fecha ISO (con hora incluida, ej. la de fecha_analisis)
-   * a un formato legible dd/mm/aaaa hh:mm.
-   */
   formatearFechaAnalisis(fechaISO: string): string {
     if (!fechaISO) return 'Fecha no disponible';
 
@@ -567,19 +1340,7 @@ export class PacienteDetalle implements OnInit, OnDestroy {
 
   formatearFechaNacimiento(fecha: string): string {
     if (!fecha) return 'No registrada';
-
-    try {
-      const d = new Date(fecha);
-      if (isNaN(d.getTime())) return fecha;
-
-      const dia = String(d.getUTCDate()).padStart(2, '0');
-      const mes = String(d.getUTCMonth() + 1).padStart(2, '0');
-      const anio = d.getUTCFullYear();
-
-      return `${dia}/${mes}/${anio}`;
-    } catch (error) {
-      return fecha;
-    }
+    return this.formatearFechaSegura(fecha);
   }
 
   calcularIMC(): { valor: number | null; categoria: string } {
@@ -599,78 +1360,6 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     else if (imc >= 30) categoria = 'Obesidad';
 
     return { valor, categoria };
-  }
-
-  imprimirExpediente() {
-    if (!isPlatformBrowser(this.platformId)) return;
-
-    const nombreCompleto = [
-      this.usuarioSeleccionado?.nombre,
-      this.usuarioSeleccionado?.tempApellidoPaterno || this.usuarioSeleccionado?.apPaterno,
-      this.usuarioSeleccionado?.tempApellidoMaterno || this.usuarioSeleccionado?.apMaterno
-    ].filter(Boolean).join(' ').trim();
-
-    const tituloOriginal = this.titleService.getTitle();
-    this.titleService.setTitle(`Expediente Clinico - ${nombreCompleto || 'Paciente'}`);
-
-    const restaurarTitulo = () => {
-      this.titleService.setTitle(tituloOriginal);
-      window.removeEventListener('afterprint', restaurarTitulo);
-    };
-    window.addEventListener('afterprint', restaurarTitulo);
-
-    setTimeout(() => {
-      window.print();
-    }, 50);
-  }
-
-  validarCampos(): { valido: boolean; mensaje: string } {
-    const u = this.usuarioSeleccionado;
-
-    if (!u.nombre || u.nombre.trim().length < 2) {
-      return { valido: false, mensaje: 'El nombre debe tener al menos 2 caracteres' };
-    }
-
-    if (!u.tempApellidoPaterno || u.tempApellidoPaterno.trim().length < 2) {
-      return { valido: false, mensaje: 'El apellido paterno debe tener al menos 2 caracteres' };
-    }
-
-    if (!u.correo || !u.correo.includes('@')) {
-      return { valido: false, mensaje: 'El correo electronico no es valido' };
-    }
-
-    if (u.curp && u.curp.length > 0) {
-      const curpRegex = /^[A-Z]{4}[0-9]{6}[A-Z]{6}[0-9]{2}$/;
-      if (!curpRegex.test(u.curp.toUpperCase())) {
-        return { valido: false, mensaje: 'El formato de CURP no es valido' };
-      }
-    }
-
-    if (u.codigoPostal && u.codigoPostal.length > 0) {
-      const cpRegex = /^[0-9]{5}$/;
-      if (!cpRegex.test(u.codigoPostal)) {
-        return { valido: false, mensaje: 'El codigo postal debe tener 5 digitos numericos' };
-      }
-    }
-
-    if (u.peso && (u.peso < 10 || u.peso > 500)) {
-      return { valido: false, mensaje: 'El peso debe estar entre 10 y 500 kg' };
-    }
-
-    if (u.altura && (u.altura < 0.5 || u.altura > 3)) {
-      return { valido: false, mensaje: 'La altura debe estar entre 0.5 y 3 metros' };
-    }
-
-    return { valido: true, mensaje: '' };
-  }
-
-  ngOnDestroy() {
-    this.destruirCalendariosCita();
-    if (this.fpNacimientoInstance) {
-      try { this.fpNacimientoInstance.destroy(); } catch (e) { }
-      this.fpNacimientoInstance = null;
-    }
-    if (this.toastTimeout) clearTimeout(this.toastTimeout);
   }
 
   volver() {
@@ -908,6 +1597,46 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     }
   }
 
+  validarCampos(): { valido: boolean; mensaje: string } {
+    const u = this.usuarioSeleccionado;
+
+    if (!u.nombre || u.nombre.trim().length < 2) {
+      return { valido: false, mensaje: 'El nombre debe tener al menos 2 caracteres' };
+    }
+
+    if (!u.tempApellidoPaterno || u.tempApellidoPaterno.trim().length < 2) {
+      return { valido: false, mensaje: 'El apellido paterno debe tener al menos 2 caracteres' };
+    }
+
+    if (!u.correo || !u.correo.includes('@')) {
+      return { valido: false, mensaje: 'El correo electronico no es valido' };
+    }
+
+    if (u.curp && u.curp.length > 0) {
+      const curpRegex = /^[A-Z]{4}[0-9]{6}[A-Z]{6}[0-9]{2}$/;
+      if (!curpRegex.test(u.curp.toUpperCase())) {
+        return { valido: false, mensaje: 'El formato de CURP no es valido' };
+      }
+    }
+
+    if (u.codigoPostal && u.codigoPostal.length > 0) {
+      const cpRegex = /^[0-9]{5}$/;
+      if (!cpRegex.test(u.codigoPostal)) {
+        return { valido: false, mensaje: 'El codigo postal debe tener 5 digitos numericos' };
+      }
+    }
+
+    if (u.peso && (u.peso < 10 || u.peso > 500)) {
+      return { valido: false, mensaje: 'El peso debe estar entre 10 y 500 kg' };
+    }
+
+    if (u.altura && (u.altura < 0.5 || u.altura > 3)) {
+      return { valido: false, mensaje: 'La altura debe estar entre 0.5 y 3 metros' };
+    }
+
+    return { valido: true, mensaje: '' };
+  }
+
   verificarEstadoSistema() {
     this.algorithmService.verificarEstado().subscribe({
       next: (response) => {
@@ -1036,183 +1765,6 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     this.analisisArchivoNombre = '';
     const fileInput = document.getElementById('pdfFile') as HTMLInputElement;
     if (fileInput) fileInput.value = '';
-  }
-
-  /**
-   * Genera un PDF profesional con los resultados del analisis y lo descarga
-   * directamente, sin pasar por el dialogo de impresion del navegador
-   * (evita el encabezado/pie de pagina que agrega Chrome al imprimir).
-   */
-  descargarResultadosPDF() {
-    if (!isPlatformBrowser(this.platformId) || !this.resultadoAnalisis) return;
-
-    const r = this.resultadoAnalisis;
-
-    const nombreCompleto = [
-      this.usuarioSeleccionado?.nombre,
-      this.usuarioSeleccionado?.tempApellidoPaterno || this.usuarioSeleccionado?.apPaterno,
-      this.usuarioSeleccionado?.tempApellidoMaterno || this.usuarioSeleccionado?.apMaterno
-    ].filter(Boolean).join(' ').trim() || 'Paciente no especificado';
-
-    // Paleta de colores acorde a la identidad visual del sistema
-    const colorPrimary: [number, number, number] = [176, 0, 30];
-    const colorDark: [number, number, number] = [10, 22, 40];
-    const colorGray: [number, number, number] = [122, 138, 158];
-    const colorTextMuted: [number, number, number] = [74, 90, 110];
-    const colorLight: [number, number, number] = [250, 251, 252];
-    const colorBorder: [number, number, number] = [230, 233, 237];
-
-    let riesgoColor: [number, number, number] = [217, 119, 6];
-    const nivelRiesgo: string = r.nivel_riesgo_clinico || 'No disponible';
-    if (nivelRiesgo.includes('CRITICO')) riesgoColor = [220, 38, 38];
-    else if (nivelRiesgo.includes('ESTABLE')) riesgoColor = [5, 150, 105];
-    else if (nivelRiesgo.includes('MODERADO')) riesgoColor = [217, 119, 6];
-
-    const doc = new jsPDF({ unit: 'mm', format: 'letter' });
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const marginX = 16;
-    let y = 0;
-
-    // Franja superior de color
-    doc.setFillColor(colorPrimary[0], colorPrimary[1], colorPrimary[2]);
-    doc.rect(0, 0, pageWidth, 4, 'F');
-
-    // Titulo
-    y = 17;
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(17);
-    doc.setTextColor(colorDark[0], colorDark[1], colorDark[2]);
-    doc.text('Resultados del Analisis HTAS', marginX, y);
-
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9);
-    doc.setTextColor(colorGray[0], colorGray[1], colorGray[2]);
-    const fechaGen = new Date().toLocaleString('es-MX', {
-      day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
-    });
-    doc.text(`Folio #${r.folio_expediente_db ?? '---'}   |   Generado: ${fechaGen}`, marginX, y + 6);
-
-    y += 13;
-    doc.setDrawColor(colorBorder[0], colorBorder[1], colorBorder[2]);
-    doc.setLineWidth(0.3);
-    doc.line(marginX, y, pageWidth - marginX, y);
-    y += 8;
-
-    // Bloque de datos del paciente
-    doc.setFillColor(colorLight[0], colorLight[1], colorLight[2]);
-    doc.setDrawColor(colorBorder[0], colorBorder[1], colorBorder[2]);
-    doc.roundedRect(marginX, y, pageWidth - marginX * 2, 15, 2, 2, 'FD');
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(7.5);
-    doc.setTextColor(colorGray[0], colorGray[1], colorGray[2]);
-    doc.text('PACIENTE', marginX + 4, y + 6);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
-    doc.setTextColor(colorDark[0], colorDark[1], colorDark[2]);
-    doc.text(nombreCompleto, marginX + 4, y + 12);
-
-    if (this.usuarioSeleccionado?.correo) {
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8.5);
-      doc.setTextColor(colorGray[0], colorGray[1], colorGray[2]);
-      doc.text(this.usuarioSeleccionado.correo, pageWidth - marginX - 4, y + 9, { align: 'right' });
-    }
-    y += 23;
-
-    // Banner de riesgo + presion
-    const bannerH = 22;
-    doc.setFillColor(riesgoColor[0], riesgoColor[1], riesgoColor[2]);
-    doc.roundedRect(marginX, y, pageWidth - marginX * 2, bannerH, 3, 3, 'F');
-
-    doc.setTextColor(255, 255, 255);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8);
-    doc.text('NIVEL DE RIESGO CLINICO', marginX + 6, y + 8);
-    doc.setFontSize(14);
-    doc.text(nivelRiesgo, marginX + 6, y + 17);
-
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8);
-    doc.text('PRESION ARTERIAL', pageWidth - marginX - 6, y + 8, { align: 'right' });
-    doc.setFontSize(14);
-    doc.text(`${r.sistolica_usada}/${r.diastolica_usada} mmHg`, pageWidth - marginX - 6, y + 17, { align: 'right' });
-
-    y += bannerH + 10;
-
-    // Tarjetas: prediccion / probabilidad / motor
-    const gap = 5;
-    const colWidth = (pageWidth - marginX * 2 - gap * 2) / 3;
-    const boxH = 22;
-
-    const drawInfoBox = (x: number, label: string, value: string) => {
-      doc.setDrawColor(colorBorder[0], colorBorder[1], colorBorder[2]);
-      doc.setFillColor(colorLight[0], colorLight[1], colorLight[2]);
-      doc.roundedRect(x, y, colWidth, boxH, 2, 2, 'FD');
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(7);
-      doc.setTextColor(colorGray[0], colorGray[1], colorGray[2]);
-      doc.text(label.toUpperCase(), x + 4, y + 8);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(11);
-      doc.setTextColor(colorDark[0], colorDark[1], colorDark[2]);
-      const valorLineas = doc.splitTextToSize(value, colWidth - 8);
-      doc.text(valorLineas, x + 4, y + 16);
-    };
-
-    drawInfoBox(marginX, 'Prediccion de Crisis', r.prediccion_crisis ? 'Positiva' : 'Negativa');
-    drawInfoBox(marginX + colWidth + gap, 'Probabilidad', `${r.probabilidad_porcentual}%`);
-    drawInfoBox(marginX + (colWidth + gap) * 2, 'Motor IA', r.motor_inferencia_usado || 'No disponible');
-
-    y += boxH + 12;
-
-    // Protocolo sugerido
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10.5);
-    doc.setTextColor(colorDark[0], colorDark[1], colorDark[2]);
-    doc.text('Protocolo Sugerido', marginX, y);
-    y += 3;
-    doc.setDrawColor(colorBorder[0], colorBorder[1], colorBorder[2]);
-    doc.line(marginX, y, pageWidth - marginX, y);
-    y += 6;
-
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9.5);
-    doc.setTextColor(colorTextMuted[0], colorTextMuted[1], colorTextMuted[2]);
-    const protocoloLineas = doc.splitTextToSize(r.protocolo_sugerido || 'No disponible', pageWidth - marginX * 2);
-    doc.text(protocoloLineas, marginX, y);
-    y += protocoloLineas.length * 5 + 10;
-
-    // Detalles del analisis
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10.5);
-    doc.setTextColor(colorDark[0], colorDark[1], colorDark[2]);
-    doc.text('Detalles del Analisis', marginX, y);
-    y += 3;
-    doc.setDrawColor(colorBorder[0], colorBorder[1], colorBorder[2]);
-    doc.line(marginX, y, pageWidth - marginX, y);
-    y += 8;
-
-    const detalles: Array<[string, string]> = [
-      ['Fuente de valores', r.valores_usados || 'No disponible'],
-      ['PDF Cedula', r.cedula_pdf_valida ? 'Valida' : 'Invalida'],
-      ['PDF Diagnostico', r.diagnostico_pdf_valido ? 'Valido' : 'Invalido']
-    ];
-    if (r.doctorId) {
-      detalles.push(['Doctor', `ID: ${r.doctorId}${r.doctorNombre ? ' - ' + r.doctorNombre : ''}`]);
-    }
-
-    doc.setFontSize(9.5);
-    detalles.forEach(([label, value]) => {
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(colorGray[0], colorGray[1], colorGray[2]);
-      doc.text(`${label}:`, marginX, y);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(colorDark[0], colorDark[1], colorDark[2]);
-      doc.text(String(value), marginX + 45, y);
-      y += 6.5;
-    });
-
-    doc.save(`Analisis_HTAS_Folio_${r.folio_expediente_db ?? 'sin_folio'}.pdf`);
   }
 
   getRiesgoClase(nivel: string): string {
