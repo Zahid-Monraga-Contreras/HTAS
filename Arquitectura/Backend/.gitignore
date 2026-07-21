@@ -1,2 +1,9 @@
 .env
 node_modules/
+
+# Archivos de prueba y credenciales
+test-admin-secure.js
+create-admin.js
+*.credentials.json
+.dev-admin-credentials.json
+admin-credentials.json

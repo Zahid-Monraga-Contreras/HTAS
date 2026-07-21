@@ -83,6 +83,17 @@ app.use((err, req, res, next) => {
     });
 });
 
+// Carga segura de rutas de desarrollo
+if (process.env.NODE_ENV === 'development' && process.env.ALLOW_DEV_ENDPOINTS === 'true') {
+    try {
+        const devRoutes = require('./routes/dev.routes');
+        app.use('/api/dev', devRoutes);
+        console.log('Rutas de desarrollo activadas');
+    } catch (error) {
+        console.log('Rutas de desarrollo no disponibles (archivos no encontrados)');
+    }
+}
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Servidor HTAS corriendo en puerto ${PORT}`);
