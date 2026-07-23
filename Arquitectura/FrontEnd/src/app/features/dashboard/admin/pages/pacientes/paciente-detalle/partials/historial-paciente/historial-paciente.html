@@ -1,0 +1,124 @@
+<!-- ESTADISTICAS -->
+@if (estadisticas) {
+<div class="estadisticas-section">
+    <h4 class="section-title">
+        <i class="bi bi-graph-up-arrow"></i>
+        Actividad del Paciente
+    </h4>
+    <div class="stats-grid">
+        <div class="stat-box">
+            <small>Total Citas</small>
+            <div class="stat-value">{{ estadisticas.totalCitas }}</div>
+        </div>
+        <div class="stat-box">
+            <small>Citas Completadas</small>
+            <div class="stat-value">{{ estadisticas.citasCompletadas }}</div>
+        </div>
+        <div class="stat-box">
+            <small>Citas Pendientes</small>
+            <div class="stat-value">{{ estadisticas.citasPendientes }}</div>
+        </div>
+        <div class="stat-box">
+            <small>Ultima Cita</small>
+            <div class="stat-value" style="font-size: 0.9rem;">
+                {{ estadisticas.ultimaCita | date:'dd/MM/yyyy' }}
+            </div>
+        </div>
+    </div>
+</div>
+}
+
+<!-- HISTORIAL DE CITAS -->
+<div class="citas-section">
+    <div class="citas-header">
+        <h4 class="section-title">
+            <i class="bi bi-calendar-event"></i>
+            Historial de Citas
+            <span class="badge-citas">{{ citasPaciente.length }}</span>
+        </h4>
+    </div>
+
+    @if (citasPaciente.length > 0) {
+    <div class="citas-lista">
+        @for (c of citasPaciente; track c.idcita) {
+        <div class="cita-item">
+            <div class="cita-indicador">
+                <span class="cita-estado-dot" [ngClass]="{
+                    'estado-completada': c.estado === 'Completada',
+                    'estado-programada': c.estado === 'Programada',
+                    'estado-confirmada': c.estado === 'Confirmada',
+                    'estado-cancelada': c.estado === 'Cancelada',
+                    'estado-no-asistio': c.estado === 'No Asistio'
+                }"></span>
+            </div>
+            <div class="cita-info">
+                <i class="bi bi-calendar-check"></i>
+                <span class="cita-fecha-hora">{{ formatearFechaYHora(c.fechacita, c.horacita) }}</span>
+            </div>
+            <div class="cita-detalle">
+                <span class="cita-motivo">{{ c.motivo || 'Sin motivo' }}</span>
+                @if (c.estado === 'Completada') {
+                <span class="badge-completada">Completada</span>
+                } @else if (c.estado === 'Programada') {
+                <span class="badge-programada">Programada</span>
+                } @else if (c.estado === 'Confirmada') {
+                <span class="badge-confirmada">Confirmada</span>
+                } @else if (c.estado === 'Cancelada') {
+                <span class="badge-cancelada">Cancelada</span>
+                } @else {
+                <span class="badge-no-asistio">No Asistio</span>
+                }
+            </div>
+        </div>
+        }
+    </div>
+    } @else {
+    <div class="citas-lista">
+        <div class="citas-vacio">
+            <i class="bi bi-calendar-plus"></i>
+            <p>No hay citas registradas</p>
+            <span>Las citas que se agenden apareceran aqui</span>
+        </div>
+    </div>
+    }
+</div>
+
+<!-- HISTORIAL DE CAMBIOS -->
+<div class="historial-section">
+    <hr class="section-divider">
+
+    <div class="historial-header">
+        <h4 class="section-title">
+            <i class="bi bi-clock-history"></i>
+            Historial del Paciente
+        </h4>
+        <span class="historial-count">{{ historialCambios.length }} eventos</span>
+    </div>
+
+    @if (historialCambios.length > 0) {
+    <div class="historial-lista">
+        @for (item of historialCambios; track item) {
+        <div class="historial-item">
+            <div class="historial-fecha">
+                <i class="bi bi-clock"></i>
+                {{ item.fecha }}
+            </div>
+            <div class="historial-detalle">
+                <strong>{{ item.accion }}</strong>
+                <span>{{ item.detalle }}</span>
+            </div>
+            <div class="historial-usuario">
+                <i class="bi bi-person"></i>
+                {{ item.usuario }}
+            </div>
+        </div>
+        }
+    </div>
+    } @else {
+    <div class="citas-vacio">
+        <i class="bi bi-clock-history"></i>
+        <p>Aun no hay actividad registrada</p>
+        <span>Los eventos del paciente apareceran aqui</span>
+    </div>
+    }
+</div>

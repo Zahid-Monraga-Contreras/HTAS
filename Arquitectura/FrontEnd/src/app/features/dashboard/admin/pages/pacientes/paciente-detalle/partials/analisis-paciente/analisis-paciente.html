@@ -1,0 +1,207 @@
+<div class="analisis-header">
+    <div class="analisis-title-group">
+        <h3 class="section-title">
+            <i class="bi bi-heart-pulse-fill"></i>
+            Analisis de Hipertension Arterial
+        </h3>
+        <p class="analisis-subtitle">
+            Sistema de prediccion HTAS-Mexico. Sube el expediente medico en PDF para analizar la presion
+            arterial del paciente. El sistema extraera automaticamente los valores del documento.
+        </p>
+    </div>
+    <div class="analisis-estado-sistema">
+        <span class="estado-indicador" [ngClass]="{'activo': sistemaActivo, 'inactivo': !sistemaActivo}">
+            <i class="bi bi-circle-fill"></i>
+            {{ sistemaActivo ? 'Sistema activo' : 'Sistema desconectado' }}
+        </span>
+    </div>
+</div>
+
+<div class="analisis-form-container">
+    <div class="analisis-form-grid" style="grid-template-columns: 1fr;">
+        <div class="analisis-formulario" style="max-width: 600px; margin: 0 auto;">
+
+            <h4 style="text-align: center;">
+                <i class="bi bi-file-earmark-pdf-fill"></i>
+                Subir Expediente Medico
+            </h4>
+
+            <div class="form-group">
+                <label>PDF del Expediente *</label>
+                <div class="file-upload-wrapper" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)"
+                    (drop)="onDrop($event)">
+                    <input type="file" id="pdfFile" accept=".pdf" (change)="onAnalisisFileSelected($event)" hidden>
+                    <label for="pdfFile" class="file-upload-label">
+                        <i class="bi bi-cloud-upload"></i>
+                        <span>{{ analisisArchivoNombre || 'Selecciona o arrastra un PDF' }}</span>
+                        <small>Maximo 10MB</small>
+                    </label>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem;">
+                <button type="button" class="btn-analizar" (click)="ejecutarAnalisis()"
+                    [disabled]="!analisisArchivo || isAnalizando" style="width: auto; padding: 0.75rem 3rem;">
+                    @if (isAnalizando) {
+                    <span class="spinner-save"></span>
+                    <span>Analizando...</span>
+                    } @else {
+                    <i class="bi bi-search-heart"></i>
+                    <span>Analizar Paciente</span>
+                    }
+                </button>
+            </div>
+
+            <div style="margin-top: 1rem; text-align: center; font-size: 0.8rem; color: #8a9aa8;">
+                <i class="bi bi-info-circle"></i>
+                El sistema extraera automaticamente la presion arterial, edad y otros datos del PDF.
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (resultadoAnalisis) {
+<div class="analisis-resultados">
+    <div class="resultados-header">
+        <h4><i class="bi bi-clipboard2-data"></i> Resultados del Analisis</h4>
+        <span class="folio-resultado">Folio #{{ resultadoAnalisis.folio_expediente_db }}</span>
+    </div>
+
+    <!-- BANNER DE RIESGO PRINCIPAL -->
+    <div class="resultado-banner" [ngClass]="getRiesgoClase(resultadoAnalisis.nivel_riesgo_clinico)">
+        <div class="banner-bloque banner-riesgo">
+            <div class="banner-icono">
+                <i class="bi" [ngClass]="getRiesgoIcono(resultadoAnalisis.nivel_riesgo_clinico)"></i>
+            </div>
+            <div class="banner-texto">
+                <span class="banner-label">Nivel de Riesgo Clinico</span>
+                <strong class="banner-valor">{{ resultadoAnalisis.nivel_riesgo_clinico }}</strong>
+            </div>
+        </div>
+        <div class="banner-divisor"></div>
+        <div class="banner-bloque banner-presion">
+            <span class="banner-label">Presion Arterial</span>
+            <strong class="banner-valor-simple">{{ resultadoAnalisis.sistolica_usada }}/{{
+                resultadoAnalisis.diastolica_usada }} <small>mmHg</small></strong>
+        </div>
+    </div>
+
+    <div class="resultados-grid">
+        <div class="resultado-card prediccion-card"
+            [ngClass]="resultadoAnalisis.prediccion_crisis ? 'crisis' : 'normal'">
+            <div class="card-icono">
+                <i class="bi"
+                    [ngClass]="resultadoAnalisis.prediccion_crisis ? 'bi-exclamation-triangle-fill' : 'bi-check-circle-fill'"></i>
+            </div>
+            <div class="card-contenido">
+                <span class="card-label">Prediccion de Crisis</span>
+                <strong class="card-valor">{{ resultadoAnalisis.prediccion_crisis ? 'Positiva' : 'Negativa' }}</strong>
+            </div>
+        </div>
+
+        <div class="resultado-card probabilidad-card">
+            <div class="card-icono">
+                <i class="bi bi-percent"></i>
+            </div>
+            <div class="card-contenido">
+                <span class="card-label">Probabilidad</span>
+                <strong class="card-valor">{{ resultadoAnalisis.probabilidad_porcentual }}%</strong>
+                <div class="barra-probabilidad">
+                    <div class="barra-progreso" [style.width.%]="resultadoAnalisis.probabilidad_porcentual" [ngClass]="{
+                            'baja': resultadoAnalisis.probabilidad_porcentual < 30,
+                            'media': resultadoAnalisis.probabilidad_porcentual >= 30 && resultadoAnalisis.probabilidad_porcentual < 70,
+                            'alta': resultadoAnalisis.probabilidad_porcentual >= 70
+                        }">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="resultado-card motor-card">
+            <div class="card-icono">
+                <i class="bi bi-cpu"></i>
+            </div>
+            <div class="card-contenido">
+                <span class="card-label">Motor IA</span>
+                <strong class="card-valor">{{ resultadoAnalisis.motor_inferencia_usado }}</strong>
+            </div>
+        </div>
+    </div>
+
+    <div class="protocolo-container">
+        <h5><i class="bi bi-file-medical"></i> Protocolo Sugerido</h5>
+        <p>{{ resultadoAnalisis.protocolo_sugerido }}</p>
+    </div>
+
+    <div class="detalles-analisis">
+        <div class="detalle-item">
+            <span class="detalle-label">Presion usada</span>
+            <span class="detalle-valor">{{ resultadoAnalisis.sistolica_usada }}/{{
+                resultadoAnalisis.diastolica_usada }} mmHg</span>
+            <span class="detalle-fuente badge bg-secondary">Fuente: {{ resultadoAnalisis.valores_usados }}</span>
+        </div>
+        <div class="detalle-item">
+            <span class="detalle-label">PDF Cedula</span>
+            <span class="detalle-valor">
+                <i class="bi"
+                    [ngClass]="resultadoAnalisis.cedula_pdf_valida ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger'"></i>
+                {{ resultadoAnalisis.cedula_pdf_valida ? 'Valida' : 'Invalida' }}
+            </span>
+        </div>
+        <div class="detalle-item">
+            <span class="detalle-label">PDF Diagnostico</span>
+            <span class="detalle-valor">
+                <i class="bi"
+                    [ngClass]="resultadoAnalisis.diagnostico_pdf_valido ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger'"></i>
+                {{ resultadoAnalisis.diagnostico_pdf_valido ? 'Valido' : 'Invalido' }}
+            </span>
+        </div>
+        <div class="detalle-item" *ngIf="resultadoAnalisis.doctorId">
+            <span class="detalle-label">Doctor</span>
+            <span class="detalle-valor">ID: {{ resultadoAnalisis.doctorId }} {{
+                resultadoAnalisis.doctorNombre ? '- ' + resultadoAnalisis.doctorNombre : '' }}</span>
+        </div>
+    </div>
+
+    <div class="analisis-actions">
+        <button type="button" class="btn-nuevo-analisis" (click)="limpiarAnalisis()">
+            <i class="bi bi-arrow-counterclockwise"></i>
+            Nuevo Analisis
+        </button>
+        <button type="button" class="btn-print-analisis" (click)="descargarResultadosPDF()">
+            <i class="bi bi-file-earmark-arrow-down"></i>
+            Descargar PDF
+        </button>
+    </div>
+</div>
+}
+
+@if (historialAnalisis.length > 0) {
+<div class="historial-analisis">
+    <div class="historial-analisis-header">
+        <h4><i class="bi bi-clock-history"></i> Historial de Analisis</h4>
+        <span class="historial-count">{{ historialAnalisis.length }} analisis</span>
+    </div>
+    <div class="historial-analisis-lista">
+        @for (item of historialAnalisis; track item.folio_expediente_db) {
+        <div class="historial-analisis-item">
+            <div class="ha-fecha">
+                <i class="bi bi-clock"></i>
+                {{ formatearFechaAnalisis(item.fecha_analisis) }}
+            </div>
+            <div class="ha-resultado">
+                <span class="ha-riesgo" [ngClass]="getRiesgoClase(item.nivel_riesgo_clinico)">
+                    <i class="bi" [ngClass]="getRiesgoIcono(item.nivel_riesgo_clinico)"></i>
+                    {{ item.nivel_riesgo_clinico }}
+                </span>
+                <span class="ha-presion">{{ item.sistolica_usada }}/{{ item.diastolica_usada }}
+                    mmHg</span>
+            </div>
+            <div class="ha-folio">
+                <span class="badge bg-secondary">Folio #{{ item.folio_expediente_db }}</span>
+            </div>
+        </div>
+        }
+    </div>
+</div>
+}
