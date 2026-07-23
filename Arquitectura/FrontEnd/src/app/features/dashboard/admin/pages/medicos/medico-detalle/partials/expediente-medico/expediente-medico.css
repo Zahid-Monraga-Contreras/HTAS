@@ -1,0 +1,493 @@
+.expediente-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+}
+
+.expediente-toolbar p {
+    margin: 0;
+    color: #7a8a9e;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.expediente-toolbar p i {
+    color: #b0001e;
+}
+
+.btn-download-expediente {
+    padding: 0.6rem 1.5rem;
+    background: linear-gradient(135deg, #0a1628, #1a2938);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    box-shadow: 0 4px 12px rgba(10, 22, 40, 0.2);
+}
+
+.btn-download-expediente:hover {
+    background: linear-gradient(135deg, #1a2938, #0a1628);
+    box-shadow: 0 8px 20px rgba(10, 22, 40, 0.28);
+}
+
+.btn-download-expediente i {
+    font-size: 1.1rem;
+}
+
+.expediente-wrapper {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 2rem;
+}
+
+.expediente-hoja {
+    background: #ffffff;
+    width: 100%;
+    max-width: 850px;
+    border-radius: 6px;
+    box-shadow: 0 20px 60px rgba(10, 22, 40, 0.1), 0 2px 8px rgba(10, 22, 40, 0.06);
+    border: 1px solid #e9edf2;
+    padding: 3.5rem 3.5rem 3rem;
+    position: relative;
+}
+
+.expediente-hoja::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: linear-gradient(90deg, #b0001e, #8a0016);
+    border-radius: 6px 6px 0 0;
+}
+
+.expediente-membrete {
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.membrete-logo {
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #b0001e, #8a0016);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 6px 16px rgba(176, 0, 30, 0.25);
+}
+
+.membrete-logo i {
+    color: #ffffff;
+    font-size: 1.6rem;
+}
+
+.membrete-texto {
+    flex: 1;
+}
+
+.membrete-texto h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #0a1628;
+    letter-spacing: -0.3px;
+}
+
+.membrete-texto p {
+    margin: 0.15rem 0 0;
+    font-size: 0.8rem;
+    color: #8a9aa8;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.membrete-folio {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.membrete-folio small {
+    font-size: 0.65rem;
+    color: #8a9aa8;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+}
+
+.membrete-folio strong {
+    font-size: 1.1rem;
+    color: #b0001e;
+    font-weight: 800;
+}
+
+.expediente-linea-doble {
+    height: 3px;
+    background: repeating-linear-gradient(90deg, #0a1628 0, #0a1628 6px, transparent 6px, transparent 10px);
+    opacity: 0.15;
+    margin-bottom: 2rem;
+}
+
+.expediente-encabezado-paciente {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+    padding: 1.25rem 1.5rem;
+    background: #fafbfc;
+    border-radius: 14px;
+    border: 1px solid #f1f4f8;
+}
+
+.expediente-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #b0001e, #8a0016);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 2px solid #ffffff;
+    box-shadow: 0 4px 10px rgba(176, 0, 30, 0.2);
+}
+
+.expediente-avatar i {
+    font-size: 1.9rem;
+    color: #ffffff;
+}
+
+.expediente-nombre-bloque {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.expediente-etiqueta {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #b0001e;
+    letter-spacing: 0.5px;
+}
+
+.expediente-nombre-bloque h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #0a1628;
+}
+
+.expediente-subetiqueta {
+    font-size: 0.85rem;
+    color: #7a8a9e;
+}
+
+.expediente-seccion {
+    margin-bottom: 1.9rem;
+}
+
+.expediente-titulo-seccion {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #0a1628;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin: 0 0 1.1rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 2px solid #f1f4f8;
+}
+
+.expediente-titulo-seccion i {
+    color: #b0001e;
+    font-size: 1rem;
+}
+
+.expediente-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem 1.5rem;
+}
+
+.expediente-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.expediente-campo span {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: #8a9aa8;
+    font-weight: 700;
+}
+
+.expediente-campo strong {
+    font-size: 0.95rem;
+    color: #1a2938;
+    font-weight: 600;
+}
+
+.expediente-campo strong.destacado {
+    color: #b0001e;
+    font-weight: 800;
+}
+
+.expediente-direccion {
+    margin: 0;
+    font-size: 0.92rem;
+    color: #4a5a6e;
+    line-height: 1.5;
+}
+
+.expediente-medicion-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem 1.5rem;
+    padding: 1rem 1.25rem;
+    background: #f0fdf4;
+    border-radius: 12px;
+    border: 1px solid #bbf7d0;
+}
+
+.expediente-medicion-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.expediente-medicion-item span {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: #6b7a8a;
+    font-weight: 700;
+}
+
+.expediente-medicion-item strong {
+    font-size: 1.1rem;
+    color: #0a1628;
+    font-weight: 700;
+}
+
+.expediente-medicion-item .valor-sistolica {
+    color: #dc2626;
+}
+
+.expediente-medicion-item .valor-diastolica {
+    color: #2563eb;
+}
+
+.expediente-medicion-item .valor-pulso {
+    color: #059669;
+}
+
+.expediente-sin-medicion {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: #f1f4f8;
+    border-radius: 8px;
+    color: #7a8a9e;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.expediente-sin-medicion i {
+    color: #8a9aa8;
+    font-size: 1rem;
+}
+
+.expediente-tabla {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.expediente-tabla thead th {
+    text-align: left;
+    padding: 0.6rem 0.9rem;
+    background: #fafbfc;
+    color: #7a8a9e;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    font-weight: 700;
+    border-bottom: 2px solid #f1f4f8;
+}
+
+.expediente-tabla tbody td {
+    padding: 0.65rem 0.9rem;
+    border-bottom: 1px solid #f1f4f8;
+    color: #1a2938;
+}
+
+.expediente-tabla tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.expediente-tabla-vacia {
+    text-align: center !important;
+    color: #b0bcc8 !important;
+    padding: 1.25rem !important;
+    font-style: italic;
+}
+
+.expediente-pie {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 3rem;
+    padding-top: 1.75rem;
+    border-top: 1px dashed #dce1e8;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.expediente-firma {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 220px;
+}
+
+.expediente-linea-firma {
+    width: 100%;
+    border-top: 1.5px solid #b0bcc8;
+}
+
+.expediente-firma span {
+    font-size: 0.75rem;
+    color: #8a9aa8;
+    font-weight: 600;
+}
+
+.expediente-sello {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #8a9aa8;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.expediente-sello i {
+    color: #10b981;
+    font-size: 1rem;
+}
+
+@media print {
+    .expediente-toolbar {
+        display: none !important;
+    }
+
+    .expediente-hoja {
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0.5cm !important;
+        border-radius: 0 !important;
+    }
+
+    .expediente-hoja::before {
+        display: none !important;
+    }
+
+    .expediente-seccion {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+}
+
+@media (max-width: 1200px) {
+    .expediente-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .expediente-medicion-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .expediente-hoja {
+        padding: 2rem 1.5rem;
+    }
+
+    .expediente-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .expediente-membrete {
+        flex-wrap: wrap;
+    }
+
+    .membrete-folio {
+        text-align: left;
+        width: 100%;
+    }
+
+    .expediente-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .btn-download-expediente {
+        justify-content: center;
+    }
+
+    .expediente-medicion-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .expediente-hoja {
+        padding: 1.5rem 1rem;
+    }
+
+    .expediente-medicion-grid {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+        padding: 0.6rem 0.8rem;
+    }
+
+    .expediente-medicion-item strong {
+        font-size: 0.9rem;
+    }
+
+    .expediente-medicion-item span {
+        font-size: 0.6rem;
+    }
+}

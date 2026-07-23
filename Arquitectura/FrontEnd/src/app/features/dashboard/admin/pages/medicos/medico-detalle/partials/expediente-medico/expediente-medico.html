@@ -1,0 +1,158 @@
+<div class="expediente-toolbar">
+    <p><i class="bi bi-info-circle"></i> Vista de solo lectura generada a partir de la informacion registrada.</p>
+    <button type="button" class="btn-download-expediente" (click)="descargarExpedientePDF()">
+        <i class="bi bi-file-earmark-arrow-down"></i>
+        <span>Descargar Expediente PDF</span>
+    </button>
+</div>
+
+<div class="expediente-wrapper">
+    <div class="expediente-hoja" id="expedienteMedicoImprimible">
+
+        <!-- MEMBRETE -->
+        <div class="expediente-membrete">
+            <div class="membrete-logo">
+                <i class="bi bi-heart-pulse-fill"></i>
+            </div>
+            <div class="membrete-texto">
+                <h1>Expediente Medico</h1>
+                <p>Sistema de Gestion de Personal Clinico</p>
+            </div>
+            <div class="membrete-folio">
+                <small>Folio</small>
+                <strong>#{{ medicoId || '---' }}</strong>
+                <small>{{ fechaGeneracion }}</small>
+            </div>
+        </div>
+
+        <div class="expediente-linea-doble"></div>
+
+        <!-- DATOS DEL MEDICO -->
+        <div class="expediente-encabezado-paciente">
+            <div class="expediente-avatar">
+                <i class="bi bi-person-fill"></i>
+            </div>
+            <div class="expediente-nombre-bloque">
+                <span class="expediente-etiqueta">Medico</span>
+                <h2>{{ usuarioSeleccionado.tempNombre || usuarioSeleccionado.nombre }}
+                    {{ usuarioSeleccionado.tempApellidoPaterno || usuarioSeleccionado.apPaterno }}
+                    {{ usuarioSeleccionado.tempApellidoMaterno || usuarioSeleccionado.apMaterno }}</h2>
+                <span class="expediente-subetiqueta">{{ usuarioSeleccionado.correo }}</span>
+            </div>
+        </div>
+
+        <!-- SECCION: DATOS GENERALES -->
+        <div class="expediente-seccion">
+            <h3 class="expediente-titulo-seccion"><i class="bi bi-person-lines-fill"></i> Datos Generales</h3>
+            <div class="expediente-grid">
+                <div class="expediente-campo">
+                    <span>Especialidad</span>
+                    <strong class="destacado">{{ usuarioSeleccionado.especialidad || 'No especificada' }}</strong>
+                </div>
+                <div class="expediente-campo">
+                    <span>Genero</span>
+                    <strong>{{ usuarioSeleccionado.genero || 'No especificado' }}</strong>
+                </div>
+                <div class="expediente-campo">
+                    <span>Fecha de Nacimiento</span>
+                    <strong>{{ formatearFechaNacimiento(usuarioSeleccionado.fechaNacimiento) }}</strong>
+                </div>
+                <div class="expediente-campo">
+                    <span>Edad</span>
+                    <strong>{{ calcularEdad() !== null ? calcularEdad() + ' anos' : 'No disponible' }}</strong>
+                </div>
+                <div class="expediente-campo">
+                    <span>Telefono</span>
+                    <strong>{{ usuarioSeleccionado.telefono || 'No registrado' }}</strong>
+                </div>
+                <div class="expediente-campo">
+                    <span>CURP</span>
+                    <strong>{{ usuarioSeleccionado.curp || 'No registrado' }}</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCION: DIRECCION CLINICA -->
+        <div class="expediente-seccion">
+            <h3 class="expediente-titulo-seccion"><i class="bi bi-hospital"></i> Direccion Clinica</h3>
+            <p class="expediente-direccion">{{ usuarioSeleccionado.direccionClinica || 'No registrada' }}</p>
+        </div>
+
+        <!-- SECCION: UBICACION -->
+        <div class="expediente-seccion">
+            <h3 class="expediente-titulo-seccion"><i class="bi bi-geo-alt"></i> Domicilio</h3>
+            <p class="expediente-direccion">{{ getUbicacionFormateada() }}</p>
+        </div>
+
+        <!-- SECCION: ESTADISTICAS -->
+        <div class="expediente-seccion">
+            <h3 class="expediente-titulo-seccion"><i class="bi bi-graph-up-arrow"></i> Actividad del Medico</h3>
+            @if (estadisticas) {
+            <div class="expediente-medicion-grid">
+                <div class="expediente-medicion-item">
+                    <span>Total Pacientes</span>
+                    <strong class="valor-sistolica">{{ estadisticas.totalPacientes }}</strong>
+                </div>
+                <div class="expediente-medicion-item">
+                    <span>Citas Completadas</span>
+                    <strong class="valor-diastolica">{{ estadisticas.citasCompletadas }}</strong>
+                </div>
+                <div class="expediente-medicion-item">
+                    <span>Citas Pendientes</span>
+                    <strong class="valor-pulso">{{ estadisticas.citasPendientes }}</strong>
+                </div>
+                <div class="expediente-medicion-item">
+                    <span>Promedio Consultas</span>
+                    <strong>{{ estadisticas.promedioConsultas }} /mes</strong>
+                </div>
+            </div>
+            } @else {
+            <p class="expediente-sin-medicion">
+                <i class="bi bi-info-circle"></i>
+                No hay estadisticas registradas para este medico.
+            </p>
+            }
+        </div>
+
+        <!-- SECCION: PACIENTES ATENDIDOS -->
+        <div class="expediente-seccion">
+            <h3 class="expediente-titulo-seccion"><i class="bi bi-people"></i> Pacientes Atendidos Recientemente</h3>
+            <table class="expediente-tabla">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Paciente</th>
+                        <th>Motivo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (p of pacientesAtendidos; track p.id) {
+                    <tr>
+                        <td>{{ p.fechaUltimaCita }}</td>
+                        <td>{{ p.nombre }}</td>
+                        <td>{{ p.motivo || 'Sin motivo' }}</td>
+                    </tr>
+                    }
+                    @if (pacientesAtendidos.length === 0) {
+                    <tr>
+                        <td colspan="3" class="expediente-tabla-vacia">Sin pacientes registrados</td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- PIE DE DOCUMENTO -->
+        <div class="expediente-pie">
+            <div class="expediente-firma">
+                <div class="expediente-linea-firma"></div>
+                <span>Firma del Medico</span>
+            </div>
+            <div class="expediente-sello">
+                <i class="bi bi-patch-check-fill"></i>
+                <span>Documento generado electronicamente</span>
+            </div>
+        </div>
+
+    </div>
+</div>

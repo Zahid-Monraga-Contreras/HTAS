@@ -1,0 +1,166 @@
+<!-- RESUMEN DEL MEDICO -->
+<div class="resumen-medico">
+    <div class="resumen-item">
+        <i class="bi bi-person-fill"></i>
+        <div>
+            <small>Nombre completo</small>
+            <strong>{{ usuarioSeleccionado.tempNombre || usuarioSeleccionado.nombre }}
+                {{ usuarioSeleccionado.tempApellidoPaterno || usuarioSeleccionado.apPaterno }}
+                {{ usuarioSeleccionado.tempApellidoMaterno || usuarioSeleccionado.apMaterno }}</strong>
+        </div>
+    </div>
+    <div class="resumen-item">
+        <i class="bi bi-envelope-fill"></i>
+        <div>
+            <small>Correo</small>
+            <strong>{{ usuarioSeleccionado.correo }}</strong>
+        </div>
+    </div>
+    <div class="resumen-item">
+        <i class="bi bi-hospital-fill"></i>
+        <div>
+            <small>Especialidad</small>
+            <strong>{{ usuarioSeleccionado.especialidad || 'No especificada' }}</strong>
+        </div>
+    </div>
+    @if (estadisticas) {
+    <div class="resumen-item">
+        <i class="bi bi-clipboard-data"></i>
+        <div>
+            <small>Pacientes atendidos</small>
+            <strong>{{ estadisticas.totalPacientes }}</strong>
+        </div>
+    </div>
+    }
+</div>
+
+<!-- FORMULARIO PRINCIPAL -->
+<div class="detail-card">
+    <div class="form-grid">
+        <div class="form-group">
+            <label>Nombre(s)</label>
+            <input type="text" maxlength="40" [(ngModel)]="usuarioSeleccionado.tempNombre" class="form-control-premium"
+                placeholder="Ej: Juan">
+        </div>
+        <div class="form-group">
+            <label>Apellido Paterno</label>
+            <input type="text" maxlength="30" [(ngModel)]="usuarioSeleccionado.tempApellidoPaterno"
+                class="form-control-premium" placeholder="Ej: Perez">
+        </div>
+        <div class="form-group">
+            <label>Apellido Materno</label>
+            <input type="text" maxlength="30" [(ngModel)]="usuarioSeleccionado.tempApellidoMaterno"
+                class="form-control-premium" placeholder="Ej: Garcia">
+        </div>
+        <div class="form-group">
+            <label>Correo Electronico</label>
+            <input type="email" maxlength="60" [(ngModel)]="usuarioSeleccionado.correo" class="form-control-premium"
+                placeholder="Ej: medico@hospital.com">
+        </div>
+        <div class="form-group">
+            <label>Especialidad</label>
+            <input type="text" maxlength="60" [(ngModel)]="usuarioSeleccionado.especialidad"
+                class="form-control-premium" placeholder="Ej: Cardiologia">
+        </div>
+        <div class="form-group">
+            <label>Telefono</label>
+            <input type="text" maxlength="10" [(ngModel)]="usuarioSeleccionado.telefono" class="form-control-premium"
+                placeholder="Ej: 2711234567">
+        </div>
+
+        <div class="form-group">
+            <label>Genero</label>
+            <select [(ngModel)]="usuarioSeleccionado.genero" class="form-control-premium">
+                <option value="Masculino">Masculino</option>
+                <option value="Femenino">Femenino</option>
+                <option value="Otro">Otro</option>
+                <option value="No especificado">No especificado</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Fecha de Nacimiento</label>
+            <div class="input-picker-wrapper">
+                <input type="text" id="fechaNacimientoMedicoInput" [(ngModel)]="usuarioSeleccionado.fechaNacimiento"
+                    placeholder="Seleccione fecha de nacimiento..." class="form-control-premium picker-custom" readonly>
+                <i class="bi bi-calendar3 icon-embed"></i>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>CURP</label>
+            <input type="text" [(ngModel)]="usuarioSeleccionado.curp" (input)="formatearCURP()" maxlength="18"
+                class="form-control-premium" placeholder="Ej: GAML850315HVZRRL01">
+            <small class="form-text text-muted">18 caracteres alfanumericos</small>
+        </div>
+    </div>
+
+    <!-- DIRECCION CLINICA -->
+    <div class="form-group full-width-group" style="padding: 0 15px;">
+        <label>Direccion Clinica</label>
+        <input type="text" [(ngModel)]="usuarioSeleccionado.direccionClinica" class="form-control-premium"
+            placeholder="Ej: Av. Reforma #123, Col. Centro">
+    </div>
+
+    <!-- UBICACION -->
+    <div class="ubicacion-section">
+        <div class="ubicacion-header">
+            <i class="bi bi-geo-alt-fill"></i>
+            <span>Datos de Ubicacion</span>
+        </div>
+
+        <div class="ubicacion-grid">
+            <div class="ubicacion-item full-width">
+                <label>Domicilio</label>
+                <input type="text" [(ngModel)]="usuarioSeleccionado.domicilio" (blur)="formatearCampoTexto('domicilio')"
+                    class="form-control-premium" placeholder="Ej: Calle Benito Juarez #123 Col. Centro">
+            </div>
+
+            <div class="ubicacion-item">
+                <label>Codigo Postal</label>
+                <input type="text" [(ngModel)]="usuarioSeleccionado.codigoPostal" (input)="formatearCodigoPostal()"
+                    maxlength="5" class="form-control-premium" placeholder="Ej: 94500">
+                <small class="form-text text-muted">5 digitos numericos</small>
+            </div>
+
+            <div class="ubicacion-item">
+                <label>Localidad</label>
+                <input type="text" [(ngModel)]="usuarioSeleccionado.localidad" (blur)="formatearCampoTexto('localidad')"
+                    class="form-control-premium" placeholder="Ej: Cordoba">
+            </div>
+
+            <div class="ubicacion-item">
+                <label>Municipio</label>
+                <input type="text" [(ngModel)]="usuarioSeleccionado.municipio" (blur)="formatearCampoTexto('municipio')"
+                    class="form-control-premium" placeholder="Ej: Cordoba">
+            </div>
+
+            <div class="ubicacion-item">
+                <label>Estado</label>
+                <input type="text" [(ngModel)]="usuarioSeleccionado.estado" (blur)="formatearCampoTexto('estado')"
+                    class="form-control-premium" placeholder="Ej: Veracruz">
+            </div>
+        </div>
+
+        @if (tieneUbicacionCompleta()) {
+        <div class="ubicacion-resumen">
+            <i class="bi bi-geo-alt-fill"></i>
+            <span>{{ getUbicacionFormateada() }}</span>
+        </div>
+        }
+    </div>
+
+    <!-- ACCIONES -->
+    <div class="action-footer">
+        <button class="btn-cancel-premium" (click)="onVolver()" [disabled]="isSaving">Cancelar</button>
+        <button class="btn-save" (click)="onGuardarCambios()" [disabled]="isSaving">
+            @if (isSaving) {
+            <span class="spinner-save"></span>
+            <span>Guardando...</span>
+            } @else {
+            <i class="bi bi-check-lg"></i>
+            <span>Guardar Cambios</span>
+            }
+        </button>
+    </div>
+</div>
