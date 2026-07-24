@@ -263,7 +263,7 @@ export class ExpedientePacienteComponent {
                 titulo: 'Datos Generales', datos: [
                     ['Genero', u.genero || 'No especificado'],
                     ['Fecha de Nacimiento', this.formatearFechaSegura(u.fechaNacimiento)],
-                    ['Edad', this.calcularEdad() !== null ? this.calcularEdad() + ' anos' : 'No disponible'],
+                    ['Edad', this.calcularEdad() !== null ? this.calcularEdad() + ' años' : 'No disponible'],
                     ['Telefono', u.telefono || 'No registrado'],
                     ['CURP', u.curp || 'No registrado'],
                     ['NSS', u.nss || 'No registrado']

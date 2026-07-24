@@ -53,29 +53,24 @@
         <!-- ============================================================ -->
         <!-- TAB 1: INFORMACIÓN DEL ACOMPAÑANTE                            -->
         <!-- ============================================================ -->
-        @if (activeTab === 'info') {
-        <app-info-acompanante [usuarioSeleccionado]="usuarioSeleccionado" [isSaving]="isSaving"
-            (guardarCambios)="guardarCambios()" (volver)="volver()">
+        <app-info-acompanante [hidden]="activeTab !== 'info'" [usuarioSeleccionado]="usuarioSeleccionado"
+            [isSaving]="isSaving" (guardarCambios)="guardarCambios()" (volver)="volver()">
         </app-info-acompanante>
-        }
 
         <!-- ============================================================ -->
         <!-- TAB 2: HISTORIAL                                              -->
         <!-- ============================================================ -->
-        @if (activeTab === 'historial') {
-        <app-historial-acompanante [historialCambios]="historialCambios" [visitasAcompanante]="visitasAcompanante"
-            [estadisticas]="estadisticas">
+        <app-historial-acompanante [hidden]="activeTab !== 'historial'" [historialCambios]="historialCambios"
+            [visitasAcompanante]="visitasAcompanante" [estadisticas]="estadisticas">
         </app-historial-acompanante>
-        }
 
         <!-- ============================================================ -->
         <!-- TAB 3: EXPEDIENTE DEL ACOMPAÑANTE                             -->
         <!-- ============================================================ -->
-        @if (activeTab === 'expediente') {
-        <app-expediente-acompanante [usuarioSeleccionado]="usuarioSeleccionado" [acompananteId]="acompananteId"
-            [visitasAcompanante]="visitasAcompanante" [fechaGeneracion]="fechaGeneracion">
+        <app-expediente-acompanante [hidden]="activeTab !== 'expediente'" [usuarioSeleccionado]="usuarioSeleccionado"
+            [acompananteId]="acompananteId" [visitasAcompanante]="visitasAcompanante"
+            [fechaGeneracion]="fechaGeneracion">
         </app-expediente-acompanante>
-        }
 
     </div>
     }

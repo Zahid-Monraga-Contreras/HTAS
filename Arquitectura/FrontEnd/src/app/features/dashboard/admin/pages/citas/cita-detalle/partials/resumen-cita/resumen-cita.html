@@ -1,0 +1,159 @@
+@if (citaSeleccionada) {
+<div class="tab-panel">
+
+    <div class="resumen-toolbar">
+        <p><i class="bi bi-info-circle"></i> Vista de solo lectura generada a partir de la información registrada.</p>
+        <button type="button" class="btn-download-resumen" (click)="descargarResumenPDF()">
+            <i class="bi bi-file-earmark-arrow-down"></i>
+            <span>Descargar Resumen PDF</span>
+        </button>
+    </div>
+
+    <div class="resumen-wrapper">
+        <div class="resumen-hoja" id="resumenImprimible">
+
+            <!-- MEMBRETE -->
+            <div class="resumen-membrete">
+                <div class="membrete-logo">
+                    <i class="bi bi-calendar-check-fill"></i>
+                </div>
+                <div class="membrete-texto">
+                    <h1>Resumen de Cita Médica</h1>
+                    <p>Sistema de Gestión de Citas</p>
+                </div>
+                <div class="membrete-folio">
+                    <small>Folio</small>
+                    <strong>#{{ citaId || '---' }}</strong>
+                    <small>{{ fechaGeneracion }}</small>
+                </div>
+            </div>
+
+            <div class="resumen-linea-doble"></div>
+
+            <!-- DATOS DEL PACIENTE -->
+            <div class="resumen-encabezado">
+                <div class="resumen-avatar">
+                    <i class="bi bi-person-fill"></i>
+                </div>
+                <div class="resumen-nombre-bloque">
+                    <span class="resumen-etiqueta">Paciente</span>
+                    <h2>{{ citaSeleccionada.nombrepaciente }} {{ citaSeleccionada.appaternopaciente }} {{
+                        citaSeleccionada.apmaternopaciente || '' }}</h2>
+                    <span class="resumen-subetiqueta">{{ citaSeleccionada.correopaciente || 'Correo no registrado'
+                        }}</span>
+                </div>
+                <div class="resumen-estado" [style.background-color]="getEstadoColor(citaSeleccionada.estado)">
+                    <span>{{ citaSeleccionada.estado || 'Sin estado' }}</span>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: DATOS DEL PACIENTE -->
+            <div class="resumen-seccion">
+                <h3 class="resumen-titulo-seccion"><i class="bi bi-person-lines-fill"></i> Datos del Paciente</h3>
+                <div class="resumen-grid">
+                    <div class="resumen-campo">
+                        <span>Nombre Completo</span>
+                        <strong>{{ getNombreCompletoPaciente() }}</strong>
+                    </div>
+                    <div class="resumen-campo">
+                        <span>Correo Electrónico</span>
+                        <strong>{{ citaSeleccionada.correopaciente || 'No registrado' }}</strong>
+                    </div>
+                    <div class="resumen-campo">
+                        <span>Teléfono</span>
+                        <strong>{{ citaSeleccionada.telefonopaciente || 'No registrado' }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: DETALLES DE LA CITA -->
+            <div class="resumen-seccion">
+                <h3 class="resumen-titulo-seccion"><i class="bi bi-calendar3"></i> Detalles de la Cita</h3>
+                <div class="resumen-grid">
+                    <div class="resumen-campo">
+                        <span>Fecha</span>
+                        <strong>{{ formatearFecha(citaSeleccionada.fechacita) }}</strong>
+                    </div>
+                    <div class="resumen-campo">
+                        <span>Hora</span>
+                        <strong>{{ citaSeleccionada.horacita || 'No registrada' }}</strong>
+                    </div>
+                    <div class="resumen-campo">
+                        <span>Modalidad</span>
+                        <strong>{{ citaSeleccionada.modalidad || 'No especificada' }}</strong>
+                    </div>
+                    <div class="resumen-campo">
+                        <span>Estado</span>
+                        <strong [style.color]="getEstadoColor(citaSeleccionada.estado)">{{ citaSeleccionada.estado ||
+                            'Sin estado' }}</strong>
+                    </div>
+                    <div class="resumen-campo full-width">
+                        <span>Motivo de la Consulta</span>
+                        <strong>{{ citaSeleccionada.motivo || 'No especificado' }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: SÍNTOMAS -->
+            @if (citaSeleccionada.sintomas) {
+            <div class="resumen-seccion">
+                <h3 class="resumen-titulo-seccion"><i class="bi bi-heart-pulse"></i> Síntomas del Paciente</h3>
+                <p class="resumen-texto">{{ citaSeleccionada.sintomas }}</p>
+            </div>
+            }
+
+            <!-- SECCIÓN: NOTAS DEL DOCTOR -->
+            @if (citaSeleccionada.notasdoctor) {
+            <div class="resumen-seccion">
+                <h3 class="resumen-titulo-seccion"><i class="bi bi-file-earmark-medical"></i> Notas del Doctor</h3>
+                <p class="resumen-texto">{{ citaSeleccionada.notasdoctor }}</p>
+            </div>
+            }
+
+            <!-- SECCIÓN: HISTORIAL DE CAMBIOS -->
+            @if (historialCambios.length > 0) {
+            <div class="resumen-seccion">
+                <h3 class="resumen-titulo-seccion"><i class="bi bi-clock-history"></i> Historial de Cambios</h3>
+                <table class="resumen-tabla">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Acción</th>
+                            <th>Usuario</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (h of historialCambios.slice(0, 10); track $index) {
+                        <tr>
+                            <td>{{ h.fecha }}</td>
+                            <td>{{ h.accion }}</td>
+                            <td>{{ h.usuario || 'Sistema' }}</td>
+                        </tr>
+                        }
+                        @if (historialCambios.length > 10) {
+                        <tr>
+                            <td colspan="3" class="resumen-tabla-mas">... y {{ historialCambios.length - 10 }} cambios
+                                más</td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            }
+
+            <!-- PIE DE DOCUMENTO -->
+            <div class="resumen-pie">
+                <div class="resumen-firma">
+                    <div class="resumen-linea-firma"></div>
+                    <span>Firma del Responsable</span>
+                </div>
+                <div class="resumen-sello">
+                    <i class="bi bi-patch-check-fill"></i>
+                    <span>Documento generado electrónicamente</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+}

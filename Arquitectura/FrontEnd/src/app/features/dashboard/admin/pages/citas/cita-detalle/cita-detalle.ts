@@ -5,22 +5,18 @@ import { Router } from '@angular/router';
 import { Users } from '../../../../../../core/services/users.service';
 import { firstValueFrom } from 'rxjs';
 import { Menu } from "../../../template/menu/menu";
-import flatpickr from 'flatpickr';
-import { Spanish } from 'flatpickr/dist/l10n/es.js';
 
-interface HistorialCita {
-  fecha: string;
-  accion: string;
-  detalle: string;
-  usuario: string;
-}
+// Importar los componentes de partials
+import { InfoCita } from './partials/info-cita/info-cita';
+import { HistorialCita, HistorialCitaItem } from './partials/historial-cita/historial-cita';
+import { ResumenCita } from './partials/resumen-cita/resumen-cita';
 
-type TabCita = 'detalle' | 'historial';
+type TabCita = 'info' | 'historial' | 'resumen';
 
 @Component({
   selector: 'app-cita-detalle',
   standalone: true,
-  imports: [CommonModule, FormsModule, Menu],
+  imports: [CommonModule, FormsModule, Menu, InfoCita, HistorialCita, ResumenCita],
   templateUrl: './cita-detalle.html',
   styleUrls: ['./cita-detalle.css']
 })
@@ -33,35 +29,16 @@ export class CitaDetalle implements OnInit, OnDestroy {
 
   citaSeleccionada: any = null;
   isSaving = false;
+  activeTab: TabCita = 'info';
 
-  // Pestaña activa
-  activeTab: TabCita = 'detalle';
-
-  // Sistema de Notificaciones Premium Toast
   mostrarToast = false;
   mensajeToast = '';
   tipoToast: 'success' | 'error' | 'warning' = 'success';
   private toastTimeout: any = null;
 
-  // Listas para selects
-  estadosCita = ['Programada', 'Confirmada', 'Completada', 'Cancelada', 'No Asistió'];
-  modalidades = ['Presencial', 'Virtual'];
-
-  // Colores por estado
-  estadosConColor = [
-    { value: 'Programada', color: '#FFA726' },
-    { value: 'Confirmada', color: '#66BB6A' },
-    { value: 'Completada', color: '#42A5F5' },
-    { value: 'Cancelada', color: '#EF5350' },
-    { value: 'No Asistió', color: '#AB47BC' }
-  ];
-
-  // Historial de cambios
-  historialCambios: HistorialCita[] = [];
-
-  // Referencias Flatpickr
-  private fpFechaInstance: any = null;
-  private fpHoraInstance: any = null;
+  historialCambios: HistorialCitaItem[] = [];
+  citaId: number | null = null;
+  fechaGeneracion = '';
 
   ngOnInit() {
     let state: any = null;
@@ -72,8 +49,15 @@ export class CitaDetalle implements OnInit, OnDestroy {
       state = navigation?.extras?.state;
     }
 
+    this.fechaGeneracion = new Date().toLocaleDateString('es-MX', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    });
+
     if (state && state.cita) {
       this.citaSeleccionada = { ...state.cita };
+      this.citaId = state.cita.idcita || state.cita.id || null;
 
       // Limpiar fechas y horas
       if (this.citaSeleccionada.fechacita) {
@@ -91,13 +75,7 @@ export class CitaDetalle implements OnInit, OnDestroy {
         this.citaSeleccionada.sintomas = '';
       }
 
-      // Inicializar el historial
       this.inicializarHistorial();
-
-      // Inicializar calendarios después de que el DOM esté listo
-      setTimeout(() => {
-        this.inicializarCalendario();
-      }, 500);
 
     } else {
       this.router.navigate(['/citas']);
@@ -105,17 +83,9 @@ export class CitaDetalle implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.destruirCalendarios();
     if (this.toastTimeout) {
       clearTimeout(this.toastTimeout);
     }
-  }
-
-  // --- CONTROL DE PESTAÑAS ---
-  cambiarTab(tab: TabCita) {
-    if (this.activeTab === tab) return;
-    this.activeTab = tab;
-    this.cdr.detectChanges();
   }
 
   // --- MÉTODOS DE UTILIDAD ---
@@ -145,6 +115,13 @@ export class CitaDetalle implements OnInit, OnDestroy {
     this.location.back();
   }
 
+  // --- CONTROL DE PESTAÑAS ---
+  cambiarTab(tab: TabCita) {
+    if (this.activeTab === tab) return;
+    this.activeTab = tab;
+    this.cdr.detectChanges();
+  }
+
   // --- INICIALIZAR HISTORIAL ---
   inicializarHistorial() {
     const ahora = new Date();
@@ -156,7 +133,6 @@ export class CitaDetalle implements OnInit, OnDestroy {
       minute: '2-digit'
     });
 
-    // Evento de creación
     this.historialCambios = [{
       fecha: fechaStr,
       usuario: 'Sistema',
@@ -164,7 +140,6 @@ export class CitaDetalle implements OnInit, OnDestroy {
       detalle: `Cita programada para ${this.citaSeleccionada.fechacita} a las ${this.citaSeleccionada.horacita}`
     }];
 
-    // Si la cita tiene un estado diferente al inicial, agregar al historial
     if (this.citaSeleccionada.estado && this.citaSeleccionada.estado !== 'Programada') {
       const fechaEstado = new Date();
       const fechaEstadoStr = fechaEstado.toLocaleString('es-MX', {
@@ -194,71 +169,13 @@ export class CitaDetalle implements OnInit, OnDestroy {
       minute: '2-digit'
     });
 
-    const nuevaEntrada: HistorialCita = {
+    this.historialCambios.unshift({
       fecha: fechaStr,
       usuario: 'Usuario actual',
       accion: accion,
       detalle: detalle
-    };
-
-    this.historialCambios.unshift(nuevaEntrada);
+    });
     this.cdr.detectChanges();
-  }
-
-  // --- CONTADORES PARA ESTADÍSTICAS ---
-  contarCambiosEstado(): number {
-    return this.historialCambios.filter(h => h.accion.includes('Estado')).length;
-  }
-
-  contarActualizaciones(): number {
-    return this.historialCambios.filter(h =>
-      h.accion.includes('Motivo') ||
-      h.accion.includes('actualizada') ||
-      h.accion.includes('modificada')
-    ).length;
-  }
-
-  // --- TOAST ---
-  lanzarNotificacion(mensaje: string, tipo: 'success' | 'error' | 'warning' = 'success') {
-    this.mensajeToast = mensaje;
-    this.tipoToast = tipo;
-    this.mostrarToast = true;
-    this.cdr.detectChanges();
-
-    if (this.toastTimeout) clearTimeout(this.toastTimeout);
-
-    this.toastTimeout = setTimeout(() => {
-      this.mostrarToast = false;
-      this.cdr.detectChanges();
-    }, 4000);
-  }
-
-  // --- COLORES DE ESTADO ---
-  getEstadoColor(estado: string): string {
-    const found = this.estadosConColor.find(e => e.value === estado);
-    return found ? found.color : '#78909C';
-  }
-
-  // --- VALIDACIONES DE FECHA ---
-  esCitaHoy(): boolean {
-    if (!this.citaSeleccionada?.fechacita) return false;
-    const hoy = new Date().toISOString().split('T')[0];
-    return this.citaSeleccionada.fechacita === hoy;
-  }
-
-  esCitaFutura(): boolean {
-    if (!this.citaSeleccionada?.fechacita) return false;
-    const hoy = new Date().toISOString().split('T')[0];
-    return this.citaSeleccionada.fechacita > hoy;
-  }
-
-  esCitaVencida(): boolean {
-    if (!this.citaSeleccionada?.fechacita) return false;
-    if (this.citaSeleccionada.estado === 'Cancelada' ||
-      this.citaSeleccionada.estado === 'Completada' ||
-      this.citaSeleccionada.estado === 'No Asistió') return false;
-    const hoy = new Date().toISOString().split('T')[0];
-    return this.citaSeleccionada.fechacita < hoy;
   }
 
   // --- VALIDAR CAMPOS ---
@@ -275,10 +192,6 @@ export class CitaDetalle implements OnInit, OnDestroy {
 
     if (!cita.horacita) {
       return { valido: false, mensaje: 'La hora de la cita es obligatoria' };
-    }
-
-    if (cita.estado === 'Completada' && this.esCitaFutura()) {
-      return { valido: false, mensaje: 'No se puede marcar como completada una cita futura' };
     }
 
     return { valido: true, mensaje: '' };
@@ -326,7 +239,6 @@ export class CitaDetalle implements OnInit, OnDestroy {
 
       await firstValueFrom(this.usersService.actualizarCita(idCita, payload));
 
-      // Registrar cambios en historial
       if (estadoAnterior !== estado) {
         this.agregarHistorialLocal(
           `Estado cambiado: ${estadoAnterior} → ${estado}`,
@@ -338,14 +250,6 @@ export class CitaDetalle implements OnInit, OnDestroy {
         this.agregarHistorialLocal(
           'Motivo actualizado',
           `Nuevo motivo: ${motivo}`
-        );
-      }
-
-      if ((this.citaSeleccionada.sintomas || '').trim() !== '' &&
-        this.citaSeleccionada.sintomas !== this.citaSeleccionada.sintomasAnterior) {
-        this.agregarHistorialLocal(
-          'Síntomas actualizados',
-          'Se registraron nuevos síntomas del paciente'
         );
       }
 
@@ -412,7 +316,8 @@ export class CitaDetalle implements OnInit, OnDestroy {
   async marcarCompletada() {
     if (!this.citaSeleccionada) return;
 
-    if (this.esCitaFutura()) {
+    const hoy = new Date().toISOString().split('T')[0];
+    if (this.citaSeleccionada.fechacita > hoy) {
       this.lanzarNotificacion("No se puede completar una cita programada para el futuro.", "warning");
       return;
     }
@@ -468,67 +373,18 @@ export class CitaDetalle implements OnInit, OnDestroy {
     }
   }
 
-  // --- INICIALIZAR CALENDARIOS ---
-  inicializarCalendario() {
-    if (!isPlatformBrowser(this.platformId)) return;
+  // --- TOAST ---
+  lanzarNotificacion(mensaje: string, tipo: 'success' | 'error' | 'warning' = 'success') {
+    this.mensajeToast = mensaje;
+    this.tipoToast = tipo;
+    this.mostrarToast = true;
+    this.cdr.detectChanges();
 
-    this.destruirCalendarios();
+    if (this.toastTimeout) clearTimeout(this.toastTimeout);
 
-    setTimeout(() => {
-      const configFecha: any = {
-        locale: Spanish,
-        dateFormat: "Y-m-d",
-        defaultDate: this.citaSeleccionada?.fechacita || null,
-        appendTo: document.body,
-        static: false,
-        disableMobile: true,
-        onChange: (selectedDates: any, dateStr: string) => {
-          if (this.citaSeleccionada) {
-            this.citaSeleccionada.fechacita = dateStr;
-            this.cdr.detectChanges();
-          }
-        }
-      };
-
-      const fechaElement = document.querySelector('#fechaCitaDetalleInput') as HTMLInputElement;
-      if (fechaElement) {
-        this.fpFechaInstance = flatpickr('#fechaCitaDetalleInput', configFecha);
-      }
-
-      const configHora: any = {
-        locale: Spanish,
-        enableTime: true,
-        noCalendar: true,
-        dateFormat: "H:i",
-        time_24hr: true,
-        defaultDate: this.citaSeleccionada?.horacita || null,
-        appendTo: document.body,
-        static: false,
-        disableMobile: true,
-        onChange: (selectedDates: any, dateStr: string) => {
-          if (this.citaSeleccionada) {
-            this.citaSeleccionada.horacita = dateStr;
-            this.cdr.detectChanges();
-          }
-        }
-      };
-
-      const horaElement = document.querySelector('#horaCitaDetalleInput') as HTMLInputElement;
-      if (horaElement) {
-        this.fpHoraInstance = flatpickr('#horaCitaDetalleInput', configHora);
-      }
-
-    }, 100);
-  }
-
-  destruirCalendarios() {
-    if (this.fpFechaInstance) {
-      try { this.fpFechaInstance.destroy(); } catch (e) { }
-      this.fpFechaInstance = null;
-    }
-    if (this.fpHoraInstance) {
-      try { this.fpHoraInstance.destroy(); } catch (e) { }
-      this.fpHoraInstance = null;
-    }
+    this.toastTimeout = setTimeout(() => {
+      this.mostrarToast = false;
+      this.cdr.detectChanges();
+    }, 4000);
   }
 }

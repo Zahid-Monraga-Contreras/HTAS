@@ -62,7 +62,12 @@ export class Citas implements OnInit, OnDestroy {
       const saved = localStorage.getItem('user_htas');
       if (saved) {
         this.currentUser = JSON.parse(saved);
+        console.log('DATOS DEL USUARIO EN LOCALSTORAGE:', this.currentUser);
+        console.log('ROL DEL USUARIO:', this.currentUser.rol);
+        console.log('ROL EN MINÚSCULAS:', this.currentUser.rol?.toLowerCase());
         await this.cargarCitas();
+      } else {
+        console.error('No se encontró usuario en localStorage');
       }
     }
   }
@@ -83,16 +88,26 @@ export class Citas implements OnInit, OnDestroy {
       .trim()
       .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-    const esAdmin = rol === 'administrador';
+    console.log(`Verificando permiso para "${accion}" con rol:`, rol);
+
+    const esAdmin = rol === 'administrador' || rol === 'admin';
     const esMedicoODoctor = rol.includes('medico') || rol.includes('doctor');
     const esAcompanante = rol === 'acompanante';
 
+    console.log(`  - esAdmin: ${esAdmin}`);
+    console.log(`  - esMedicoODoctor: ${esMedicoODoctor}`);
+    console.log(`  - esAcompanante: ${esAcompanante}`);
+
     switch (accion) {
       case 'crear':
-        return rol === 'paciente' || esAcompanante;
+        const puedeCrear = rol === 'paciente' || esAcompanante || esAdmin;
+        console.log(`  - Puede crear: ${puedeCrear}`);
+        return puedeCrear;
       case 'editar':
       case 'eliminar':
-        return esMedicoODoctor || esAdmin;
+        const puedeGestionar = esMedicoODoctor || esAdmin;
+        console.log(`  - Puede ${accion}: ${puedeGestionar}`);
+        return puedeGestionar;
       default:
         return false;
     }
@@ -113,34 +128,78 @@ export class Citas implements OnInit, OnDestroy {
   }
 
   async cargarCitas() {
-    if (!this.currentUser || !this.currentUser.correo) return;
+    if (!this.currentUser || !this.currentUser.correo) {
+      console.error('Usuario o correo no disponible');
+      return;
+    }
 
+    console.log('Iniciando carga de citas...');
+    console.log('Usuario actual:', this.currentUser.correo);
+    console.log('Rol del usuario:', this.currentUser.rol);
+
+    // Normalizar el rol
     const rol = this.currentUser.rol.toLowerCase().trim()
       .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-    const tieneAccesoGlobal = rol.includes('medico') ||
-      rol.includes('doctor') ||
-      rol.includes('administrador') ||
-      rol.includes('acompanante');
+    console.log('Rol normalizado:', rol);
+
+    // Verificar si es administrador (de varias formas)
+    const esAdmin = rol === 'administrador' ||
+      rol === 'admin' ||
+      this.currentUser.rol?.toLowerCase().includes('admin') ||
+      this.currentUser.rol?.toLowerCase() === 'administrador';
+
+    const esMedico = rol.includes('medico') || rol.includes('doctor');
+    const esAcompanante = rol === 'acompanante';
+
+    const tieneAccesoGlobal = esAdmin || esMedico || esAcompanante;
+
+    console.log('Resultado de verificación:');
+    console.log('  - esAdmin:', esAdmin);
+    console.log('  - esMedico:', esMedico);
+    console.log('  - esAcompanante:', esAcompanante);
+    console.log('  - tieneAccesoGlobal:', tieneAccesoGlobal);
 
     let data: any[] = [];
 
     try {
       if (tieneAccesoGlobal) {
+        console.log('Cargando TODAS las citas (getAllCitas)');
         data = await firstValueFrom(this.usersService.getAllCitas());
+        console.log('Número de citas obtenidas:', data?.length || 0);
       } else {
+        console.log('Cargando SOLO citas del paciente (getMisCitas)');
         data = await firstValueFrom(this.usersService.getMisCitas(this.currentUser.correo));
+        console.log('Número de citas del paciente:', data?.length || 0);
+      }
+
+      // Verificar que data sea un array
+      if (!data || !Array.isArray(data)) {
+        console.warn('La respuesta no es un array válido:', data);
+        data = [];
       }
 
       this.citasTodo = data.map(c => ({
         ...c,
         id: c.idcita,
-        NombreMostrar: `${c.nombrepaciente} ${c.appaternopaciente}`
+        NombreMostrar: `${c.nombrepaciente || ''} ${c.appaternopaciente || ''}`.trim() || 'Paciente sin nombre'
       }));
+
+      console.log('citasTodo actualizado. Total:', this.citasTodo.length);
+      console.log('Primeras 3 citas:', this.citasTodo.slice(0, 3));
+
       this.cdr.detectChanges();
+
+      if (this.citasTodo.length === 0) {
+        console.warn('No se encontraron citas para mostrar');
+        this.lanzarNotificacion('No hay citas disponibles en el sistema', 'warning');
+      }
+
     } catch (error) {
       console.error('Error al cargar citas:', error);
       this.lanzarNotificacion('Error al cargar la lista de citas', 'error');
+      this.citasTodo = [];
+      this.cdr.detectChanges();
     }
   }
 
@@ -168,6 +227,7 @@ export class Citas implements OnInit, OnDestroy {
   }
 
   seleccionarCita(c: any) {
+    console.log('Seleccionando cita:', c.idcita);
     this.citaSeleccionada = {
       ...c,
       tempEstado: c.estado,
@@ -264,7 +324,6 @@ export class Citas implements OnInit, OnDestroy {
     this.mostrarModalDelete = true;
   }
 
-  // ✅ CONFIRMAR ELIMINAR CITA - CORREGIDO (Usando cancelarCita)
   async confirmarEliminarCita() {
     if (!this.verificarPermiso('eliminar')) {
       this.lanzarNotificacion('Acción inválida para tu rol.', 'error');
@@ -276,7 +335,6 @@ export class Citas implements OnInit, OnDestroy {
       return;
     }
 
-    // ✅ Validar estado de la cita
     if (this.citaSeleccionada.estado === 'Cancelada') {
       this.lanzarNotificacion('Esta cita ya está cancelada.', 'warning');
       this.cerrarModal();
@@ -294,7 +352,6 @@ export class Citas implements OnInit, OnDestroy {
     try {
       const idCita = this.citaSeleccionada.idcita || this.citaSeleccionada.id;
 
-      // ✅ USAR CANCELAR CITA (PATCH) - Cambia estado a Cancelada
       await firstValueFrom(
         this.usersService.cancelarCita(idCita, 'Cancelada por el usuario')
       );

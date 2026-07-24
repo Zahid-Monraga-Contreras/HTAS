@@ -196,7 +196,7 @@ export class ExpedienteMedicoComponent {
             ['Especialidad', u.especialidad || 'No especificada'],
             ['Genero', u.genero || 'No especificado'],
             ['Fecha de Nacimiento', fechaNacimientoFormateada],
-            ['Edad', this.calcularEdad() !== null ? this.calcularEdad() + ' anos' : 'No disponible'],
+            ['Edad', this.calcularEdad() !== null ? this.calcularEdad() + ' años' : 'No disponible'],
             ['Telefono', u.telefono || 'No registrado'],
             ['CURP', u.curp || 'No registrado']
         ];

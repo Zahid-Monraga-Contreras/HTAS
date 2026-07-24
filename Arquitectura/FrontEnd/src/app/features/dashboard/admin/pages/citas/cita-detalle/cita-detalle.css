@@ -1,6 +1,7 @@
 /* ==========================================================================
-   1. ESTILOS BASE Y CONTENEDOR PRINCIPAL
+   ESTILOS PRINCIPALES DEL DETALLE DE CITA
    ========================================================================== */
+
 .main-content {
     margin-left: 250px;
     padding: 85px 40px 40px;
@@ -19,9 +20,7 @@
     margin: 0 auto;
 }
 
-/* ==========================================================================
-   2. HEADER SECTION
-   ========================================================================== */
+/* HEADER SECTION */
 .header-section {
     margin-bottom: 1.75rem;
     display: flex;
@@ -61,86 +60,7 @@
     flex-wrap: wrap;
 }
 
-/* ==========================================================================
-   3. ESTADO DE LA CITA
-   ========================================================================== */
-.estado-cita {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6rem;
-    padding: 0.5rem 1.25rem;
-    border-radius: 50px;
-    font-weight: 700;
-    font-size: 0.82rem;
-    letter-spacing: 0.3px;
-    text-transform: uppercase;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-    color: #ffffff;
-}
-
-.estado-cita i {
-    font-size: 0.7rem;
-}
-
-/* ==========================================================================
-   4. MENÚ DE PESTAÑAS (TABS)
-   ========================================================================== */
-.tabs-nav-wrapper {
-    display: flex;
-    justify-content: flex-start;
-    margin-bottom: 2rem;
-}
-
-.tabs-nav {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    background: #ffffff;
-    border: 1px solid #e9edf2;
-    border-radius: 18px;
-    padding: 6px;
-    box-shadow: 0 2px 10px rgba(10, 22, 40, 0.04);
-}
-
-.tab-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.55rem;
-    border: none;
-    background: transparent;
-    color: #7a8a9e;
-    font-weight: 700;
-    font-size: 0.85rem;
-    padding: 0.7rem 1.4rem;
-    border-radius: 13px;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.tab-btn i {
-    font-size: 1rem;
-}
-
-.tab-btn:hover:not(.active) {
-    background: #f1f4f8;
-    color: #1a2938;
-}
-
-.tab-btn.active {
-    background: linear-gradient(135deg, #b0001e, #8a0016);
-    color: #ffffff;
-    box-shadow: 0 6px 16px rgba(176, 0, 30, 0.28);
-}
-
-.tab-panel {
-    animation: fadeIn 0.35s ease;
-}
-
-/* ==========================================================================
-   5. BOTONES DE ACCIÓN
-   ========================================================================== */
+/* BOTONES DE ACCIÓN */
 .btn-action {
     padding: 0.55rem 1.2rem;
     border: none;
@@ -190,13 +110,6 @@
     box-shadow: none !important;
 }
 
-.btn-action:active:not(:disabled) {
-    transform: translateY(0);
-}
-
-/* ==========================================================================
-   6. BOTONES PREMIUM
-   ========================================================================== */
 .btn-cancel-premium {
     padding: 0.65rem 1.5rem;
     background: #ffffff;
@@ -221,679 +134,56 @@
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
 }
 
-.btn-cancel-premium:active:not(:disabled) {
-    transform: translateY(0);
+/* MENÚ DE PESTAÑAS */
+.tabs-nav-wrapper {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 2rem;
 }
 
-.btn-cancel-premium:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
-    transform: none !important;
+.tabs-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #ffffff;
+    border: 1px solid #e9edf2;
+    border-radius: 18px;
+    padding: 6px;
+    box-shadow: 0 2px 10px rgba(10, 22, 40, 0.04);
 }
 
-.btn-save {
-    padding: 0.65rem 2rem;
+.tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    border: none;
+    background: transparent;
+    color: #7a8a9e;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 0.7rem 1.4rem;
+    border-radius: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tab-btn i {
+    font-size: 1rem;
+}
+
+.tab-btn:hover:not(.active) {
+    background: #f1f4f8;
+    color: #1a2938;
+}
+
+.tab-btn.active {
     background: linear-gradient(135deg, #b0001e, #8a0016);
     color: #ffffff;
-    border: none;
-    border-radius: 10px;
-    font-weight: 700;
-    font-size: 0.9rem;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6rem;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 12px rgba(176, 0, 30, 0.25);
+    box-shadow: 0 6px 16px rgba(176, 0, 30, 0.28);
 }
 
-.btn-save:hover:not(:disabled) {
-    background: linear-gradient(135deg, #8a0016, #6d0012);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(176, 0, 30, 0.35);
-}
-
-.btn-save:active:not(:disabled) {
-    transform: translateY(0);
-}
-
-.btn-save:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
-    transform: none !important;
-    box-shadow: none !important;
-}
-
-.spinner-save {
-    width: 18px;
-    height: 18px;
-    border: 2.5px solid rgba(255, 255, 255, 0.25);
-    border-radius: 50%;
-    border-top-color: #ffffff;
-    animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-/* ==========================================================================
-   7. BANNER DE ESTADO
-   ========================================================================== */
-.estado-banner {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.75rem 1.5rem;
-    background: #fafbfc;
-    border-radius: 14px;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
-    border: 1px solid #e9edf2;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-}
-
-.estado-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.4rem 1.2rem;
-    border-radius: 50px;
-    color: #ffffff;
-    font-weight: 700;
-    font-size: 0.8rem;
-    white-space: nowrap;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-.estado-badge i {
-    font-size: 0.7rem;
-}
-
-.alerta-vencida {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: #dc2626;
-    font-weight: 600;
-    font-size: 0.9rem;
-}
-
-.alerta-vencida i {
-    font-size: 1.1rem;
-}
-
-.alerta-hoy {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: #2563eb;
-    font-weight: 600;
-    font-size: 0.9rem;
-}
-
-.alerta-hoy i {
-    font-size: 1.1rem;
-}
-
-.alerta-futura {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: #6b7a8a;
-    font-weight: 500;
-    font-size: 0.9rem;
-}
-
-.alerta-futura i {
-    font-size: 1.1rem;
-}
-
-/* ==========================================================================
-   8. DETALLE CARD Y FORMULARIO
-   ========================================================================== */
-.detail-card {
-    background: #ffffff;
-    border-radius: 20px;
-    padding: 2.5rem 2.5rem 2rem;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
-    border: 1px solid #e9edf2;
-    transition: box-shadow 0.3s ease;
-}
-
-.detail-card:hover {
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
-}
-
-.section-block {
-    margin-bottom: 1.5rem;
-}
-
-.section-title {
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: #1a2938;
-    margin: 0 0 1.1rem 0;
-    padding-bottom: 0.6rem;
-    border-bottom: 2px solid #f1f4f8;
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-}
-
-.section-title i {
-    color: #b0001e;
-    font-size: 1.15rem;
-}
-
-.section-divider {
-    border: none;
-    border-top: 2px solid #e9edf2;
-    margin: 1.75rem 0;
-}
-
-/* ==========================================================================
-   9. FORMULARIO
-   ========================================================================== */
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
-}
-
-.readonly-grid {
-    background: #f8fafc;
-    border-radius: 12px;
-    padding: 1.25rem;
-    border: 1.5px dashed #dce1e8;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    max-width: 100%;
-}
-
-.form-group label {
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: #4a5a6e;
-    letter-spacing: 0.2px;
-    text-transform: uppercase;
-}
-
-.form-control-premium {
-    padding: 0.7rem 1rem;
-    border: 1.5px solid #e2e7ee;
-    border-radius: 10px;
-    font-size: 0.95rem;
-    color: #0a1628;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    background: #fafbfc;
-    width: 100%;
-    box-sizing: border-box;
-    font-family: inherit;
-    max-width: 100%;
-}
-
-.form-control-premium::placeholder {
-    color: #b0bcc8;
-    font-weight: 400;
-}
-
-.form-control-premium:focus {
-    outline: none;
-    border-color: #b0001e;
-    background: #ffffff;
-    box-shadow: 0 0 0 4px rgba(176, 0, 30, 0.08);
-}
-
-.form-control-premium[readonly] {
-    background: #f1f3f5;
-    cursor: pointer;
-}
-
-.form-control-premium[readonly]:focus {
-    border-color: #b0001e;
-    box-shadow: 0 0 0 4px rgba(176, 0, 30, 0.08);
-}
-
-.readonly-field {
-    background: #f1f5f9;
-    color: #64748b;
-    cursor: not-allowed;
-    border-style: dashed;
-}
-
-.full-width-group {
-    grid-column: 1 / -1;
-}
-
-/* TEXTAREA FIJO */
-textarea.form-control-premium {
-    min-height: 80px;
-    max-height: 80px;
-    height: 80px;
-    resize: none !important;
-    font-family: inherit;
-    line-height: 1.5;
-    width: 100%;
-    overflow-y: auto;
-    box-sizing: border-box;
-}
-
-.full-width-group textarea.form-control-premium {
-    min-height: 80px;
-    max-height: 80px;
-    height: 80px;
-    resize: none !important;
-}
-
-select.form-control-premium {
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a5a6e' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 1rem center;
-    padding-right: 2.5rem;
-    cursor: pointer;
-}
-
-select.form-control-premium option {
-    padding: 0.5rem;
-}
-
-select.form-control-premium option:checked {
-    background: #b0001e;
-    color: #ffffff;
-}
-
-.form-text {
-    font-size: 0.7rem;
-    color: #8a9aa8;
-    margin-top: 0.2rem;
-    display: block;
-}
-
-.text-muted {
-    color: #8a9aa8 !important;
-}
-
-/* ==========================================================================
-   10. INPUT PICKER WRAPPER (FLATPICKR)
-   ========================================================================== */
-.input-picker-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-    width: 100%;
-}
-
-.picker-custom {
-    padding-right: 2.8rem !important;
-    cursor: pointer;
-    background: #fafbfc !important;
-}
-
-.picker-custom:focus {
-    background: #ffffff !important;
-    border-color: #b0001e;
-    box-shadow: 0 0 0 4px rgba(176, 0, 30, 0.08);
-}
-
-.icon-embed {
-    position: absolute;
-    right: 14px;
-    color: #8a9aa8;
-    font-size: 1.1rem;
-    pointer-events: none;
-    transition: all 0.25s ease;
-}
-
-.input-picker-wrapper:focus-within .icon-embed {
-    color: #b0001e;
-    transform: scale(1.05);
-}
-
-.flatpickr-calendar {
-    z-index: 10000 !important;
-    background: #ffffff !important;
-    border-radius: 14px !important;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15) !important;
-    border: 1px solid #e9edf2 !important;
-    padding: 0.5rem !important;
-    font-family: inherit !important;
-}
-
-.flatpickr-day.selected {
-    background: #b0001e !important;
-    border-color: #b0001e !important;
-    font-weight: 700 !important;
-}
-
-.flatpickr-day.selected:hover {
-    background: #8a0016 !important;
-    border-color: #8a0016 !important;
-}
-
-.flatpickr-day:hover {
-    background: #f1f4f8 !important;
-}
-
-.flatpickr-months .flatpickr-month {
-    color: #0a1628 !important;
-}
-
-.flatpickr-current-month .flatpickr-monthDropdown-months {
-    font-weight: 700 !important;
-}
-
-/* ==========================================================================
-   11. RESUMEN DE LA CITA (TAB HISTORIAL)
-   ========================================================================== */
-.resumen-cita {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 0;
-    padding: 0;
-    background: #ffffff;
-    border-radius: 16px;
-    margin-bottom: 1.75rem;
-    border: 1px solid #e9edf2;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-    overflow: hidden;
-}
-
-.resumen-item {
-    display: flex;
-    align-items: center;
-    gap: 0.9rem;
-    padding: 1.1rem 1.5rem;
-    border-right: 1px solid #e9edf2;
-    transition: background 0.2s ease;
-}
-
-.resumen-item:last-child {
-    border-right: none;
-}
-
-.resumen-item:hover {
-    background: #fafbfc;
-}
-
-.resumen-item i {
-    font-size: 1.5rem;
-    color: #b0001e;
-    min-width: 36px;
-    text-align: center;
-    opacity: 0.85;
-}
-
-.resumen-item div {
-    display: flex;
-    flex-direction: column;
-    gap: 0.1rem;
-}
-
-.resumen-item small {
-    font-size: 0.6rem;
-    text-transform: uppercase;
-    color: #8a9aa8;
-    font-weight: 700;
-    letter-spacing: 0.6px;
-}
-
-.resumen-item strong {
-    font-size: 1rem;
-    color: #0a1628;
-    font-weight: 600;
-    word-break: break-word;
-}
-
-/* ==========================================================================
-   12. ESTADÍSTICAS
-   ========================================================================== */
-.estadisticas-section {
-    margin-top: 1.75rem;
-    padding-top: 1.75rem;
-    border-top: 1px solid #e9edf2;
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1rem;
-}
-
-.stat-box {
-    background: #ffffff;
-    padding: 1.2rem 1rem;
-    border-radius: 14px;
-    border: 1px solid #e9edf2;
-    text-align: center;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-}
-
-.stat-box:hover {
-    transform: translateY(-4px);
-    border-color: #d0d7df;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
-}
-
-.stat-box small {
-    display: block;
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    font-weight: 700;
-    color: #8a9aa8;
-    margin-bottom: 0.4rem;
-    letter-spacing: 0.4px;
-}
-
-.stat-value {
-    font-size: 1.65rem;
-    font-weight: 800;
-    color: #0a1628;
-    line-height: 1.2;
-}
-
-/* ==========================================================================
-   13. HISTORIAL
-   ========================================================================== */
-.historial-section {
-    margin-top: 0.5rem;
-}
-
-.historial-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 0;
-}
-
-.historial-header .section-title {
-    margin-bottom: 0;
-}
-
-.historial-count {
-    font-size: 0.75rem;
-    color: #4a5a6e;
-    background: #f1f4f8;
-    padding: 0.2rem 0.9rem;
-    border-radius: 30px;
-    font-weight: 700;
-}
-
-.historial-lista {
-    margin-top: 1rem;
-    max-height: 400px;
-    overflow-y: auto;
-    border: 1px solid #e9edf2;
-    border-radius: 14px;
-    background: #ffffff;
-    animation: fadeIn 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
-}
-
-.historial-item {
-    display: flex;
-    align-items: center;
-    gap: 1.2rem;
-    padding: 0.8rem 1.25rem;
-    border-bottom: 1px solid #f1f4f8;
-    font-size: 0.9rem;
-    transition: background 0.2s ease;
-}
-
-.historial-item:last-child {
-    border-bottom: none;
-}
-
-.historial-item:hover {
-    background: #fafbfc;
-}
-
-/* Estilos por tipo de cambio */
-.historial-item.cambio-creacion {
-    border-left: 4px solid #10b981;
-}
-
-.historial-item.cambio-estado {
-    border-left: 4px solid #f59e0b;
-}
-
-.historial-item.cambio-cancelacion {
-    border-left: 4px solid #ef4444;
-}
-
-.historial-item.cambio-completada {
-    border-left: 4px solid #3b82f6;
-}
-
-.historial-item.cambio-motivo {
-    border-left: 4px solid #8b5cf6;
-}
-
-.historial-icono {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    font-size: 1.1rem;
-    flex-shrink: 0;
-}
-
-.historial-fecha {
-    min-width: 150px;
-    color: #6b7a8a;
-    font-size: 0.8rem;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-}
-
-.historial-fecha i {
-    font-size: 0.8rem;
-    color: #8a9aa8;
-}
-
-.historial-detalle {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 0.05rem;
-}
-
-.historial-detalle strong {
-    color: #0a1628;
-    font-size: 0.9rem;
-}
-
-.historial-detalle span {
-    color: #6b7a8a;
-    font-size: 0.8rem;
-}
-
-.historial-usuario {
-    color: #6b7a8a;
-    font-size: 0.8rem;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    white-space: nowrap;
-}
-
-.historial-usuario i {
-    font-size: 0.8rem;
-    color: #8a9aa8;
-}
-
-.historial-vacio {
-    text-align: center;
-    padding: 3rem 1rem;
-    color: #8a9aa8;
-}
-
-.historial-vacio i {
-    font-size: 2.8rem;
-    color: #dce1e8;
-    margin-bottom: 0.75rem;
-    display: block;
-}
-
-.historial-vacio p {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #4a5a6e;
-    margin: 0 0 0.25rem 0;
-}
-
-.historial-vacio span {
-    font-size: 0.85rem;
-    color: #8a9aa8;
-}
-
-/* Scroll personalizado */
-.historial-lista::-webkit-scrollbar {
-    width: 6px;
-}
-
-.historial-lista::-webkit-scrollbar-track {
-    background: #f1f4f8;
-    border-radius: 3px;
-}
-
-.historial-lista::-webkit-scrollbar-thumb {
-    background: #d0d7df;
-    border-radius: 3px;
-    transition: background 0.2s;
-}
-
-.historial-lista::-webkit-scrollbar-thumb:hover {
-    background: #bcc5d0;
-}
-
-/* ==========================================================================
-   14. ACCIONES FOOTER
-   ========================================================================== */
-.action-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    margin-top: 2.5rem;
-    padding-top: 1.75rem;
-    border-top: 2px solid #e9edf2;
-}
-
-/* ==========================================================================
-   15. TOAST NOTIFICACIÓN
-   ========================================================================== */
+/* TOAST */
 .toast-premium-container {
     position: fixed;
     top: 30px;
@@ -953,42 +243,7 @@ select.form-control-premium option:checked {
     }
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-8px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* ==========================================================================
-   16. RESPONSIVIDAD
-   ========================================================================== */
-@media (max-width: 1200px) {
-    .form-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 992px) {
-    .resumen-cita {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .resumen-item {
-        border-right: none;
-        border-bottom: 1px solid #e9edf2;
-    }
-
-    .resumen-item:nth-last-child(-n+2) {
-        border-bottom: none;
-    }
-}
-
+/* RESPONSIVIDAD */
 @media (max-width: 768px) {
     .main-content {
         margin-left: 0;
@@ -1010,11 +265,6 @@ select.form-control-premium option:checked {
     }
 
     .header-controls button {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .estado-cita {
         width: 100%;
         justify-content: center;
     }
@@ -1043,112 +293,12 @@ select.form-control-premium option:checked {
         font-size: 1.15rem;
     }
 
-    .form-grid {
-        grid-template-columns: 1fr;
-        gap: 1.25rem;
-    }
-
-    .full-width-group {
-        grid-column: 1;
-    }
-
-    .resumen-cita {
-        grid-template-columns: 1fr;
-        border-radius: 12px;
-    }
-
-    .resumen-item {
-        border-bottom: 1px solid #e9edf2;
-        padding: 0.9rem 1.25rem;
-    }
-
-    .resumen-item:last-child {
-        border-bottom: none;
-    }
-
-    .detail-card {
-        padding: 1.25rem;
-        border-radius: 16px;
-    }
-
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .estado-banner {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-        padding: 0.75rem 1rem;
-    }
-
-    .estado-badge {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .alerta-vencida,
-    .alerta-hoy,
-    .alerta-futura {
-        width: 100%;
-        font-size: 0.8rem;
-    }
-
-    .historial-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.3rem;
-        padding: 0.7rem 1rem;
-    }
-
-    .historial-fecha {
-        min-width: auto;
-    }
-
-    .historial-usuario {
-        align-self: flex-start;
-    }
-
-    .historial-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-    }
-
-    .historial-icono {
-        display: none;
-    }
-
     .toast-premium-container {
         top: 15px;
         right: 15px;
         left: 15px;
         max-width: none;
         border-radius: 12px;
-    }
-
-    .action-footer {
-        flex-direction: column-reverse;
-        gap: 0.75rem;
-        margin-top: 1.75rem;
-        padding-top: 1.25rem;
-    }
-
-    .action-footer button {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .readonly-grid {
-        padding: 0.75rem;
-    }
-
-    textarea.form-control-premium,
-    .full-width-group textarea.form-control-premium {
-        min-height: 70px;
-        max-height: 70px;
-        height: 70px;
-        resize: none !important;
     }
 
     .btn-action {
@@ -1166,55 +316,13 @@ select.form-control-premium option:checked {
         font-size: 0.85rem;
     }
 
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .stat-box {
-        padding: 0.9rem;
-    }
-
-    .stat-value {
-        font-size: 1.35rem;
-    }
-
-    .form-control-premium {
-        font-size: 0.9rem;
-        padding: 0.6rem 0.8rem;
-    }
-
-    .btn-save,
     .btn-cancel-premium {
         font-size: 0.85rem;
         padding: 0.6rem 1.2rem;
     }
-
-    .resumen-item strong {
-        font-size: 0.9rem;
-    }
-
-    .estado-banner {
-        padding: 0.5rem 0.75rem;
-    }
-
-    .estado-badge {
-        font-size: 0.7rem;
-        padding: 0.3rem 0.8rem;
-    }
-
-    textarea.form-control-premium,
-    .full-width-group textarea.form-control-premium {
-        min-height: 60px;
-        max-height: 60px;
-        height: 60px;
-        resize: none !important;
-        font-size: 0.85rem;
-    }
 }
 
-/* ==========================================================================
-   17. UTILIDADES
-   ========================================================================== */
+/* UTILIDADES */
 html {
     scroll-behavior: smooth;
 }
