@@ -1,0 +1,130 @@
+<!-- TAB 2: HISTORIAL -->
+<div class="tab-panel">
+    <div class="detail-card">
+
+        <!-- ESTADÍSTICAS -->
+        @if (estadisticas) {
+        <div class="estadisticas-section" style="margin-top:0; padding-top:0; border-top:none;">
+            <h4 class="section-title">
+                <i class="bi bi-graph-up-arrow"></i>
+                Actividad del Acompañante
+            </h4>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <small>Total Visitas</small>
+                    <div class="stat-value">{{ estadisticas.totalVisitas }}</div>
+                </div>
+                <div class="stat-box">
+                    <small>Visitas Completadas</small>
+                    <div class="stat-value">{{ estadisticas.visitasCompletadas }}</div>
+                </div>
+                <div class="stat-box">
+                    <small>Visitas Pendientes</small>
+                    <div class="stat-value">{{ estadisticas.visitasPendientes }}</div>
+                </div>
+                <div class="stat-box">
+                    <small>Última Visita</small>
+                    <div class="stat-value" style="font-size: 0.9rem;">
+                        {{ estadisticas.ultimaVisita | date:'dd/MM/yyyy' }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        }
+
+        <!-- HISTORIAL DE VISITAS -->
+        <div class="visitas-section">
+            <div class="visitas-header">
+                <h4 class="section-title">
+                    <i class="bi bi-calendar-event"></i>
+                    Historial de Visitas
+                    <span class="badge-visitas">{{ visitasAcompanante.length }}</span>
+                </h4>
+            </div>
+
+            @if (visitasAcompanante.length > 0) {
+            <div class="visitas-lista">
+                @for (v of visitasAcompanante; track v.id) {
+                <div class="visita-item">
+                    <div class="visita-indicador">
+                        <span class="visita-estado-dot" [ngClass]="{
+                            'estado-completada': v.estado === 'Completada',
+                            'estado-programada': v.estado === 'Programada',
+                            'estado-confirmada': v.estado === 'Confirmada',
+                            'estado-cancelada': v.estado === 'Cancelada',
+                            'estado-no-asistio': v.estado === 'No Asistió'
+                        }"></span>
+                    </div>
+                    <div class="visita-info">
+                        <i class="bi bi-calendar-check"></i>
+                        <span class="visita-fecha-hora">{{ formatearFechaYHora(v.fechavisita, v.horavisita) }}</span>
+                    </div>
+                    <div class="visita-detalle">
+                        <span class="visita-motivo">{{ v.motivo || 'Sin motivo' }}</span>
+                        @if (v.estado === 'Completada') {
+                        <span class="badge-completada">Completada</span>
+                        } @else if (v.estado === 'Programada') {
+                        <span class="badge-programada">Programada</span>
+                        } @else if (v.estado === 'Confirmada') {
+                        <span class="badge-confirmada">Confirmada</span>
+                        } @else if (v.estado === 'Cancelada') {
+                        <span class="badge-cancelada">Cancelada</span>
+                        } @else {
+                        <span class="badge-no-asistio">No Asistió</span>
+                        }
+                    </div>
+                </div>
+                }
+            </div>
+            } @else {
+            <div class="visitas-lista">
+                <div class="visitas-vacio">
+                    <i class="bi bi-calendar-plus"></i>
+                    <p>No hay visitas registradas</p>
+                    <span>Las visitas que se agenden aparecerán aquí</span>
+                </div>
+            </div>
+            }
+        </div>
+
+        <!-- HISTORIAL DE CAMBIOS -->
+        <div class="historial-section">
+            <hr class="section-divider">
+
+            <div class="historial-header">
+                <h4 class="section-title">
+                    <i class="bi bi-clock-history"></i>
+                    Historial del Acompañante
+                </h4>
+                <span class="historial-count">{{ historialCambios.length }} eventos</span>
+            </div>
+
+            @if (historialCambios.length > 0) {
+            <div class="historial-lista">
+                @for (item of historialCambios; track item) {
+                <div class="historial-item">
+                    <div class="historial-fecha">
+                        <i class="bi bi-clock"></i>
+                        {{ item.fecha }}
+                    </div>
+                    <div class="historial-detalle">
+                        <strong>{{ item.accion }}</strong>
+                        <span>{{ item.detalle }}</span>
+                    </div>
+                    <div class="historial-usuario">
+                        <i class="bi bi-person"></i>
+                        {{ item.usuario }}
+                    </div>
+                </div>
+                }
+            </div>
+            } @else {
+            <div class="visitas-vacio">
+                <i class="bi bi-clock-history"></i>
+                <p>Aún no hay actividad registrada</p>
+                <span>Los eventos del acompañante aparecerán aquí</span>
+            </div>
+            }
+        </div>
+    </div>
+</div>

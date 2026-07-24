@@ -1,0 +1,127 @@
+<!-- TAB 3: EXPEDIENTE DEL ACOMPAÑANTE -->
+<div class="tab-panel">
+
+    <div class="expediente-toolbar">
+        <p><i class="bi bi-info-circle"></i> Vista de solo lectura generada a partir de la información
+            registrada.</p>
+        <button type="button" class="btn-download-expediente" (click)="descargarExpedientePDF()">
+            <i class="bi bi-file-earmark-arrow-down"></i>
+            <span>Descargar Expediente PDF</span>
+        </button>
+    </div>
+
+    <div class="expediente-wrapper">
+        <div class="expediente-hoja" id="expedienteImprimible">
+
+            <!-- MEMBRETE -->
+            <div class="expediente-membrete">
+                <div class="membrete-logo">
+                    <i class="bi bi-person-badge-fill"></i>
+                </div>
+                <div class="membrete-texto">
+                    <h1>Expediente de Acompañante</h1>
+                    <p>Sistema de Gestión de Acompañantes</p>
+                </div>
+                <div class="membrete-folio">
+                    <small>Folio</small>
+                    <strong>#{{ acompananteId || '---' }}</strong>
+                    <small>{{ fechaGeneracion }}</small>
+                </div>
+            </div>
+
+            <div class="expediente-linea-doble"></div>
+
+            <!-- DATOS DEL ACOMPAÑANTE -->
+            <div class="expediente-encabezado-acompanante">
+                <div class="expediente-avatar">
+                    <i class="bi bi-person-fill"></i>
+                </div>
+                <div class="expediente-nombre-bloque">
+                    <span class="expediente-etiqueta">Acompañante</span>
+                    <h2>{{ usuarioSeleccionado.nombre }}
+                        {{ usuarioSeleccionado.apPaterno }}
+                        {{ usuarioSeleccionado.apMaterno }}</h2>
+                    <span class="expediente-subetiqueta">{{ usuarioSeleccionado.correo }}</span>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: DATOS GENERALES -->
+            <div class="expediente-seccion">
+                <h3 class="expediente-titulo-seccion"><i class="bi bi-person-lines-fill"></i> Datos Generales</h3>
+                <div class="expediente-grid">
+                    <div class="expediente-campo">
+                        <span>Género</span>
+                        <strong>{{ usuarioSeleccionado.genero || 'No especificado' }}</strong>
+                    </div>
+                    <div class="expediente-campo">
+                        <span>Fecha de Nacimiento</span>
+                        <strong>{{ formatearFechaNacimiento(usuarioSeleccionado.fechaNacimiento) }}</strong>
+                    </div>
+                    <div class="expediente-campo">
+                        <span>Edad</span>
+                        <strong>{{ calcularEdad() !== null ? calcularEdad() + ' años' : 'No disponible' }}</strong>
+                    </div>
+                    <div class="expediente-campo">
+                        <span>Teléfono</span>
+                        <strong>{{ usuarioSeleccionado.telefono || 'No registrado' }}</strong>
+                    </div>
+                    <div class="expediente-campo">
+                        <span>CURP</span>
+                        <strong>{{ usuarioSeleccionado.curp || 'No registrado' }}</strong>
+                    </div>
+                    <div class="expediente-campo">
+                        <span>Fecha de Asignación</span>
+                        <strong>{{ formatearFechaNacimiento(usuarioSeleccionado.fechaAsignacion) }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: UBICACIÓN -->
+            <div class="expediente-seccion">
+                <h3 class="expediente-titulo-seccion"><i class="bi bi-geo-alt"></i> Domicilio</h3>
+                <p class="expediente-direccion">{{ getUbicacionFormateada() }}</p>
+            </div>
+
+            <!-- SECCIÓN: RESUMEN DE VISITAS -->
+            <div class="expediente-seccion">
+                <h3 class="expediente-titulo-seccion"><i class="bi bi-calendar3"></i> Resumen de Visitas</h3>
+                <table class="expediente-tabla">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Motivo</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (v of visitasAcompanante; track v.id) {
+                        <tr>
+                            <td>{{ formatearFechaYHora(v.fechavisita, v.horavisita) }}</td>
+                            <td>{{ v.motivo || 'Sin motivo' }}</td>
+                            <td>{{ v.estado }}</td>
+                        </tr>
+                        }
+                        @if (visitasAcompanante.length === 0) {
+                        <tr>
+                            <td colspan="3" class="expediente-tabla-vacia">Sin visitas registradas</td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- PIE DE DOCUMENTO -->
+            <div class="expediente-pie">
+                <div class="expediente-firma">
+                    <div class="expediente-linea-firma"></div>
+                    <span>Firma del Responsable</span>
+                </div>
+                <div class="expediente-sello">
+                    <i class="bi bi-patch-check-fill"></i>
+                    <span>Documento generado electrónicamente</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

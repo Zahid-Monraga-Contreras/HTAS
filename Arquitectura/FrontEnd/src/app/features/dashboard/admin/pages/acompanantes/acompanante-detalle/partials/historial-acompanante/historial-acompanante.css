@@ -1,0 +1,467 @@
+/* ==========================================================================
+   ESTILOS DE LA PESTAÑA DE HISTORIAL
+   ========================================================================== */
+
+.detail-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 2.5rem 2.5rem 2rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    border: 1px solid #e9edf2;
+    transition: box-shadow 0.3s ease;
+}
+
+.detail-card:hover {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+}
+
+.estadisticas-section {
+    margin-top: 1.75rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid #e9edf2;
+}
+
+.section-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1a2938;
+    margin: 0 0 1.1rem 0;
+    padding-bottom: 0.6rem;
+    border-bottom: 2px solid #f1f4f8;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.section-title i {
+    color: #b0001e;
+    font-size: 1.15rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.stat-box {
+    background: #ffffff;
+    padding: 1.2rem 1rem;
+    border-radius: 14px;
+    border: 1px solid #e9edf2;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.stat-box:hover {
+    transform: translateY(-4px);
+    border-color: #d0d7df;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.stat-box small {
+    display: block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #8a9aa8;
+    margin-bottom: 0.4rem;
+    letter-spacing: 0.4px;
+}
+
+.stat-value {
+    font-size: 1.65rem;
+    font-weight: 800;
+    color: #0a1628;
+    line-height: 1.2;
+}
+
+/* VISITAS */
+.visitas-section {
+    margin-top: 1.75rem;
+}
+
+.visitas-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0;
+}
+
+.visitas-header .section-title {
+    margin-bottom: 0;
+}
+
+.badge-visitas {
+    background: linear-gradient(135deg, #b0001e, #8a0016);
+    color: #ffffff;
+    padding: 0.15rem 0.7rem;
+    border-radius: 30px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    margin-left: 0.5rem;
+    box-shadow: 0 2px 6px rgba(176, 0, 30, 0.2);
+}
+
+.visitas-lista {
+    margin-top: 1rem;
+    border: 1px solid #e9edf2;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    animation: fadeIn 0.3s ease;
+}
+
+.visita-item {
+    display: flex;
+    align-items: center;
+    padding: 0.85rem 1.25rem;
+    border-bottom: 1px solid #f1f4f8;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    transition: background 0.2s ease;
+}
+
+.visita-item:last-child {
+    border-bottom: none;
+}
+
+.visita-item:hover {
+    background: #fafbfc;
+}
+
+.visita-indicador {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 16px;
+    margin-right: 0.25rem;
+}
+
+.visita-estado-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.visita-info {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex: 1;
+}
+
+.visita-info i {
+    color: #b0001e;
+    font-size: 1.1rem;
+    opacity: 0.8;
+}
+
+.visita-fecha-hora {
+    font-weight: 600;
+    color: #0a1628;
+    font-size: 0.9rem;
+}
+
+.visita-detalle {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+}
+
+.visita-motivo {
+    font-size: 0.85rem;
+    color: #4a5a6e;
+}
+
+.badge-completada,
+.badge-programada,
+.badge-confirmada,
+.badge-cancelada,
+.badge-no-asistio {
+    padding: 0.2rem 0.8rem;
+    border-radius: 30px;
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.badge-completada {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.badge-programada {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.badge-confirmada {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.badge-cancelada {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.badge-no-asistio {
+    background: #ede9fe;
+    color: #5b21b6;
+}
+
+.estado-completada {
+    background: #10b981;
+}
+
+.estado-programada {
+    background: #f59e0b;
+}
+
+.estado-confirmada {
+    background: #3b82f6;
+}
+
+.estado-cancelada {
+    background: #ef4444;
+}
+
+.estado-no-asistio {
+    background: #8b5cf6;
+}
+
+.visitas-vacio {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #8a9aa8;
+}
+
+.visitas-vacio i {
+    font-size: 2.8rem;
+    color: #dce1e8;
+    margin-bottom: 0.75rem;
+    display: block;
+}
+
+.visitas-vacio p {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #4a5a6e;
+    margin: 0 0 0.25rem 0;
+}
+
+.visitas-vacio span {
+    font-size: 0.85rem;
+    color: #8a9aa8;
+}
+
+/* HISTORIAL */
+.historial-section {
+    margin-top: 1.75rem;
+}
+
+.section-divider {
+    border: none;
+    border-top: 2px solid #e9edf2;
+    margin: 1.75rem 0;
+}
+
+.historial-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+}
+
+.historial-header .section-title {
+    margin-bottom: 0;
+}
+
+.historial-count {
+    font-size: 0.75rem;
+    color: #4a5a6e;
+    background: #f1f4f8;
+    padding: 0.2rem 0.9rem;
+    border-radius: 30px;
+    font-weight: 700;
+}
+
+.historial-lista {
+    margin-top: 1rem;
+    max-height: 350px;
+    overflow-y: auto;
+    border: 1px solid #e9edf2;
+    border-radius: 14px;
+    background: #ffffff;
+    animation: fadeIn 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.historial-item {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    padding: 0.8rem 1.25rem;
+    border-bottom: 1px solid #f1f4f8;
+    font-size: 0.9rem;
+    transition: background 0.2s ease;
+}
+
+.historial-item:last-child {
+    border-bottom: none;
+}
+
+.historial-item:hover {
+    background: #fafbfc;
+}
+
+.historial-fecha {
+    min-width: 150px;
+    color: #6b7a8a;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.historial-fecha i {
+    font-size: 0.8rem;
+    color: #8a9aa8;
+}
+
+.historial-detalle {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.05rem;
+}
+
+.historial-detalle strong {
+    color: #0a1628;
+    font-size: 0.9rem;
+}
+
+.historial-detalle span {
+    color: #6b7a8a;
+    font-size: 0.8rem;
+}
+
+.historial-usuario {
+    color: #6b7a8a;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    white-space: nowrap;
+}
+
+.historial-usuario i {
+    font-size: 0.8rem;
+    color: #8a9aa8;
+}
+
+.historial-lista::-webkit-scrollbar {
+    width: 6px;
+}
+
+.historial-lista::-webkit-scrollbar-track {
+    background: #f1f4f8;
+    border-radius: 3px;
+}
+
+.historial-lista::-webkit-scrollbar-thumb {
+    background: #d0d7df;
+    border-radius: 3px;
+    transition: background 0.2s;
+}
+
+.historial-lista::-webkit-scrollbar-thumb:hover {
+    background: #bcc5d0;
+}
+
+/* ANIMACIONES */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.tab-panel {
+    animation: fadeIn 0.35s ease;
+}
+
+/* RESPONSIVIDAD */
+@media (max-width: 768px) {
+    .detail-card {
+        padding: 1.25rem;
+        border-radius: 16px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .historial-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+        padding: 0.7rem 1rem;
+    }
+
+    .historial-fecha {
+        min-width: auto;
+    }
+
+    .historial-usuario {
+        align-self: flex-start;
+    }
+
+    .historial-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .visita-item {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0.75rem 1rem;
+    }
+
+    .visita-detalle {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .visita-info {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-box {
+        padding: 0.9rem;
+    }
+
+    .stat-value {
+        font-size: 1.35rem;
+    }
+}
