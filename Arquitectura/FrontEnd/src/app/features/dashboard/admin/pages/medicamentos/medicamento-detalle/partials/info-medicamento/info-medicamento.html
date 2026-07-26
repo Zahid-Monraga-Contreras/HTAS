@@ -1,0 +1,94 @@
+<div class="tab-panel">
+    <div class="detail-card">
+
+        <!-- Tarjeta de resumen del medicamento -->
+        <div class="resumen-medicamento">
+            <div class="resumen-item">
+                <i class="bi bi-capsule"></i>
+                <div>
+                    <small>Nombre</small>
+                    <strong>{{ nombreFormateado }}</strong>
+                </div>
+            </div>
+            <div class="resumen-item">
+                <i class="bi bi-box-seam"></i>
+                <div>
+                    <small>Presentación</small>
+                    <strong>{{ infoPresentacion || 'Sin especificar' }}</strong>
+                </div>
+            </div>
+            <div class="resumen-item">
+                <i class="bi bi-building"></i>
+                <div>
+                    <small>Laboratorio</small>
+                    <strong>{{ medicamento.laboratorio || 'No especificado' }}</strong>
+                </div>
+            </div>
+            <div class="resumen-item">
+                <i class="bi bi-clipboard-data"></i>
+                <div>
+                    <small>Tratamientos</small>
+                    <strong>{{ estadisticas?.totalTratamientos || 0 }} ({{ estadisticas?.tratamientosActivos || 0 }}
+                        activos)</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario -->
+        <div class="form-grid">
+            <div class="form-group" style="grid-column: span 2;">
+                <label>Nombre Comercial</label>
+                <input type="text" [(ngModel)]="medicamento.nombrecomercial" maxlength="100"
+                    class="form-control-premium" placeholder="Ej: Amoxicilina, Ibuprofeno...">
+            </div>
+
+            <div class="form-group">
+                <label>Sustancia Activa</label>
+                <input type="text" [(ngModel)]="medicamento.sustanciaactiva" maxlength="100"
+                    class="form-control-premium" placeholder="Ej: Paracetamol...">
+            </div>
+
+            <div class="form-group">
+                <label>Presentación</label>
+                <input type="text" [(ngModel)]="medicamento.presentacion" maxlength="50" class="form-control-premium"
+                    placeholder="Ej: Caja, Jarabe, Ampolletas...">
+            </div>
+
+            <div class="form-group">
+                <label>Concentración</label>
+                <input type="text" [(ngModel)]="medicamento.concentracion" maxlength="50" class="form-control-premium"
+                    placeholder="Ej: 500 mg, 10 ml...">
+                <small class="form-text text-muted">Formato: 500 mg, 10 ml, 50%</small>
+            </div>
+
+            <div class="form-group">
+                <label>Laboratorio</label>
+                <input type="text" [(ngModel)]="medicamento.laboratorio" maxlength="100" class="form-control-premium"
+                    placeholder="Ej: Bayer, Genomma Lab...">
+            </div>
+        </div>
+
+        <div class="form-group full-width-group">
+            <label>Indicaciones Generales</label>
+            <textarea [(ngModel)]="medicamento.indicacionesgenerales" rows="4" class="form-control-premium"
+                placeholder="Describe el uso del medicamento e indicaciones..."
+                (blur)="medicamento.indicacionesgenerales = formatearIndicaciones(medicamento.indicacionesgenerales)">
+            </textarea>
+            <small class="form-text text-muted">Las indicaciones se formatearán automáticamente</small>
+        </div>
+
+        <!-- Acciones -->
+        <div class="action-footer">
+            <button class="btn-cancel-premium" (click)="onVolver()" [disabled]="isSaving">Cancelar</button>
+            <button class="btn-save" (click)="onGuardar()" [disabled]="isSaving">
+                @if (isSaving) {
+                <span class="spinner-save"></span>
+                <span>Guardando...</span>
+                } @else {
+                <i class="bi bi-check-lg"></i>
+                <span>Guardar Cambios</span>
+                }
+            </button>
+        </div>
+    </div>
+</div>

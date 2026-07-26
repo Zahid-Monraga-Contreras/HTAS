@@ -1,0 +1,157 @@
+<div class="tab-panel">
+    <div class="detail-card">
+
+        <!-- RESUMEN DEL MEDICAMENTO -->
+        <div class="resumen-medicamento-historial">
+            <div class="resumen-item">
+                <i class="bi bi-capsule"></i>
+                <div>
+                    <small>Nombre</small>
+                    <strong>{{ nombreFormateado }}</strong>
+                </div>
+            </div>
+            <div class="resumen-item">
+                <i class="bi bi-box-seam"></i>
+                <div>
+                    <small>Presentación</small>
+                    <strong>{{ infoPresentacion || 'Sin especificar' }}</strong>
+                </div>
+            </div>
+            <div class="resumen-item">
+                <i class="bi bi-building"></i>
+                <div>
+                    <small>Laboratorio</small>
+                    <strong>{{ medicamento.laboratorio || 'No especificado' }}</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- ESTADÍSTICAS DE USO -->
+        <div class="estadisticas-section">
+            <h4 class="section-title">
+                <i class="bi bi-graph-up-arrow"></i>
+                Estadísticas de Uso
+            </h4>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <small>Total Tratamientos</small>
+                    <div class="stat-value">{{ estadisticas?.totalTratamientos || 0 }}</div>
+                </div>
+                <div class="stat-box">
+                    <small>Tratamientos Activos</small>
+                    <div class="stat-value">{{ estadisticas?.tratamientosActivos || 0 }}</div>
+                </div>
+                <div class="stat-box">
+                    <small>Pacientes Activos</small>
+                    <div class="stat-value">{{ estadisticas?.pacientesActivos || 0 }}</div>
+                </div>
+                <div class="stat-box">
+                    <small>Último Uso</small>
+                    <div class="stat-value" style="font-size: 0.9rem;">
+                        {{ ultimoUsoFormateado }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr class="section-divider">
+
+        <!-- TRATAMIENTOS ASOCIADOS -->
+        <div class="tratamientos-section">
+            <div class="tratamientos-header">
+                <h4 class="section-title">
+                    <i class="bi bi-prescription"></i>
+                    Tratamientos Asociados
+                    <span class="badge-tratamientos">{{ totalTratamientos }}</span>
+                </h4>
+            </div>
+
+            @if (tratamientosAsociados.length > 0) {
+            <div class="tratamientos-lista">
+                @for (t of tratamientosAsociados; track t.id) {
+                <div class="tratamiento-item" [class.activo]="t.activo">
+                    <div class="tratamiento-info">
+                        <i class="bi bi-person-fill"></i>
+                        <div>
+                            <span class="paciente-nombre">{{ t.paciente }}</span>
+                            <span class="paciente-dosis">{{ t.dosis }}</span>
+                        </div>
+                    </div>
+                    <div class="tratamiento-detalle">
+                        <span class="fecha-info">
+                            <i class="bi bi-calendar-event"></i>
+                            {{ t.fechaInicio }}
+                            @if (t.fechaFin) {
+                            <span>→ {{ t.fechaFin }}</span>
+                            }
+                        </span>
+                        @if (t.activo) {
+                        <span class="badge-activo">
+                            <i class="bi bi-check-circle-fill"></i> Activo
+                        </span>
+                        } @else {
+                        <span class="badge-inactivo">
+                            <i class="bi bi-clock"></i> Inactivo
+                        </span>
+                        }
+                    </div>
+                </div>
+                }
+            </div>
+            } @else {
+            <div class="tratamientos-vacio">
+                <i class="bi bi-inbox"></i>
+                <p>Sin tratamientos asociados</p>
+                <span>Este medicamento aún no se ha usado en ningún tratamiento</span>
+            </div>
+            }
+        </div>
+
+        <hr class="section-divider">
+
+        <!-- HISTORIAL DE CAMBIOS -->
+        <div class="historial-section">
+            <div class="historial-header">
+                <h4 class="section-title">
+                    <i class="bi bi-clock-history"></i>
+                    Historial del Medicamento
+                </h4>
+                <span class="historial-count">{{ historialCambios.length }} eventos</span>
+            </div>
+
+            @if (historialCambios.length > 0) {
+            <div class="historial-lista">
+                @for (item of historialCambios; track $index) {
+                <div class="historial-item">
+                    <div class="historial-fecha">
+                        <i class="bi bi-clock"></i>
+                        {{ item.fecha }}
+                    </div>
+                    <div class="historial-detalle">
+                        <strong>{{ item.accion }}</strong>
+                        <span>{{ item.detalle }}</span>
+                    </div>
+                    <div class="historial-usuario">
+                        <i class="bi bi-person"></i>
+                        {{ item.usuario }}
+                    </div>
+                </div>
+                }
+            </div>
+            } @else {
+            <div class="historial-vacio">
+                <i class="bi bi-clock-history"></i>
+                <p>Aún no hay actividad registrada</p>
+                <span>Los cambios del medicamento aparecerán aquí</span>
+            </div>
+            }
+        </div>
+
+        <!-- ACCIONES -->
+        <div class="action-footer">
+            <button class="btn-cancel-premium" (click)="onVolver()">
+                Cancelar
+            </button>
+        </div>
+    </div>
+</div>
