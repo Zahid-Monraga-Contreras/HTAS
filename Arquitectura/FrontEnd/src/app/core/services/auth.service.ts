@@ -50,7 +50,7 @@ export class AuthService {
   private apiUrl = `${environment.baseUrl}/api/auth`;
   private currentUser = new BehaviorSubject<AuthUser | null>(null);
   private authToken: string | null = null;
-  private refreshTokenValue: string | null = null; // ✅ CAMBIADO: rename para evitar conflicto
+  private refreshTokenValue: string | null = null;
 
   constructor(
     private http: HttpClient,
@@ -192,7 +192,7 @@ export class AuthService {
       tap((response: any) => {
         // Actualizar usuario en localStorage si es el mismo
         const currentUser = this.currentUser.value;
-        // ✅ CORREGIDO: Convertir uid a string para comparar
+        // CORREGIDO: Convertir uid a string para comparar
         if (currentUser && String(currentUser.uid) === String(uid)) {
           const usuarioActualizado = {
             ...currentUser,

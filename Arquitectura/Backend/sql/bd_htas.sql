@@ -74,20 +74,12 @@ CREATE TABLE DOCTORES (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-SELECT  
-    d . IdUsuario , 
-    u . Nombre , 
-    u . ApPaterno , 
-    u . ApMaterno , 
-    u . Correo , 
-    d . Cedula , 
-    d . Especialidad , 
-    d . TipoSangre , 
-    d . Peso , 
-    d . Altura 
-FROM  DOCTORES d 
-JOIN  USUARIOS u  ON  d . IdUsuario  =  u . IdUsuario 
-WHERE  u . Activo  =  true  AND  u . deleted_at  IS  NULL ; 
+SELECT d.IdUsuario, u.Nombre, u.ApPaterno, u.ApMaterno, u.Correo, d.Cedula, d.Especialidad, d.TipoSangre, d.Peso, d.Altura
+FROM DOCTORES d
+    JOIN USUARIOS u ON d.IdUsuario = u.IdUsuario
+WHERE
+    u.Activo = true
+    AND u.deleted_at IS NULL;
 
 -- ============================================
 -- 3. TABLA: PACIENTES
@@ -113,10 +105,10 @@ CREATE TABLE PACIENTES (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-SELECT*FROM PACIENTES;
+SELECT * FROM PACIENTES;
 
 -- Verificar el estado del usuario
-SELECT 
+SELECT
     IdUsuario,
     Nombre,
     ApPaterno,
@@ -124,24 +116,17 @@ SELECT
     Correo,
     Activo,
     deleted_at
-FROM USUARIOS 
-WHERE IdUsuario = 1;
+FROM USUARIOS
+WHERE
+    IdUsuario = 1;
 
 -- Ver todos los pacientes
-SELECT 
-    p.IdUsuario,
-    u.Nombre,
-    u.ApPaterno,
-    u.ApMaterno,
-    u.Correo,
-    p.NSS,
-    p.TipoSangre,
-    p.Peso,
-    p.Altura,
-    p.AntecedentesFamiliares
+SELECT p.IdUsuario, u.Nombre, u.ApPaterno, u.ApMaterno, u.Correo, p.NSS, p.TipoSangre, p.Peso, p.Altura, p.AntecedentesFamiliares
 FROM PACIENTES p
-JOIN USUARIOS u ON p.IdUsuario = u.IdUsuario
-WHERE u.Activo = true AND u.deleted_at IS NULL;
+    JOIN USUARIOS u ON p.IdUsuario = u.IdUsuario
+WHERE
+    u.Activo = true
+    AND u.deleted_at IS NULL;
 
 SELECT * FROM PACIENTES WHERE IdUsuario = 1;
 
@@ -160,7 +145,7 @@ CREATE TABLE ACOMPANANTES (
 ALTER TABLE ACOMPANANTES ALTER COLUMN FechaAsignacion DROP NOT NULL;
 
 -- Ver todos los acompañantes
-SELECT 
+SELECT
     a.IdUsuario,
     u.Nombre,
     u.ApPaterno,
@@ -170,19 +155,28 @@ SELECT
     a.IdPacienteAsociado,
     pu.Nombre AS NombrePaciente,
     pu.ApPaterno AS ApPaternoPaciente
-FROM ACOMPANANTES a
-JOIN USUARIOS u ON a.IdUsuario = u.IdUsuario
-LEFT JOIN USUARIOS pu ON a.IdPacienteAsociado = pu.IdUsuario
-WHERE u.Activo = true AND u.deleted_at IS NULL;
+FROM
+    ACOMPANANTES a
+    JOIN USUARIOS u ON a.IdUsuario = u.IdUsuario
+    LEFT JOIN USUARIOS pu ON a.IdPacienteAsociado = pu.IdUsuario
+WHERE
+    u.Activo = true
+    AND u.deleted_at IS NULL;
 
-SELECT IdUsuario, Nombre, Activo, deleted_at 
-FROM USUARIOS 
-WHERE IdUsuario = 1;
+SELECT
+    IdUsuario,
+    Nombre,
+    Activo,
+    deleted_at
+FROM USUARIOS
+WHERE
+    IdUsuario = 1;
 
 -- Ver la estructura exacta de PACIENTES
-SELECT column_name, data_type 
-FROM information_schema.columns 
-WHERE table_name = 'pacientes'
+SELECT column_name, data_type
+FROM information_schema.columns
+WHERE
+    table_name = 'pacientes'
 ORDER BY ordinal_position;
 
 -- ============================================
@@ -279,6 +273,7 @@ FrecuenciaHoras INT NOT NULL, -- Ej: 8 (significa cada 8 horas)
 
 -- Duración del tratamiento
 
+
 FechaInicio DATE NOT NULL,
     FechaFin DATE NOT NULL,
     
@@ -303,7 +298,8 @@ CREATE TABLE REGISTRO_TOMAS (
             'Pendiente',
             'Tomada',
             'Omitida',
-            'Retrasada'
+            'Retrasada',
+            'Eliminada'
         )
     ),
     NotasTomas TEXT, -- Ej: "Sintió náuseas después de tomarla"
@@ -354,13 +350,15 @@ FechaHoraLectura TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Momento en que
 SELECT * FROM MEDICIONES_PRESION WHERE IdPaciente = 2;
 
 -- Eliminar la restricción actual
-ALTER TABLE MEDICIONES_PRESION 
+ALTER TABLE MEDICIONES_PRESION
 DROP CONSTRAINT IF EXISTS mediciones_presion_pulso_check;
 
 -- Crear una nueva restricción que permita 0
-ALTER TABLE MEDICIONES_PRESION 
-ADD CONSTRAINT mediciones_presion_pulso_check 
-CHECK (Pulso = 0 OR (Pulso BETWEEN 30 AND 220));
+ALTER TABLE MEDICIONES_PRESION
+ADD CONSTRAINT mediciones_presion_pulso_check CHECK (
+    Pulso = 0
+    OR (Pulso BETWEEN 30 AND 220)
+);
 
 -- ============================================
 -- ÍNDICES PARA MEJORAR RENDIMIENTO
@@ -391,7 +389,8 @@ $$ LANGUAGE plpgsql;
 -- ============================================
 -- VISTA PARA INFORMACIÓN COMPLETA DE USUARIOS
 -- ============================================
-CREATE OR REPLACE VIEW VW_USUARIOS_COMPLETO AS
+CREATE
+OR REPLACE VIEW VW_USUARIOS_COMPLETO AS
 SELECT
     u.IdUsuario,
     u.Nombre,

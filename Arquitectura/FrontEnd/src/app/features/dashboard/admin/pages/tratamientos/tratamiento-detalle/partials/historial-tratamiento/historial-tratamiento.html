@@ -1,0 +1,126 @@
+<div class="historial-tratamiento-container">
+    <!-- RESUMEN DEL TRATAMIENTO -->
+    <div class="resumen-tratamiento-historial">
+        <div class="resumen-item">
+            <i class="bi bi-capsule"></i>
+            <div>
+                <small>Medicamento</small>
+                <strong>{{ tratamientoSeleccionado?.nombremedicamento || 'No especificado' }}</strong>
+            </div>
+        </div>
+        <div class="resumen-item">
+            <i class="bi bi-calendar3"></i>
+            <div>
+                <small>Inicio</small>
+                <strong>{{ tratamientoSeleccionado?.fechainicio | date:'dd/MM/yyyy' }}</strong>
+            </div>
+        </div>
+        <div class="resumen-item">
+            <i class="bi bi-calendar-range"></i>
+            <div>
+                <small>Fin</small>
+                <strong>{{ tratamientoSeleccionado?.fechafin | date:'dd/MM/yyyy' }}</strong>
+            </div>
+        </div>
+        <div class="resumen-item">
+            <i class="bi bi-tag-fill"></i>
+            <div>
+                <small>Estado</small>
+                <strong [style.color]="getEstadoTratamiento().color">{{ getEstadoTratamiento().texto }}</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- ESTADÍSTICAS DEL HISTORIAL -->
+    <div class="estadisticas-section">
+        <h4 class="section-title">
+            <i class="bi bi-graph-up-arrow"></i>
+            Resumen de Actividad
+        </h4>
+        <div class="stats-grid">
+            <div class="stat-box">
+                <small>Total Cambios</small>
+                <div class="stat-value">{{ historialCambios.length }}</div>
+            </div>
+            <div class="stat-box">
+                <small>Cambios de Dosis</small>
+                <div class="stat-value">{{ contarCambiosDosis() }}</div>
+            </div>
+            <div class="stat-box">
+                <small>Cambios de Estado</small>
+                <div class="stat-value">{{ contarCambiosEstado() }}</div>
+            </div>
+            <div class="stat-box">
+                <small>Última Modificación</small>
+                <div class="stat-value" style="font-size: 0.9rem;">
+                    {{ historialCambios.length > 0 ? historialCambios[0].fecha : 'Sin cambios' }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- HISTORIAL DE CAMBIOS COMPLETO -->
+    <div class="historial-section">
+        <div class="historial-header">
+            <h4 class="section-title">
+                <i class="bi bi-clock-history"></i>
+                Historial de Cambios
+            </h4>
+            <span class="historial-count">{{ historialCambios.length }} eventos</span>
+        </div>
+
+        @if (historialCambios.length > 0) {
+        <div class="historial-lista">
+            @for (item of historialCambios; track $index) {
+            <div class="historial-item" [ngClass]="{
+                'cambio-estado': item.accion.includes('activado') || item.accion.includes('desactivado'),
+                'cambio-dosis': item.accion.includes('Dosis'),
+                'cambio-creacion': item.accion.includes('creado'),
+                'cambio-info': item.accion.includes('actualizada')
+            }">
+                <div class="historial-icono">
+                    @if (item.accion.includes('creado')) {
+                    <i class="bi bi-plus-circle-fill" style="color: #10b981;"></i>
+                    } @else if (item.accion.includes('activado')) {
+                    <i class="bi bi-play-circle-fill" style="color: #10b981;"></i>
+                    } @else if (item.accion.includes('desactivado')) {
+                    <i class="bi bi-stop-circle-fill" style="color: #ef4444;"></i>
+                    } @else if (item.accion.includes('Dosis')) {
+                    <i class="bi bi-pencil-square" style="color: #f59e0b;"></i>
+                    } @else {
+                    <i class="bi bi-pencil-square" style="color: #8a9aa8;"></i>
+                    }
+                </div>
+                <div class="historial-fecha">
+                    <i class="bi bi-clock"></i>
+                    {{ item.fecha }}
+                </div>
+                <div class="historial-detalle">
+                    <strong>{{ item.accion }}</strong>
+                    <span>{{ item.detalle }}</span>
+                </div>
+                <div class="historial-usuario">
+                    <i class="bi bi-person"></i>
+                    {{ item.usuario }}
+                </div>
+            </div>
+            }
+        </div>
+        } @else {
+        <div class="historial-vacio">
+            <i class="bi bi-clock-history"></i>
+            <p>Aún no hay actividad registrada</p>
+            <span>Los cambios del tratamiento aparecerán aquí</span>
+        </div>
+        }
+    </div>
+
+    <!-- ACCIONES DEL HISTORIAL -->
+    <div class="action-footer">
+        <button class="btn-cancel-premium" (click)="onVolver()">
+            Cancelar
+        </button>
+    </div>
+</div>

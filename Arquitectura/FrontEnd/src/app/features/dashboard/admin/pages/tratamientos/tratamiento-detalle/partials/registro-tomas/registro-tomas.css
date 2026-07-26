@@ -1,0 +1,936 @@
+/* ==========================================================================
+   REGISTRO-TOMAS - ESTILOS COMPLETOS
+   ========================================================================== */
+
+/* TOAST */
+.toast-premium-container {
+    position: fixed;
+    top: 30px;
+    right: 30px;
+    z-index: 10005;
+    padding: 1rem 1.5rem;
+    border-radius: 14px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12);
+    display: flex;
+    align-items: center;
+    max-width: 420px;
+    animation: slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    color: #ffffff;
+    backdrop-filter: blur(4px);
+}
+
+.toast-premium-container.success {
+    background: linear-gradient(135deg, #10b981, #059669);
+    border-left: 4px solid #047857;
+}
+
+.toast-premium-container.error {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    border-left: 4px solid #b91c1c;
+}
+
+.toast-premium-container.warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border-left: 4px solid #b45309;
+}
+
+.toast-content {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.icon-toast {
+    font-size: 1.4rem;
+}
+
+.toast-message {
+    font-weight: 600;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(120%) scale(0.95);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+    }
+}
+
+/* RESUMEN */
+.resumen-tratamiento-historial {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    background: #fafbfc;
+    border-radius: 14px;
+    margin-bottom: 1.75rem;
+    border: 1px solid #e9edf2;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.resumen-item {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.25rem 0;
+}
+
+.resumen-item i {
+    font-size: 1.5rem;
+    color: #b0001e;
+    min-width: 32px;
+    text-align: center;
+    opacity: 0.85;
+}
+
+.resumen-item div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.05rem;
+}
+
+.resumen-item small {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    color: #8a9aa8;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+}
+
+.resumen-item strong {
+    font-size: 0.95rem;
+    color: #0a1628;
+    font-weight: 600;
+}
+
+/* ESTADÍSTICAS */
+.estadisticas-section {
+    margin-top: 1.75rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid #e9edf2;
+}
+
+.section-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1a2938;
+    margin: 0 0 1.1rem 0;
+    padding-bottom: 0.6rem;
+    border-bottom: 2px solid #f1f4f8;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.section-title i {
+    color: #b0001e;
+    font-size: 1.15rem;
+}
+
+.section-divider {
+    border: none;
+    border-top: 2px solid #e9edf2;
+    margin: 1.75rem 0;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.stat-box {
+    background: #ffffff;
+    padding: 1.2rem 1rem;
+    border-radius: 14px;
+    border: 1px solid #e9edf2;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.stat-box:hover {
+    transform: translateY(-4px);
+    border-color: #d0d7df;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.stat-box small {
+    display: block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #8a9aa8;
+    margin-bottom: 0.4rem;
+    letter-spacing: 0.4px;
+}
+
+.stat-value {
+    font-size: 1.65rem;
+    font-weight: 800;
+    color: #0a1628;
+    line-height: 1.2;
+}
+
+.stat-total .stat-value {
+    color: #3b82f6;
+}
+
+.stat-completadas .stat-value {
+    color: #10b981;
+}
+
+.stat-pendientes .stat-value {
+    color: #f59e0b;
+}
+
+.stat-omitidas .stat-value {
+    color: #ef4444;
+}
+
+.stat-retrasadas .stat-value {
+    color: #f97316;
+}
+
+.stat-cumplimiento .stat-value {
+    color: #8b5cf6;
+}
+
+.stat-dias .stat-value {
+    color: #8b5cf6;
+}
+
+/* BOTÓN GENERAR TOMAS */
+.tomas-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+    gap: 0.75rem;
+}
+
+.btn-generar-tomas {
+    padding: 0.55rem 1.5rem;
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+}
+
+.btn-generar-tomas:hover:not(:disabled) {
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.35);
+}
+
+.btn-generar-tomas:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.spinner-save {
+    width: 18px;
+    height: 18px;
+    border: 2.5px solid rgba(255, 255, 255, 0.25);
+    border-radius: 50%;
+    border-top-color: #ffffff;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* TOMAS */
+.tomas-section-full {
+    margin-top: 1.5rem;
+}
+
+.tomas-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0;
+}
+
+.tomas-header .section-title {
+    margin-bottom: 0;
+}
+
+.badge-tomas {
+    background: linear-gradient(135deg, #b0001e, #8a0016);
+    color: #ffffff;
+    padding: 0.15rem 0.7rem;
+    border-radius: 30px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    margin-left: 0.5rem;
+    box-shadow: 0 2px 6px rgba(176, 0, 30, 0.2);
+}
+
+.tomas-lista-full {
+    margin-top: 1rem;
+    border: 1px solid #e9edf2;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.toma-item-full {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.9rem 1.5rem;
+    border-bottom: 1px solid #f1f4f8;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    transition: all 0.2s ease;
+}
+
+.toma-item-full:last-child {
+    border-bottom: none;
+}
+
+.toma-item-full:hover {
+    background: #fafbfc;
+}
+
+.toma-item-full.toma-completada {
+    border-left: 4px solid #10b981;
+}
+
+.toma-item-full.toma-pendiente {
+    border-left: 4px solid #f59e0b;
+}
+
+.toma-item-full.toma-omitida {
+    border-left: 4px solid #ef4444;
+}
+
+.toma-item-full.toma-retrasada {
+    border-left: 4px solid #f97316;
+}
+
+.toma-info-full {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.toma-fecha-hora {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.toma-fecha-hora .toma-fecha {
+    font-weight: 600;
+    color: #0a1628;
+    font-size: 0.95rem;
+}
+
+.toma-fecha-hora .toma-hora {
+    font-size: 0.85rem;
+    color: #6b7a8a;
+    font-weight: 500;
+    background: #f1f4f8;
+    padding: 0.1rem 0.6rem;
+    border-radius: 12px;
+}
+
+.toma-estado-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.8rem;
+    border-radius: 30px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.toma-actions-full {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.toma-actions-buttons {
+    display: flex;
+    gap: 0.3rem;
+    align-items: center;
+}
+
+.btn-toma-completar,
+.btn-toma-omitir,
+.btn-toma-retrasar {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+}
+
+.btn-toma-completar {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.btn-toma-completar:hover {
+    background: #10b981;
+    color: #ffffff;
+    transform: scale(1.1);
+}
+
+.btn-toma-omitir {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.btn-toma-omitir:hover {
+    background: #ef4444;
+    color: #ffffff;
+    transform: scale(1.1);
+}
+
+.btn-toma-retrasar {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.btn-toma-retrasar:hover {
+    background: #f59e0b;
+    color: #ffffff;
+    transform: scale(1.1);
+}
+
+.toma-notas-full {
+    font-size: 0.75rem;
+    color: #6b7a8a;
+    background: #f1f4f8;
+    padding: 0.15rem 0.7rem;
+    border-radius: 30px;
+}
+
+.tomas-vacio {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: #8a9aa8;
+}
+
+.tomas-vacio i {
+    font-size: 2.5rem;
+    color: #dce1e8;
+    margin-bottom: 0.75rem;
+    display: block;
+}
+
+.tomas-vacio p {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #4a5a6e;
+    margin: 0 0 0.25rem 0;
+}
+
+.tomas-vacio span {
+    font-size: 0.85rem;
+    color: #8a9aa8;
+}
+
+/* BOTONES */
+.btn-cancel-premium {
+    padding: 0.65rem 1.5rem;
+    background: #ffffff;
+    color: #4a5a6e;
+    border: 1.5px solid #dce1e8;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.btn-cancel-premium:hover:not(:disabled) {
+    background: #f1f4f8;
+    color: #1a2938;
+    transform: translateY(-2px);
+    border-color: #bcc5d0;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+.action-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2.5rem;
+    padding-top: 1.75rem;
+    border-top: 2px solid #e9edf2;
+}
+
+/* MODAL */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 10006;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.modal-container {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 2rem;
+    max-width: 450px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: modalSlideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes modalSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.modal-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    color: #d97706;
+    flex-shrink: 0;
+}
+
+.modal-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0a1628;
+    margin: 0;
+}
+
+.modal-body {
+    padding: 0.5rem 0 1.5rem 0;
+}
+
+.modal-mensaje {
+    font-size: 0.95rem;
+    color: #4a5a6e;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e9edf2;
+}
+
+.modal-btn {
+    padding: 0.6rem 1.5rem;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modal-btn-cancel {
+    background: #f1f4f8;
+    color: #4a5a6e;
+}
+
+.modal-btn-cancel:hover {
+    background: #e2e7ee;
+    transform: translateY(-2px);
+}
+
+.modal-btn-confirm {
+    background: linear-gradient(135deg, #b0001e, #8a0016);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(176, 0, 30, 0.25);
+}
+
+.modal-btn-confirm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(176, 0, 30, 0.35);
+}
+
+.modal-btn-confirm i {
+    font-size: 1rem;
+}
+
+/* RESPONSIVIDAD */
+@media (max-width: 768px) {
+    .resumen-tratamiento-historial {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+        padding: 1rem 1.25rem;
+    }
+
+    .resumen-item {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e9edf2;
+    }
+
+    .resumen-item:last-child {
+        border-bottom: none;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .toma-item-full {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+        padding: 0.7rem 1rem;
+    }
+
+    .toma-actions-full {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .toma-info-full {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.4rem;
+    }
+
+    .toma-fecha-hora {
+        flex-wrap: wrap;
+    }
+
+    .action-footer {
+        flex-direction: column-reverse;
+        gap: 0.75rem;
+        margin-top: 1.75rem;
+        padding-top: 1.25rem;
+    }
+
+    .action-footer button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .toast-premium-container {
+        top: 15px;
+        right: 15px;
+        left: 15px;
+        max-width: none;
+        border-radius: 12px;
+    }
+
+    .toma-actions-buttons .btn-toma-completar,
+    .toma-actions-buttons .btn-toma-omitir,
+    .toma-actions-buttons .btn-toma-retrasar {
+        width: 24px;
+        height: 24px;
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-box {
+        padding: 0.9rem;
+    }
+
+    .stat-value {
+        font-size: 1.35rem;
+    }
+
+    .resumen-item strong {
+        font-size: 0.85rem;
+    }
+
+    .resumen-item i {
+        font-size: 1.2rem;
+        min-width: 28px;
+    }
+
+    .toma-fecha {
+        font-size: 0.8rem;
+    }
+
+    .toma-hora {
+        font-size: 0.7rem;
+    }
+
+    .toma-estado-badge {
+        font-size: 0.65rem;
+        padding: 0.15rem 0.6rem;
+    }
+
+    .modal-container {
+        padding: 1.5rem;
+    }
+
+    .modal-footer {
+        flex-direction: column-reverse;
+    }
+
+    .modal-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Botón de eliminar toma */
+.btn-toma-eliminar {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.btn-toma-eliminar:hover {
+    background: #ef4444;
+    color: #ffffff;
+    transform: scale(1.1);
+}
+
+/* Estilos para tomas eliminadas */
+.toma-item-full.toma-eliminada {
+    border-left: 4px solid #6c757d;
+    opacity: 0.7;
+    background: #f8f9fa;
+}
+
+.toma-estado-eliminada {
+    font-size: 0.75rem;
+    color: #6c757d;
+    font-weight: 600;
+    padding: 0.15rem 0.7rem;
+    border-radius: 30px;
+    background: #e9ecef;
+}
+
+/* Modal de peligro */
+.modal-header-danger .modal-icon-danger {
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    color: #dc2626;
+}
+
+.modal-btn-danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+}
+
+.modal-btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(239, 68, 68, 0.35);
+}
+
+/* Estilos para el contenedor de acciones */
+.tomas-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.tomas-actions-left {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.tomas-actions-right {
+    display: flex;
+    gap: 0.75rem;
+}
+
+/* Botón Eliminar Todas */
+.btn-eliminar-todas {
+    padding: 0.55rem 1.5rem;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+}
+
+.btn-eliminar-todas:hover:not(:disabled) {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(239, 68, 68, 0.35);
+}
+
+.btn-eliminar-todas:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Badges de tomas */
+.badge-tomas.badge-activas {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #ffffff;
+}
+
+/* Modal de peligro grande */
+.modal-danger-large .modal-container {
+    max-width: 550px;
+}
+
+.modal-advertencia {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: #fef3c7;
+    border-radius: 10px;
+    color: #92400e;
+    margin: 1rem 0;
+}
+
+.modal-advertencia i {
+    font-size: 1.2rem;
+    color: #d97706;
+}
+
+.modal-detalle-eliminacion {
+    background: #f8fafc;
+    padding: 1rem;
+    border-radius: 10px;
+    border: 1px solid #e9edf2;
+    margin-top: 0.5rem;
+}
+
+.modal-detalle-eliminacion p {
+    margin: 0.3rem 0;
+    font-size: 0.9rem;
+    color: #4a5a6e;
+}
+
+.modal-footer-danger {
+    border-top: 2px solid #fee2e2;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .tomas-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .tomas-actions-left,
+    .tomas-actions-right {
+        width: 100%;
+    }
+
+    .tomas-actions-left button,
+    .tomas-actions-right button {
+        width: 100%;
+        justify-content: center;
+    }
+}

@@ -283,6 +283,73 @@ const tomasController = {
                 detalle: error.message
             });
         }
+    },
+
+    // ==========================================================================
+    // ✅ NUEVO: ELIMINAR TODAS LAS TOMAS DE UN TRATAMIENTO
+    // ==========================================================================
+    eliminarTodasTomas: async (req, res) => {
+        const { idTratamiento } = req.params;
+
+        if (!idTratamiento) {
+            return res.status(400).json({
+                error: "ID de tratamiento es requerido"
+            });
+        }
+
+        try {
+            // Verificar que el tratamiento existe
+            const tratamientoExists = await db.query(
+                `SELECT IdTratamiento FROM TRATAMIENTOS WHERE IdTratamiento = $1`,
+                [idTratamiento]
+            );
+
+            if (tratamientoExists.rows.length === 0) {
+                return res.status(404).json({
+                    error: "Tratamiento no encontrado",
+                    detalle: `No existe tratamiento con ID ${idTratamiento}`
+                });
+            }
+
+            // Contar cuántas tomas se van a eliminar
+            const countResult = await db.query(
+                `SELECT COUNT(*) AS total FROM REGISTRO_TOMAS WHERE IdTratamiento = $1`,
+                [idTratamiento]
+            );
+            const totalTomas = parseInt(countResult.rows[0].total) || 0;
+
+            if (totalTomas === 0) {
+                return res.status(404).json({
+                    error: "No hay tomas para eliminar",
+                    totalEliminadas: 0
+                });
+            }
+
+            // Eliminar todas las tomas del tratamiento
+            const deleteResult = await db.query(
+                `DELETE FROM REGISTRO_TOMAS WHERE IdTratamiento = $1 RETURNING *`,
+                [idTratamiento]
+            );
+
+            const eliminadas = deleteResult.rows.length;
+
+            res.json({
+                message: `Se eliminaron ${eliminadas} tomas del tratamiento con éxito`,
+                totalEliminadas: eliminadas,
+                tratamiento: {
+                    id: idTratamiento,
+                    tomasEliminadas: eliminadas
+                }
+            });
+
+        } catch (error) {
+            console.error("Error al eliminar todas las tomas del tratamiento:", error);
+            res.status(500).json({
+                error: "Error al eliminar todas las tomas del tratamiento",
+                detalle: error.message,
+                stack: error.stack
+            });
+        }
     }
 };
 

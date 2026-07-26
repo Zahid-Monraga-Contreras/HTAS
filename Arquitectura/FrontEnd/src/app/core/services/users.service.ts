@@ -63,8 +63,8 @@ export interface RegistroData {
 
 export interface MedicionData {
   idPaciente: number;
-  sistolica: number;  // CORREGIDO: antes era "sistólica" con acento
-  diastolica: number; // CORREGIDO: antes era "diastólica" con acento
+  sistolica: number;
+  diastolica: number;
   pulso: number;
   metodoSincronizacion?: 'Bluetooth' | 'Manual';
   idDispositivo?: number | null;
@@ -78,13 +78,13 @@ export interface DispositivoData {
   activo?: boolean;
 }
 
-// NUEVA INTERFAZ PARA TOMAS
+// ✅ CORREGIDO: Agregar 'Eliminada' al tipo de estado
 export interface RegistroToma {
   id?: number;
   idTratamiento: number;
   fechaProgramada: string;
   fechaRealizada?: string;
-  estado: 'Pendiente' | 'Tomada' | 'Omitida' | 'Retrasada';
+  estado: 'Pendiente' | 'Tomada' | 'Omitida' | 'Retrasada' | 'Eliminada';
   notas?: string;
   idAcompanante?: number;
   nombreAcompanante?: string;
@@ -445,7 +445,7 @@ export class Users {
   }
 
   // ==========================================================================
-  // --- ✅ NUEVO: GESTIÓN DE TOMAS ---
+  // --- ✅ GESTIÓN DE TOMAS ---
   // ==========================================================================
 
   /**
@@ -508,7 +508,7 @@ export class Users {
   /**
    * Actualiza el estado de una toma específica
    * @param id ID de la toma
-   * @param estado Nuevo estado ('Pendiente' | 'Tomada' | 'Omitida' | 'Retrasada')
+   * @param estado Nuevo estado ('Pendiente' | 'Tomada' | 'Omitida' | 'Retrasada' | 'Eliminada')
    * @param fechaHoraRealizada Fecha y hora en que se realizó la toma (opcional)
    * @param notasTomas Notas adicionales (opcional)
    * @returns Observable con la toma actualizada
@@ -566,6 +566,16 @@ export class Users {
     return this.http.delete<any>(`${this.apiUrl}/tomas/${id}`);
   }
 
+  /**
+   * ✅ ELIMINA TODAS LAS TOMAS DE UN TRATAMIENTO
+   * @param idTratamiento ID del tratamiento
+   * @returns Observable con el resultado de la operación
+   */
+  eliminarTodasTomas(idTratamiento: number): Observable<any> {
+    console.log(`[Service] Eliminando todas las tomas del tratamiento ID: ${idTratamiento}`);
+    return this.http.delete<any>(`${this.apiUrl}/tomas/tratamiento/${idTratamiento}/todas`);
+  }
+
   // ==========================================================================
   // --- GESTIÓN DE DISPOSITIVOS ---
   // ==========================================================================
@@ -620,14 +630,13 @@ export class Users {
   }
 
   // ==========================================================================
-  // --- GESTIÓN DE MEDICIONES (CORREGIDO) ---
+  // --- GESTIÓN DE MEDICIONES ---
   // ==========================================================================
 
   /**
    * Registrar una nueva medición manualmente
    */
   registrarMedicion(datos: MedicionData): Observable<any> {
-    // Asegurar que los nombres de los campos coincidan con el backend
     const payload = {
       idPaciente: datos.idPaciente,
       sistolica: datos.sistolica,
@@ -697,7 +706,6 @@ export class Users {
    * Registrar múltiples mediciones en lote
    */
   registrarMultiplesMediciones(mediciones: any[]): Observable<any> {
-    // Asegurar que los campos tengan los nombres correctos
     const medicionesFormateadas = mediciones.map(m => ({
       idPaciente: m.idPaciente,
       sistolica: m.sistolica,
@@ -710,11 +718,9 @@ export class Users {
 
   /**
    * OBTENER MEDICIÓN DESDE TENSIÓMETRO VÍA BLUETOOTH
-   * Este método ejecuta el script Python que se conecta al dispositivo
    */
   obtenerMedicionTensiometro(idPaciente: number | string): Observable<any> {
     console.log(`[Service] Solicitando medición para paciente ID: ${idPaciente}`);
-    // Cambiado a GET porque el controller usa req.params, no req.body
     return this.http.get(`${this.apiUrl}/mediciones/tensiometro/${idPaciente}`);
   }
 

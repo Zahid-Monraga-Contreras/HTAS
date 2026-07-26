@@ -72,7 +72,14 @@ export class Tratamientos implements OnInit, OnDestroy {
         try {
           this.currentUser = JSON.parse(saved);
           // Log para depurar qué está llegando realmente
+          console.log("Usuario completo:", this.currentUser);
           console.log("Rol del usuario cargado:", this.currentUser.rol);
+          console.log("Tipo de dato del rol:", typeof this.currentUser.rol);
+
+          // Verificar permisos después de cargar
+          console.log("¿Puede crear?", this.verificarPermiso('crear'));
+          console.log("¿Puede editar?", this.verificarPermiso('editar'));
+          console.log("¿Puede eliminar?", this.verificarPermiso('eliminar'));
         } catch (e) {
           console.error("Error al parsear usuario", e);
         }
@@ -89,29 +96,47 @@ export class Tratamientos implements OnInit, OnDestroy {
   /**
    * Validador estricto basado en tus requerimientos para Tratamientos:
    * Solo 'administrador' y 'medico' pueden Crear, Editar o Eliminar.
+   * CORREGIDO: Ahora reconoce correctamente el rol 'administrador'
    */
   verificarPermiso(accion: 'crear' | 'editar' | 'eliminar'): boolean {
-    if (!this.currentUser || !this.currentUser.rol) return false;
+    if (!this.currentUser || !this.currentUser.rol) {
+      console.log('No hay usuario o rol');
+      return false;
+    }
 
     // 1. Normalizamos: pasamos a minúsculas, quitamos espacios y tildes
-    const rol = this.currentUser.rol
-      .toLowerCase()
-      .trim()
-      .normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Quita tildes
+    const rolOriginal = this.currentUser.rol;
+    const rolLower = rolOriginal.toLowerCase().trim();
+    const rolNormalizado = rolLower
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, ""); // Quita tildes
 
-    // 2. Definimos los grupos permitidos
-    const esAdmin = rol === 'administrador';
-    const esMedico = rol.includes('medico') || rol.includes('doctor');
+    console.log(`Validando permiso para ${accion}:`, {
+      original: rolOriginal,
+      lower: rolLower,
+      normalizado: rolNormalizado
+    });
 
-    // 3. Lógica de acceso
-    switch (accion) {
-      case 'crear':
-      case 'editar':
-      case 'eliminar':
-        return esAdmin || esMedico;
-      default:
-        return false;
-    }
+    // 2. Definimos los grupos permitidos - CORREGIDO
+    const esAdmin =
+      rolNormalizado === 'administrador' ||
+      rolNormalizado === 'admin' ||
+      rolLower === 'administrador' ||
+      rolLower === 'admin';
+
+    const esMedico =
+      rolLower.includes('medico') ||
+      rolLower.includes('doctor') ||
+      rolNormalizado.includes('medico') ||
+      rolNormalizado.includes('doctor');
+
+    console.log(`¿Es admin? ${esAdmin}, ¿Es médico? ${esMedico}`);
+
+    // 3. Lógica de acceso - TODOS los permisos para admin y médico
+    const permitido = esAdmin || esMedico;
+    console.log(`Permiso ${accion}: ${permitido}`);
+
+    return permitido;
   }
 
   inicializarCalendario() {
@@ -345,7 +370,7 @@ export class Tratamientos implements OnInit, OnDestroy {
         idMedicamento: idMed,
         idDoctor: this.nuevoTratamiento.idDoctor ? parseInt(this.nuevoTratamiento.idDoctor, 10) : null,
         dosis: dosisLimpia,
-        frecuenciaHoras: frec, // <- CORREGIDO: Se cambió de 'frecuenciaHours' a 'frecuenciaHoras' para cumplir con la interfaz del servicio
+        frecuenciaHoras: frec,
         fechaInicio: fInicio,
         fechaFin: fFin,
         notasInstrucciones: (this.nuevoTratamiento.notasInstrucciones || '').trim(),

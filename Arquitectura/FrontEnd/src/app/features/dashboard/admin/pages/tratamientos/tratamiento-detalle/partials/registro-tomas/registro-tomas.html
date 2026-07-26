@@ -1,0 +1,315 @@
+@if (mostrarToast) {
+<div class="toast-premium-container" [ngClass]="tipoToast">
+    <div class="toast-content">
+        @if (tipoToast === 'success') { <i class="bi bi-check-circle-fill icon-toast"></i> }
+        @if (tipoToast === 'error') { <i class="bi bi-exclamation-triangle-fill icon-toast"></i> }
+        @if (tipoToast === 'warning') { <i class="bi bi-exclamation-circle-fill icon-toast"></i> }
+        <span class="toast-message">{{ mensajeToast }}</span>
+    </div>
+</div>
+}
+
+<div class="registro-tomas-container">
+    <!-- Resumen del tratamiento -->
+    <div class="resumen-tratamiento-historial">
+        <div class="resumen-item">
+            <i class="bi bi-capsule"></i>
+            <div>
+                <small>Medicamento</small>
+                <strong>{{ tratamientoSeleccionado?.nombremedicamento || 'No especificado' }}</strong>
+            </div>
+        </div>
+        <div class="resumen-item">
+            <i class="bi bi-clock-history"></i>
+            <div>
+                <small>Frecuencia</small>
+                <strong>{{ getFrecuenciaTexto() }}</strong>
+            </div>
+        </div>
+        <div class="resumen-item">
+            <i class="bi bi-calendar-range"></i>
+            <div>
+                <small>Duración</small>
+                <strong>{{ getDuracionDias() || 0 }} días</strong>
+            </div>
+        </div>
+        <div class="resumen-item">
+            <i class="bi bi-check2-circle"></i>
+            <div>
+                <small>Estado</small>
+                <strong [style.color]="getEstadoTratamiento().color">{{ getEstadoTratamiento().texto }}</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas completas -->
+    @if (estadisticas) {
+    <div class="estadisticas-section">
+        <h4 class="section-title">
+            <i class="bi bi-graph-up-arrow"></i>
+            Estadísticas del Tratamiento
+        </h4>
+        <div class="stats-grid">
+            <div class="stat-box stat-total">
+                <small>Total Tomas</small>
+                <div class="stat-value">{{ estadisticas.totalTomas }}</div>
+            </div>
+            <div class="stat-box stat-completadas">
+                <small>Completadas</small>
+                <div class="stat-value">{{ estadisticas.tomasCompletadas }}</div>
+            </div>
+            <div class="stat-box stat-pendientes">
+                <small>Pendientes</small>
+                <div class="stat-value">{{ estadisticas.tomasPendientes }}</div>
+            </div>
+            <div class="stat-box stat-omitidas">
+                <small>Omitidas</small>
+                <div class="stat-value">{{ estadisticas.tomasOmitidas }}</div>
+            </div>
+            <div class="stat-box stat-retrasadas">
+                <small>Retrasadas</small>
+                <div class="stat-value">{{ estadisticas.tomasRetrasadas }}</div>
+            </div>
+            <div class="stat-box stat-cumplimiento">
+                <small>Cumplimiento</small>
+                <div class="stat-value">{{ estadisticas.porcentajeCumplimiento }}%</div>
+            </div>
+            <div class="stat-box stat-dias">
+                <small>Días Restantes</small>
+                <div class="stat-value">{{ estadisticas.diasRestantes }}</div>
+            </div>
+        </div>
+    </div>
+    }
+
+    <hr class="section-divider">
+
+    <!-- Acciones: Generar y Eliminar todas -->
+    <div class="tomas-actions">
+        <div class="tomas-actions-left">
+            <button class="btn-generar-tomas" (click)="onGenerarTomas()" [disabled]="isBotonGenerarDisabled()"
+                [class.btn-completas]="tieneTomasEnTodoElPeriodo()">
+                @if (generandoTomas) {
+                <span class="spinner-save"></span>
+                <span>Generando...</span>
+                } @else if (tieneTomasEnTodoElPeriodo()) {
+                <i class="bi bi-check-circle-fill"></i>
+                <span>{{ getMensajeBotonGenerar() }}</span>
+                } @else {
+                <i class="bi bi-plus-circle"></i>
+                <span>{{ getMensajeBotonGenerar() }}</span>
+                }
+            </button>
+        </div>
+
+        <div class="tomas-actions-right">
+            <button class="btn-eliminar-todas" (click)="abrirModalEliminarTodas()"
+                [disabled]="isBotonEliminarTodasDisabled()">
+                @if (eliminandoTomas) {
+                <span class="spinner-save"></span>
+                <span>Eliminando...</span>
+                } @else {
+                <i class="bi bi-trash-fill"></i>
+                <span>Eliminar Todas ({{ getCantidadTomasActivas() }})</span>
+                }
+            </button>
+        </div>
+    </div>
+
+    <!-- Lista completa de tomas -->
+    <div class="tomas-section-full">
+        <div class="tomas-header">
+            <h4 class="section-title">
+                <i class="bi bi-list-check"></i>
+                Registro de Tomas
+                <span class="badge-tomas">{{ registrosTomas.length }}</span>
+                <span class="badge-tomas badge-activas">{{ getCantidadTomasActivas() }} activas</span>
+            </h4>
+        </div>
+
+        <div class="tomas-lista-full">
+            @if (registrosTomas.length > 0) {
+            @for (t of registrosTomas; track t.id) {
+            <div class="toma-item-full" [ngClass]="{
+                    'toma-completada': t.estado === 'Tomada',
+                    'toma-pendiente': t.estado === 'Pendiente',
+                    'toma-omitida': t.estado === 'Omitida',
+                    'toma-retrasada': t.estado === 'Retrasada',
+                    'toma-eliminada': t.estado === 'Eliminada'
+                }">
+                <div class="toma-info-full">
+                    <div class="toma-fecha-hora">
+                        <span class="toma-fecha">{{ t.fechaFormateada || t.fechaProgramada }}</span>
+                        <span class="toma-hora">{{ t.horaFormateada }}</span>
+                    </div>
+                    <span class="toma-estado-badge" [style.background]="getEstadoColor(t.estado)">
+                        <i class="bi" [ngClass]="getEstadoIcono(t.estado)"></i>
+                        {{ t.estado }}
+                    </span>
+                </div>
+                <div class="toma-actions-full">
+                    @if (t.estado !== 'Eliminada') {
+                    @if (t.estado === 'Pendiente') {
+                    <div class="toma-actions-buttons">
+                        <button class="btn-toma-completar" (click)="onActualizarEstado(t.id, 'Tomada')"
+                            title="Marcar como tomada">
+                            <i class="bi bi-check-circle"></i>
+                        </button>
+                        <button class="btn-toma-omitir" (click)="onActualizarEstado(t.id, 'Omitida')"
+                            title="Marcar como omitida">
+                            <i class="bi bi-x-circle"></i>
+                        </button>
+                        <button class="btn-toma-retrasar" (click)="onActualizarEstado(t.id, 'Retrasada')"
+                            title="Marcar como retrasada">
+                            <i class="bi bi-clock"></i>
+                        </button>
+                        <button class="btn-toma-eliminar" (click)="abrirModalEliminarToma(t.id)" title="Eliminar toma">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                    }
+                    @if (t.estado === 'Retrasada') {
+                    <div class="toma-actions-buttons">
+                        <button class="btn-toma-completar" (click)="onActualizarEstado(t.id, 'Tomada')"
+                            title="Marcar como tomada">
+                            <i class="bi bi-check-circle"></i>
+                        </button>
+                        <button class="btn-toma-omitir" (click)="onActualizarEstado(t.id, 'Omitida')"
+                            title="Marcar como omitida">
+                            <i class="bi bi-x-circle"></i>
+                        </button>
+                        <button class="btn-toma-eliminar" (click)="abrirModalEliminarToma(t.id)" title="Eliminar toma">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                    }
+                    @if (t.estado === 'Tomada' || t.estado === 'Omitida') {
+                    <div class="toma-actions-buttons">
+                        <span class="toma-estado-final">{{ t.estado }}</span>
+                    </div>
+                    }
+                    } @else {
+                    <div class="toma-actions-buttons">
+                        <span class="toma-estado-eliminada">Eliminada</span>
+                    </div>
+                    }
+                    @if (t.notas) {
+                    <span class="toma-notas-full">{{ t.notas }}</span>
+                    }
+                </div>
+            </div>
+            }
+            } @else {
+            <div class="tomas-vacio">
+                <i class="bi bi-inbox"></i>
+                <p>No hay tomas registradas</p>
+                <span>Genera tomas programadas o regístralas manualmente</span>
+            </div>
+            }
+        </div>
+    </div>
+
+    <!-- Acciones -->
+    <div class="action-footer">
+        <button class="btn-cancel-premium" (click)="onVolver()">
+            Cancelar
+        </button>
+    </div>
+</div>
+
+<!-- MODAL DE CONFIRMACIÓN PARA ELIMINAR TOMA INDIVIDUAL -->
+@if (mostrarModalEliminar) {
+<div class="modal-overlay" (click)="cerrarModalEliminar()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+        <div class="modal-header modal-header-danger">
+            <div class="modal-icon modal-icon-danger">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+            </div>
+            <h3 class="modal-title">Eliminar Toma</h3>
+        </div>
+        <div class="modal-body">
+            <p class="modal-mensaje">¿Estás seguro de que deseas eliminar esta toma?</p>
+            <p class="modal-mensaje text-muted">Esta acción no se puede deshacer.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-btn modal-btn-cancel" (click)="cerrarModalEliminar()">
+                Cancelar
+            </button>
+            <button class="modal-btn modal-btn-danger" (click)="confirmarEliminarToma()">
+                <i class="bi bi-trash"></i>
+                Eliminar
+            </button>
+        </div>
+    </div>
+</div>
+}
+
+<!-- MODAL DE CONFIRMACIÓN PARA ELIMINAR TODAS LAS TOMAS -->
+@if (mostrarModalEliminarTodas) {
+<div class="modal-overlay" (click)="cerrarModalEliminarTodas()">
+    <div class="modal-container modal-danger-large" (click)="$event.stopPropagation()">
+        <div class="modal-header modal-header-danger">
+            <div class="modal-icon modal-icon-danger">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+            </div>
+            <h3 class="modal-title">Eliminar Todas las Tomas</h3>
+        </div>
+        <div class="modal-body">
+            <p class="modal-mensaje">
+                <strong>¿Estás seguro de que deseas eliminar TODAS las tomas de este tratamiento?</strong>
+            </p>
+            <div class="modal-advertencia">
+                <i class="bi bi-info-circle-fill"></i>
+                <span>Esta acción eliminará <strong>{{ getCantidadTomasActivas() }}</strong> tomas y no se puede
+                    deshacer.</span>
+            </div>
+            <div class="modal-detalle-eliminacion">
+                <p><strong>Tratamiento:</strong> {{ tratamientoSeleccionado?.nombremedicamento || 'No especificado' }}
+                </p>
+                <p><strong>Paciente:</strong> {{ tratamientoSeleccionado?.nombrepaciente || 'No especificado' }}</p>
+                <p><strong>Total tomas a eliminar:</strong> {{ getCantidadTomasActivas() }}</p>
+            </div>
+        </div>
+        <div class="modal-footer modal-footer-danger">
+            <button class="modal-btn modal-btn-cancel" (click)="cerrarModalEliminarTodas()">
+                Cancelar
+            </button>
+            <button class="modal-btn modal-btn-danger" (click)="confirmarEliminarTodas()" [disabled]="eliminandoTomas">
+                @if (eliminandoTomas) {
+                <span class="spinner-save"></span>
+                <span>Eliminando...</span>
+                } @else {
+                <i class="bi bi-trash-fill"></i>
+                <span>Eliminar Todas</span>
+                }
+            </button>
+        </div>
+    </div>
+</div>
+}
+
+<!-- MODAL DE CONFIRMACIÓN GENERAL -->
+@if (mostrarModalConfirmacion) {
+<div class="modal-overlay" (click)="cerrarModal()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <div class="modal-icon">
+                <i class="bi bi-question-circle-fill"></i>
+            </div>
+            <h3 class="modal-title">Confirmar acción</h3>
+        </div>
+        <div class="modal-body">
+            <p class="modal-mensaje">{{ modalConfirmacionMensaje }}</p>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-btn modal-btn-cancel" (click)="cerrarModal()">
+                Cancelar
+            </button>
+            <button class="modal-btn modal-btn-confirm" (click)="confirmarModal()">
+                <i class="bi bi-check-circle"></i>
+                Aceptar
+            </button>
+        </div>
+    </div>
+</div>
+}
