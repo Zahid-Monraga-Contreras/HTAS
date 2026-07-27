@@ -1,37 +1,25 @@
-import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef, PLATFORM_ID, ViewChild } from '@angular/core';
 import { CommonModule, Location, isPlatformBrowser } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Users } from '../../../../../../core/services/users.service';
 import { firstValueFrom } from 'rxjs';
 import { Menu } from "../../../template/menu/menu";
 
+// Importar los partials
+import { InfoDispositivo } from './partials/info-dispositivo/info-dispositivo';
+import { HistorialDispositivo, HistorialEvento, Estadisticas } from './partials/historial-dispositivo/historial-dispositivo';
+import { Mediciones, MedicionTensiometro, UltimaMedicion } from './partials/mediciones/mediciones';
+
 // ==========================================================================
 // INTERFACES
 // ==========================================================================
-
-interface HistorialDispositivo {
-  fecha: string;
-  accion: string;
-  detalle: string;
-  usuario: string;
-}
-
-interface MedicionTensiometro {
-  id: number;
-  sistolica: number;
-  diastolica: number;
-  pulso: number;
-  fecha: string;
-  guardada: boolean;
-}
 
 type TabDispositivo = 'detalle' | 'historial' | 'mediciones';
 
 @Component({
   selector: 'app-dispositivo-detalle',
   standalone: true,
-  imports: [CommonModule, FormsModule, Menu],
+  imports: [CommonModule, Menu, InfoDispositivo, HistorialDispositivo, Mediciones],
   templateUrl: './dispositivo-detalle.html',
   styleUrls: ['./dispositivo-detalle.css']
 })
@@ -47,6 +35,8 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
   private platformId = inject(PLATFORM_ID);
 
+  @ViewChild('sidebar') sidebar!: Menu;
+
   // ==========================================================================
   // PROPIEDADES DEL DISPOSITIVO
   // ==========================================================================
@@ -54,9 +44,7 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
   dispositivoSeleccionado: any = null;
   isSaving = false;
   pacientesLista: any[] = [];
-  filtroPaciente: string = '';
-  mostrarDropdown = false;
-  modo: string = 'editar'; // 'editar' | 'medir'
+  modo: string = 'editar';
   currentUser: any = null;
   esPacienteOAcompanante: boolean = false;
 
@@ -73,8 +61,8 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
   // DATOS DE MEDICIONES
   // ==========================================================================
 
-  ultimaMedicion: any = null;
-  historialCambios: HistorialDispositivo[] = [];
+  ultimaMedicion: UltimaMedicion | null = null;
+  historialCambios: HistorialEvento[] = [];
   mostrarHistorial = false;
 
   // ==========================================================================
@@ -88,25 +76,14 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
   // ESTADÍSTICAS
   // ==========================================================================
 
-  estadisticas: {
-    totalMediciones: number;
-    promedioSistolica: number;
-    promedioDiastolica: number;
-    promedioPulso: number;
-  } | null = null;
+  estadisticas: Estadisticas | null = null;
 
   // ==========================================================================
   // PROPIEDADES DEL TENSIÓMETRO
   // ==========================================================================
 
   isObteniendoMedicion = false;
-  ultimaMedicionTensiometro: {
-    sistolica: number;
-    diastolica: number;
-    pulso: number;
-    fecha: string;
-  } | null = null;
-
+  ultimaMedicionTensiometro: { sistolica: number; diastolica: number; pulso: number; fecha: string } | null = null;
   medicionesTensiometro: MedicionTensiometro[] = [];
 
   // ==========================================================================
@@ -141,25 +118,10 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
   // ==========================================================================
 
   async ngOnInit() {
-    // Cargar usuario actual
-    if (isPlatformBrowser(this.platformId)) {
-      const saved = localStorage.getItem('user_htas');
-      if (saved) {
-        this.currentUser = JSON.parse(saved);
-        const rol = this.currentUser?.rol?.toLowerCase().trim() || '';
-        this.esPacienteOAcompanante = rol === 'paciente' || rol === 'acompañante';
-
-        // Si es paciente o acompañante, forzar la pestaña de mediciones
-        if (this.esPacienteOAcompanante) {
-          this.activeTab = 'mediciones';
-        }
-      }
-    }
-
+    await this.cargarUsuarioActual();
     await this.cargarDispositivo();
     await this.cargarPacientes();
     await this.cargarDatosIniciales();
-    this.inicializarTensiometro();
   }
 
   // ==========================================================================
@@ -177,41 +139,23 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
   }
 
   // ==========================================================================
-  // CONTROL DE PESTAÑAS
+  // MÉTODOS DE CARGA
   // ==========================================================================
 
-  cambiarTab(tab: TabDispositivo) {
-    // Si es paciente o acompañante, solo puede ver la pestaña de mediciones
-    if (this.esPacienteOAcompanante && tab !== 'mediciones') {
-      this.lanzarNotificacion('No tienes permiso para acceder a esta sección.', 'warning');
-      return;
-    }
+  private async cargarUsuarioActual() {
+    if (isPlatformBrowser(this.platformId)) {
+      const saved = localStorage.getItem('user_htas');
+      if (saved) {
+        this.currentUser = JSON.parse(saved);
+        const rol = this.currentUser?.rol?.toLowerCase().trim() || '';
+        this.esPacienteOAcompanante = rol === 'paciente' || rol === 'acompañante';
 
-    if (this.activeTab === tab) return;
-    this.activeTab = tab;
-
-    if (tab === 'historial') {
-      const idPaciente = this.obtenerIdPaciente();
-      if (idPaciente) {
-        this.cargarEstadisticas(this.dispositivoSeleccionado?.iddispositivo);
-        this.cargarMedicionesTensiometro(idPaciente);
+        if (this.esPacienteOAcompanante) {
+          this.activeTab = 'mediciones';
+        }
       }
     }
-
-    if (tab === 'mediciones') {
-      const idPaciente = this.obtenerIdPaciente();
-      if (idPaciente) {
-        this.cargarUltimaMedicion(idPaciente);
-        this.cargarMedicionesTensiometro(idPaciente);
-      }
-    }
-
-    this.cdr.detectChanges();
   }
-
-  // ==========================================================================
-  // MÉTODOS DE CARGA INICIAL
-  // ==========================================================================
 
   private async cargarDispositivo() {
     let state: any = null;
@@ -227,7 +171,6 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
       this.dispositivoSeleccionado = { ...state.dispositivo };
       this.modo = state.modo || 'editar';
 
-      // Si es paciente o acompañante, forzar modo medición
       if (this.esPacienteOAcompanante) {
         this.modo = 'medir';
       }
@@ -310,10 +253,6 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
     }
   }
 
-  inicializarTensiometro() {
-    // Ya se carga en cargarDatosIniciales
-  }
-
   // ==========================================================================
   // MÉTODOS PARA OBTENER DATOS
   // ==========================================================================
@@ -333,22 +272,48 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
     return `${nombre} ${apPaterno} ${apMaterno}`.trim();
   }
 
-  onFiltroPacienteChange() {
-    if (this.filtroPaciente.length > 0) {
-      this.mostrarDropdown = true;
-    }
-  }
-
-  private normalizarMedicion(data: any): any | null {
+  private normalizarMedicion(data: any): UltimaMedicion | null {
     if (!data) return null;
 
+    let fecha = data.fechahoralectura ||
+      data.FechaHoraLectura ||
+      data.fecha ||
+      data.Fecha ||
+      data.created_at ||
+      data.createdat ||
+      data.createdAt ||
+      data.fechacreacion ||
+      data.FechaCreacion ||
+      new Date().toISOString();
+
     return {
-      idmedicion: data.idmedicion || data.IdMedicion,
-      sistolica: data.sistolica || data.Sistolica || 0,
-      diastolica: data.diastolica || data.Diastolica || 0,
-      pulso: data.pulso || data.Pulso || 0,
-      fechahoralectura: data.fechahoralectura || data.FechaHoraLectura || data.created_at || data.createdat
+      sistolica: Number(data.sistolica || data.Sistolica || 0),
+      diastolica: Number(data.diastolica || data.Diastolica || 0),
+      pulso: Number(data.pulso || data.Pulso || 0),
+      fechahoralectura: fecha,
+      fecha: fecha
     };
+  }
+
+  // ==========================================================================
+  // MÉTODO DE DEBUG
+  // ==========================================================================
+
+  private debugEstructuraDatos(data: any) {
+    if (data?.mediciones?.length > 0) {
+      const primera = data.mediciones[0];
+      console.log('🔍 ESTRUCTURA DE LA PRIMERA MEDICIÓN:');
+      console.log('Campos:', Object.keys(primera));
+      console.log('Contenido:', JSON.stringify(primera, null, 2));
+
+      const camposFecha = Object.keys(primera).filter(key => {
+        const value = primera[key];
+        return typeof value === 'string' &&
+          (value.includes('-') || value.includes('/')) &&
+          value.length >= 8;
+      });
+      console.log('📅 Posibles campos de fecha:', camposFecha);
+    }
   }
 
   // ==========================================================================
@@ -420,30 +385,136 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
     try {
       const data = await firstValueFrom(this.usersService.getMedicionesPaciente(idPaciente, 10));
 
+      console.log('📊 Datos crudos de mediciones:', data);
+
+      this.debugEstructuraDatos(data);
+
       if (data?.mediciones?.length > 0) {
-        const mediciones = data.mediciones.map((m: any, index: number) => ({
-          id: index + 1,
-          sistolica: m.sistolica || m.Sistolica || 0,
-          diastolica: m.diastolica || m.Diastolica || 0,
-          pulso: m.pulso || m.Pulso || 0,
-          fecha: m.fechahoralectura || m.FechaHoraLectura || new Date().toISOString(),
-          guardada: true
-        }));
+        const mediciones = data.mediciones.map((m: any, index: number) => {
+          let fecha = null;
 
-        this.medicionesTensiometro = mediciones;
+          if (m.fechahoralectura) {
+            fecha = m.fechahoralectura;
+          } else if (m.FechaHoraLectura) {
+            fecha = m.FechaHoraLectura;
+          } else if (m.fecha) {
+            fecha = m.fecha;
+          } else if (m.Fecha) {
+            fecha = m.Fecha;
+          } else if (m.created_at) {
+            fecha = m.created_at;
+          } else if (m.createdat) {
+            fecha = m.createdat;
+          } else if (m.createdAt) {
+            fecha = m.createdAt;
+          } else if (m.fechacreacion) {
+            fecha = m.fechacreacion;
+          } else if (m.FechaCreacion) {
+            fecha = m.FechaCreacion;
+          }
 
-        if (mediciones.length > 0) {
+          if (!fecha) {
+            console.warn('⚠️ Medición sin fecha en el índice', index, ':', m);
+            for (const key of Object.keys(m)) {
+              const value = m[key];
+              if (typeof value === 'string' &&
+                (value.includes('-') || value.includes('/')) &&
+                value.length >= 8) {
+                fecha = value;
+                console.log('🔍 Fecha encontrada en campo:', key, '=', value);
+                break;
+              }
+            }
+            if (!fecha) {
+              fecha = new Date().toISOString();
+            }
+          }
+
+          let fechaISO = fecha;
+          try {
+            const dateObj = new Date(fecha);
+            if (!isNaN(dateObj.getTime())) {
+              fechaISO = dateObj.toISOString();
+            } else {
+              const partes = fecha.split('/');
+              if (partes.length === 3) {
+                const dia = parseInt(partes[0]);
+                const mes = parseInt(partes[1]) - 1;
+                const anio = parseInt(partes[2].split(' ')[0]);
+                const horaPartes = partes[2].split(' ')[1]?.split(':') || [];
+                const horas = parseInt(horaPartes[0]) || 0;
+                const minutos = parseInt(horaPartes[1]) || 0;
+                const segundos = parseInt(horaPartes[2]) || 0;
+
+                const fechaObj = new Date(anio, mes, dia, horas, minutos, segundos);
+                if (!isNaN(fechaObj.getTime())) {
+                  fechaISO = fechaObj.toISOString();
+                }
+              }
+            }
+          } catch (error) {
+            console.warn('⚠️ Error al convertir fecha:', fecha);
+            fechaISO = new Date().toISOString();
+          }
+
+          const sistolica = Number(m.sistolica || m.Sistolica || 0);
+          const diastolica = Number(m.diastolica || m.Diastolica || 0);
+          const pulso = Number(m.pulso || m.Pulso || 0);
+
+          console.log(`📝 Medición ${index + 1}:`, {
+            fecha_original: fecha,
+            fecha_iso: fechaISO,
+            sistolica: sistolica,
+            diastolica: diastolica,
+            pulso: pulso
+          });
+
+          return {
+            id: m.idmedicion || m.IdMedicion || m.id || index + 1,
+            sistolica: sistolica,
+            diastolica: diastolica,
+            pulso: pulso,
+            fecha: fechaISO,
+            guardada: true
+          };
+        });
+
+        // ============================================================
+        // ORDENAR POR FECHA (más reciente PRIMERO)
+        // ============================================================
+        this.medicionesTensiometro = mediciones.sort((a: MedicionTensiometro, b: MedicionTensiometro) => {
+          try {
+            const dateA = new Date(a.fecha).getTime();
+            const dateB = new Date(b.fecha).getTime();
+            if (isNaN(dateA)) return 1;
+            if (isNaN(dateB)) return -1;
+            return dateB - dateA;
+          } catch (error) {
+            return 0;
+          }
+        });
+
+        console.log('✅ Mediciones procesadas (ordenadas DESC):', this.medicionesTensiometro);
+
+        if (this.medicionesTensiometro.length > 0) {
+          const primera = this.medicionesTensiometro[0];
           this.ultimaMedicionTensiometro = {
-            sistolica: mediciones[0].sistolica,
-            diastolica: mediciones[0].diastolica,
-            pulso: mediciones[0].pulso,
-            fecha: mediciones[0].fecha
+            sistolica: primera.sistolica,
+            diastolica: primera.diastolica,
+            pulso: primera.pulso,
+            fecha: primera.fecha
           };
         }
-        setTimeout(() => this.cdr.detectChanges());
+
+        // Forzar actualización de la vista
+        this.cdr.detectChanges();
+
+      } else {
+        console.warn('⚠️ No se encontraron mediciones');
+        this.medicionesTensiometro = [];
       }
     } catch (error) {
-      console.warn('No se pudieron cargar mediciones previas:', error);
+      console.error('❌ Error al cargar mediciones:', error);
       this.medicionesTensiometro = [];
     }
   }
@@ -497,7 +568,7 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
   }
 
   // ==========================================================================
-  // MÉTODO PRINCIPAL: OBTENER MEDICIÓN DEL TENSIÓMETRO
+  // MÉTODO PRINCIPAL: OBTENER MEDICIÓN
   // ==========================================================================
 
   async obtenerMedicionTensiometro() {
@@ -543,14 +614,22 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
     }
   }
 
-  // ==========================================================================
-  // MÉTODOS AUXILIARES PARA PROCESAR MEDICIÓN
-  // ==========================================================================
-
   private async procesarMedicionExitosa(medicion: any) {
     const sistolica = medicion.sistolica || 0;
     const diastolica = medicion.diastolica || 0;
     const pulso = medicion.pulso || 0;
+
+    const nuevaMedicion: MedicionTensiometro = {
+      id: Date.now(),
+      sistolica: sistolica,
+      diastolica: diastolica,
+      pulso: pulso,
+      fecha: new Date().toISOString(),
+      guardada: true
+    };
+
+    // AGREGAR AL INICIO DEL ARRAY
+    this.medicionesTensiometro.unshift(nuevaMedicion);
 
     this.ultimaMedicionTensiometro = {
       sistolica: sistolica,
@@ -558,15 +637,6 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
       pulso: pulso,
       fecha: new Date().toISOString()
     };
-
-    this.medicionesTensiometro.unshift({
-      id: Date.now(),
-      sistolica: sistolica,
-      diastolica: diastolica,
-      pulso: pulso,
-      fecha: new Date().toISOString(),
-      guardada: true
-    });
 
     this.ultimaMedicion = {
       sistolica: sistolica,
@@ -613,27 +683,10 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
   }
 
   // ==========================================================================
-  // MÉTODOS DE GESTIÓN DE PACIENTES (SOLO PARA ADMIN/MÉDICO)
+  // MÉTODOS DE GESTIÓN DE PACIENTES
   // ==========================================================================
 
-  get pacientesFiltrados() {
-    if (!this.filtroPaciente) return this.pacientesLista;
-    const term = this.filtroPaciente.toLowerCase();
-    return this.pacientesLista.filter(p => {
-      const nombreCompleto = this.obtenerNombreCompleto(p).toLowerCase();
-      return nombreCompleto.includes(term);
-    });
-  }
-
-  ocultarDropdown() {
-    setTimeout(() => {
-      this.mostrarDropdown = false;
-      this.cdr.detectChanges();
-    }, 200);
-  }
-
   asignarPaciente(p: any) {
-    // Si es paciente o acompañante, no puede asignar pacientes
     if (this.esPacienteOAcompanante) {
       this.lanzarNotificacion('No tienes permiso para asignar pacientes.', 'warning');
       return;
@@ -653,9 +706,6 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
       codigoPostal: p.codigoPostal || ''
     };
 
-    this.filtroPaciente = this.obtenerNombreCompleto(p);
-    this.mostrarDropdown = false;
-
     const nombreCompleto = this.obtenerNombreCompleto(p);
     this.agregarHistorial(
       'Paciente asignado',
@@ -668,7 +718,6 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
   }
 
   desasignarPaciente() {
-    // Si es paciente o acompañante, no puede desasignar pacientes
     if (this.esPacienteOAcompanante) {
       this.lanzarNotificacion('No tienes permiso para desasignar pacientes.', 'warning');
       return;
@@ -682,7 +731,6 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
       this.dispositivoSeleccionado.appaternopaciente = null;
       this.dispositivoSeleccionado.apmaternopaciente = null;
       this.dispositivoSeleccionado.paciente = null;
-      this.filtroPaciente = '';
 
       this.agregarHistorial(
         'Paciente desasignado',
@@ -694,66 +742,6 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
       this.medicionesTensiometro = [];
       this.cdr.detectChanges();
     }
-  }
-
-  // ==========================================================================
-  // MÉTODOS DE ESTADO DE CONEXIÓN
-  // ==========================================================================
-
-  verificarUltimaSincronizacion() {
-    if (this.dispositivoSeleccionado?.ultimasincronizacion) {
-      this.ultimaSincronizacion = this.dispositivoSeleccionado.ultimasincronizacion;
-      if (this.ultimaSincronizacion) {
-        const fecha = new Date(this.ultimaSincronizacion);
-        const ahora = new Date();
-        const diffHoras = (ahora.getTime() - fecha.getTime()) / (1000 * 60 * 60);
-
-        if (diffHoras < 1) {
-          this.estadoConexion = 'conectado';
-        } else if (diffHoras < 24) {
-          this.estadoConexion = 'sincronizando';
-        } else {
-          this.estadoConexion = 'desconectado';
-        }
-      }
-    }
-  }
-
-  getEstadoConexionClass(): string {
-    const clases = {
-      'conectado': 'estado-conectado',
-      'desconectado': 'estado-desconectado',
-      'sincronizando': 'estado-sincronizando'
-    };
-    return clases[this.estadoConexion] || 'estado-desconectado';
-  }
-
-  getEstadoConexionTexto(): string {
-    const textos = {
-      'conectado': 'Conectado',
-      'desconectado': 'Desconectado',
-      'sincronizando': 'Sincronizando...'
-    };
-    return textos[this.estadoConexion] || 'Desconectado';
-  }
-
-  getEstadoConexionIcono(): string {
-    const iconos = {
-      'conectado': 'bi-wifi',
-      'desconectado': 'bi-wifi-off',
-      'sincronizando': 'bi-arrow-repeat'
-    };
-    return iconos[this.estadoConexion] || 'bi-wifi-off';
-  }
-
-  getEstadoBotonMedicion(): string {
-    if (this.isObteniendoMedicion) return 'bi-arrow-repeat spin';
-    return 'bi-heart-pulse';
-  }
-
-  getEstadoBotonTexto(): string {
-    if (this.isObteniendoMedicion) return 'Obteniendo medición...';
-    return 'Obtener Medición';
   }
 
   // ==========================================================================
@@ -800,7 +788,6 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
   }
 
   async toggleActivo() {
-    // Si es paciente o acompañante, no puede cambiar el estado
     if (this.esPacienteOAcompanante) {
       this.lanzarNotificacion('No tienes permiso para cambiar el estado del dispositivo.', 'warning');
       return;
@@ -839,7 +826,6 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
   }
 
   async guardarCambios() {
-    // Si es paciente o acompañante, no puede guardar cambios
     if (this.esPacienteOAcompanante) {
       this.lanzarNotificacion('No tienes permiso para editar el dispositivo.', 'warning');
       return;
@@ -959,20 +945,58 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
   }
 
   // ==========================================================================
-  // MÉTODOS DE UBICACIÓN
+  // MÉTODOS DE ESTADO DE CONEXIÓN
   // ==========================================================================
 
-  getUbicacionPaciente(): string {
-    const p = this.dispositivoSeleccionado?.paciente;
-    if (!p) return 'Sin ubicación registrada';
-    const partes = [p.domicilio, p.localidad, p.municipio, p.estado].filter(Boolean);
-    return partes.length ? partes.join(', ') : 'Sin ubicación completa';
+  verificarUltimaSincronizacion() {
+    if (this.dispositivoSeleccionado?.ultimasincronizacion) {
+      this.ultimaSincronizacion = this.dispositivoSeleccionado.ultimasincronizacion;
+      if (this.ultimaSincronizacion) {
+        const fecha = new Date(this.ultimaSincronizacion);
+        const ahora = new Date();
+        const diffHoras = (ahora.getTime() - fecha.getTime()) / (1000 * 60 * 60);
+
+        if (diffHoras < 1) {
+          this.estadoConexion = 'conectado';
+        } else if (diffHoras < 24) {
+          this.estadoConexion = 'sincronizando';
+        } else {
+          this.estadoConexion = 'desconectado';
+        }
+      }
+    }
   }
 
-  pacienteTieneUbicacion(): boolean {
-    const p = this.dispositivoSeleccionado?.paciente;
-    if (!p) return false;
-    return !!(p.domicilio && p.localidad && p.municipio && p.estado);
+  // ==========================================================================
+  // CONTROL DE PESTAÑAS
+  // ==========================================================================
+
+  cambiarTab(tab: TabDispositivo) {
+    if (this.esPacienteOAcompanante && tab !== 'mediciones') {
+      this.lanzarNotificacion('No tienes permiso para acceder a esta sección.', 'warning');
+      return;
+    }
+
+    if (this.activeTab === tab) return;
+    this.activeTab = tab;
+
+    if (tab === 'historial') {
+      const idPaciente = this.obtenerIdPaciente();
+      if (idPaciente) {
+        this.cargarEstadisticas(this.dispositivoSeleccionado?.iddispositivo);
+        this.cargarMedicionesTensiometro(idPaciente);
+      }
+    }
+
+    if (tab === 'mediciones') {
+      const idPaciente = this.obtenerIdPaciente();
+      if (idPaciente) {
+        this.cargarUltimaMedicion(idPaciente);
+        this.cargarMedicionesTensiometro(idPaciente);
+      }
+    }
+
+    this.cdr.detectChanges();
   }
 
   // ==========================================================================
@@ -1002,41 +1026,26 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
   }
 
   // ==========================================================================
-  // MÉTODOS PARA EL TEMPLATE - CONTROL DE VISIBILIDAD
+  // MÉTODOS PARA EL TEMPLATE
   // ==========================================================================
 
-  /**
-   * Verifica si el usuario puede editar el dispositivo
-   */
   puedeEditar(): boolean {
     return !this.esPacienteOAcompanante;
   }
 
-  /**
-   * Verifica si el usuario puede ver la pestaña de detalle
-   */
   puedeVerDetalle(): boolean {
     return !this.esPacienteOAcompanante;
   }
 
-  /**
-   * Verifica si el usuario puede ver la pestaña de historial
-   */
   puedeVerHistorial(): boolean {
     return !this.esPacienteOAcompanante;
   }
 
-  /**
-   * Verifica si el usuario puede ver la pestaña de mediciones
-   */
   puedeVerMediciones(): boolean {
-    return true; // Todos pueden ver mediciones
+    return true;
   }
 
-  /**
-   * Verifica si el usuario puede tomar mediciones
-   */
   puedeMedir(): boolean {
-    return true; // Todos pueden medir (paciente, acompañante, admin, médico)
+    return true;
   }
 }

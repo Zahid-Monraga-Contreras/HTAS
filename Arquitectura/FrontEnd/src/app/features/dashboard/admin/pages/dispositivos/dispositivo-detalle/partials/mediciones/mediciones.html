@@ -1,0 +1,217 @@
+<div class="detail-card">
+    <!-- RESUMEN DEL DISPOSITIVO - VERSIÓN SIMPLIFICADA -->
+    <div class="resumen-dispositivo-mediciones">
+        <div class="resumen-item">
+            <i class="bi bi-cpu"></i>
+            <div>
+                <small>Nombre</small>
+                <strong>{{ dispositivo?.nombre || 'Sin nombre' }}</strong>
+            </div>
+        </div>
+        <div class="resumen-item">
+            <i class="bi bi-person-fill"></i>
+            <div>
+                <small>Paciente Asignado</small>
+                <strong>{{ dispositivo?.nombrepaciente ? obtenerNombreCompleto({
+                    nombre: dispositivo?.nombrepaciente,
+                    appaterno: dispositivo?.appaternopaciente,
+                    apmaterno: dispositivo?.apmaternopaciente
+                    }) : 'Sin asignar' }}</strong>
+            </div>
+        </div>
+        <div class="resumen-item">
+            <i class="bi bi-wifi"></i>
+            <div>
+                <small>Estado Conexión</small>
+                <strong
+                    [style.color]="estadoConexion === 'conectado' ? '#10b981' : estadoConexion === 'sincronizando' ? '#f59e0b' : '#ef4444'">
+                    {{ getEstadoConexionTexto() }}
+                </strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- BANNER DE ESTADO -->
+    <div class="estado-banner-mediciones">
+        <div class="estado-badge-conexion" [ngClass]="getEstadoConexionClass()">
+            <i class="bi" [ngClass]="getEstadoConexionIcono()"></i>
+            <span>{{ getEstadoConexionTexto() }}</span>
+        </div>
+
+        @if (ultimaSincronizacion) {
+        <div class="info-sincronizacion">
+            <i class="bi bi-clock"></i>
+            <span>Última sincronización: {{ formatearFecha(ultimaSincronizacion) }}</span>
+        </div>
+        }
+
+        <button class="btn-sincronizar-mediciones" (click)="onSincronizar()" [disabled]="isSaving">
+            <i class="bi bi-arrow-repeat"></i>
+            Sincronizar ahora
+        </button>
+    </div>
+
+    <!-- SECCIÓN: TENSIÓMETRO FEMMTO -->
+    <div class="tensiometro-section">
+        <div class="tensiometro-header">
+            <h4 class="section-title">
+                <i class="bi bi-heart-pulse-fill"></i>
+                Tensiómetro FEMMTO
+            </h4>
+            <div class="tensiometro-controls">
+                <button class="btn-action btn-medir" (click)="onObtenerMedicion()" [disabled]="isObteniendoMedicion">
+                    <i class="bi" [ngClass]="getEstadoBotonMedicion()"></i>
+                    <span>{{ getEstadoBotonTexto() }}</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Estado del dispositivo -->
+        <div class="bluetooth-status">
+            <div class="status-indicator" [ngClass]="estadoConexion">
+                <i class="bi" [ngClass]="getEstadoConexionIcono()"></i>
+                <span>Estado: {{ getEstadoConexionTexto() }}</span>
+            </div>
+            @if (dispositivo?.direccionmac) {
+            <div class="mac-address">
+                <i class="bi bi-hdd-network"></i>
+                <span>MAC: {{ dispositivo?.direccionmac }}</span>
+            </div>
+            }
+        </div>
+
+        <!-- Progreso de conexión -->
+        @if (progresoLogVisible && progresoLog.length > 0) {
+        <div class="progreso-conexion-panel">
+            <div class="progreso-header">
+                <i class="bi bi-terminal-fill"></i>
+                <span>Progreso de conexión con el tensiómetro</span>
+            </div>
+            <div class="progreso-log">
+                @for (linea of progresoLog; track $index) {
+                <div class="progreso-linea">
+                    <i class="bi bi-caret-right-fill"></i>
+                    <span>{{ linea }}</span>
+                </div>
+                }
+            </div>
+        </div>
+        }
+
+        <!-- Última medición del tensiómetro -->
+        @if (ultimaMedicionTensiometro) {
+        <div class="medicion-tensiometro">
+            <div class="medicion-grid">
+                <div class="medicion-item sistolica">
+                    <span class="medicion-label">Sistólica</span>
+                    <span class="medicion-value">{{ ultimaMedicionTensiometro.sistolica }}
+                        <small>mmHg</small></span>
+                </div>
+                <div class="medicion-item diastolica">
+                    <span class="medicion-label">Diastólica</span>
+                    <span class="medicion-value">{{ ultimaMedicionTensiometro.diastolica }}
+                        <small>mmHg</small></span>
+                </div>
+                <div class="medicion-item pulso">
+                    <span class="medicion-label">Pulso</span>
+                    <span class="medicion-value">{{ ultimaMedicionTensiometro.pulso }}
+                        <small>bpm</small></span>
+                </div>
+            </div>
+            <div class="medicion-fecha">
+                <i class="bi bi-clock"></i>
+                <span>Última medición: {{ formatearFecha(ultimaMedicionTensiometro.fecha) }}</span>
+            </div>
+        </div>
+        }
+
+        <!-- Sin mediciones -->
+        @if (!ultimaMedicionTensiometro) {
+        <div class="sin-mediciones-tensiometro">
+            <i class="bi bi-heart-pulse"></i>
+            <span>Presiona "Obtener Medición" para tomar una lectura del tensiómetro.</span>
+        </div>
+        }
+
+        <!-- Última lectura del paciente -->
+        @if (ultimaMedicion) {
+        <div class="ultima-lectura-section">
+            <h5 class="section-title small">
+                <i class="bi bi-clipboard-data"></i>
+                Última Lectura del Paciente
+            </h5>
+            <div class="lectura-grid">
+                <div class="lectura-item">
+                    <span class="lectura-label">Sistólica</span>
+                    <span class="lectura-value">{{ ultimaMedicion.sistolica || 0 }} mmHg</span>
+                </div>
+                <div class="lectura-item">
+                    <span class="lectura-label">Diastólica</span>
+                    <span class="lectura-value">{{ ultimaMedicion.diastolica || 0 }} mmHg</span>
+                </div>
+                <div class="lectura-item">
+                    <span class="lectura-label">Pulso</span>
+                    <span class="lectura-value">{{ ultimaMedicion.pulso || 0 }} bpm</span>
+                </div>
+            </div>
+            @if (ultimaMedicion.fechahoralectura || ultimaMedicion.fecha) {
+            <div class="medicion-fecha" style="margin-top: 0.75rem; justify-content: center;">
+                <i class="bi bi-clock"></i>
+                <span>Fecha: {{ formatearFecha(ultimaMedicion.fechahoralectura || ultimaMedicion.fecha) }}</span>
+            </div>
+            }
+        </div>
+        }
+
+        <!-- Historial de mediciones -->
+        @if (medicionesTensiometro && medicionesTensiometro.length > 0) {
+        <div class="mediciones-historial">
+            <h5 class="historial-titulo">
+                <i class="bi bi-clock-history"></i>
+                Historial de mediciones ({{ medicionesTensiometro.length }})
+            </h5>
+            <div class="mediciones-lista">
+                @for (med of medicionesTensiometro; track med.id) {
+                <div class="medicion-item-historial">
+                    <div class="medicion-fecha-historial">
+                        <i class="bi bi-clock"></i>
+                        {{ formatearFecha(med.fecha) }}
+                    </div>
+                    <div class="medicion-valores-historial">
+                        @if (tieneDatosValidos(med)) {
+                        <span class="sys">{{ med.sistolica }} mmHg</span>
+                        <span class="sep">/</span>
+                        <span class="dia">{{ med.diastolica }} mmHg</span>
+                        <span class="pulse"><i class="bi bi-heart-pulse-fill"></i> {{ med.pulso }} bpm</span>
+                        } @else {
+                        <span class="text-muted">Datos incompletos o sin fecha</span>
+                        }
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+        } @else {
+        <div class="sin-mediciones-tensiometro" style="margin-top: 1rem;">
+            <i class="bi bi-clock-history"></i>
+            <span>No hay historial de mediciones disponibles</span>
+        </div>
+        }
+    </div>
+
+    <!-- ACCIONES -->
+    @if (!esPacienteOAcompanante) {
+    <div class="action-footer">
+        <button class="btn-cancel-premium" (click)="onVolver()">
+            Cancelar
+        </button>
+    </div>
+    } @else {
+    <div class="action-footer" style="justify-content: center;">
+        <button class="btn-cancel-premium" (click)="onVolver()">
+            <i class="bi bi-arrow-left"></i>
+            <span>Volver a la lista</span>
+        </button>
+    </div>
+    }
+</div>

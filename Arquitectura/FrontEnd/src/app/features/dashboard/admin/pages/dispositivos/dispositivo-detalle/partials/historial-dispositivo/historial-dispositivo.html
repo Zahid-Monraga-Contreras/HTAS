@@ -1,0 +1,113 @@
+<div class="detail-card">
+    <!-- RESUMEN DEL DISPOSITIVO -->
+    <div class="resumen-dispositivo-historial">
+        <div class="resumen-item">
+            <i class="bi bi-cpu"></i>
+            <div>
+                <small>Nombre</small>
+                <strong>{{ dispositivo?.nombre || 'Sin nombre' }}</strong>
+            </div>
+        </div>
+        <div class="resumen-item">
+            <i class="bi bi-hdd-network"></i>
+            <div>
+                <small>Dirección MAC</small>
+                <strong>{{ dispositivo?.direccionmac || 'No registrada' }}</strong>
+            </div>
+        </div>
+        <div class="resumen-item">
+            <i class="bi bi-person-fill"></i>
+            <div>
+                <small>Paciente Asignado</small>
+                <strong>{{ dispositivo?.nombrepaciente ? obtenerNombreCompleto({
+                    nombre: dispositivo?.nombrepaciente,
+                    appaterno: dispositivo?.appaternopaciente,
+                    apmaterno: dispositivo?.apmaternopaciente
+                    }) : 'Sin asignar' }}</strong>
+            </div>
+        </div>
+        <div class="resumen-item">
+            <i class="bi bi-tag-fill"></i>
+            <div>
+                <small>Estado</small>
+                <strong [style.color]="dispositivo?.activo ? '#10b981' : '#ef4444'">
+                    {{ dispositivo?.activo ? 'Activo' : 'Inactivo' }}
+                </strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- ESTADÍSTICAS DE USO -->
+    @if (estadisticas) {
+    <div class="estadisticas-section">
+        <h4 class="section-title">
+            <i class="bi bi-graph-up-arrow"></i>
+            Estadísticas del Dispositivo
+        </h4>
+        <div class="stats-grid">
+            <div class="stat-box">
+                <small>Total Mediciones</small>
+                <div class="stat-value">{{ estadisticas.totalMediciones }}</div>
+            </div>
+            <div class="stat-box">
+                <small>Presión Promedio</small>
+                <div class="stat-value">
+                    {{ estadisticas.promedioSistolica }}/{{ estadisticas.promedioDiastolica }}
+                    <small>mmHg</small>
+                </div>
+            </div>
+            <div class="stat-box">
+                <small>Pulso Promedio</small>
+                <div class="stat-value">{{ estadisticas.promedioPulso }} <small>bpm</small></div>
+            </div>
+        </div>
+    </div>
+    }
+
+    <hr class="section-divider">
+
+    <!-- HISTORIAL DEL DISPOSITIVO -->
+    <div class="historial-section">
+        <div class="historial-header">
+            <h4 class="section-title">
+                <i class="bi bi-clock-history"></i>
+                Historial del Dispositivo
+            </h4>
+            <span class="historial-count">{{ historialCambios.length }} eventos</span>
+        </div>
+
+        @if (historialCambios.length > 0) {
+        <div class="historial-lista">
+            @for (item of historialCambios; track $index) {
+            <div class="historial-item">
+                <div class="historial-fecha">
+                    <i class="bi bi-clock"></i>
+                    {{ item.fecha }}
+                </div>
+                <div class="historial-detalle">
+                    <strong>{{ item.accion }}</strong>
+                    <span>{{ item.detalle }}</span>
+                </div>
+                <div class="historial-usuario">
+                    <i class="bi bi-person"></i>
+                    {{ item.usuario }}
+                </div>
+            </div>
+            }
+        </div>
+        } @else {
+        <div class="historial-vacio">
+            <i class="bi bi-clock-history"></i>
+            <p>Aún no hay actividad registrada</p>
+            <span>Los cambios del dispositivo aparecerán aquí</span>
+        </div>
+        }
+    </div>
+
+    <!-- ACCIONES -->
+    <div class="action-footer">
+        <button class="btn-cancel-premium" (click)="onVolver()">
+            Cancelar
+        </button>
+    </div>
+</div>

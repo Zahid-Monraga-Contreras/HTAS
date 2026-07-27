@@ -1,0 +1,161 @@
+<!-- Tarjeta de resumen del dispositivo -->
+@if (dispositivo) {
+<div class="resumen-dispositivo">
+    <div class="resumen-item">
+        <i class="bi bi-cpu"></i>
+        <div>
+            <small>Nombre</small>
+            <strong>{{ dispositivo.nombre || 'Sin nombre' }}</strong>
+        </div>
+    </div>
+    <div class="resumen-item">
+        <i class="bi bi-hdd-network"></i>
+        <div>
+            <small>Dirección MAC</small>
+            <strong>{{ dispositivo.direccionmac || 'No registrada' }}</strong>
+        </div>
+    </div>
+    <div class="resumen-item">
+        <i class="bi bi-person-fill"></i>
+        <div>
+            <small>Paciente Asignado</small>
+            <strong>{{ dispositivo.nombrepaciente ? obtenerNombreCompleto({
+                nombre: dispositivo.nombrepaciente,
+                appaterno: dispositivo.appaternopaciente,
+                apmaterno: dispositivo.apmaternopaciente
+                }) : 'Sin asignar' }}</strong>
+        </div>
+    </div>
+    <div class="resumen-item">
+        <i class="bi bi-tag-fill"></i>
+        <div>
+            <small>Estado</small>
+            <strong [style.color]="dispositivo.activo ? '#10b981' : '#ef4444'">
+                {{ dispositivo.activo ? 'Activo' : 'Inactivo' }}
+            </strong>
+        </div>
+    </div>
+</div>
+
+<div class="detail-card">
+    <div class="form-grid">
+        <!-- NOMBRE DEL DISPOSITIVO -->
+        <div class="form-group full-width-group">
+            <label>Nombre del Dispositivo</label>
+            <input type="text" [(ngModel)]="dispositivo.nombre" maxlength="100" class="form-control-premium"
+                placeholder="Ej. Monitor de Signos Vitales HTAS" [disabled]="esPacienteOAcompanante">
+        </div>
+
+        <!-- DIRECCIÓN MAC -->
+        <div class="form-group full-width-group">
+            <label>Dirección MAC</label>
+            <input type="text" [(ngModel)]="dispositivo.direccionmac" maxlength="17"
+                class="form-control-premium mono-text" placeholder="AA:BB:CC:DD:EE:FF"
+                style="font-family: 'Courier New', monospace; font-weight: 600; letter-spacing: 0.5px; background: #f8fafc; border-color: #dce1e8; text-transform: uppercase;"
+                [disabled]="esPacienteOAcompanante">
+            <div class="form-text text-muted">
+                <i class="bi bi-info-circle"></i> Formato: AA:BB:CC:DD:EE:FF (ejemplo: 0C:E7:39:1C:D0:04)
+            </div>
+        </div>
+
+        <!-- ESTADO -->
+        <div class="form-group" style="grid-column: span 1;">
+            <label>Estado en el Sistema</label>
+            <select [(ngModel)]="dispositivo.activo" class="form-control-premium" [disabled]="esPacienteOAcompanante">
+                <option [ngValue]="true">Activo / Operativo</option>
+                <option [ngValue]="false">Inactivo / Fuera de servicio</option>
+            </select>
+        </div>
+
+        <!-- Paciente Vinculado Actual -->
+        <div class="form-group full-width-group">
+            <label>Paciente Vinculado Actual</label>
+            <div class="patient-badge-container">
+                @if (dispositivo.nombrepaciente) {
+                <div class="patient-info">
+                    <i class="bi bi-person-fill icon-patient active"></i>
+                    <span class="patient-name">
+                        {{ obtenerNombreCompleto({
+                        nombre: dispositivo.nombrepaciente,
+                        appaterno: dispositivo.appaternopaciente,
+                        apmaterno: dispositivo.apmaternopaciente
+                        }) }}
+                    </span>
+                    @if (!esPacienteOAcompanante) {
+                    <button class="btn-desasignar" (click)="onDesasignarPaciente()" title="Desasignar paciente">
+                        <i class="bi bi-x-circle-fill"></i>
+                    </button>
+                    }
+                </div>
+
+                @if (pacienteTieneUbicacion()) {
+                <div class="ubicacion-paciente">
+                    <i class="bi bi-geo-alt-fill"></i>
+                    <span>{{ getUbicacionPaciente() }}</span>
+                </div>
+                }
+                } @else {
+                <div class="patient-info">
+                    <i class="bi bi-person-dash icon-patient unlinked"></i>
+                    <span class="patient-name text-muted">Dispositivo disponible en almacén (Sin vincular)</span>
+                </div>
+                }
+            </div>
+        </div>
+
+        <!-- Buscador de Pacientes - Solo si NO es paciente/acompañante -->
+        @if (!esPacienteOAcompanante) {
+        <div class="form-group full-width-group">
+            <label>Buscar Paciente para Vincular</label>
+            <div class="search-patient-container">
+                <input type="text" class="form-control-premium" placeholder="Escribe el nombre del paciente..."
+                    [(ngModel)]="filtroPaciente" (focus)="mostrarDropdown = true" (blur)="ocultarDropdown()"
+                    (input)="onFiltroPacienteChange()">
+                <i class="bi bi-search search-icon"></i>
+
+                @if (mostrarDropdown && pacientesFiltrados.length > 0) {
+                <div class="dropdown-list">
+                    @for (p of pacientesFiltrados.slice(0, 5); track p.idusuario) {
+                    <div class="dropdown-item" (click)="onAsignarPaciente(p)">
+                        <i class="bi bi-person-fill"></i>
+                        <span class="nombre-completo">{{ obtenerNombreCompleto(p) }}</span>
+                        <span class="badge-paciente">Paciente</span>
+                    </div>
+                    }
+                    @if (pacientesFiltrados.length > 5) {
+                    <div class="dropdown-more">
+                        <i class="bi bi-three-dots"></i>
+                        <span>Mostrando 5 de {{ pacientesFiltrados.length }} resultados</span>
+                    </div>
+                    }
+                </div>
+                }
+
+                @if (mostrarDropdown && filtroPaciente && pacientesFiltrados.length === 0) {
+                <div class="dropdown-list">
+                    <div class="dropdown-empty">
+                        <i class="bi bi-exclamation-circle"></i>
+                        <span>No se encontraron pacientes con ese nombre</span>
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+        }
+    </div>
+
+    <!-- Acciones -->
+    <div class="action-footer">
+        <button class="btn-cancel-premium" (click)="onVolver()" [disabled]="isSaving">Cancelar</button>
+        <button class="btn-save" (click)="onGuardar()" [disabled]="isSaving || esPacienteOAcompanante">
+            @if (isSaving) {
+            <span class="spinner-save"></span>
+            <span>Actualizando...</span>
+            } @else {
+            <i class="bi bi-cloud-arrow-up-fill"></i>
+            <span>Actualizar Dispositivo</span>
+            }
+        </button>
+    </div>
+</div>
+}
