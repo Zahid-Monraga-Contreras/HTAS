@@ -1,5 +1,5 @@
 import { Component, inject, ChangeDetectorRef, NgZone, PLATFORM_ID } from '@angular/core';
-import { Auth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from '@angular/fire/auth';
+import { Auth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from '@angular/fire/auth';
 import { Firestore, doc, getDoc, setDoc } from '@angular/fire/firestore';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { soloLetrasValidator, soloLetras } from '../../../shared/validations/validators';
@@ -40,11 +40,9 @@ export class Login {
   loginForm: FormGroup;
   loading = false;
 
-  // Variables para el registro por pasos
   currentStep: number = 1;
   totalSteps: number = 3;
 
-  // Variables para mostrar/ocultar contraseñas
   showLoginPassword: boolean = false;
   showRegisterPassword: boolean = false;
   showConfirmPassword: boolean = false;
@@ -60,7 +58,6 @@ export class Login {
   modalIcon = '';
   modalType: 'modal-success' | 'modal-error' = 'modal-success';
 
-  // Variables del calendario
   fechaMinima: string = '';
   fechaMaxima: string = '';
 
@@ -102,14 +99,12 @@ export class Login {
     this.configurarLimitesFecha();
   }
 
-  // Validador de coincidencia de contraseñas
   passwordMatchValidator(group: FormGroup): any {
     const password = group.get('Password')?.value;
     const confirmPassword = group.get('ConfirmPassword')?.value;
     return password === confirmPassword ? null : { mismatch: true };
   }
 
-  // Funciones para mostrar/ocultar contraseñas
   toggleLoginPassword(): void {
     this.showLoginPassword = !this.showLoginPassword;
   }
@@ -122,13 +117,10 @@ export class Login {
     this.showConfirmPassword = !this.showConfirmPassword;
   }
 
-  // Navegación entre pasos
   nextStep(): void {
     if (this.currentStep < this.totalSteps) {
-      // Validar el paso actual antes de avanzar
       if (this.isStepValid(this.currentStep)) {
         this.currentStep++;
-        // Si el siguiente paso es el 3, inicializar el calendario
         if (this.currentStep === 3) {
           setTimeout(() => this.inicializarCalendario(), 100);
         }
@@ -144,7 +136,6 @@ export class Login {
     }
   }
 
-  // Validar si el paso actual está completo
   isStepValid(step: number): boolean {
     const form = this.registerForm;
     switch (step) {
@@ -159,15 +150,13 @@ export class Login {
       case 3:
         const rol = form.get('Rol')?.value;
         if (!rol) return false;
-
-        // Validar campos específicos según el rol
         if (rol === 'Paciente') {
           return !!(form.get('NSS')?.valid);
         } else if (rol === 'Doctor') {
           return !!(form.get('FotoCedula')?.valid &&
             form.get('Especialidad')?.valid &&
             form.get('DireccionClinica')?.valid);
-        } else if (rol === 'Acompañante') {
+        } else if (rol === 'Acompanante') {
           return !!(form.get('FechaAsignacion')?.valid);
         }
         return true;
@@ -176,7 +165,6 @@ export class Login {
     }
   }
 
-  // Verificar si el paso actual tiene errores visibles
   isStepInvalid(step: number): boolean {
     const form = this.registerForm;
     switch (step) {
@@ -197,7 +185,7 @@ export class Login {
           return !!(form.get('FotoCedula')?.invalid ||
             form.get('Especialidad')?.invalid ||
             form.get('DireccionClinica')?.invalid);
-        } else if (rol === 'Acompañante') {
+        } else if (rol === 'Acompanante') {
           return !!(form.get('FechaAsignacion')?.invalid);
         }
         return false;
@@ -253,7 +241,7 @@ export class Login {
 
     acompananteFields.forEach(fieldName => {
       const control = this.registerForm.get(fieldName);
-      if (rol === 'Acompañante') {
+      if (rol === 'Acompanante') {
         control?.setValidators([Validators.required]);
       } else {
         control?.clearValidators();
@@ -263,9 +251,41 @@ export class Login {
     });
   }
 
+  private getRouteForRole(role: string): string {
+    const roleMap: { [key: string]: string } = {
+      'admin': '/admin',
+      'administrador': '/admin',
+      'paciente': '/patient',
+      'patient': '/patient',
+      'doctor': '/doctor',
+      'medico': '/doctor',
+      'acompanante': '/caregiver',
+      'acompañante': '/caregiver',
+      'caregiver': '/caregiver'
+    };
+    return roleMap[role] || '/landing';
+  }
+
+  private redirectBasedOnRole(role: string): void {
+    const route = this.getRouteForRole(role.toLowerCase());
+    console.log('Redirigiendo a: ' + route + ' (rol: ' + role + ')');
+
+    this.ngZone.run(() => {
+      this.router.navigate([route]).then(success => {
+        console.log('Navegacion a ' + route + ': ' + success);
+        if (!success) {
+          window.location.href = route;
+        }
+      }).catch(err => {
+        console.error('Error en navegacion:', err);
+        window.location.href = route;
+      });
+    });
+  }
+
   async onSubmitSignUp(): Promise<void> {
     if (!this.captchaTokenRegister) {
-      this.openModal('Verificación requerida', 'Por favor completa el reCAPTCHA.', 'modal-error');
+      this.openModal('Verificacion requerida', 'Por favor completa el reCAPTCHA.', 'modal-error');
       return;
     }
 
@@ -300,37 +320,17 @@ export class Login {
 
       this.users.registrar(datosParaBackend).subscribe({
         next: (res: any) => {
-          this.users.login({ correo: f.Email, contrasenia: f.Password }).subscribe({
-            next: (loginRes: any) => {
-              this.ngZone.run(() => {
-                this.loading = false;
-                this.usuarioUidTemporal = loginRes.uid;
-                this.pinCorrectoBD = loginRes.pin;
-                this.esperandoPin = true;
-                this.isToggled = false;
-                this.currentStep = 1;
-
-                this.openModal(
-                  '¡Registro Exitoso!',
-                  'Usuario guardado correctamente. Revisa tu correo para tu PIN.',
-                  'modal-success'
-                );
-                this.cdr.detectChanges();
-              });
-            },
-            error: () => {
-              this.ngZone.run(() => {
-                this.loading = false;
-                this.isToggled = false;
-                this.currentStep = 1;
-                this.openModal(
-                  '¡Registro Exitoso!',
-                  'Usuario guardado. Por favor inicia sesión.',
-                  'modal-success'
-                );
-                this.cdr.detectChanges();
-              });
-            }
+          console.log('Registro exitoso:', res);
+          this.ngZone.run(() => {
+            this.loading = false;
+            this.isToggled = false;
+            this.currentStep = 1;
+            this.openModal(
+              'Registro Exitoso',
+              'Usuario guardado correctamente. Por favor inicia sesion.',
+              'modal-success'
+            );
+            this.cdr.detectChanges();
           });
         },
         error: (err) => {
@@ -353,35 +353,70 @@ export class Login {
 
     try {
       const res: any = await this.googleService.loginWithGoogle();
+      console.log('Google login response:', res);
+
       this.ngZone.run(() => {
         this.loading = false;
-        this.usuarioUidTemporal = res.uid;
-        if (res.pinVerificado === true) {
-          if (res.accessToken) localStorage.setItem('token', res.accessToken);
-          this.router.navigate(['/inicio']);
-        } else {
-          this.pinCorrectoBD = res.pin;
-          this.esperandoPin = true;
-          this.openModal('Verificación Requerida', 'Se ha enviado un código de seguridad a tu correo de Google.', 'modal-success');
-          this.cdr.detectChanges();
+
+        if (res) {
+          if (res.accessToken) {
+            localStorage.setItem('token', res.accessToken);
+          }
+
+          // ✅ ACTUALIZAR EL USERS SERVICE
+          this.users.establecerSesion(res);
+
+          if (res.uid || res.idusuario) {
+            const userData = {
+              uid: res.uid || res.idusuario,
+              rol: res.rol || res.role || res.tipo || '',
+              nombre: res.nombre || 'Usuario',
+              correo: res.correo || res.Email || res.email,
+              apPaterno: res.apPaterno || '',
+              apMaterno: res.apMaterno || '',
+              telefono: res.telefono || ''
+            };
+            localStorage.setItem('user_htas', JSON.stringify(userData));
+          }
+
+          if (res.pinVerificado === false) {
+            this.usuarioUidTemporal = res.uid || res.idusuario || res.id;
+            this.pinCorrectoBD = res.pin;
+            this.esperandoPin = true;
+            this.openModal('Verificacion Requerida', 'Se ha enviado un codigo de seguridad a tu correo.', 'modal-success');
+            this.cdr.detectChanges();
+            return;
+          }
+
+          const role = res.rol || res.role || res.tipo || '';
+          console.log('Rol obtenido del backend: ' + role);
+
+          if (role) {
+            setTimeout(() => {
+              this.redirectBasedOnRole(role);
+            }, 300);
+          } else {
+            console.error('No se pudo obtener el rol del usuario');
+            this.openModal('Error', 'No se pudo obtener la informacion del usuario.', 'modal-error');
+          }
         }
       });
     } catch (error: any) {
       this.ngZone.run(() => {
         this.loading = false;
-        this.openModal('Acceso Denegado', error.message, 'modal-error');
+        this.openModal('Acceso Denegado', error.message || 'Error al iniciar sesion con Google', 'modal-error');
       });
     }
   }
 
   async onLoginWithEmailPassword(): Promise<void> {
     if (!this.captchaTokenLogin) {
-      this.openModal('Verificación requerida', 'Por favor completa el reCAPTCHA.', 'modal-error');
+      this.openModal('Verificacion requerida', 'Por favor completa el reCAPTCHA.', 'modal-error');
       return;
     }
 
     if (this.loginForm.invalid) {
-      this.openModal('Formulario Incompleto', 'Por favor ingresa un correo y contraseña válidos.', 'modal-error');
+      this.openModal('Formulario Incompleto', 'Por favor ingresa un correo y contrasena validos.', 'modal-error');
       return;
     }
 
@@ -393,16 +428,51 @@ export class Login {
 
     this.users.login(credenciales).subscribe({
       next: (res: any) => {
+        console.log('Login response del backend:', res);
         this.ngZone.run(() => {
           this.loading = false;
-          if (res.pinVerificado === true) {
-            if (res.token) localStorage.setItem('token', res.token);
-            this.router.navigate(['/inicio']);
-          } else {
-            this.usuarioUidTemporal = res.uid;
-            this.pinCorrectoBD = res.pin;
-            this.esperandoPin = true;
-            this.cdr.detectChanges();
+
+          if (res) {
+            if (res.token || res.accessToken) {
+              localStorage.setItem('token', res.token || res.accessToken);
+            }
+
+            // ✅ ACTUALIZAR EL USERS SERVICE
+            this.users.establecerSesion(res);
+
+            if (res.uid || res.idusuario) {
+              const userData = {
+                uid: res.uid || res.idusuario,
+                rol: res.rol || res.role || res.tipo || '',
+                nombre: res.nombre || 'Usuario',
+                correo: res.correo || res.Email || res.email,
+                apPaterno: res.apPaterno || '',
+                apMaterno: res.apMaterno || '',
+                telefono: res.telefono || ''
+              };
+              localStorage.setItem('user_htas', JSON.stringify(userData));
+            }
+
+            if (res.pinVerificado === false) {
+              this.usuarioUidTemporal = res.uid || res.idusuario || res.id;
+              this.pinCorrectoBD = res.pin;
+              this.esperandoPin = true;
+              this.openModal('Verificacion Requerida', 'Se ha enviado un codigo de seguridad a tu correo.', 'modal-success');
+              this.cdr.detectChanges();
+              return;
+            }
+
+            const role = res.rol || res.role || res.tipo || '';
+            console.log('Rol obtenido del backend: ' + role);
+
+            if (role) {
+              setTimeout(() => {
+                this.redirectBasedOnRole(role);
+              }, 300);
+            } else {
+              console.error('No se pudo obtener el rol del usuario');
+              this.openModal('Error', 'No se pudo obtener la informacion del usuario.', 'modal-error');
+            }
           }
         });
       },
@@ -410,9 +480,9 @@ export class Login {
         this.ngZone.run(() => {
           this.loading = false;
           if (err.status === 423) {
-            this.openModal('Cuenta Bloqueada', `Demasiados intentos. Espera un momento.`, 'modal-error');
+            this.openModal('Cuenta Bloqueada', 'Demasiados intentos. Espera un momento.', 'modal-error');
           } else {
-            const mensajeError = err.error?.error || 'Correo o contraseña incorrectos.';
+            const mensajeError = err.error?.error || 'Correo o contrasena incorrectos.';
             this.openModal('Error de Acceso', mensajeError, 'modal-error');
           }
         });
@@ -426,9 +496,41 @@ export class Login {
 
     this.users.verificarPin(this.usuarioUidTemporal, this.pinIngresado).subscribe({
       next: (res: any) => {
+        console.log('PIN verification response:', res);
         this.loading = false;
-        if (res.accessToken) localStorage.setItem('token', res.accessToken);
-        this.ngZone.run(() => this.router.navigate(['/inicio']));
+
+        if (res.accessToken) {
+          localStorage.setItem('token', res.accessToken);
+        }
+
+        // ✅ ACTUALIZAR EL USERS SERVICE DESPUES DE VERIFICAR PIN
+        if (res.uid || this.usuarioUidTemporal) {
+          const userData = {
+            uid: res.uid || this.usuarioUidTemporal,
+            rol: res.rol || res.role || res.tipo || '',
+            nombre: res.nombre || 'Usuario',
+            correo: res.correo || res.Email || res.email,
+            apPaterno: res.apPaterno || '',
+            apMaterno: res.apMaterno || '',
+            telefono: res.telefono || ''
+          };
+          localStorage.setItem('user_htas', JSON.stringify(userData));
+          this.users.establecerSesion(userData);
+        }
+
+        this.ngZone.run(() => {
+          const role = res.rol || res.role || res.tipo || '';
+          console.log('Rol obtenido despues de verificar PIN: ' + role);
+
+          if (role) {
+            setTimeout(() => {
+              this.redirectBasedOnRole(role);
+            }, 300);
+          } else {
+            console.error('No se pudo obtener el rol despues de verificar PIN');
+            this.router.navigate(['/landing']);
+          }
+        });
       },
       error: (err) => {
         this.loading = false;
@@ -446,12 +548,12 @@ export class Login {
     const total = this.users.segundosRestantes();
     const min = Math.floor(total / 60);
     const seg = total % 60;
-    return `${min}:${seg < 10 ? '0' : ''}${seg}`;
+    return min + ':' + (seg < 10 ? '0' : '') + seg;
   }
 
   async reenviarPin(): Promise<void> {
     if (!this.usuarioUidTemporal) {
-      this.openModal('Error', 'No se pudo identificar al usuario. Intenta iniciar sesión de nuevo.', 'modal-error');
+      this.openModal('Error', 'No se pudo identificar al usuario. Intenta iniciar sesion de nuevo.', 'modal-error');
       return;
     }
 
@@ -462,7 +564,7 @@ export class Login {
       next: () => {
         this.ngZone.run(() => {
           this.loading = false;
-          this.openModal('PIN Reenviado', 'Se ha enviado un nuevo código a tu correo.', 'modal-success');
+          this.openModal('PIN Reenviado', 'Se ha enviado un nuevo codigo a tu correo.', 'modal-success');
           this.cdr.detectChanges();
         });
       },
@@ -557,7 +659,7 @@ export class Login {
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
       if (file.type !== 'application/pdf') {
-        this.openModal('Formato Inválido', 'Por favor, selecciona tu Cédula en formato PDF.', 'modal-error');
+        this.openModal('Formato Invalido', 'Por favor, selecciona tu Cedula en formato PDF.', 'modal-error');
         input.value = '';
         return;
       }

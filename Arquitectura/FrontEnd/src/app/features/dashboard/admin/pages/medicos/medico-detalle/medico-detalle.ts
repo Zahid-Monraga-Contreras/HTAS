@@ -69,7 +69,7 @@ export class MedicoDetalle implements OnInit, OnDestroy {
       this.inicializarCampos();
       this.cargarDatosAdicionales();
     } else {
-      this.router.navigate(['/medicos']);
+      this.router.navigate(['/admin/medicos']);
     }
   }
 
@@ -326,7 +326,7 @@ export class MedicoDetalle implements OnInit, OnDestroy {
       this.lanzarNotificacion("Los datos del medico se actualizaron correctamente.", "success");
 
       setTimeout(() => {
-        this.router.navigate(['/medicos']);
+        this.router.navigate(['/admin/medicos']);
       }, 2000);
 
     } catch (error) {

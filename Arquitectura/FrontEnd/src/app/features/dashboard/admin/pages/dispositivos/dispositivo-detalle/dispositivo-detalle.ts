@@ -189,14 +189,14 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
             this.inicializarCampos();
             setTimeout(() => this.cdr.detectChanges());
           } else {
-            this.router.navigate(['/dispositivos']);
+            this.router.navigate(['/admin/dispositivos']);
           }
         } catch (error) {
           console.error("Error al cargar dispositivo:", error);
-          this.router.navigate(['/dispositivos']);
+          this.router.navigate(['/admin/dispositivos']);
         }
       } else {
-        this.router.navigate(['/dispositivos']);
+        this.router.navigate(['/admin/dispositivos']);
       }
     }
   }
@@ -302,7 +302,7 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
   private debugEstructuraDatos(data: any) {
     if (data?.mediciones?.length > 0) {
       const primera = data.mediciones[0];
-      console.log('🔍 ESTRUCTURA DE LA PRIMERA MEDICIÓN:');
+      console.log('ESTRUCTURA DE LA PRIMERA MEDICIÓN:');
       console.log('Campos:', Object.keys(primera));
       console.log('Contenido:', JSON.stringify(primera, null, 2));
 
@@ -312,7 +312,7 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
           (value.includes('-') || value.includes('/')) &&
           value.length >= 8;
       });
-      console.log('📅 Posibles campos de fecha:', camposFecha);
+      console.log('Posibles campos de fecha:', camposFecha);
     }
   }
 
@@ -385,7 +385,7 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
     try {
       const data = await firstValueFrom(this.usersService.getMedicionesPaciente(idPaciente, 10));
 
-      console.log('📊 Datos crudos de mediciones:', data);
+      console.log('Datos crudos de mediciones:', data);
 
       this.debugEstructuraDatos(data);
 
@@ -414,14 +414,14 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
           }
 
           if (!fecha) {
-            console.warn('⚠️ Medición sin fecha en el índice', index, ':', m);
+            console.warn('Medición sin fecha en el índice', index, ':', m);
             for (const key of Object.keys(m)) {
               const value = m[key];
               if (typeof value === 'string' &&
                 (value.includes('-') || value.includes('/')) &&
                 value.length >= 8) {
                 fecha = value;
-                console.log('🔍 Fecha encontrada en campo:', key, '=', value);
+                console.log('Fecha encontrada en campo:', key, '=', value);
                 break;
               }
             }
@@ -453,7 +453,7 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
               }
             }
           } catch (error) {
-            console.warn('⚠️ Error al convertir fecha:', fecha);
+            console.warn('Error al convertir fecha:', fecha);
             fechaISO = new Date().toISOString();
           }
 
@@ -461,7 +461,7 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
           const diastolica = Number(m.diastolica || m.Diastolica || 0);
           const pulso = Number(m.pulso || m.Pulso || 0);
 
-          console.log(`📝 Medición ${index + 1}:`, {
+          console.log(`Medición ${index + 1}:`, {
             fecha_original: fecha,
             fecha_iso: fechaISO,
             sistolica: sistolica,
@@ -494,7 +494,7 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
           }
         });
 
-        console.log('✅ Mediciones procesadas (ordenadas DESC):', this.medicionesTensiometro);
+        console.log('Mediciones procesadas (ordenadas DESC):', this.medicionesTensiometro);
 
         if (this.medicionesTensiometro.length > 0) {
           const primera = this.medicionesTensiometro[0];
@@ -510,11 +510,11 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
         this.cdr.detectChanges();
 
       } else {
-        console.warn('⚠️ No se encontraron mediciones');
+        console.warn('No se encontraron mediciones');
         this.medicionesTensiometro = [];
       }
     } catch (error) {
-      console.error('❌ Error al cargar mediciones:', error);
+      console.error('Error al cargar mediciones:', error);
       this.medicionesTensiometro = [];
     }
   }
@@ -889,7 +889,7 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
       this.lanzarNotificacion("¡Dispositivo actualizado con éxito!", "success");
 
       setTimeout(() => {
-        this.router.navigate(['/dispositivos']);
+        this.router.navigate(['/admin/dispositivos']);
       }, 1500);
 
     } catch (error: any) {

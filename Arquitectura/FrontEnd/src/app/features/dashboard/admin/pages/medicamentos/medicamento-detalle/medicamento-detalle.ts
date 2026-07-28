@@ -106,7 +106,7 @@ export class MedicamentoDetalle implements OnInit, OnDestroy {
         this.cargarDatosHijos(idMedicamento);
       }
     } else {
-      this.router.navigate(['/medicamentos']);
+      this.router.navigate(['/admin/medicamentos']);
     }
   }
 
@@ -201,7 +201,7 @@ export class MedicamentoDetalle implements OnInit, OnDestroy {
       }
 
       setTimeout(() => {
-        this.router.navigate(['/medicamentos']);
+        this.router.navigate(['/admin/medicamentos']);
       }, 2000);
     } else {
       this.lanzarNotificacion(resultado.mensaje, 'error');

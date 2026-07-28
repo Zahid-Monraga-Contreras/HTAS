@@ -1,22 +1,11 @@
 <app-menu #sidebar></app-menu>
 
-@if (mostrarToast) {
-<div class="toast-premium-container" [ngClass]="tipoToast">
-    <div class="toast-content">
-        @if (tipoToast === 'success') { <i class="bi bi-check-circle-fill icon-toast"></i> }
-        @if (tipoToast === 'error') { <i class="bi bi-exclamation-triangle-fill icon-toast"></i> }
-        @if (tipoToast === 'warning') { <i class="bi bi-exclamation-circle-fill icon-toast"></i> }
-        <span class="toast-message">{{ mensajeToast }}</span>
-    </div>
-</div>
-}
-
 <main class="main-content" [class.menu-collapsed]="sidebar.isCollapsed">
     <div class="container-fluid">
 
         <div class="header-section">
             <div class="title-group">
-                <h2 class="title-page">Gestión de Citas Médicas</h2>
+                <h2 class="title-page">Gestion de Citas Medicas</h2>
                 <p class="subtitle-page">Administra, supervisa y actualiza el estado de las citas en el sistema.</p>
             </div>
 
@@ -26,7 +15,7 @@
                     <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar por paciente o motivo...">
                 </div>
 
-                @if (verificarPermiso('crear')) {
+                @if (canAdd) {
                 <button class="btn-save btn-new-appointment" (click)="abrirCrearCita()">
                     <i class="bi bi-plus-lg"></i>
                     <span>Cita</span>
@@ -34,14 +23,14 @@
                 }
 
                 <div class="action-buttons-group" [class.visible]="citaSeleccionada">
-                    @if (verificarPermiso('editar')) {
+                    @if (canEdit) {
                     <button class="btn-action btn-edit-premium" (click)="abrirEditarCita()" title="Editar cita">
                         <i class="bi bi-pencil-fill"></i>
                         <span>Editar</span>
                     </button>
                     }
 
-                    @if (verificarPermiso('eliminar')) {
+                    @if (canDelete) {
                     <button class="btn-action btn-delete-premium" (click)="abrirEliminarCita()" title="Cancelar cita">
                         <i class="bi bi-trash-fill"></i>
                         <span>Cancelar</span>
@@ -141,7 +130,7 @@
                                     <div class="detail-card-item">
                                         <div class="detail-icon"><i class="bi bi-display"></i></div>
                                         <div class="detail-data">
-                                            <label>Modalidad de Atención</label>
+                                            <label>Modalidad de Atencion</label>
                                             <span class="badge-premium" [attr.data-rol]="cita.modalidad">
                                                 <span class="dot-indicator"></span>
                                                 {{ cita.modalidad }}
@@ -229,13 +218,13 @@
             <div class="form-group full-width-modal">
                 <label>Motivo de la Consulta</label>
                 <input type="text" [(ngModel)]="nuevaCita.motivo"
-                    placeholder="Ej: Control de rutina, revisión de presión arterial" class="form-control-premium">
+                    placeholder="Ej: Control de rutina, revision de presion arterial" class="form-control-premium">
             </div>
 
             <div class="form-group full-width-modal">
-                <label>Síntomas actuales</label>
+                <label>Sintomas actuales</label>
                 <textarea [(ngModel)]="nuevaCita.sintomas" rows="3"
-                    placeholder="Escribe aquí tus malestares o síntomas actuales..."
+                    placeholder="Escribe aqui tus malestares o sintomas actuales..."
                     class="form-control-premium"></textarea>
             </div>
         </div>
@@ -265,14 +254,14 @@
             <i class="bi bi-exclamation-triangle-fill"></i>
         </div>
         <h3>¿Cancelar Cita?</h3>
-        <p class="text-muted">Esta acción notificará automáticamente al sistema.</p>
+        <p class="text-muted">Esta accion notificara automaticamente al sistema.</p>
         <div class="modal-footer-danger">
             <button class="btn-danger-confirm" (click)="confirmarEliminarCita()" [disabled]="isDeleting">
                 @if (isDeleting) {
                 <span class="spinner-save"></span>
                 <span>Cancelando...</span>
                 } @else {
-                <span>Sí, Cancelar Cita</span>
+                <span>Si, Cancelar Cita</span>
                 }
             </button>
             <button class="btn-outline-cancel" (click)="cerrarModal()" [disabled]="isDeleting">No, volver</button>

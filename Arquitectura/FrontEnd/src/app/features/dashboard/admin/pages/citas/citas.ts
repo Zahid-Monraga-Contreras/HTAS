@@ -4,7 +4,7 @@ import { Menu } from "../../template/menu/menu";
 import { FormsModule } from '@angular/forms';
 import { Users } from '../../../../../core/services/users.service';
 import { firstValueFrom } from 'rxjs';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Spanish } from 'flatpickr/dist/l10n/es.js';
 
 declare var flatpickr: any;
@@ -21,17 +21,20 @@ export class Citas implements OnInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
   private platformId = inject(PLATFORM_ID);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   citasTodo: any[] = [];
   searchTerm: string = '';
   expandedId: number | null = null;
   currentUser: any = null;
 
-  // Paginación
+  canAdd: boolean = true;
+  canEdit: boolean = true;
+  canDelete: boolean = true;
+
   paginaActual = 0;
   itemsPorPagina = 10;
 
-  // Selección y Modales
   citaSeleccionada: any = null;
   mostrarModalCrear = false;
   mostrarModalEdit = false;
@@ -47,103 +50,100 @@ export class Citas implements OnInit, OnDestroy {
     sintomas: ''
   };
 
-  // Sistema de Notificaciones Premium
-  mostrarToast = false;
-  mensajeToast = '';
-  tipoToast: 'success' | 'error' | 'warning' = 'success';
-  private toastTimeout: any = null;
-
-  // Instancias locales de Flatpickr
   private fpFechaInstance: any = null;
   private fpHoraInstance: any = null;
 
   async ngOnInit() {
+    this.route.queryParams.subscribe(params => {
+      this.canAdd = params['canAdd'] !== 'false';
+      this.canEdit = params['canEdit'] !== 'false';
+      this.canDelete = params['canDelete'] !== 'false';
+      console.log('Permisos Citas:', { canAdd: this.canAdd, canEdit: this.canEdit, canDelete: this.canDelete });
+    });
+
     if (isPlatformBrowser(this.platformId)) {
-      const saved = localStorage.getItem('user_htas');
-      if (saved) {
-        this.currentUser = JSON.parse(saved);
-        console.log('DATOS DEL USUARIO EN LOCALSTORAGE:', this.currentUser);
-        console.log('ROL DEL USUARIO:', this.currentUser.rol);
-        console.log('ROL EN MINÚSCULAS:', this.currentUser.rol?.toLowerCase());
+      await this.obtenerUsuario();
+
+      if (this.currentUser && this.currentUser.correo) {
+        console.log('Usuario cargado correctamente:', this.currentUser.correo);
+        console.log('Rol del usuario:', this.currentUser.rol);
         await this.cargarCitas();
       } else {
-        console.error('No se encontró usuario en localStorage');
+        console.error('No se pudo obtener el usuario');
       }
+    }
+  }
+
+  private async obtenerUsuario(): Promise<void> {
+    try {
+      const uService = this.usersService as any;
+      if (uService.currentUserSubject && uService.currentUserSubject.value) {
+        const user = uService.currentUserSubject.value;
+        console.log('Usuario desde UsersService:', user);
+        if (user && (user.correo || user.email)) {
+          this.currentUser = {
+            ...user,
+            correo: user.correo || user.email,
+            nombre: user.nombre || user.displayName,
+            rol: user.rol || 'Paciente'
+          };
+          return;
+        }
+      }
+
+      const saved = localStorage.getItem('user_htas');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        console.log('Usuario desde localStorage:', parsed);
+        if (parsed && parsed.correo) {
+          this.currentUser = parsed;
+          return;
+        }
+      }
+
+      if (uService.cargarSesionPersistente) {
+        uService.cargarSesionPersistente();
+        const user = uService.currentUserSubject?.value;
+        if (user && (user.correo || user.email)) {
+          console.log('Usuario desde sesion persistente:', user);
+          this.currentUser = {
+            ...user,
+            correo: user.correo || user.email
+          };
+          return;
+        }
+      }
+
+      console.warn('No se encontro usuario en ninguna fuente');
+      this.currentUser = null;
+    } catch (error) {
+      console.error('Error al obtener usuario:', error);
+      this.currentUser = null;
     }
   }
 
   ngOnDestroy() {
     this.destruirCalendarios();
-    if (this.toastTimeout) clearTimeout(this.toastTimeout);
-  }
-
-  /**
-   * Validador de permisos
-   */
-  verificarPermiso(accion: 'crear' | 'editar' | 'eliminar'): boolean {
-    if (!this.currentUser || !this.currentUser.rol) return false;
-
-    const rol = this.currentUser.rol
-      .toLowerCase()
-      .trim()
-      .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-
-    console.log(`Verificando permiso para "${accion}" con rol:`, rol);
-
-    const esAdmin = rol === 'administrador' || rol === 'admin';
-    const esMedicoODoctor = rol.includes('medico') || rol.includes('doctor');
-    const esAcompanante = rol === 'acompanante';
-
-    console.log(`  - esAdmin: ${esAdmin}`);
-    console.log(`  - esMedicoODoctor: ${esMedicoODoctor}`);
-    console.log(`  - esAcompanante: ${esAcompanante}`);
-
-    switch (accion) {
-      case 'crear':
-        const puedeCrear = rol === 'paciente' || esAcompanante || esAdmin;
-        console.log(`  - Puede crear: ${puedeCrear}`);
-        return puedeCrear;
-      case 'editar':
-      case 'eliminar':
-        const puedeGestionar = esMedicoODoctor || esAdmin;
-        console.log(`  - Puede ${accion}: ${puedeGestionar}`);
-        return puedeGestionar;
-      default:
-        return false;
-    }
-  }
-
-  lanzarNotificacion(mensaje: string, tipo: 'success' | 'error' | 'warning' = 'success') {
-    this.mensajeToast = mensaje;
-    this.tipoToast = tipo;
-    this.mostrarToast = true;
-    this.cdr.detectChanges();
-
-    if (this.toastTimeout) clearTimeout(this.toastTimeout);
-
-    this.toastTimeout = setTimeout(() => {
-      this.mostrarToast = false;
-      this.cdr.detectChanges();
-    }, 4000);
   }
 
   async cargarCitas() {
     if (!this.currentUser || !this.currentUser.correo) {
       console.error('Usuario o correo no disponible');
-      return;
+      await this.obtenerUsuario();
+      if (!this.currentUser || !this.currentUser.correo) {
+        return;
+      }
     }
 
-    console.log('Iniciando carga de citas...');
+    console.log('=== INICIANDO CARGA DE CITAS ===');
     console.log('Usuario actual:', this.currentUser.correo);
     console.log('Rol del usuario:', this.currentUser.rol);
 
-    // Normalizar el rol
     const rol = this.currentUser.rol.toLowerCase().trim()
       .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
     console.log('Rol normalizado:', rol);
 
-    // Verificar si es administrador (de varias formas)
     const esAdmin = rol === 'administrador' ||
       rol === 'admin' ||
       this.currentUser.rol?.toLowerCase().includes('admin') ||
@@ -154,7 +154,7 @@ export class Citas implements OnInit, OnDestroy {
 
     const tieneAccesoGlobal = esAdmin || esMedico || esAcompanante;
 
-    console.log('Resultado de verificación:');
+    console.log('Resultado de verificacion:');
     console.log('  - esAdmin:', esAdmin);
     console.log('  - esMedico:', esMedico);
     console.log('  - esAcompanante:', esAcompanante);
@@ -165,39 +165,60 @@ export class Citas implements OnInit, OnDestroy {
     try {
       if (tieneAccesoGlobal) {
         console.log('Cargando TODAS las citas (getAllCitas)');
-        data = await firstValueFrom(this.usersService.getAllCitas());
-        console.log('Número de citas obtenidas:', data?.length || 0);
+        const response = await firstValueFrom(this.usersService.getAllCitas());
+        console.log('Respuesta getAllCitas:', response);
+
+        if (response && Array.isArray(response)) {
+          data = response;
+        } else if (response && typeof response === 'object') {
+          const keys = ['data', 'citas', 'results', 'items', 'rows'];
+          for (const key of keys) {
+            if (response[key] && Array.isArray(response[key])) {
+              data = response[key];
+              console.log('Datos encontrados en "' + key + '":', data.length);
+              break;
+            }
+          }
+          if (data.length === 0) {
+            data = Object.values(response).filter(v => Array.isArray(v)).flat() || [];
+          }
+        }
       } else {
         console.log('Cargando SOLO citas del paciente (getMisCitas)');
-        data = await firstValueFrom(this.usersService.getMisCitas(this.currentUser.correo));
-        console.log('Número de citas del paciente:', data?.length || 0);
+        const response = await firstValueFrom(this.usersService.getMisCitas(this.currentUser.correo));
+        console.log('Respuesta getMisCitas:', response);
+
+        if (response && Array.isArray(response)) {
+          data = response;
+        } else if (response && typeof response === 'object') {
+          const keys = ['data', 'citas', 'results', 'items', 'rows'];
+          for (const key of keys) {
+            if (response[key] && Array.isArray(response[key])) {
+              data = response[key];
+              break;
+            }
+          }
+        }
       }
 
-      // Verificar que data sea un array
-      if (!data || !Array.isArray(data)) {
-        console.warn('La respuesta no es un array válido:', data);
-        data = [];
-      }
+      console.log('Total de citas cargadas:', data.length);
 
       this.citasTodo = data.map(c => ({
         ...c,
-        id: c.idcita,
-        NombreMostrar: `${c.nombrepaciente || ''} ${c.appaternopaciente || ''}`.trim() || 'Paciente sin nombre'
+        id: c.idcita || c.id,
+        NombreMostrar: c.nombrepaciente || c.paciente || c.NombreMostrar || 'Paciente sin nombre'
       }));
 
       console.log('citasTodo actualizado. Total:', this.citasTodo.length);
-      console.log('Primeras 3 citas:', this.citasTodo.slice(0, 3));
 
       this.cdr.detectChanges();
 
       if (this.citasTodo.length === 0) {
         console.warn('No se encontraron citas para mostrar');
-        this.lanzarNotificacion('No hay citas disponibles en el sistema', 'warning');
       }
 
     } catch (error) {
       console.error('Error al cargar citas:', error);
-      this.lanzarNotificacion('Error al cargar la lista de citas', 'error');
       this.citasTodo = [];
       this.cdr.detectChanges();
     }
@@ -227,7 +248,7 @@ export class Citas implements OnInit, OnDestroy {
   }
 
   seleccionarCita(c: any) {
-    console.log('Seleccionando cita:', c.idcita);
+    console.log('Seleccionando cita:', c.idcita || c.id);
     this.citaSeleccionada = {
       ...c,
       tempEstado: c.estado,
@@ -236,8 +257,7 @@ export class Citas implements OnInit, OnDestroy {
   }
 
   abrirCrearCita() {
-    if (!this.verificarPermiso('crear')) {
-      this.lanzarNotificacion('No posees los permisos requeridos para agendar citas.', 'error');
+    if (!this.canAdd) {
       return;
     }
 
@@ -247,7 +267,7 @@ export class Citas implements OnInit, OnDestroy {
     const dia = String(hoy.getDate()).padStart(2, '0');
 
     this.nuevaCita = {
-      fecha: `${anio}-${mes}-${dia}`,
+      fecha: anio + '-' + mes + '-' + dia,
       hora: '10:00',
       motivo: '',
       modalidad: 'Presencial',
@@ -259,29 +279,27 @@ export class Citas implements OnInit, OnDestroy {
   }
 
   async guardarNuevaCita() {
-    if (!this.verificarPermiso('crear')) {
-      this.lanzarNotificacion('Acción denegada por restricciones de rol.', 'error');
+    if (!this.canAdd) {
       return;
     }
 
     if (!this.nuevaCita.fecha || !this.nuevaCita.hora || !this.nuevaCita.motivo.trim()) {
-      this.lanzarNotificacion('Por favor llena los campos obligatorios del formulario.', 'warning');
       return;
     }
 
     this.isSaving = true;
 
     const citaParaEnviar = {
-      nombrePaciente: this.currentUser.nombre,
-      apPaternoPaciente: this.currentUser.apPaterno,
+      nombrePaciente: this.currentUser.nombre || this.currentUser.NombreCompleto || 'Paciente',
+      apPaternoPaciente: this.currentUser.apPaterno || '',
       apMaternoPaciente: this.currentUser.apMaterno || '',
       telefonoPaciente: this.currentUser.telefono ? String(this.currentUser.telefono) : null,
       correoPaciente: this.currentUser.correo,
       fechaCita: this.nuevaCita.fecha,
-      horaCita: this.nuevaCita.hora.length === 5 ? `${this.nuevaCita.hora}:00` : this.nuevaCita.hora,
+      horaCita: this.nuevaCita.hora.length === 5 ? this.nuevaCita.hora + ':00' : this.nuevaCita.hora,
       motivo: this.nuevaCita.motivo.trim(),
       modalidad: this.nuevaCita.modalidad,
-      sintomas: this.nuevaCita.sintomas.trim() || 'Sin síntomas',
+      sintomas: this.nuevaCita.sintomas.trim() || 'Sin sintomas',
       estado: 'Programada'
     };
 
@@ -289,10 +307,8 @@ export class Citas implements OnInit, OnDestroy {
       await firstValueFrom(this.usersService.crearCita(citaParaEnviar));
       await this.cargarCitas();
       this.cerrarModal();
-      this.lanzarNotificacion('¡Éxito! La cita médica ha sido agendada correctamente.', 'success');
     } catch (error) {
       console.error('Error al guardar cita:', error);
-      this.lanzarNotificacion('No se pudo agendar la cita médica en el servidor.', 'error');
     } finally {
       this.isSaving = false;
       this.cdr.detectChanges();
@@ -300,49 +316,41 @@ export class Citas implements OnInit, OnDestroy {
   }
 
   abrirEditarCita() {
-    if (!this.verificarPermiso('editar')) {
-      this.lanzarNotificacion('Tu rol no cuenta con permisos para editar citas.', 'error');
+    if (!this.canEdit) {
       return;
     }
     if (!this.citaSeleccionada) {
-      this.lanzarNotificacion('Selecciona una cita de la tabla primero.', 'warning');
       return;
     }
     const id = this.citaSeleccionada.idcita || this.citaSeleccionada.id;
-    this.router.navigate(['/citas/editar', id], { state: { cita: this.citaSeleccionada } });
+    this.router.navigate(['/admin/citas/editar', id], { state: { cita: this.citaSeleccionada } });
   }
 
   abrirEliminarCita() {
-    if (!this.verificarPermiso('eliminar')) {
-      this.lanzarNotificacion('Tu rol no cuenta con permisos para cancelar citas.', 'error');
+    if (!this.canDelete) {
       return;
     }
     if (!this.citaSeleccionada) {
-      this.lanzarNotificacion('Selecciona una cita para cancelar.', 'warning');
       return;
     }
     this.mostrarModalDelete = true;
   }
 
   async confirmarEliminarCita() {
-    if (!this.verificarPermiso('eliminar')) {
-      this.lanzarNotificacion('Acción inválida para tu rol.', 'error');
+    if (!this.canDelete) {
       return;
     }
 
     if (!this.citaSeleccionada) {
-      this.lanzarNotificacion('No hay cita seleccionada.', 'warning');
       return;
     }
 
     if (this.citaSeleccionada.estado === 'Cancelada') {
-      this.lanzarNotificacion('Esta cita ya está cancelada.', 'warning');
       this.cerrarModal();
       return;
     }
 
     if (this.citaSeleccionada.estado === 'Completada') {
-      this.lanzarNotificacion('No se puede cancelar una cita ya completada.', 'warning');
       this.cerrarModal();
       return;
     }
@@ -359,11 +367,8 @@ export class Citas implements OnInit, OnDestroy {
       await this.cargarCitas();
       this.cerrarModal();
       this.citaSeleccionada = null;
-      this.lanzarNotificacion('La cita médica ha sido cancelada con éxito.', 'success');
     } catch (error: any) {
       console.error('Error al cancelar:', error);
-      const mensajeError = error.error?.error || error.message || 'Error al cancelar la cita';
-      this.lanzarNotificacion(`Error: ${mensajeError}`, 'error');
     } finally {
       this.isDeleting = false;
       this.cdr.detectChanges();

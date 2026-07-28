@@ -688,7 +688,7 @@ export class PacienteDetalle implements OnInit, OnDestroy {
       await this.cargarDatosReales();
 
       setTimeout(() => {
-        this.router.navigate(['/pacientes']);
+        this.router.navigate(['/admin/pacientes']);
       }, 2000);
 
     } catch (error: any) {

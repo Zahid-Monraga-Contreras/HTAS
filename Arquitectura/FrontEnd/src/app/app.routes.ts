@@ -7,27 +7,7 @@ import { Recursos } from './features/landing/pages/recursos/recursos';
 import { Contacto } from './features/landing/pages/contacto/contacto';
 import { Pagos } from './features/landing/pages/pagos/pagos';
 import { Error404 } from './features/landing/pages/error-404/error-404';
-import { Menu } from './features/dashboard/admin/template/menu/menu';
-import { Inicio } from './features/dashboard/admin/pages/inicio/inicio';
-import { Usuarios } from './features/dashboard/admin/pages/usuarios/usuarios';
-import { Perfil } from './features/dashboard/admin/template/perfil/perfil';
-import { Acompanantes } from './features/dashboard/admin/pages/acompanantes/acompanantes';
-import { AcompananteDetalle } from './features/dashboard/admin/pages/acompanantes/acompanante-detalle/acompanante-detalle';
-import { Pacientes } from './features/dashboard/admin/pages/pacientes/pacientes';
-import { PacienteDetalle } from './features/dashboard/admin/pages/pacientes/paciente-detalle/paciente-detalle';
-import { Medicos } from './features/dashboard/admin/pages/medicos/medicos';
-import { MedicoDetalle } from './features/dashboard/admin/pages/medicos/medico-detalle/medico-detalle';
-import { Notificaciones } from './features/dashboard/admin/template/notificaciones/notificaciones';
 import { Success } from './features/landing/pages/success/success';
-import { Citas } from './features/dashboard/admin/pages/citas/citas';
-import { CitaDetalle } from './features/dashboard/admin/pages/citas/cita-detalle/cita-detalle';
-import { Tratamientos } from './features/dashboard/admin/pages/tratamientos/tratamientos';
-import { TratamientoDetalle } from './features/dashboard/admin/pages/tratamientos/tratamiento-detalle/tratamiento-detalle';
-import { Medicamentos } from './features/dashboard/admin/pages/medicamentos/medicamentos';
-import { MedicamentoDetalle } from './features/dashboard/admin/pages/medicamentos/medicamento-detalle/medicamento-detalle';
-import { Dispositivos } from './features/dashboard/admin/pages/dispositivos/dispositivos';
-import { DispositivoDetalle } from './features/dashboard/admin/pages/dispositivos/dispositivo-detalle/dispositivo-detalle';
-import { Configuracion } from './features/dashboard/admin/pages/configuracion/configuracion';
 
 export const routes: Routes = [
   {
@@ -67,86 +47,30 @@ export const routes: Routes = [
     path: 'pagos',
     component: Pagos,
   },
+
+  // ==========================================
+  // RUTAS CON LAZY LOADING PARA CADA ROL
+  // ==========================================
+
   {
     path: 'admin',
-    component: Menu,
+    loadChildren: () => import('./features/dashboard/admin/admin.routes').then(m => m.ADMIN_ROUTES)
+  },
+
+  {
+    path: 'patient',
+    loadChildren: () => import('./features/dashboard/patient/patient.routes').then(m => m.PATIENT_ROUTES)
+  },
+  /*
+  {
+    path: 'doctor',
+    loadChildren: () => import('./features/dashboard/doctor/doctor.routes').then(m => m.DOCTOR_ROUTES)
   },
   {
-    path: 'inicio',
-    component: Inicio
-  },
-  {
-    path: 'usuarios',
-    component: Usuarios
-  },
-  {
-    path: 'medicos',
-    component: Medicos
-  },
-  {
-    path: 'medicos/editar/:id',
-    component: MedicoDetalle
-  },
-  {
-    path: 'pacientes',
-    component: Pacientes
-  },
-  {
-    path: 'pacientes/editar/:id',
-    component: PacienteDetalle
-  },
-  {
-    path: 'acompanantes',
-    component: Acompanantes
-  },
-  {
-    path: 'acompanantes/editar/:id',
-    component: AcompananteDetalle
-  },
-  {
-    path: 'citas',
-    component: Citas
-  },
-  {
-    path: 'citas/editar/:id',
-    component: CitaDetalle
-  },
-  {
-    path: 'tratamientos',
-    component: Tratamientos
-  },
-  {
-    path: 'tratamientos/editar/:id',
-    component: TratamientoDetalle
-  },
-  {
-    path: 'medicamentos',
-    component: Medicamentos
-  },
-  {
-    path: 'medicamentos/editar/:id',
-    component: MedicamentoDetalle
-  },
-  {
-    path: 'dispositivos',
-    component: Dispositivos
-  },
-  {
-    path: 'dispositivos/editar/:id',
-    component: DispositivoDetalle
-  },
-  {
-    path: 'perfil',
-    component: Perfil
-  },
-  {
-    path: 'notificaciones',
-    component: Notificaciones
-  },
-  {
-    path: 'configuracion',
-    component: Configuracion
-  },
+    path: 'caregiver',
+    loadChildren: () => import('./features/dashboard/caregiver/caregiver.routes').then(m => m.CAREGIVER_ROUTES)
+  },*/
+
   {
     path: '**',
     component: Error404

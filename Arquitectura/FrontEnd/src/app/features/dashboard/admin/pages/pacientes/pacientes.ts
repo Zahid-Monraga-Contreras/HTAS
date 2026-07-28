@@ -152,7 +152,7 @@ export class Pacientes implements OnInit {
   abrirEditar() {
     if (this.usuarioSeleccionado) {
       const id = this.usuarioSeleccionado.idusuario || this.usuarioSeleccionado.id;
-      this.router.navigate(['/pacientes/editar', id], { state: { usuario: this.usuarioSeleccionado } });
+      this.router.navigate(['/admin/pacientes/editar', id], { state: { usuario: this.usuarioSeleccionado } });
     }
   }
 

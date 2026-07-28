@@ -11,7 +11,6 @@ import { InfoTratamiento } from './partials/info-tratamiento/info-tratamiento';
 import { RegistroTomas } from './partials/registro-tomas/registro-tomas';
 import { HistorialTratamiento, HistorialCambio } from './partials/historial-tratamiento/historial-tratamiento';
 
-// ✅ CORREGIDO: Incluir 'Eliminada' en el estado
 interface RegistroToma {
   id: number;
   idTratamiento: number;
@@ -99,7 +98,7 @@ export class TratamientoDetalle implements OnInit, OnDestroy {
       this.inicializarCampos();
       this.cargarDatosAdicionales();
     } else {
-      this.router.navigate(['/tratamientos']);
+      this.router.navigate(['/admin/tratamientos']);
     }
   }
 
@@ -212,7 +211,7 @@ export class TratamientoDetalle implements OnInit, OnDestroy {
           const fechaProgramada = t.fechaProgramada || t.FechaHoraProgramada;
           const { fecha, hora } = this.formatearFechaYHora(fechaProgramada);
 
-          // ✅ Asegurar que el estado sea válido, incluyendo 'Eliminada'
+          // Asegurar que el estado sea válido, incluyendo 'Eliminada'
           const estadosValidos = ['Pendiente', 'Tomada', 'Omitida', 'Retrasada', 'Eliminada'];
           const estado = estadosValidos.includes(t.estado) ? t.estado : 'Pendiente';
 
@@ -512,7 +511,7 @@ export class TratamientoDetalle implements OnInit, OnDestroy {
       this.lanzarNotificacion("¡Éxito! El tratamiento ha sido actualizado correctamente.", "success");
 
       setTimeout(() => {
-        this.router.navigate(['/tratamientos']);
+        this.router.navigate(['/admin/tratamientos']);
       }, 2000);
 
     } catch (error: any) {

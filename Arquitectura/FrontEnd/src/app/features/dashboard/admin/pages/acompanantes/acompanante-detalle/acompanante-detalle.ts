@@ -190,7 +190,7 @@ export class AcompananteDetalle implements OnInit, OnDestroy {
 
     } else {
       if (isPlatformBrowser(this.platformId)) {
-        this.router.navigate(['/acompanantes']);
+        this.router.navigate(['/admin/acompanantes']);
       }
     }
   }
@@ -498,7 +498,7 @@ export class AcompananteDetalle implements OnInit, OnDestroy {
       this.agregarHistorial('Datos actualizados', 'Información del acompañante actualizada');
 
       setTimeout(() => {
-        this.router.navigate(['/acompanantes']);
+        this.router.navigate(['/admin/acompanantes']);
       }, 2000);
 
     } catch (error: any) {

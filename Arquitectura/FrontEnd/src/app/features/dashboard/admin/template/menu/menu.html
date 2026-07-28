@@ -18,12 +18,12 @@
             </div>
 
             <div class="actions-group d-flex align-items-center">
-                <a routerLink="/notificaciones" class="notif-wrapper">
+                <a routerLink="/admin/notificaciones" class="notif-wrapper">
                     <i class="bi bi-bell icon-gray"></i>
                 </a>
 
                 <ng-container *ngIf="userName !== 'Invitado'; else noUser">
-                    <a routerLink="/perfil" class="user-pill d-flex align-items-center">
+                    <a routerLink="/admin/perfil" class="user-pill d-flex align-items-center">
                         <img [src]="userPhoto" class="user-img" [alt]="userName" referrerpolicy="no-referrer"
                             (error)="userPhoto = generarAvatarFallback(userName)">
                         <span class="user-name-text">{{ userName }}</span>

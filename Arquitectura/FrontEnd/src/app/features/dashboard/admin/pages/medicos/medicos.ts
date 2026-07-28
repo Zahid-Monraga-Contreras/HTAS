@@ -121,7 +121,7 @@ export class Medicos implements OnInit {
   abrirEditar() {
     if (this.usuarioSeleccionado) {
       const id = this.usuarioSeleccionado.idusuario || this.usuarioSeleccionado.id;
-      this.router.navigate(['/medicos/editar', id], { state: { usuario: this.usuarioSeleccionado } });
+      this.router.navigate(['/admin/medicos/editar', id], { state: { usuario: this.usuarioSeleccionado } });
     }
   }
 

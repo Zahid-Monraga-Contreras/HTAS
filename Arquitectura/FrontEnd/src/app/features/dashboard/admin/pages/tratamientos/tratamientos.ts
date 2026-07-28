@@ -315,7 +315,7 @@ export class Tratamientos implements OnInit, OnDestroy {
       this.lanzarNotificacion('No tienes permisos para realizar modificaciones.', 'error');
       return;
     }
-    this.router.navigate(['/tratamientos/editar', t.idtratamiento || t.id], {
+    this.router.navigate(['/admin/tratamientos/editar', t.idtratamiento || t.id], {
       state: { tratamiento: t }
     });
   }

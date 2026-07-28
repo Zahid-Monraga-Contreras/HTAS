@@ -32,28 +32,88 @@ export class Menu implements OnInit, OnDestroy {
   userRol: string = '';
   searchTerm: string = '';
 
-  // TU ESTRUCTURA BASE ORIGINAL INTACTA
+  // ESTRUCTURA CON RUTAS /admin/ Y PERMISOS POR DEFECTO PARA ADMIN
   private allNavItems = [
-    { category: 'General', items: [{ route: '/inicio', icon: 'bi bi-house-heart', label: 'Inicio', queryParams: {} }] },
+    {
+      category: 'General',
+      items: [
+        {
+          route: '/admin/inicio',
+          icon: 'bi bi-house-heart',
+          label: 'Inicio',
+          queryParams: { canAdd: false, canEdit: false, canDelete: false }
+        }
+      ]
+    },
     {
       category: 'Administración',
       items: [
-        { route: '/usuarios', icon: 'bi-people', label: 'Usuarios', queryParams: {} },
-        { route: '/medicos', icon: 'bi-person-badge', label: 'Médicos', queryParams: {} },
-        { route: '/pacientes', icon: 'bi-person-heart', label: 'Pacientes', queryParams: {} },
-        { route: '/acompanantes', icon: 'bi-person-fill-add', label: 'Acompañantes', queryParams: {} }
+        {
+          route: '/admin/usuarios',
+          icon: 'bi-people',
+          label: 'Usuarios',
+          queryParams: { canAdd: true, canEdit: true, canDelete: true }
+        },
+        {
+          route: '/admin/medicos',
+          icon: 'bi-person-badge',
+          label: 'Medicos',
+          queryParams: { canAdd: true, canEdit: true, canDelete: true }
+        },
+        {
+          route: '/admin/pacientes',
+          icon: 'bi-person-heart',
+          label: 'Pacientes',
+          queryParams: { canAdd: true, canEdit: true, canDelete: true }
+        },
+        {
+          route: '/admin/acompanantes',
+          icon: 'bi-person-fill-add',
+          label: 'Acompanantes',
+          queryParams: { canAdd: true, canEdit: true, canDelete: true }
+        }
       ]
     },
     {
       category: 'Seguimiento',
       items: [
-        { route: '/citas', icon: 'bi-calendar-check', label: 'Citas', queryParams: {} },
-        { route: '/tratamientos', icon: 'bi-clipboard-data', label: 'Tratamientos', queryParams: {} },
-        { route: '/medicamentos', icon: 'bi-capsule', label: 'Medicamentos', queryParams: {} },
-        { route: '/dispositivos', icon: 'bi-heart-pulse', label: 'Dispositivos', queryParams: {} },
+        {
+          route: '/admin/citas',
+          icon: 'bi-calendar-check',
+          label: 'Citas',
+          queryParams: { canAdd: true, canEdit: true, canDelete: true }
+        },
+        {
+          route: '/admin/tratamientos',
+          icon: 'bi-clipboard-data',
+          label: 'Tratamientos',
+          queryParams: { canAdd: true, canEdit: true, canDelete: true }
+        },
+        {
+          route: '/admin/medicamentos',
+          icon: 'bi-capsule',
+          label: 'Medicamentos',
+          queryParams: { canAdd: true, canEdit: true, canDelete: true }
+        },
+        {
+          route: '/admin/dispositivos',
+          icon: 'bi-heart-pulse',
+          label: 'Dispositivos',
+          queryParams: { canAdd: true, canEdit: true, canDelete: true }
+        },
       ]
     },
-    { category: 'Cuenta', items: [{ route: '/configuracion', icon: 'bi-gear', label: 'Configuración', queryParams: {} }] }
+    {
+      category: 'Cuenta',
+      items: [
+        {
+          route: '/admin/configuracion',
+          icon: 'bi-gear',
+          label: 'Configuracion',
+          queryParams: { canAdd: false, canEdit: true, canDelete: false }
+        }
+      ]
+    }
   ];
 
   menuFiltrado: any[] = [];
@@ -62,7 +122,6 @@ export class Menu implements OnInit, OnDestroy {
     const uService = this.usersService as any;
     const isBrowser = typeof window !== 'undefined';
 
-    // --- DETECTAR RUTA ACTIVA ---
     this.currentRoute = this.router.url;
 
     this.routerSub = this.router.events.pipe(
@@ -88,7 +147,6 @@ export class Menu implements OnInit, OnDestroy {
         pUser = saved ? JSON.parse(saved) : null;
       }
 
-      // PRIORIDAD 1: Usuarios registrados/autenticados que provienen de PostgreSQL
       if (pUser) {
         this.userName = pUser.nombre || pUser.NombreCompleto || 'Usuario';
         this.userPhoto = pUser.photoURL || pUser.foto || this.generarAvatar(this.userName);
@@ -98,13 +156,11 @@ export class Menu implements OnInit, OnDestroy {
           uService.currentUserSubject.next(pUser);
         }
       }
-      // PRIORIDAD 2: Fallback directo a sesión activa de Google temporal
       else if (gUser) {
         this.userName = gUser.nombre || gUser.displayName || 'Usuario';
         this.userPhoto = gUser.photoURL || this.generarAvatar(this.userName);
         this.userRol = 'Paciente';
       }
-      // PRIORIDAD 3: Estado Invitado
       else {
         this.userName = 'Invitado';
         this.userPhoto = this.generarAvatar('Invitado');
@@ -120,7 +176,6 @@ export class Menu implements OnInit, OnDestroy {
   }
 
   private generarMenuPorRol() {
-    // Clonación profunda para no alterar "allNavItems" jamás
     const mapeoOriginal = JSON.parse(JSON.stringify(this.allNavItems));
     const rol = this.userRol.toLowerCase();
 
@@ -134,18 +189,37 @@ export class Menu implements OnInit, OnDestroy {
             item.queryParams = { canAdd: false, canEdit: false, canDelete: false };
           });
         }
+        if (section.category === 'Cuenta') {
+          section.items.forEach((item: any) => {
+            item.queryParams = { canAdd: false, canEdit: false, canDelete: false };
+          });
+        }
       }
 
       // REGLAS PARA ROL: PACIENTE
       if (rol === 'paciente') {
         if (section.category === 'Administración') {
-          section.items = section.items.filter((i: any) => i.route === '/usuarios');
+          section.items = section.items.filter((i: any) => i.route === '/admin/usuarios');
+          section.items.forEach((item: any) => {
+            item.queryParams = { canAdd: false, canEdit: false, canDelete: false };
+          });
         }
         if (section.category === 'Seguimiento') {
           section.items.forEach((item: any) => {
-            if (item.route === '/citas') item.queryParams = { canAdd: true, canEdit: false, canDelete: false };
-            if (item.route === '/tratamientos' || item.route === '/medicamentos') item.queryParams = { canAdd: false, canEdit: false, canDelete: false };
-            if (item.route === '/dispositivos') item.queryParams = { canAdd: true, canEdit: false, canDelete: false };
+            if (item.route === '/admin/citas') {
+              item.queryParams = { canAdd: true, canEdit: false, canDelete: false };
+            }
+            if (item.route === '/admin/tratamientos' || item.route === '/admin/medicamentos') {
+              item.queryParams = { canAdd: false, canEdit: false, canDelete: false };
+            }
+            if (item.route === '/admin/dispositivos') {
+              item.queryParams = { canAdd: true, canEdit: false, canDelete: false };
+            }
+          });
+        }
+        if (section.category === 'Cuenta') {
+          section.items.forEach((item: any) => {
+            item.queryParams = { canAdd: false, canEdit: true, canDelete: false };
           });
         }
       }
@@ -153,13 +227,27 @@ export class Menu implements OnInit, OnDestroy {
       // REGLAS PARA ROL: ACOMPAÑANTE
       if (rol === 'acompañante' || rol === 'acompanante') {
         if (section.category === 'Administración') {
-          section.items = section.items.filter((i: any) => i.route === '/usuarios');
+          section.items = section.items.filter((i: any) => i.route === '/admin/usuarios');
+          section.items.forEach((item: any) => {
+            item.queryParams = { canAdd: false, canEdit: false, canDelete: false };
+          });
         }
         if (section.category === 'Seguimiento') {
           section.items.forEach((item: any) => {
-            if (item.route === '/citas') item.queryParams = { canAdd: false, canEdit: false, canDelete: false };
-            if (item.route === '/tratamientos' || item.route === '/medicamentos') item.queryParams = { canAdd: false, canEdit: false, canDelete: false };
-            if (item.route === '/dispositivos') item.queryParams = { canAdd: false, canEdit: true, canDelete: false };
+            if (item.route === '/admin/citas') {
+              item.queryParams = { canAdd: false, canEdit: false, canDelete: false };
+            }
+            if (item.route === '/admin/tratamientos' || item.route === '/admin/medicamentos') {
+              item.queryParams = { canAdd: false, canEdit: false, canDelete: false };
+            }
+            if (item.route === '/admin/dispositivos') {
+              item.queryParams = { canAdd: false, canEdit: true, canDelete: false };
+            }
+          });
+        }
+        if (section.category === 'Cuenta') {
+          section.items.forEach((item: any) => {
+            item.queryParams = { canAdd: false, canEdit: true, canDelete: false };
           });
         }
       }
@@ -167,18 +255,40 @@ export class Menu implements OnInit, OnDestroy {
       // REGLAS PARA ROL: MÉDICO / DOCTOR
       if (rol === 'doctor' || rol === 'medico') {
         if (section.category === 'Administración') {
-          section.items = section.items.filter((i: any) => i.route !== '/medicos');
+          section.items = section.items.filter((i: any) => i.route !== '/admin/medicos');
           section.items.forEach((item: any) => {
-            if (item.route === '/pacientes' || item.route === '/acompanantes') {
+            if (item.route === '/admin/pacientes' || item.route === '/admin/acompanantes') {
               item.queryParams = { canAdd: true, canEdit: true, canDelete: true };
+            }
+            if (item.route === '/admin/usuarios') {
+              item.queryParams = { canAdd: false, canEdit: false, canDelete: false };
             }
           });
         }
         if (section.category === 'Seguimiento') {
           section.items.forEach((item: any) => {
-            if (item.route === '/tratamientos' || item.route === '/medicamentos' || item.route === '/dispositivos') {
+            if (item.route === '/admin/tratamientos' || item.route === '/admin/medicamentos' || item.route === '/admin/dispositivos') {
               item.queryParams = { canAdd: true, canEdit: true, canDelete: true };
             }
+            if (item.route === '/admin/citas') {
+              item.queryParams = { canAdd: true, canEdit: true, canDelete: true };
+            }
+          });
+        }
+        if (section.category === 'Cuenta') {
+          section.items.forEach((item: any) => {
+            item.queryParams = { canAdd: false, canEdit: true, canDelete: false };
+          });
+        }
+      }
+
+      // REGLAS PARA ROL: ADMIN (todos los permisos)
+      if (rol === 'admin' || rol === 'administrador') {
+        // Mantener todos los permisos por defecto (ya están en allNavItems)
+        // Solo aseguramos que Cuenta tenga editar
+        if (section.category === 'Cuenta') {
+          section.items.forEach((item: any) => {
+            item.queryParams = { canAdd: false, canEdit: true, canDelete: false };
           });
         }
       }
@@ -187,16 +297,13 @@ export class Menu implements OnInit, OnDestroy {
     });
   }
 
-  // --- FUNCIÓN PARA DETECTAR SI UNA RUTA ESTÁ ACTIVA ---
   isActive(route: string): boolean {
     if (!this.currentRoute) return false;
 
-    // Para /inicio, verificamos exacto o raíz
-    if (route === '/inicio') {
-      return this.currentRoute === '/inicio' || this.currentRoute === '/' || this.currentRoute === '';
+    if (route === '/admin/inicio') {
+      return this.currentRoute === '/admin/inicio' || this.currentRoute === '/admin' || this.currentRoute === '/admin/';
     }
 
-    // Para las demás rutas, verificamos que comience con la ruta
     return this.currentRoute.startsWith(route);
   }
 
@@ -204,7 +311,6 @@ export class Menu implements OnInit, OnDestroy {
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(nombre)}&background=b0001e&color=fff&bold=true`;
   }
 
-  // Método de auxilio por si la URL de la imagen guardada o externa falla en responder
   public generarAvatarFallback(nombre: string): string {
     return this.generarAvatar(nombre);
   }
@@ -214,14 +320,15 @@ export class Menu implements OnInit, OnDestroy {
     this.routerSub?.unsubscribe();
   }
 
-  toggleSidebar() { this.isCollapsed = !this.isCollapsed; }
+  toggleSidebar() {
+    this.isCollapsed = !this.isCollapsed;
+  }
 
   toggleSearch() {
     this.showSearch = !this.showSearch;
     if (!this.showSearch) this.searchTerm = '';
   }
 
-  // Escanea e interactúa con el contenido directo basándose en los privilegios de su rol actual
   onSearch(value: string) {
     this.searchTerm = value;
     const query = value.toLowerCase().trim();

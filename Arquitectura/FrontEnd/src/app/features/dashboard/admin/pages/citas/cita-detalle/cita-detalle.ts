@@ -78,7 +78,7 @@ export class CitaDetalle implements OnInit, OnDestroy {
       this.inicializarHistorial();
 
     } else {
-      this.router.navigate(['/citas']);
+      this.router.navigate(['/admin/citas']);
     }
   }
 
@@ -256,7 +256,7 @@ export class CitaDetalle implements OnInit, OnDestroy {
       this.lanzarNotificacion("¡Éxito! La información de la cita ha sido actualizada.", "success");
 
       setTimeout(() => {
-        this.router.navigate(['/citas']);
+        this.router.navigate(['/admin/citas']);
       }, 2000);
 
     } catch (error: any) {

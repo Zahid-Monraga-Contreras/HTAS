@@ -255,7 +255,7 @@ export class Medicamentos implements OnInit, OnDestroy {
 
     const id = m.IdMedicamento || m.idmedicamento || m.id;
     console.log('Navegando a editar medicamento ID:', id);
-    this.router.navigate(['/medicamentos/editar', id], {
+    this.router.navigate(['/admin/medicamentos/editar', id], {
       state: { medicamento: m }
     });
   }
