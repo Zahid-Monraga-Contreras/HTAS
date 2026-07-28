@@ -2,7 +2,7 @@ import { Injectable, inject, PLATFORM_ID, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { isPlatformBrowser } from '@angular/common';
-import { tap, catchError } from 'rxjs/operators';
+import { tap, catchError, map } from 'rxjs/operators';
 import emailjs from '@emailjs/browser';
 import { Observable, throwError } from 'rxjs';
 import { BehaviorSubject } from 'rxjs';
@@ -156,13 +156,34 @@ export class Users {
   }
 
   establecerSesion(res: any) {
+    console.log('ESTABLECIENDO SESION - Datos recibidos:', res);
+
+    // ✅ CONSTRUIR NOMBRE COMPLETO
+    const nombre = res.nombre || '';
+    const apPaterno = res.apPaterno || '';
+    const apMaterno = res.apMaterno || '';
+    const nombreCompleto = `${nombre} ${apPaterno} ${apMaterno}`.trim() || nombre;
+
+    const userId = res.uid || res.idusuario || res.id || res.idUsuario || res.userId || null;
+
     const usuarioProcesado = {
       ...res,
-      uid: res.uid || res.idusuario || res.id,
-      nombre: res.nombre,
-      rol: res.rol,
-      photoURL: `https://ui-avatars.com/api/?name=${encodeURIComponent(res.nombre)}&background=b0001e&color=fff&bold=true`
+      uid: res.uid || '',
+      idusuario: userId,
+      nombre: res.nombre || 'Usuario',
+      nombreCompleto: nombreCompleto,  // ✅ AGREGADO
+      rol: res.rol || 'Paciente',
+      correo: res.correo || res.Email || res.email || '',
+      apPaterno: apPaterno,
+      apMaterno: apMaterno,
+      telefono: res.telefono || '',
+      photoURL: `https://ui-avatars.com/api/?name=${encodeURIComponent(res.nombre || 'Usuario')}&background=b0001e&color=fff&bold=true`
     };
+
+    console.log('USUARIO PROCESADO (guardado en localStorage):', usuarioProcesado);
+    console.log('ID de usuario guardado:', usuarioProcesado.idusuario);
+    console.log('Nombre completo guardado:', usuarioProcesado.nombreCompleto);  // ✅ VERIFICAR
+
     this.currentUserSubject.next(usuarioProcesado);
     localStorage.setItem('user_htas', JSON.stringify(usuarioProcesado));
   }
@@ -598,7 +619,16 @@ export class Users {
   }
 
   getDispositivosByPaciente(idPaciente: number | string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/dispositivos/paciente/${idPaciente}/dispositivos`);
+    // Usar el endpoint que devuelve todos los dispositivos y filtrar en el frontend
+    return this.http.get<any[]>(`${this.apiUrl}/dispositivos/dispositivos`).pipe(
+      map((dispositivos: any[]) => {
+        // Filtrar dispositivos del paciente
+        return dispositivos.filter((d: any) => {
+          const pacienteId = d.idpacienteasociado || d.idPacienteAsociado || d.pacienteId || d.idusuario;
+          return pacienteId === idPaciente;
+        });
+      })
+    );
   }
 
   crearDispositivo(datos: DispositivoData): Observable<any> {

@@ -3,16 +3,19 @@ import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { Auth } from '@angular/fire/auth';
 import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-patient-menu',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterLink, RouterLinkActive, FormsModule],
   templateUrl: './menu.html',
   styleUrls: ['./menu.css']
 })
 export class PatientMenu {
   isMenuOpen = false;
+  searchActive = false;
+  searchTerm = '';
 
   menuItems = [
     { path: '/patient/inicio', icon: 'bi-house-door', label: 'Inicio' },
@@ -20,9 +23,7 @@ export class PatientMenu {
     { path: '/patient/tratamientos', icon: 'bi-heart-pulse', label: 'Tratamientos' },
     { path: '/patient/medicamentos', icon: 'bi-capsule', label: 'Medicamentos' },
     { path: '/patient/dispositivos', icon: 'bi-device-hdd', label: 'Dispositivos' },
-    { path: '/patient/perfil', icon: 'bi-person', label: 'Perfil' },
-    { path: '/patient/notificaciones', icon: 'bi-bell', label: 'Notificaciones' },
-    { path: '/patient/configuracion', icon: 'bi-gear', label: 'Configuración' }
+    { path: '/patient/perfil', icon: 'bi-person', label: 'Perfil' }
   ];
 
   constructor(
@@ -36,6 +37,19 @@ export class PatientMenu {
 
   cerrarMenu(): void {
     this.isMenuOpen = false;
+  }
+
+  toggleSearch(): void {
+    this.searchActive = !this.searchActive;
+    if (!this.searchActive) {
+      this.searchTerm = '';
+    }
+  }
+
+  closeSearch(): void {
+    if (!this.searchTerm) {
+      this.searchActive = false;
+    }
   }
 
   async logout(): Promise<void> {

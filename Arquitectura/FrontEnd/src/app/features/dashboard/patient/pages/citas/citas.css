@@ -1,0 +1,1221 @@
+/* ==========================================================================
+   PAGINA DE CITAS DEL PACIENTE
+   ========================================================================== */
+
+:host {
+    --primary: #b0001e;
+    --primary-dark: #8a0017;
+    --primary-light: #d42a4a;
+    --primary-gradient: linear-gradient(135deg, #b0001e 0%, #d42a4a 100%);
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #0369a1;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-400: #94a3b8;
+    --gray-500: #64748b;
+    --gray-600: #475569;
+    --gray-700: #334155;
+    --gray-800: #1e293b;
+    --gray-900: #0f172a;
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.10);
+    --border-radius: 16px;
+    --border-radius-sm: 10px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:host {
+    display: block;
+    width: 100%;
+    min-height: 100vh;
+    background: var(--gray-50);
+}
+
+/* ==========================================================================
+   PAGINA PRINCIPAL
+   ========================================================================== */
+.citas-page {
+    min-height: 100vh;
+    background: var(--gray-50);
+    padding: 16px 16px 100px;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 680px;
+}
+
+/* ==========================================================================
+   HEADER
+   ========================================================================== */
+.citas-header {
+    padding: 0 0 16px;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-info h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin: 0;
+}
+
+.header-info p {
+    font-size: 0.85rem;
+    color: var(--gray-500);
+    margin: 2px 0 0;
+}
+
+.btn-agendar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 4px 16px rgba(176, 0, 30, 0.3);
+    flex-shrink: 0;
+}
+
+.btn-agendar:active {
+    transform: scale(0.95);
+}
+
+.btn-agendar i {
+    font-size: 1rem;
+}
+
+/* ==========================================================================
+   LOADING
+   ========================================================================== */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--gray-200);
+    border-top: 4px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-container p {
+    margin-top: 16px;
+    color: var(--gray-500);
+    font-size: 0.9rem;
+}
+
+/* ==========================================================================
+   ESTADISTICAS
+   ========================================================================== */
+.stats-section {
+    margin-bottom: 20px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.stat-card {
+    background: white;
+    padding: 12px 6px;
+    border-radius: var(--border-radius-sm);
+    text-align: center;
+    box-shadow: var(--shadow-md);
+    cursor: pointer;
+    transition: var(--transition);
+    border: 2px solid transparent;
+}
+
+.stat-card:active {
+    transform: scale(0.95);
+}
+
+.stat-card.active {
+    border-color: var(--primary);
+    background: #b0001e08;
+}
+
+.stat-number {
+    display: block;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    line-height: 1.2;
+}
+
+.stat-label {
+    font-size: 0.6rem;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.contador-programada .stat-number {
+    color: #f59e0b;
+}
+
+.contador-completada .stat-number {
+    color: #3b82f6;
+}
+
+.contador-cancelada .stat-number {
+    color: #ef4444;
+}
+
+/* ==========================================================================
+   SECCION DE CITAS
+   ========================================================================== */
+.citas-section {
+    background: white;
+    padding: 16px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-md);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.section-header h2 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.section-header h2 i {
+    color: var(--primary);
+}
+
+.citas-count {
+    font-size: 0.8rem;
+    color: var(--gray-500);
+    background: var(--gray-100);
+    padding: 2px 14px;
+    border-radius: 20px;
+}
+
+/* ==========================================================================
+   FILTROS RAPIDOS - SIN SCROLL
+   ========================================================================== */
+.filtros-rapidos {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-bottom: 16px;
+}
+
+.filtro-btn {
+    padding: 8px 8px;
+    border-radius: 10px;
+    border: 1.5px solid var(--gray-200);
+    background: transparent;
+    font-size: 0.6rem;
+    font-weight: 500;
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.filtro-btn i {
+    font-size: 0.7rem;
+}
+
+.filtro-btn:active {
+    transform: scale(0.95);
+}
+
+.filtro-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.filtro-btn.active i {
+    color: white;
+}
+
+/* ==========================================================================
+   LISTA DE CITAS
+   ========================================================================== */
+.citas-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.cita-card {
+    background: var(--gray-50);
+    border-radius: var(--border-radius-sm);
+    padding: 14px;
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.cita-card:active {
+    transform: scale(0.98);
+}
+
+.cita-card-header {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.cita-fecha-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    background: white;
+    padding: 4px 8px;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    flex-shrink: 0;
+}
+
+.cita-dia {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--gray-800);
+    line-height: 1.2;
+}
+
+.cita-mes {
+    font-size: 0.6rem;
+    color: var(--gray-500);
+    text-transform: uppercase;
+}
+
+.cita-info-principal {
+    flex: 1;
+    min-width: 0;
+}
+
+.cita-info-principal h3 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin: 0 0 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cita-doctor {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.cita-doctor i {
+    font-size: 0.7rem;
+}
+
+.cita-especialidad {
+    font-size: 0.7rem;
+    color: var(--gray-400);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.cita-especialidad i {
+    font-size: 0.65rem;
+}
+
+.badge-tiempo {
+    font-size: 0.6rem;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 12px;
+    white-space: nowrap;
+    height: fit-content;
+    flex-shrink: 0;
+}
+
+.badge-hoy {
+    background: #b0001e15;
+    color: var(--primary);
+}
+
+.badge-proxima {
+    background: #10b98115;
+    color: var(--success);
+}
+
+.badge-pasada {
+    background: #94a3b815;
+    color: var(--gray-500);
+}
+
+.cita-card-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.cita-detalles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+}
+
+.cita-detalle {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.7rem;
+    color: var(--gray-600);
+}
+
+.cita-detalle i {
+    font-size: 0.7rem;
+    color: var(--gray-400);
+}
+
+.modalidad-badge {
+    font-size: 0.65rem;
+    font-weight: 500;
+    padding: 1px 8px;
+    border-radius: 10px;
+}
+
+.modalidad-presencial {
+    background: #0369a115;
+    color: var(--info);
+}
+
+.modalidad-virtual {
+    background: #7c3aed15;
+    color: #7c3aed;
+}
+
+.cita-acciones {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.estado-badge {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 3px 12px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.estado-badge i {
+    font-size: 0.55rem;
+}
+
+.estado-programada {
+    background: #f59e0b15;
+    color: #f59e0b;
+}
+
+.estado-completada {
+    background: #3b82f615;
+    color: #3b82f6;
+}
+
+.estado-cancelada {
+    background: #ef444415;
+    color: var(--danger);
+}
+
+.estado-info {
+    background: #94a3b815;
+    color: var(--gray-500);
+}
+
+.btn-detalle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: white;
+    color: var(--gray-400);
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow);
+}
+
+.btn-detalle:active {
+    transform: scale(0.9);
+}
+
+/* ==========================================================================
+   EMPTY STATE
+   ========================================================================== */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 12px;
+    color: var(--gray-400);
+}
+
+.empty-state i {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    margin: 0 0 12px;
+    font-size: 0.9rem;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 10px;
+    font-weight: 500;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+}
+
+.btn-primary:active {
+    transform: scale(0.95);
+}
+
+/* ==========================================================================
+   MODALES CON HEADER Y FOOTER FIJOS
+   ========================================================================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 20px;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-content {
+    background: white;
+    border-radius: var(--border-radius);
+    max-width: 480px;
+    width: 100%;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-lg);
+    animation: slideUp 0.3s ease;
+    overflow: hidden;
+}
+
+/* MODAL HEADER - FIJO */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 24px 14px;
+    border-bottom: 1px solid var(--gray-200);
+    flex-shrink: 0;
+    background: white;
+    z-index: 1;
+}
+
+.modal-header h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.modal-header h2 i {
+    color: var(--primary);
+}
+
+.modal-close {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: none;
+    background: var(--gray-100);
+    color: var(--gray-500);
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-close:active {
+    transform: scale(0.9);
+}
+
+/* MODAL BODY - SCROLLABLE */
+.modal-body {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.modal-body::-webkit-scrollbar {
+    width: 4px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: var(--gray-300);
+    border-radius: 10px;
+}
+
+/* MODAL FOOTER - FIJO */
+.modal-footer {
+    padding: 14px 24px 18px;
+    border-top: 1px solid var(--gray-200);
+    flex-shrink: 0;
+    background: white;
+    z-index: 1;
+}
+
+.modal-footer .form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+/* ==========================================================================
+   FORMULARIO DEL MODAL AGENDAR
+   ========================================================================== */
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 4px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 10px;
+    font-size: 0.95rem;
+    color: var(--gray-800);
+    background: white;
+    transition: var(--transition);
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(176, 0, 30, 0.1);
+}
+
+.form-control.ng-invalid.ng-touched {
+    border-color: var(--danger);
+}
+
+.error-text {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--danger);
+    margin-top: 3px;
+}
+
+/* TEXTAREA FIJO SIN EXPANSION */
+.textarea-fixed {
+    resize: none;
+    min-height: 60px;
+    max-height: 60px;
+    overflow-y: auto;
+    line-height: 1.4;
+}
+
+.textarea-fixed::-webkit-scrollbar {
+    width: 4px;
+}
+
+.textarea-fixed::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.textarea-fixed::-webkit-scrollbar-thumb {
+    background: var(--gray-300);
+    border-radius: 10px;
+}
+
+/* BOTONES DEL MODAL */
+.btn-cancelar {
+    padding: 10px 24px;
+    border-radius: 10px;
+    border: 1.5px solid var(--gray-200);
+    background: transparent;
+    color: var(--gray-600);
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-cancelar:active {
+    transform: scale(0.95);
+}
+
+.btn-guardar {
+    padding: 10px 28px;
+    border-radius: 10px;
+    border: none;
+    background: var(--primary-gradient);
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-guardar:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-guardar:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.spinner-small {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+}
+
+/* ==========================================================================
+   MODAL DETALLE
+   ========================================================================== */
+.modal-detalle {
+    max-width: 440px;
+}
+
+.detalle-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.detalle-item:last-child {
+    border-bottom: none;
+}
+
+.detalle-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--gray-500);
+}
+
+.detalle-valor {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--gray-800);
+    text-align: right;
+    max-width: 60%;
+    word-break: break-word;
+}
+
+.detalle-acciones {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.detalle-acciones .btn-cancelar {
+    background: #ef444415;
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+.detalle-acciones .btn-cancelar:active {
+    background: #ef444430;
+}
+
+.btn-cerrar {
+    padding: 10px 28px;
+    border-radius: 10px;
+    border: none;
+    background: var(--gray-200);
+    color: var(--gray-700);
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition);
+    flex: 1;
+}
+
+.btn-cerrar:active {
+    transform: scale(0.95);
+}
+
+/* ==========================================================================
+   MODAL CONFIRMACION
+   ========================================================================== */
+.modal-confirmacion .modal-body {
+    text-align: center;
+    padding: 30px 24px;
+}
+
+.modal-confirmacion .modal-body i {
+    font-size: 3.5rem;
+    color: var(--success);
+    margin-bottom: 12px;
+}
+
+.modal-confirmacion .modal-body p {
+    font-size: 0.95rem;
+    color: var(--gray-600);
+    line-height: 1.5;
+}
+
+.modal-confirmacion .modal-footer .form-actions {
+    justify-content: center;
+}
+
+.modal-confirmacion .btn-cancelar {
+    padding: 10px 36px;
+    background: var(--primary);
+    color: white;
+    border: none;
+}
+
+.modal-confirmacion .btn-cancelar:active {
+    opacity: 0.8;
+}
+
+/* ==========================================================================
+   ESTILOS PARA FLATPICKR EN MODAL
+   ========================================================================== */
+.input-picker-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.input-picker-wrapper .form-control {
+    padding-right: 40px;
+    cursor: pointer;
+}
+
+.input-picker-wrapper .icon-embed {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-400);
+    font-size: 1.1rem;
+    pointer-events: none;
+}
+
+.modal-patient-info {
+    background: var(--gray-50);
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 0.9rem;
+    color: var(--gray-700);
+}
+
+.modal-patient-info strong {
+    color: var(--gray-800);
+}
+
+/* Flatpickr sobreescritura */
+.flatpickr-calendar {
+    z-index: 9999 !important;
+}
+
+.flatpickr-calendar .flatpickr-day.selected {
+    background: var(--primary) !important;
+    border-color: var(--primary) !important;
+}
+
+.flatpickr-calendar .flatpickr-day.selected:hover {
+    background: var(--primary-dark) !important;
+    border-color: var(--primary-dark) !important;
+}
+
+.flatpickr-calendar .flatpickr-day.today {
+    border-color: var(--primary) !important;
+}
+
+.flatpickr-calendar .flatpickr-day.today.selected {
+    box-shadow: 0 0 0 2px white, 0 0 0 4px var(--primary) !important;
+}
+
+.flatpickr-calendar .flatpickr-time input:hover,
+.flatpickr-calendar .flatpickr-time input:focus {
+    background: white !important;
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+
+@media screen and (min-width: 1025px) {
+    .citas-page {
+        padding: 24px 32px 100px;
+        max-width: 780px;
+    }
+
+    .stats-grid {
+        gap: 10px;
+    }
+
+    .stat-card {
+        padding: 16px 10px;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+    }
+
+    .stat-label {
+        font-size: 0.65rem;
+    }
+
+    .citas-section {
+        padding: 20px;
+    }
+
+    .modal-content {
+        max-width: 520px;
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    .citas-page {
+        padding: 18px 20px 90px;
+        max-width: 640px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .citas-page {
+        padding: 16px 16px 85px;
+        max-width: 100%;
+    }
+
+    .header-info h1 {
+        font-size: 1.3rem;
+    }
+
+    .btn-agendar {
+        padding: 8px 14px;
+        font-size: 0.8rem;
+    }
+
+    .btn-agendar span {
+        display: none;
+    }
+
+    .stats-grid {
+        gap: 6px;
+    }
+
+    .stat-card {
+        padding: 10px 4px;
+    }
+
+    .stat-number {
+        font-size: 1.15rem;
+    }
+
+    .modal-content {
+        max-width: 95%;
+        margin: 10px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .citas-page {
+        padding: 12px 12px 80px;
+    }
+
+    .header-info h1 {
+        font-size: 1.1rem;
+    }
+
+    .stats-grid {
+        gap: 4px;
+    }
+
+    .stat-card {
+        padding: 8px 2px;
+        border-radius: 8px;
+    }
+
+    .stat-number {
+        font-size: 1rem;
+    }
+
+    .stat-label {
+        font-size: 0.5rem;
+        letter-spacing: 0.2px;
+    }
+
+    .filtros-rapidos {
+        gap: 4px;
+    }
+
+    .filtro-btn {
+        font-size: 0.55rem;
+        padding: 5px 6px;
+        gap: 2px;
+        border-radius: 8px;
+    }
+
+    .filtro-btn i {
+        font-size: 0.6rem;
+    }
+
+    .cita-card {
+        padding: 12px;
+    }
+
+    .cita-card-header {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .cita-fecha-badge {
+        min-width: 36px;
+        padding: 2px 6px;
+    }
+
+    .cita-dia {
+        font-size: 0.9rem;
+    }
+
+    .cita-info-principal h3 {
+        font-size: 0.8rem;
+    }
+
+    .cita-card-body {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .cita-acciones {
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .modal-content {
+        max-width: 100%;
+        margin: 10px;
+        border-radius: 12px;
+    }
+
+    .modal-header {
+        padding: 14px 16px 12px;
+    }
+
+    .modal-header h2 {
+        font-size: 1rem;
+    }
+
+    .modal-body {
+        padding: 16px;
+    }
+
+    .modal-footer {
+        padding: 12px 16px 14px;
+    }
+
+    .modal-footer .form-actions {
+        flex-direction: column;
+    }
+
+    .modal-footer .form-actions button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .detalle-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+        padding: 8px 0;
+    }
+
+    .detalle-valor {
+        text-align: left;
+        max-width: 100%;
+    }
+
+    .detalle-acciones {
+        flex-direction: column;
+    }
+
+    .detalle-acciones button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .flatpickr-calendar {
+        width: 100% !important;
+        max-width: 320px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+    }
+
+    .textarea-fixed {
+        min-height: 50px;
+        max-height: 50px;
+    }
+}
+
+@media screen and (max-width: 360px) {
+    .citas-page {
+        padding: 10px 10px 75px;
+    }
+
+    .stats-grid {
+        gap: 3px;
+    }
+
+    .stat-card {
+        padding: 6px 2px;
+        border-radius: 6px;
+    }
+
+    .stat-number {
+        font-size: 0.9rem;
+    }
+
+    .stat-label {
+        font-size: 0.45rem;
+    }
+
+    .filtros-rapidos {
+        gap: 3px;
+    }
+
+    .filtro-btn {
+        font-size: 0.5rem;
+        padding: 4px 4px;
+        border-radius: 6px;
+    }
+
+    .filtro-btn i {
+        font-size: 0.55rem;
+    }
+
+    .cita-detalles {
+        gap: 4px 10px;
+    }
+
+    .flatpickr-calendar {
+        max-width: 280px !important;
+    }
+}

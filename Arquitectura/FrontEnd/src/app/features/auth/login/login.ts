@@ -363,21 +363,21 @@ export class Login {
             localStorage.setItem('token', res.accessToken);
           }
 
-          // ✅ ACTUALIZAR EL USERS SERVICE
-          this.users.establecerSesion(res);
+          const userData = {
+            uid: res.uid || '',
+            idusuario: res.idusuario || res.id || res.idUsuario || null,
+            rol: res.rol || res.role || res.tipo || 'Paciente',
+            nombre: res.nombre || 'Usuario',
+            correo: res.correo || res.Email || res.email || '',
+            apPaterno: res.apPaterno || '',
+            apMaterno: res.apMaterno || '',
+            telefono: res.telefono || ''
+          };
 
-          if (res.uid || res.idusuario) {
-            const userData = {
-              uid: res.uid || res.idusuario,
-              rol: res.rol || res.role || res.tipo || '',
-              nombre: res.nombre || 'Usuario',
-              correo: res.correo || res.Email || res.email,
-              apPaterno: res.apPaterno || '',
-              apMaterno: res.apMaterno || '',
-              telefono: res.telefono || ''
-            };
-            localStorage.setItem('user_htas', JSON.stringify(userData));
-          }
+          console.log('Guardando en localStorage (Google):', userData);
+
+          localStorage.setItem('user_htas', JSON.stringify(userData));
+          this.users.establecerSesion(userData);
 
           if (res.pinVerificado === false) {
             this.usuarioUidTemporal = res.uid || res.idusuario || res.id;
@@ -428,7 +428,7 @@ export class Login {
 
     this.users.login(credenciales).subscribe({
       next: (res: any) => {
-        console.log('Login response del backend:', res);
+        console.log('Login response del backend COMPLETA:', JSON.stringify(res, null, 2));
         this.ngZone.run(() => {
           this.loading = false;
 
@@ -437,21 +437,32 @@ export class Login {
               localStorage.setItem('token', res.token || res.accessToken);
             }
 
-            // ✅ ACTUALIZAR EL USERS SERVICE
-            this.users.establecerSesion(res);
+            // IMPORTANTE: El ID viene en el campo 'uid' como número
+            const userId = res.uid || res.idusuario || res.id || res.idUsuario || res.userId || null;
 
-            if (res.uid || res.idusuario) {
-              const userData = {
-                uid: res.uid || res.idusuario,
-                rol: res.rol || res.role || res.tipo || '',
-                nombre: res.nombre || 'Usuario',
-                correo: res.correo || res.Email || res.email,
-                apPaterno: res.apPaterno || '',
-                apMaterno: res.apMaterno || '',
-                telefono: res.telefono || ''
-              };
-              localStorage.setItem('user_htas', JSON.stringify(userData));
-            }
+            const nombre = res.nombre || '';
+            const apPaterno = res.apPaterno || '';
+            const apMaterno = res.apMaterno || '';
+            const nombreCompleto = `${nombre} ${apPaterno} ${apMaterno}`.trim() || nombre;
+
+            const userData = {
+              uid: res.uid || '',
+              idusuario: userId,
+              rol: res.rol || res.role || res.tipo || 'Paciente',
+              nombre: res.nombre || 'Usuario',
+              nombreCompleto: nombreCompleto,
+              correo: res.correo || res.Email || res.email || '',
+              apPaterno: res.apPaterno || '',
+              apMaterno: res.apMaterno || '',
+              telefono: res.telefono || ''
+            };
+
+            console.log('Guardando en localStorage:', userData);
+            console.log('ID de usuario:', userData.idusuario);
+            console.log('Nombre completo:', userData.nombreCompleto);
+
+            localStorage.setItem('user_htas', JSON.stringify(userData));
+            this.users.establecerSesion(userData);
 
             if (res.pinVerificado === false) {
               this.usuarioUidTemporal = res.uid || res.idusuario || res.id;
@@ -503,20 +514,21 @@ export class Login {
           localStorage.setItem('token', res.accessToken);
         }
 
-        // ✅ ACTUALIZAR EL USERS SERVICE DESPUES DE VERIFICAR PIN
-        if (res.uid || this.usuarioUidTemporal) {
-          const userData = {
-            uid: res.uid || this.usuarioUidTemporal,
-            rol: res.rol || res.role || res.tipo || '',
-            nombre: res.nombre || 'Usuario',
-            correo: res.correo || res.Email || res.email,
-            apPaterno: res.apPaterno || '',
-            apMaterno: res.apMaterno || '',
-            telefono: res.telefono || ''
-          };
-          localStorage.setItem('user_htas', JSON.stringify(userData));
-          this.users.establecerSesion(userData);
-        }
+        const userData = {
+          uid: res.uid || this.usuarioUidTemporal || '',
+          idusuario: res.idusuario || res.id || null,
+          rol: res.rol || res.role || res.tipo || 'Paciente',
+          nombre: res.nombre || 'Usuario',
+          correo: res.correo || res.Email || res.email || '',
+          apPaterno: res.apPaterno || '',
+          apMaterno: res.apMaterno || '',
+          telefono: res.telefono || ''
+        };
+
+        console.log('Guardando en localStorage (PIN):', userData);
+
+        localStorage.setItem('user_htas', JSON.stringify(userData));
+        this.users.establecerSesion(userData);
 
         this.ngZone.run(() => {
           const role = res.rol || res.role || res.tipo || '';

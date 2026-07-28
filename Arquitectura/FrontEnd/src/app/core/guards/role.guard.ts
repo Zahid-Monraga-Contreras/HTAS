@@ -1,13 +1,14 @@
 import { CanActivateFn, Router } from '@angular/router';
 import { inject } from '@angular/core';
 import { Auth, onAuthStateChanged } from '@angular/fire/auth';
-import { Firestore, doc, getDoc } from '@angular/fire/firestore';
 import { Observable, Observer } from 'rxjs';
+import { Users } from '../services/users.service';
+import { firstValueFrom } from 'rxjs';
 
 export const roleGuard: CanActivateFn = (route, state) => {
     const auth = inject(Auth);
-    const firestore = inject(Firestore);
     const router = inject(Router);
+    const usersService = inject(Users);
 
     const expectedRoles = route.data['roles'] as string[];
 
@@ -26,96 +27,86 @@ export const roleGuard: CanActivateFn = (route, state) => {
                 isResolved = true;
                 unsubscribe();
 
-                if (!user) {
-                    console.warn('RoleGuard: Usuario no autenticado, verificando localStorage...');
+                let userRole = '';
+                let userId = null;
 
-                    const savedUser = localStorage.getItem('user_htas');
-                    if (savedUser) {
+                // 1. Intentar obtener de localStorage primero
+                const savedUser = localStorage.getItem('user_htas');
+                if (savedUser) {
+                    try {
+                        const userData = JSON.parse(savedUser);
+                        userRole = userData.rol?.toLowerCase() || '';
+                        userId = userData.idusuario || userData.id || null;
+                        console.log('RoleGuard: Datos de localStorage:', { userRole, userId });
+                    } catch (error) {
+                        console.warn('RoleGuard: Error al parsear localStorage:', error);
+                    }
+                }
+
+                // 2. Si no hay rol en localStorage, obtener del backend
+                if (!userRole && user) {
+                    try {
+                        console.log('RoleGuard: Consultando backend para obtener perfil...');
+                        const usuarioData = await firstValueFrom(
+                            usersService.getPerfilUsuario(user.uid)
+                        );
+
+                        if (usuarioData) {
+                            userRole = usuarioData.rol?.toLowerCase() || '';
+                            userId = usuarioData.idusuario || usuarioData.id || null;
+
+                            // Guardar en localStorage para futuras veces
+                            const updatedUser = {
+                                idusuario: userId,
+                                nombre: usuarioData.nombre || '',
+                                correo: usuarioData.correo || '',
+                                rol: userRole,
+                                uid: user.uid
+                            };
+                            localStorage.setItem('user_htas', JSON.stringify(updatedUser));
+                            console.log('RoleGuard: Datos actualizados en localStorage:', updatedUser);
+                        }
+                    } catch (error) {
+                        console.warn('RoleGuard: Error al obtener perfil del backend:', error);
+                    }
+                }
+
+                // 3. Si aún no hay rol, verificar en localStorage nuevamente (por si se actualizó)
+                if (!userRole) {
+                    const savedUserAgain = localStorage.getItem('user_htas');
+                    if (savedUserAgain) {
                         try {
-                            const userData = JSON.parse(savedUser);
-                            if (userData && userData.rol) {
-                                const userRole = userData.rol.toLowerCase();
-                                console.log('RoleGuard: Usuario encontrado en localStorage con rol:', userRole);
-
-                                if (expectedRoles.includes(userRole)) {
-                                    console.log('RoleGuard: Acceso permitido');
-                                    observer.next(true);
-                                    observer.complete();
-                                    return;
-                                } else {
-                                    console.log('RoleGuard: Rol no autorizado:', userRole);
-                                    redirectBasedOnRole(userRole, router);
-                                    observer.next(false);
-                                    observer.complete();
-                                    return;
-                                }
-                            }
+                            const userData = JSON.parse(savedUserAgain);
+                            userRole = userData.rol?.toLowerCase() || '';
+                            console.log('RoleGuard: Rol desde localStorage (segunda lectura):', userRole);
                         } catch (error) {
                             console.warn('RoleGuard: Error al parsear localStorage:', error);
                         }
                     }
-
-                    console.warn('RoleGuard: Redirigiendo a login');
-                    router.navigate(['/login']);
-                    observer.next(false);
-                    observer.complete();
-                    return;
                 }
 
-                try {
-                    let userRole = '';
-                    let encontrado = false;
+                console.log('RoleGuard: Rol final:', userRole);
 
-                    try {
-                        console.log('RoleGuard: Buscando en Firestore...');
-                        const userDoc = doc(firestore, `users/${user.uid}`);
-                        const docSnap = await getDoc(userDoc);
-                        if (docSnap.exists()) {
-                            const userData = docSnap.data();
-                            userRole = userData['rol']?.toLowerCase() || '';
-                            encontrado = true;
-                            console.log('RoleGuard: Firestore - rol:', userRole);
-                        }
-                    } catch (error) {
-                        console.warn('RoleGuard: Error en Firestore:', error);
-                    }
+                // 4. Verificar acceso según rol
+                if (userRole && expectedRoles.includes(userRole)) {
+                    console.log('RoleGuard: Acceso permitido para rol:', userRole);
+                    observer.next(true);
+                    observer.complete();
+                } else if (userRole) {
+                    console.log('RoleGuard: Rol no autorizado:', userRole);
+                    redirectBasedOnRole(userRole, router);
+                    observer.next(false);
+                    observer.complete();
+                } else {
+                    console.error('RoleGuard: No se pudo determinar el rol');
 
-                    if (!encontrado) {
-                        try {
-                            const savedUser = localStorage.getItem('user_htas');
-                            if (savedUser) {
-                                const parsedUser = JSON.parse(savedUser);
-                                if (parsedUser && parsedUser.rol) {
-                                    userRole = parsedUser.rol?.toLowerCase() || '';
-                                    encontrado = true;
-                                    console.log('RoleGuard: localStorage - rol:', userRole);
-                                }
-                            }
-                        } catch (error) {
-                            console.warn('RoleGuard: Error en localStorage:', error);
-                        }
-                    }
-
-                    if (encontrado && userRole) {
-                        if (expectedRoles.includes(userRole)) {
-                            console.log('RoleGuard: Acceso permitido');
-                            observer.next(true);
-                            observer.complete();
-                        } else {
-                            console.log('RoleGuard: Rol no autorizado:', userRole);
-                            redirectBasedOnRole(userRole, router);
-                            observer.next(false);
-                            observer.complete();
-                        }
+                    // Verificar si hay usuario autenticado pero sin rol
+                    if (user) {
+                        console.log('RoleGuard: Usuario autenticado pero sin rol, redirigiendo a landing');
+                        router.navigate(['/landing']);
                     } else {
-                        console.error('RoleGuard: No se pudo determinar el rol');
                         router.navigate(['/login']);
-                        observer.next(false);
-                        observer.complete();
                     }
-                } catch (error) {
-                    console.error('RoleGuard Error:', error);
-                    router.navigate(['/login']);
                     observer.next(false);
                     observer.complete();
                 }
@@ -127,10 +118,14 @@ export const roleGuard: CanActivateFn = (route, state) => {
 function redirectBasedOnRole(role: string, router: Router): void {
     const roleMap: { [key: string]: string } = {
         'admin': '/admin',
+        'administrador': '/admin',
         'paciente': '/patient',
+        'patient': '/patient',
         'doctor': '/doctor',
+        'medico': '/doctor',
         'acompanante': '/caregiver',
-        'acompañante': '/caregiver'
+        'acompañante': '/caregiver',
+        'caregiver': '/caregiver'
     };
     const route = roleMap[role] || '/landing';
     console.log('RoleGuard redirigiendo a:', route);

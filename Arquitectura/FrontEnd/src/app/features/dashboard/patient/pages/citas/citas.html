@@ -1,0 +1,318 @@
+<app-patient-menu></app-patient-menu>
+
+<div class="citas-page">
+
+    <header class="citas-header">
+        <div class="header-top">
+            <div class="header-info">
+                <h1>Mis Citas</h1>
+                <p>Gestiona tus citas medicas</p>
+            </div>
+            <button class="btn-agendar" (click)="abrirModalAgendar()">
+                <i class="bi bi-plus-lg"></i>
+                <span>Nueva</span>
+            </button>
+        </div>
+    </header>
+
+    <div *ngIf="isLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Cargando tus citas...</p>
+    </div>
+
+    <div *ngIf="!isLoading" class="citas-content">
+
+        <section class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card" (click)="aplicarFiltro('todas')" [class.active]="filterEstado === 'todas'">
+                    <span class="stat-number">{{ citasEstadisticas.total }}</span>
+                    <span class="stat-label">Total</span>
+                </div>
+                <div class="stat-card contador-programada" (click)="aplicarFiltro('programada')"
+                    [class.active]="filterEstado === 'programada'">
+                    <span class="stat-number">{{ citasEstadisticas.programadas }}</span>
+                    <span class="stat-label">Programadas</span>
+                </div>
+                <div class="stat-card contador-completada" (click)="aplicarFiltro('completada')"
+                    [class.active]="filterEstado === 'completada'">
+                    <span class="stat-number">{{ citasEstadisticas.completadas }}</span>
+                    <span class="stat-label">Completadas</span>
+                </div>
+                <div class="stat-card contador-cancelada" (click)="aplicarFiltro('cancelada')"
+                    [class.active]="filterEstado === 'cancelada'">
+                    <span class="stat-number">{{ citasEstadisticas.canceladas }}</span>
+                    <span class="stat-label">Canceladas</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="citas-section">
+            <div class="section-header">
+                <h2><i class="bi bi-list-ul"></i> Lista de Citas</h2>
+                <span class="citas-count">{{ citasFiltradas.length }} citas</span>
+            </div>
+
+            <div class="filtros-rapidos">
+                <button class="filtro-btn" [class.active]="filterEstado === 'todas'" (click)="aplicarFiltro('todas')">
+                    <i class="bi bi-grid-3x3-gap-fill"></i> Todas
+                </button>
+                <button class="filtro-btn" [class.active]="filterEstado === 'programada'"
+                    (click)="aplicarFiltro('programada')">
+                    <i class="bi bi-calendar-plus"></i> Programadas
+                </button>
+                <button class="filtro-btn" [class.active]="filterEstado === 'completada'"
+                    (click)="aplicarFiltro('completada')">
+                    <i class="bi bi-check2-circle"></i> Completadas
+                </button>
+                <button class="filtro-btn" [class.active]="filterEstado === 'cancelada'"
+                    (click)="aplicarFiltro('cancelada')">
+                    <i class="bi bi-x-circle"></i> Canceladas
+                </button>
+            </div>
+
+            <div class="citas-list">
+                <div *ngFor="let cita of citasFiltradas" class="cita-card" (click)="verDetalleCita(cita)">
+                    <div class="cita-card-header">
+                        <div class="cita-fecha-badge">
+                            <span class="cita-dia">{{ obtenerDia(cita.fechacita || cita.fecha) }}</span>
+                            <span class="cita-mes">{{ obtenerMes(cita.fechacita || cita.fecha) }}</span>
+                        </div>
+                        <div class="cita-info-principal">
+                            <h3>{{ cita.motivo || 'Consulta Medica' }}</h3>
+                            <p class="cita-doctor">
+                                <i class="bi bi-person"></i> {{ cita.medico || 'Medico' }}
+                            </p>
+                            <p class="cita-especialidad" *ngIf="cita.especialidad">
+                                <i class="bi bi-briefcase"></i> {{ cita.especialidad }}
+                            </p>
+                        </div>
+                        <span class="badge-tiempo" [class]="getBadgeTiempoClass(cita.fechacita || cita.fecha)">
+                            {{ obtenerBadgeTiempo(cita.fechacita || cita.fecha) }}
+                        </span>
+                    </div>
+
+                    <div class="cita-card-body">
+                        <div class="cita-detalles">
+                            <div class="cita-detalle">
+                                <i class="bi bi-clock"></i>
+                                <span>{{ formatearHora(cita.horacita || cita.hora) }}</span>
+                            </div>
+                            <div class="cita-detalle">
+                                <i class="bi bi-calendar3"></i>
+                                <span>{{ formatearFecha(cita.fechacita || cita.fecha) }}</span>
+                            </div>
+                            <div class="cita-detalle">
+                                <i class="bi" [class]="getModalidadIcon(cita.modalidad)"></i>
+                                <span class="modalidad-badge" [class]="getModalidadClass(cita.modalidad)">
+                                    {{ cita.modalidad || 'Presencial' }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="cita-acciones">
+                            <span class="estado-badge" [class]="getEstadoClass(cita.estado)">
+                                <i class="bi" [class]="getEstadoIcon(cita.estado)"></i>
+                                {{ cita.estado || 'Programada' }}
+                            </span>
+                            <button class="btn-detalle" (click)="$event.stopPropagation(); verDetalleCita(cita)"
+                                title="Ver detalle">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="!citasFiltradas?.length" class="empty-state">
+                    <i class="bi bi-calendar-x"></i>
+                    <p>No tienes citas {{ filterEstado !== 'todas' ? filterEstado : '' }}</p>
+                    <button class="btn-primary" (click)="abrirModalAgendar()">Agendar Cita</button>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- MODAL PARA AGENDAR CITA CON FLATPICKR -->
+<!-- ============================================ -->
+<div class="modal-overlay" *ngIf="mostrarModalAgendar" (click)="cerrarModalAgendar()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <!-- HEADER FIJO -->
+        <div class="modal-header">
+            <h2><i class="bi bi-calendar-plus"></i> Agendar Cita</h2>
+            <button class="modal-close" (click)="cerrarModalAgendar()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <!-- BODY SCROLLABLE -->
+        <div class="modal-body">
+            <div class="modal-patient-info">
+                <strong>Paciente:</strong> {{ patientFullName || patientName }}
+            </div>
+
+            <form [formGroup]="citaForm">
+                <div class="form-group">
+                    <label for="motivo">Motivo de la consulta</label>
+                    <input type="text" id="motivo" formControlName="motivo"
+                        placeholder="Ej: Dolor de cabeza, Revision..." class="form-control">
+                    <small class="error-text"
+                        *ngIf="citaForm.get('motivo')?.touched && citaForm.get('motivo')?.invalid">
+                        El motivo es obligatorio
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="fechaCitaInput">Fecha de la cita</label>
+                    <div class="input-picker-wrapper">
+                        <input type="text" id="fechaCitaInput" class="form-control picker-custom datepicker-input"
+                            placeholder="Seleccione fecha..." readonly>
+                        <i class="bi bi-calendar3 icon-embed"></i>
+                    </div>
+                    <small class="error-text"
+                        *ngIf="citaForm.get('fechaCita')?.touched && citaForm.get('fechaCita')?.invalid">
+                        Selecciona una fecha valida
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="horaCitaInput">Hora de la cita</label>
+                    <div class="input-picker-wrapper">
+                        <input type="text" id="horaCitaInput" class="form-control picker-custom timepicker-input"
+                            placeholder="Seleccione hora..." readonly>
+                        <i class="bi bi-clock icon-embed"></i>
+                    </div>
+                    <small class="error-text"
+                        *ngIf="citaForm.get('horaCita')?.touched && citaForm.get('horaCita')?.invalid">
+                        Selecciona una hora valida (8:00 AM - 7:00 PM)
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="modalidad">Modalidad</label>
+                    <select id="modalidad" formControlName="modalidad" class="form-control">
+                        <option value="Presencial">Presencial</option>
+                        <option value="Virtual">Virtual</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="sintomas">Sintomas actuales</label>
+                    <textarea id="sintomas" formControlName="sintomas" rows="2"
+                        placeholder="Escribe aqui tus malestares o sintomas actuales..."
+                        class="form-control textarea-fixed"></textarea>
+                </div>
+            </form>
+        </div>
+
+        <!-- FOOTER FIJO -->
+        <div class="modal-footer">
+            <div class="form-actions">
+                <button type="button" class="btn-cancelar" (click)="cerrarModalAgendar()">Cancelar</button>
+                <button type="button" class="btn-guardar" [disabled]="citaForm.invalid || cargandoAgendar"
+                    (click)="agendarCita()">
+                    <i class="bi bi-check-lg" *ngIf="!cargandoAgendar"></i>
+                    <span class="spinner-small" *ngIf="cargandoAgendar"></span>
+                    {{ cargandoAgendar ? 'Guardando...' : 'Agendar Cita' }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- MODAL PARA DETALLE DE CITA (CON HEADER Y FOOTER FIJOS) -->
+<!-- ============================================ -->
+<div class="modal-overlay" *ngIf="mostrarModalDetalle" (click)="cerrarModalDetalle()">
+    <div class="modal-content modal-detalle" (click)="$event.stopPropagation()">
+        <!-- HEADER FIJO -->
+        <div class="modal-header">
+            <h2><i class="bi bi-calendar-event"></i> Detalle de Cita</h2>
+            <button class="modal-close" (click)="cerrarModalDetalle()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <!-- BODY SCROLLABLE -->
+        <div class="modal-body" *ngIf="citaSeleccionada">
+            <div class="detalle-item">
+                <span class="detalle-label">Motivo</span>
+                <span class="detalle-valor">{{ citaSeleccionada.motivo || 'Consulta Medica' }}</span>
+            </div>
+            <div class="detalle-item">
+                <span class="detalle-label">Fecha</span>
+                <span class="detalle-valor">{{ formatearFecha(citaSeleccionada.fechacita || citaSeleccionada.fecha)
+                    }}</span>
+            </div>
+            <div class="detalle-item">
+                <span class="detalle-label">Hora</span>
+                <span class="detalle-valor">{{ formatearHora(citaSeleccionada.horacita || citaSeleccionada.hora)
+                    }}</span>
+            </div>
+            <div class="detalle-item">
+                <span class="detalle-label">Medico</span>
+                <span class="detalle-valor">{{ citaSeleccionada.medico || 'No asignado' }}</span>
+            </div>
+            <div class="detalle-item" *ngIf="citaSeleccionada.especialidad">
+                <span class="detalle-label">Especialidad</span>
+                <span class="detalle-valor">{{ citaSeleccionada.especialidad }}</span>
+            </div>
+            <div class="detalle-item">
+                <span class="detalle-label">Modalidad</span>
+                <span class="detalle-valor">
+                    <span class="modalidad-badge" [class]="getModalidadClass(citaSeleccionada.modalidad)">
+                        {{ citaSeleccionada.modalidad || 'Presencial' }}
+                    </span>
+                </span>
+            </div>
+            <div class="detalle-item">
+                <span class="detalle-label">Estado</span>
+                <span class="estado-badge" [class]="getEstadoClass(citaSeleccionada.estado)">
+                    <i class="bi" [class]="getEstadoIcon(citaSeleccionada.estado)"></i>
+                    {{ citaSeleccionada.estado || 'Programada' }}
+                </span>
+            </div>
+            <div class="detalle-item" *ngIf="citaSeleccionada.sintomas">
+                <span class="detalle-label">Sintomas</span>
+                <span class="detalle-valor">{{ citaSeleccionada.sintomas }}</span>
+            </div>
+            <div class="detalle-item" *ngIf="citaSeleccionada.notasdoctor">
+                <span class="detalle-label">Notas del Doctor</span>
+                <span class="detalle-valor">{{ citaSeleccionada.notasdoctor }}</span>
+            </div>
+        </div>
+
+        <!-- FOOTER FIJO -->
+        <div class="modal-footer">
+            <div class="detalle-acciones">
+                <button class="btn-cancelar"
+                    *ngIf="citaSeleccionada.estado !== 'Cancelada' && citaSeleccionada.estado !== 'Completada'"
+                    (click)="cancelarCita(citaSeleccionada)">
+                    <i class="bi bi-x-circle"></i> Cancelar Cita
+                </button>
+                <button class="btn-cerrar" (click)="cerrarModalDetalle()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- MODAL DE CONFIRMACION -->
+<!-- ============================================ -->
+<div class="modal-overlay" *ngIf="mostrarModalConfirmacion" (click)="cerrarModalConfirmacion()">
+    <div class="modal-content modal-confirmacion" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2><i class="bi" [class]="modalConfirmacion.icono"></i> {{ modalConfirmacion.titulo }}</h2>
+            <button class="modal-close" (click)="cerrarModalConfirmacion()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p>{{ modalConfirmacion.mensaje }}</p>
+            <div class="form-actions">
+                <button class="btn-cancelar" (click)="cerrarModalConfirmacion()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -26,7 +26,7 @@ export const authGuard: CanActivateFn = (route, state) => {
           if (savedUser) {
             try {
               const userData = JSON.parse(savedUser);
-              if (userData && userData.uid) {
+              if (userData && (userData.uid || userData.idusuario)) {
                 console.log('AuthGuard: Usuario encontrado en localStorage, permitiendo acceso');
                 observer.next(true);
                 observer.complete();
