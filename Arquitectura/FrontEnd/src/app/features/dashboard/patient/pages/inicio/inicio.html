@@ -1,4 +1,4 @@
-<!-- Menú al inicio para que se muestre correctamente -->
+<!-- Menu al inicio para que se muestre correctamente -->
 <app-patient-menu></app-patient-menu>
 
 <div class="patient-dashboard">
@@ -138,7 +138,7 @@
                         </span>
                     </div>
                 </div>
-                <div *ngIf="!citasRecientes?.length" class="empty-state">
+                <div *ngIf="!citasRecientes.length" class="empty-state">
                     <i class="bi bi-calendar-x"></i>
                     <p>No tienes citas programadas</p>
                     <button class="btn-primary" routerLink="/patient/citas">Agendar Cita</button>

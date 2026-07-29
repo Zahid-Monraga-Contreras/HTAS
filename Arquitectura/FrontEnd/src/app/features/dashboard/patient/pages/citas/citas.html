@@ -153,7 +153,7 @@
                     </div>
                 </div>
 
-                <div *ngIf="!citasFiltradas?.length" class="empty-state">
+                <div *ngIf="!citasFiltradas.length" class="empty-state">
                     <i class="bi bi-calendar-x"></i>
                     <p>No tienes citas {{ filterEstado !== 'todas' ? filterEstado : '' }}</p>
                     <button class="btn-primary" (click)="abrirModalAgendar()">Agendar Cita</button>
@@ -304,7 +304,7 @@
         <div class="modal-footer">
             <div class="detalle-acciones">
                 <button class="btn-cancelar-cita"
-                    *ngIf="citaSeleccionada?.estado !== 'Cancelada' && citaSeleccionada?.estado !== 'Completada'"
+                    *ngIf="citaSeleccionada.estado !== 'Cancelada' && citaSeleccionada.estado !== 'Completada'"
                     (click)="confirmarCancelarCita(citaSeleccionada)" [disabled]="cargandoCancelar">
                     <i class="bi bi-x-circle" *ngIf="!cargandoCancelar"></i>
                     <span class="spinner-small" *ngIf="cargandoCancelar"></span>

@@ -1,0 +1,312 @@
+<app-patient-menu></app-patient-menu>
+
+<!-- NOTIFICACIONES TOAST -->
+<div class="toast-premium-container" *ngIf="mostrarToast" [class]="tipoToast">
+    <div class="toast-content">
+        <i class="bi" [class]="
+            tipoToast === 'success' ? 'bi-check-circle-fill icon-toast' :
+            tipoToast === 'error' ? 'bi-exclamation-triangle-fill icon-toast' :
+            'bi-exclamation-circle-fill icon-toast'
+        "></i>
+        <span class="toast-message">{{ mensajeToast }}</span>
+    </div>
+</div>
+
+<div class="tratamientos-page">
+    <header class="tratamientos-header">
+        <div class="header-top">
+            <div class="header-info">
+                <h1>Mis Tratamientos</h1>
+                <p>Gestiona tus tratamientos medicos</p>
+            </div>
+        </div>
+    </header>
+
+    <div *ngIf="isLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Cargando tus tratamientos...</p>
+    </div>
+
+    <div *ngIf="!isLoading" class="tratamientos-content">
+
+        <section class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card" (click)="aplicarFiltro('todos')" [class.active]="filterEstado === 'todos'">
+                    <span class="stat-number">{{ estadisticas.total }}</span>
+                    <span class="stat-label">Total</span>
+                </div>
+                <div class="stat-card stat-activo" (click)="aplicarFiltro('activos')"
+                    [class.active]="filterEstado === 'activos'">
+                    <span class="stat-number">{{ estadisticas.activos }}</span>
+                    <span class="stat-label">Activos</span>
+                </div>
+                <div class="stat-card stat-inactivo" (click)="aplicarFiltro('inactivos')"
+                    [class.active]="filterEstado === 'inactivos'">
+                    <span class="stat-number">{{ estadisticas.inactivos }}</span>
+                    <span class="stat-label">Inactivos</span>
+                </div>
+                <div class="stat-card stat-vencido" (click)="aplicarFiltro('vencidos')"
+                    [class.active]="filterEstado === 'vencidos'">
+                    <span class="stat-number">{{ estadisticas.vencidos }}</span>
+                    <span class="stat-label">Vencidos</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="tratamientos-section">
+            <div class="section-header">
+                <h2><i class="bi bi-list-ul"></i> Lista de Tratamientos</h2>
+                <span class="tratamientos-count">{{ tratamientosPaginados.length }} tratamiento{{
+                    tratamientosPaginados.length !== 1 ? 's' : '' }}</span>
+            </div>
+
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar por medicamento, doctor o paciente...">
+            </div>
+
+            <div class="tratamientos-list">
+                <div *ngFor="let t of tratamientosPaginados" class="tratamiento-card" (click)="verDetalle(t)">
+                    <div class="tratamiento-card-header">
+                        <div class="tratamiento-info-principal">
+                            <h3>{{ t.nombremedicamento }}</h3>
+                            <p class="tratamiento-dosis">
+                                <i class="bi bi-capsule"></i> {{ t.dosis }}
+                            </p>
+                            <p class="tratamiento-doctor">
+                                <i class="bi bi-person"></i> {{ t.nombredoctor }} {{ t.appaternodoctor }}
+                            </p>
+                            <p class="tratamiento-paciente">
+                                <i class="bi bi-person-badge"></i> {{ t.nombrepaciente }} {{ t.appaternopaciente }}
+                            </p>
+                        </div>
+                        <span class="estado-badge" [class]="getEstadoClass(t.activo)">
+                            <i class="bi" [class]="getEstadoIcon(t.activo)"></i>
+                            {{ getEstadoTexto(t.activo) }}
+                        </span>
+                    </div>
+
+                    <div class="tratamiento-card-body">
+                        <div class="tratamiento-detalles">
+                            <div class="tratamiento-detalle">
+                                <i class="bi bi-calendar3"></i>
+                                <span>Inicio: {{ formatearFecha(t.fechainicio) }}</span>
+                            </div>
+                            <div class="tratamiento-detalle">
+                                <i class="bi bi-calendar-check"></i>
+                                <span>Fin: {{ formatearFecha(t.fechafin) }}</span>
+                            </div>
+                            <div class="tratamiento-detalle" *ngIf="t.activo">
+                                <i class="bi bi-clock"></i>
+                                <span class="dias-badge" [class]="getDiasClass(t.fechafin)">
+                                    {{ getDiasRestantes(t.fechafin) }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="tratamiento-acciones">
+                            <button class="btn-detalle" (click)="$event.stopPropagation(); verDetalle(t)"
+                                title="Ver detalle">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="!tratamientosPaginados.length" class="empty-state">
+                    <i class="bi bi-capsule"></i>
+                    <p>No tienes tratamientos {{ filterEstado !== 'todos' ? filterEstado : '' }}</p>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- MODAL DETALLE DE TRATAMIENTO CON TOMAS -->
+<!-- ============================================ -->
+<div class="modal-overlay" *ngIf="mostrarModalDetalle" (click)="cerrarModalDetalle()">
+    <div class="modal-content modal-detalle modal-detalle-grande" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2><i class="bi bi-capsule"></i> Detalle de Tratamiento</h2>
+            <button class="modal-close" (click)="cerrarModalDetalle()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="modal-body" *ngIf="tratamientoSeleccionado">
+            <!-- Información del tratamiento -->
+            <div class="detalle-grid">
+                <div class="detalle-item">
+                    <span class="detalle-label">Medicamento</span>
+                    <span class="detalle-valor">{{ tratamientoSeleccionado.nombremedicamento }}</span>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-label">Paciente</span>
+                    <span class="detalle-valor">{{ tratamientoSeleccionado.nombrepaciente }} {{
+                        tratamientoSeleccionado.appaternopaciente }}</span>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-label">Doctor</span>
+                    <span class="detalle-valor">{{ tratamientoSeleccionado.nombredoctor }} {{
+                        tratamientoSeleccionado.appaternodoctor }}</span>
+                </div>
+                <div class="detalle-item" *ngIf="tratamientoSeleccionado.especialidaddoctor">
+                    <span class="detalle-label">Especialidad</span>
+                    <span class="detalle-valor">{{ tratamientoSeleccionado.especialidaddoctor }}</span>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-label">Dosis</span>
+                    <span class="detalle-valor">{{ tratamientoSeleccionado.dosis }}</span>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-label">Frecuencia</span>
+                    <span class="detalle-valor">Cada {{ tratamientoSeleccionado.frecuenciahoras }} horas</span>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-label">Fecha Inicio</span>
+                    <span class="detalle-valor">{{ formatearFechaCompleta(tratamientoSeleccionado.fechainicio) }}</span>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-label">Fecha Fin</span>
+                    <span class="detalle-valor">{{ formatearFechaCompleta(tratamientoSeleccionado.fechafin) }}</span>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-label">Estado</span>
+                    <span class="detalle-valor">
+                        <span class="estado-badge" [class]="getEstadoClass(tratamientoSeleccionado.activo)">
+                            <i class="bi" [class]="getEstadoIcon(tratamientoSeleccionado.activo)"></i>
+                            {{ getEstadoTexto(tratamientoSeleccionado.activo) }}
+                        </span>
+                    </span>
+                </div>
+                <div class="detalle-item" *ngIf="tratamientoSeleccionado.notasinstrucciones">
+                    <span class="detalle-label">Instrucciones</span>
+                    <span class="detalle-valor">{{ tratamientoSeleccionado.notasinstrucciones }}</span>
+                </div>
+            </div>
+
+            <hr class="section-divider">
+
+            <!-- SECCION DE TOMAS -->
+            <div class="tomas-section">
+                <div class="tomas-header">
+                    <h4 class="section-title">
+                        <i class="bi bi-list-check"></i>
+                        Registro de Tomas
+                        <span class="badge-tomas">{{ registrosTomas.length }}</span>
+                        <span class="badge-tomas badge-activas">{{ getCantidadTomasActivas() }} activas</span>
+                    </h4>
+                </div>
+
+                <!-- Estadisticas de Tomas -->
+                <div class="tomas-estadisticas" *ngIf="estadisticasTomas">
+                    <div class="tomas-stats-grid">
+                        <div class="tomas-stat">
+                            <span class="tomas-stat-value">{{ estadisticasTomas.totalTomas }}</span>
+                            <span class="tomas-stat-label">Total</span>
+                        </div>
+                        <div class="tomas-stat stat-completadas">
+                            <span class="tomas-stat-value">{{ estadisticasTomas.tomasCompletadas }}</span>
+                            <span class="tomas-stat-label">Completadas</span>
+                        </div>
+                        <div class="tomas-stat stat-pendientes">
+                            <span class="tomas-stat-value">{{ estadisticasTomas.tomasPendientes }}</span>
+                            <span class="tomas-stat-label">Pendientes</span>
+                        </div>
+                        <div class="tomas-stat stat-omitidas">
+                            <span class="tomas-stat-value">{{ estadisticasTomas.tomasOmitidas }}</span>
+                            <span class="tomas-stat-label">Omitidas</span>
+                        </div>
+                        <div class="tomas-stat stat-retrasadas">
+                            <span class="tomas-stat-value">{{ estadisticasTomas.tomasRetrasadas }}</span>
+                            <span class="tomas-stat-label">Retrasadas</span>
+                        </div>
+                        <div class="tomas-stat stat-cumplimiento">
+                            <span class="tomas-stat-value">{{ estadisticasTomas.porcentajeCumplimiento }}%</span>
+                            <span class="tomas-stat-label">Cumplimiento</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de acciones - SOLO GENERAR TOMAS (sin eliminar) -->
+                <div class="tomas-actions">
+                    <button class="btn-generar-tomas" (click)="generarTomas()" [disabled]="isBotonGenerarDisabled()"
+                        [class.btn-deshabilitado]="tieneTomasGeneradas()">
+                        <span class="spinner-save" *ngIf="generandoTomas"></span>
+                        <i class="bi" [class]="tieneTomasGeneradas() ? 'bi-check-circle-fill' : 'bi-plus-circle'"
+                            *ngIf="!generandoTomas"></i>
+                        <span>{{ getMensajeBotonGenerar() }}</span>
+                    </button>
+                </div>
+
+                <!-- Lista de Tomas -->
+                <div class="tomas-lista">
+                    <div *ngIf="cargandoTomas" class="tomas-loading">
+                        <div class="spinner-small"></div>
+                        <p>Cargando tomas...</p>
+                    </div>
+
+                    <div *ngFor="let t of registrosTomas" class="toma-item" [class]="{
+                        'toma-completada': t.estado === 'Tomada',
+                        'toma-pendiente': t.estado === 'Pendiente',
+                        'toma-omitida': t.estado === 'Omitida',
+                        'toma-retrasada': t.estado === 'Retrasada',
+                        'toma-eliminada': t.estado === 'Eliminada'
+                    }">
+                        <div class="toma-info">
+                            <div class="toma-fecha-hora">
+                                <span class="toma-fecha">{{ t.fechaFormateada || t.fechaProgramada }}</span>
+                                <span class="toma-hora">{{ t.horaFormateada }}</span>
+                            </div>
+                            <span class="toma-estado-badge" [style.background]="getEstadoColor(t.estado)">
+                                <i class="bi" [class]="getEstadoIcono(t.estado)"></i>
+                                {{ t.estado }}
+                            </span>
+                        </div>
+                        <div class="toma-actions">
+                            <ng-container *ngIf="t.estado !== 'Eliminada'">
+                                <ng-container *ngIf="t.estado === 'Pendiente' || t.estado === 'Retrasada'">
+                                    <button class="btn-toma-completar"
+                                        (click)="actualizarEstadoToma({ id: t.id, estado: 'Tomada' })"
+                                        title="Marcar como tomada">
+                                        <i class="bi bi-check-circle"></i>
+                                    </button>
+                                    <button class="btn-toma-omitir"
+                                        (click)="actualizarEstadoToma({ id: t.id, estado: 'Omitida' })"
+                                        title="Marcar como omitida">
+                                        <i class="bi bi-x-circle"></i>
+                                    </button>
+                                    <button class="btn-toma-retrasar"
+                                        (click)="actualizarEstadoToma({ id: t.id, estado: 'Retrasada' })"
+                                        title="Marcar como retrasada">
+                                        <i class="bi bi-clock"></i>
+                                    </button>
+                                </ng-container>
+                                <ng-container *ngIf="t.estado === 'Tomada' || t.estado === 'Omitida'">
+                                    <span class="toma-estado-final">{{ t.estado }}</span>
+                                </ng-container>
+                            </ng-container>
+                            <ng-container *ngIf="t.estado === 'Eliminada'">
+                                <span class="toma-estado-eliminada">Eliminada</span>
+                            </ng-container>
+                            <span class="toma-notas" *ngIf="t.notas">{{ t.notas }}</span>
+                        </div>
+                    </div>
+
+                    <div *ngIf="!cargandoTomas && registrosTomas.length === 0" class="tomas-vacio">
+                        <i class="bi bi-inbox"></i>
+                        <p>No hay tomas registradas</p>
+                        <span>Genera tomas programadas para este tratamiento</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <div class="detalle-acciones">
+                <button class="btn-cerrar" (click)="cerrarModalDetalle()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>

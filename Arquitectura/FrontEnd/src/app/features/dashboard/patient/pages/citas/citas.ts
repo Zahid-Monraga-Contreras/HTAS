@@ -1,6 +1,5 @@
 import { Component, OnInit, inject, ChangeDetectorRef, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { PatientMenu } from "../../template/menu/menu";
 import { Users } from '../../../../../core/services/users.service';
 import { Auth } from '@angular/fire/auth';
@@ -21,7 +20,7 @@ interface ToastNotification {
 @Component({
     selector: 'app-patient-citas',
     standalone: true,
-    imports: [CommonModule, RouterLink, PatientMenu, ReactiveFormsModule],
+    imports: [CommonModule, PatientMenu, ReactiveFormsModule],
     templateUrl: './citas.html',
     styleUrls: ['./citas.css']
 })
@@ -32,11 +31,9 @@ export class PatientCitas implements OnInit {
     private platformId = inject(PLATFORM_ID);
     private fb = inject(FormBuilder);
 
-    // Notificaciones Toast
     notifications: ToastNotification[] = [];
     private notificationCounter = 0;
 
-    // Estados
     isLoading = true;
     cargandoAgendar = false;
     cargandoCancelar = false;

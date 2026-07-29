@@ -1,0 +1,1352 @@
+/* ==========================================================================
+   PAGINA DE TRATAMIENTOS DEL PACIENTE - COMPLETA
+   ========================================================================== */
+
+:host {
+    --primary: #b0001e;
+    --primary-dark: #8a0017;
+    --primary-light: #d42a4a;
+    --primary-gradient: linear-gradient(135deg, #b0001e 0%, #d42a4a 100%);
+    --success: #10b981;
+    --success-light: #d1fae5;
+    --success-dark: #059669;
+    --warning: #f59e0b;
+    --warning-light: #fef3c7;
+    --warning-dark: #d97706;
+    --danger: #ef4444;
+    --danger-light: #fee2e2;
+    --danger-dark: #dc2626;
+    --info: #3b82f6;
+    --info-light: #dbeafe;
+    --info-dark: #2563eb;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-400: #94a3b8;
+    --gray-500: #64748b;
+    --gray-600: #475569;
+    --gray-700: #334155;
+    --gray-800: #1e293b;
+    --gray-900: #0f172a;
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+    --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.15);
+    --border-radius: 16px;
+    --border-radius-sm: 10px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:host {
+    display: block;
+    width: 100%;
+    min-height: 100vh;
+    background: var(--gray-50);
+}
+
+/* ==========================================================================
+   PAGINA PRINCIPAL
+   ========================================================================== */
+.tratamientos-page {
+    min-height: 100vh;
+    background: var(--gray-50);
+    padding: 16px 16px 100px;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 680px;
+}
+
+/* ==========================================================================
+   HEADER
+   ========================================================================== */
+.tratamientos-header {
+    padding: 0 0 16px;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-info h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin: 0;
+}
+
+.header-info p {
+    font-size: 0.85rem;
+    color: var(--gray-500);
+    margin: 2px 0 0;
+}
+
+/* ==========================================================================
+   LOADING
+   ========================================================================== */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--gray-200);
+    border-top: 4px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-container p {
+    margin-top: 16px;
+    color: var(--gray-500);
+    font-size: 0.9rem;
+}
+
+/* ==========================================================================
+   ESTADISTICAS
+   ========================================================================== */
+.stats-section {
+    margin-bottom: 20px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.stat-card {
+    background: white;
+    padding: 14px 8px;
+    border-radius: var(--border-radius-sm);
+    text-align: center;
+    box-shadow: var(--shadow-md);
+    cursor: pointer;
+    transition: var(--transition);
+    border: 2px solid transparent;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.stat-card:active {
+    transform: scale(0.95);
+}
+
+.stat-card.active {
+    border-color: var(--primary);
+    background: #b0001e08;
+}
+
+.stat-number {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    line-height: 1.2;
+}
+
+.stat-label {
+    font-size: 0.6rem;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.stat-activo .stat-number {
+    color: var(--success);
+}
+
+.stat-inactivo .stat-number {
+    color: var(--gray-500);
+}
+
+.stat-vencido .stat-number {
+    color: var(--danger);
+}
+
+/* ==========================================================================
+   SECCION DE TRATAMIENTOS
+   ========================================================================== */
+.tratamientos-section {
+    background: white;
+    padding: 16px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-md);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.section-header h2 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.section-header h2 i {
+    color: var(--primary);
+}
+
+.tratamientos-count {
+    font-size: 0.8rem;
+    color: var(--gray-500);
+    background: var(--gray-100);
+    padding: 2px 14px;
+    border-radius: 20px;
+}
+
+/* ==========================================================================
+   SEARCH BOX
+   ========================================================================== */
+.search-box {
+    position: relative;
+    margin-bottom: 16px;
+}
+
+.search-box i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-400);
+}
+
+.search-box input {
+    width: 100%;
+    padding: 10px 14px 10px 42px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 10px;
+    font-size: 0.9rem;
+    color: var(--gray-800);
+    background: var(--gray-50);
+    transition: var(--transition);
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(176, 0, 30, 0.1);
+}
+
+/* ==========================================================================
+   LISTA DE TRATAMIENTOS
+   ========================================================================== */
+.tratamientos-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.tratamiento-card {
+    background: var(--gray-50);
+    border-radius: var(--border-radius-sm);
+    padding: 14px;
+    transition: var(--transition);
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.tratamiento-card:hover {
+    border-color: var(--gray-200);
+    box-shadow: var(--shadow-md);
+}
+
+.tratamiento-card:active {
+    transform: scale(0.98);
+}
+
+.tratamiento-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.tratamiento-info-principal {
+    flex: 1;
+    min-width: 0;
+}
+
+.tratamiento-info-principal h3 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin: 0 0 4px;
+}
+
+.tratamiento-dosis {
+    font-size: 0.8rem;
+    color: var(--gray-600);
+    margin: 0 0 2px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.tratamiento-dosis i {
+    font-size: 0.7rem;
+    color: var(--gray-400);
+}
+
+.tratamiento-doctor {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    margin: 0 0 2px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.tratamiento-doctor i {
+    font-size: 0.7rem;
+    color: var(--gray-400);
+}
+
+.tratamiento-paciente {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.tratamiento-paciente i {
+    font-size: 0.7rem;
+    color: var(--gray-400);
+}
+
+.estado-badge {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 3px 12px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.estado-badge i {
+    font-size: 0.55rem;
+}
+
+.estado-activo {
+    background: #10b98115;
+    color: var(--success);
+}
+
+.estado-inactivo {
+    background: #94a3b815;
+    color: var(--gray-500);
+}
+
+.tratamiento-card-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tratamiento-detalles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+}
+
+.tratamiento-detalle {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.7rem;
+    color: var(--gray-600);
+}
+
+.tratamiento-detalle i {
+    font-size: 0.7rem;
+    color: var(--gray-400);
+}
+
+.dias-badge {
+    font-weight: 600;
+    padding: 1px 8px;
+    border-radius: 10px;
+    font-size: 0.65rem;
+}
+
+.dias-normal {
+    color: var(--success);
+    background: #10b98115;
+}
+
+.dias-urgente {
+    color: var(--warning);
+    background: #f59e0b15;
+}
+
+.dias-vencido {
+    color: var(--danger);
+    background: #ef444415;
+}
+
+.tratamiento-acciones {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-detalle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: white;
+    color: var(--gray-400);
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow);
+}
+
+.btn-detalle:hover {
+    background: var(--primary);
+    color: white;
+    transform: scale(1.05);
+}
+
+.btn-detalle:active {
+    transform: scale(0.9);
+}
+
+/* ==========================================================================
+   EMPTY STATE
+   ========================================================================== */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 12px;
+    color: var(--gray-400);
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 12px;
+    opacity: 0.5;
+}
+
+.empty-state p {
+    margin: 0 0 16px;
+    font-size: 0.95rem;
+}
+
+/* ==========================================================================
+   MODALES
+   ========================================================================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 20px;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-content {
+    background: white;
+    border-radius: var(--border-radius);
+    max-width: 480px;
+    width: 100%;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-xl);
+    animation: slideUp 0.3s ease;
+    overflow: hidden;
+}
+
+.modal-detalle-grande {
+    max-width: 700px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 24px 14px;
+    border-bottom: 1px solid var(--gray-200);
+    flex-shrink: 0;
+    background: white;
+    z-index: 1;
+}
+
+.modal-header h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.modal-header h2 i {
+    color: var(--primary);
+}
+
+.modal-close {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: none;
+    background: var(--gray-100);
+    color: var(--gray-500);
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-close:hover {
+    background: var(--gray-200);
+    transform: rotate(90deg);
+}
+
+.modal-close:active {
+    transform: scale(0.9);
+}
+
+.modal-body {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.modal-body::-webkit-scrollbar {
+    width: 4px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: var(--gray-300);
+    border-radius: 10px;
+}
+
+.modal-footer {
+    padding: 14px 24px 18px;
+    border-top: 1px solid var(--gray-200);
+    flex-shrink: 0;
+    background: white;
+    z-index: 1;
+}
+
+/* ==========================================================================
+   MODAL DETALLE
+   ========================================================================== */
+.detalle-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 16px;
+}
+
+.detalle-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.detalle-item:last-child {
+    border-bottom: none;
+}
+
+.detalle-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--gray-500);
+}
+
+.detalle-valor {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--gray-800);
+    text-align: right;
+    max-width: 60%;
+    word-break: break-word;
+}
+
+.detalle-acciones {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.detalle-acciones .btn-cerrar {
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none;
+    background: var(--gray-200);
+    color: var(--gray-700);
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition);
+    flex: 1;
+}
+
+.detalle-acciones .btn-cerrar:hover {
+    background: var(--gray-300);
+}
+
+.detalle-acciones .btn-cerrar:active {
+    transform: scale(0.95);
+}
+
+/* ==========================================================================
+   SECCION DE TOMAS EN EL MODAL
+   ========================================================================== */
+.section-divider {
+    border: none;
+    border-top: 1px solid var(--gray-200);
+    margin: 16px 0;
+}
+
+.tomas-section {
+    margin-top: 8px;
+}
+
+.tomas-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.section-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.section-title i {
+    color: var(--primary);
+}
+
+.badge-tomas {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 12px;
+    background: var(--gray-200);
+    color: var(--gray-600);
+}
+
+.badge-activas {
+    background: #10b98115;
+    color: var(--success);
+}
+
+/* ==========================================================================
+   ESTADISTICAS DE TOMAS
+   ========================================================================== */
+.tomas-estadisticas {
+    background: var(--gray-50);
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 12px;
+}
+
+.tomas-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+}
+
+.tomas-stat {
+    text-align: center;
+}
+
+.tomas-stat-value {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--gray-800);
+}
+
+.tomas-stat-label {
+    font-size: 0.55rem;
+    color: var(--gray-500);
+    text-transform: uppercase;
+}
+
+.stat-completadas .tomas-stat-value {
+    color: var(--success);
+}
+
+.stat-pendientes .tomas-stat-value {
+    color: var(--warning);
+}
+
+.stat-omitidas .tomas-stat-value {
+    color: var(--danger);
+}
+
+.stat-retrasadas .tomas-stat-value {
+    color: #f97316;
+}
+
+.stat-cumplimiento .tomas-stat-value {
+    color: var(--info);
+}
+
+/* ==========================================================================
+   ACCIONES DE TOMAS - SOLO GENERAR TOMAS
+   ========================================================================== */
+.tomas-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.btn-generar-tomas {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    background: var(--primary-gradient);
+    color: white;
+    font-weight: 500;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-generar-tomas:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(176, 0, 30, 0.3);
+}
+
+.btn-generar-tomas:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-generar-tomas.btn-deshabilitado {
+    background: var(--gray-300);
+    color: var(--gray-500);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.btn-generar-tomas.btn-deshabilitado:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-generar-tomas.btn-deshabilitado i {
+    color: var(--gray-500);
+}
+
+.spinner-save {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+}
+
+/* ==========================================================================
+   LISTA DE TOMAS
+   ========================================================================== */
+.tomas-lista {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.tomas-lista::-webkit-scrollbar {
+    width: 4px;
+}
+
+.tomas-lista::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.tomas-lista::-webkit-scrollbar-thumb {
+    background: var(--gray-300);
+    border-radius: 10px;
+}
+
+.toma-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    background: var(--gray-50);
+    border-left: 3px solid var(--gray-300);
+    transition: var(--transition);
+}
+
+.toma-item:hover {
+    background: var(--gray-100);
+}
+
+.toma-completada {
+    border-left-color: var(--success);
+    background: #10b98108;
+}
+
+.toma-pendiente {
+    border-left-color: var(--warning);
+    background: #f59e0b08;
+}
+
+.toma-omitida {
+    border-left-color: var(--danger);
+    background: #ef444408;
+}
+
+.toma-retrasada {
+    border-left-color: #f97316;
+    background: #f9731608;
+}
+
+.toma-eliminada {
+    border-left-color: var(--gray-400);
+    background: var(--gray-50);
+    opacity: 0.6;
+}
+
+.toma-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.toma-fecha-hora {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.toma-fecha {
+    font-size: 0.8rem;
+    color: var(--gray-700);
+}
+
+.toma-hora {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    font-weight: 500;
+}
+
+.toma-estado-badge {
+    font-size: 0.6rem;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 10px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.toma-estado-badge i {
+    font-size: 0.5rem;
+}
+
+.toma-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+/* Botones para paciente - SOLO 3 acciones */
+.btn-toma-completar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: none;
+    background: #10b98115;
+    color: var(--success);
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-toma-completar:hover {
+    background: var(--success);
+    color: white;
+}
+
+.btn-toma-omitir {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: none;
+    background: #ef444415;
+    color: var(--danger);
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-toma-omitir:hover {
+    background: var(--danger);
+    color: white;
+}
+
+.btn-toma-retrasar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: none;
+    background: #f9731615;
+    color: #f97316;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-toma-retrasar:hover {
+    background: #f97316;
+    color: white;
+}
+
+.toma-estado-final {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--gray-500);
+    padding: 2px 10px;
+}
+
+.toma-estado-eliminada {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--gray-400);
+    padding: 2px 10px;
+}
+
+.toma-notas {
+    font-size: 0.7rem;
+    color: var(--gray-400);
+    margin-left: 4px;
+}
+
+.tomas-vacio {
+    text-align: center;
+    padding: 20px;
+    color: var(--gray-400);
+}
+
+.tomas-vacio i {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.tomas-vacio p {
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+.tomas-vacio span {
+    font-size: 0.75rem;
+}
+
+.tomas-loading {
+    text-align: center;
+    padding: 20px;
+}
+
+.spinner-small {
+    width: 24px;
+    height: 24px;
+    border: 3px solid var(--gray-200);
+    border-top: 3px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 8px;
+}
+
+/* ==========================================================================
+   TOAST NOTIFICATIONS
+   ========================================================================== */
+.toast-premium-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    background: white;
+    border-radius: 12px;
+    padding: 14px 20px;
+    box-shadow: var(--shadow-xl);
+    border-left: 4px solid var(--success);
+    animation: slideInRight 0.4s ease;
+    max-width: 400px;
+}
+
+.toast-premium-container.success {
+    border-left-color: var(--success);
+}
+
+.toast-premium-container.success .icon-toast {
+    color: var(--success);
+}
+
+.toast-premium-container.error {
+    border-left-color: var(--danger);
+}
+
+.toast-premium-container.error .icon-toast {
+    color: var(--danger);
+}
+
+.toast-premium-container.warning {
+    border-left-color: var(--warning);
+}
+
+.toast-premium-container.warning .icon-toast {
+    color: var(--warning);
+}
+
+.toast-premium-container .toast-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.toast-premium-container .icon-toast {
+    font-size: 1.2rem;
+}
+
+.toast-premium-container .toast-message {
+    font-size: 0.85rem;
+    color: var(--gray-700);
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+@media screen and (min-width: 1025px) {
+    .tratamientos-page {
+        padding: 24px 32px 100px;
+        max-width: 780px;
+    }
+
+    .stats-grid {
+        gap: 10px;
+    }
+
+    .stat-card {
+        padding: 16px 10px;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+    }
+
+    .stat-label {
+        font-size: 0.65rem;
+    }
+
+    .tratamientos-section {
+        padding: 20px;
+    }
+
+    .modal-content {
+        max-width: 520px;
+    }
+
+    .modal-detalle-grande {
+        max-width: 760px;
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    .tratamientos-page {
+        padding: 18px 20px 90px;
+        max-width: 640px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .tratamientos-page {
+        padding: 16px 16px 85px;
+        max-width: 100%;
+    }
+
+    .header-info h1 {
+        font-size: 1.3rem;
+    }
+
+    .stats-grid {
+        gap: 6px;
+    }
+
+    .stat-card {
+        padding: 10px 4px;
+    }
+
+    .stat-number {
+        font-size: 1.15rem;
+    }
+
+    .modal-content {
+        max-width: 95%;
+        margin: 10px;
+    }
+
+    .modal-detalle-grande {
+        max-width: 95%;
+    }
+
+    .detalle-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tomas-stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .tomas-actions {
+        flex-direction: column;
+    }
+
+    .tomas-actions button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .toma-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+    }
+
+    .toma-info {
+        justify-content: space-between;
+    }
+
+    .toma-actions {
+        justify-content: flex-start;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .tratamientos-page {
+        padding: 12px 12px 80px;
+    }
+
+    .header-info h1 {
+        font-size: 1.1rem;
+    }
+
+    .stats-grid {
+        gap: 4px;
+    }
+
+    .stat-card {
+        padding: 8px 2px;
+        border-radius: 8px;
+    }
+
+    .stat-number {
+        font-size: 1rem;
+    }
+
+    .stat-label {
+        font-size: 0.5rem;
+        letter-spacing: 0.2px;
+    }
+
+    .tratamiento-card {
+        padding: 12px;
+    }
+
+    .tratamiento-card-header {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .tratamiento-info-principal h3 {
+        font-size: 0.8rem;
+    }
+
+    .tratamiento-card-body {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .tratamiento-detalles {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .modal-content {
+        max-width: 100%;
+        margin: 10px;
+        border-radius: 12px;
+    }
+
+    .modal-header {
+        padding: 14px 16px 12px;
+    }
+
+    .modal-header h2 {
+        font-size: 1rem;
+    }
+
+    .modal-body {
+        padding: 16px;
+    }
+
+    .modal-footer {
+        padding: 12px 16px 14px;
+        flex-direction: column;
+    }
+
+    .modal-footer button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .detalle-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+        padding: 8px 0;
+    }
+
+    .detalle-valor {
+        text-align: left;
+        max-width: 100%;
+    }
+
+    .detalle-acciones {
+        flex-direction: column;
+    }
+
+    .detalle-acciones button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .tomas-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+    }
+
+    .toma-fecha-hora {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+    }
+
+    .toast-premium-container {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+}
