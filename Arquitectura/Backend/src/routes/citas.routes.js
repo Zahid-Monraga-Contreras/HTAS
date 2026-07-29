@@ -8,10 +8,10 @@ router.post('/agendar-cita', citasController.agendarCita);
 router.get('/mis-citas/:email', citasController.getCitasUsuario);
 router.put('/actualizar-cita/:idCita', citasController.actualizarEstadoCita);
 
-// ✅ NUEVA RUTA: Actualizar cita completa
+// NUEVA RUTA: Actualizar cita completa
 router.put('/cita/:idCita', citasController.actualizarCita);
 
-// ✅ NUEVAS RUTAS: Obtener cita por ID y otras funcionalidades
+// NUEVAS RUTAS: Obtener cita por ID y otras funcionalidades
 router.get('/cita/:idCita', citasController.getCitaById);
 router.get('/citas/fecha/:fecha', citasController.getCitasByFecha);
 router.get('/citas/hoy', citasController.getCitasHoy);

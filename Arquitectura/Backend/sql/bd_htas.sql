@@ -238,10 +238,11 @@ Modalidad VARCHAR(15) DEFAULT 'Presencial' CHECK (
     Modalidad IN ('Presencial', 'Virtual')
 ),
 NotasDoctor TEXT,
+fechacancelacion TIMESTAMP,
 
 -- Auditoría
 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- ============================================

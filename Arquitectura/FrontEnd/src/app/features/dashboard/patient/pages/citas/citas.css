@@ -1,5 +1,5 @@
 /* ==========================================================================
-   PAGINA DE CITAS DEL PACIENTE
+   PAGINA DE CITAS DEL PACIENTE - COMPLETA
    ========================================================================== */
 
 :host {
@@ -8,9 +8,17 @@
     --primary-light: #d42a4a;
     --primary-gradient: linear-gradient(135deg, #b0001e 0%, #d42a4a 100%);
     --success: #10b981;
+    --success-light: #d1fae5;
+    --success-dark: #059669;
     --warning: #f59e0b;
+    --warning-light: #fef3c7;
+    --warning-dark: #d97706;
     --danger: #ef4444;
-    --info: #0369a1;
+    --danger-light: #fee2e2;
+    --danger-dark: #dc2626;
+    --info: #3b82f6;
+    --info-light: #dbeafe;
+    --info-dark: #2563eb;
     --gray-50: #f8fafc;
     --gray-100: #f1f5f9;
     --gray-200: #e2e8f0;
@@ -23,7 +31,8 @@
     --gray-900: #0f172a;
     --shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
     --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
-    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.10);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+    --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.15);
     --border-radius: 16px;
     --border-radius-sm: 10px;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -84,8 +93,8 @@
 .btn-agendar {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 10px 18px;
+    gap: 8px;
+    padding: 10px 20px;
     background: var(--primary-gradient);
     color: white;
     border: none;
@@ -98,12 +107,17 @@
     flex-shrink: 0;
 }
 
+.btn-agendar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(176, 0, 30, 0.4);
+}
+
 .btn-agendar:active {
     transform: scale(0.95);
 }
 
 .btn-agendar i {
-    font-size: 1rem;
+    font-size: 1.1rem;
 }
 
 /* ==========================================================================
@@ -153,13 +167,18 @@
 
 .stat-card {
     background: white;
-    padding: 12px 6px;
+    padding: 14px 8px;
     border-radius: var(--border-radius-sm);
     text-align: center;
     box-shadow: var(--shadow-md);
     cursor: pointer;
     transition: var(--transition);
     border: 2px solid transparent;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
 }
 
 .stat-card:active {
@@ -173,7 +192,7 @@
 
 .stat-number {
     display: block;
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     font-weight: 700;
     color: var(--gray-900);
     line-height: 1.2;
@@ -187,16 +206,16 @@
     letter-spacing: 0.3px;
 }
 
-.contador-programada .stat-number {
-    color: #f59e0b;
+.stat-programada .stat-number {
+    color: var(--warning);
 }
 
-.contador-completada .stat-number {
-    color: #3b82f6;
+.stat-completada .stat-number {
+    color: var(--info);
 }
 
-.contador-cancelada .stat-number {
-    color: #ef4444;
+.stat-cancelada .stat-number {
+    color: var(--danger);
 }
 
 /* ==========================================================================
@@ -238,7 +257,7 @@
 }
 
 /* ==========================================================================
-   FILTROS RAPIDOS - SIN SCROLL
+   FILTROS RAPIDOS
    ========================================================================== */
 .filtros-rapidos {
     display: grid;
@@ -266,6 +285,11 @@
 
 .filtro-btn i {
     font-size: 0.7rem;
+}
+
+.filtro-btn:hover {
+    background: var(--gray-50);
+    border-color: var(--gray-300);
 }
 
 .filtro-btn:active {
@@ -297,6 +321,12 @@
     padding: 14px;
     transition: var(--transition);
     cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.cita-card:hover {
+    border-color: var(--gray-200);
+    box-shadow: var(--shadow-md);
 }
 
 .cita-card:active {
@@ -500,6 +530,12 @@
     box-shadow: var(--shadow);
 }
 
+.btn-detalle:hover {
+    background: var(--primary);
+    color: white;
+    transform: scale(1.05);
+}
+
 .btn-detalle:active {
     transform: scale(0.9);
 }
@@ -511,25 +547,26 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 30px 12px;
+    padding: 40px 12px;
     color: var(--gray-400);
 }
 
 .empty-state i {
-    font-size: 2.5rem;
-    margin-bottom: 8px;
+    font-size: 3rem;
+    margin-bottom: 12px;
+    opacity: 0.5;
 }
 
 .empty-state p {
-    margin: 0 0 12px;
-    font-size: 0.9rem;
+    margin: 0 0 16px;
+    font-size: 0.95rem;
 }
 
 .btn-primary {
     background: var(--primary);
     color: white;
     border: none;
-    padding: 8px 20px;
+    padding: 10px 24px;
     border-radius: 10px;
     font-weight: 500;
     font-size: 0.85rem;
@@ -538,12 +575,18 @@
     text-decoration: none;
 }
 
+.btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(176, 0, 30, 0.3);
+}
+
 .btn-primary:active {
     transform: scale(0.95);
 }
 
 /* ==========================================================================
-   MODALES CON HEADER Y FOOTER FIJOS
+   MODALES
    ========================================================================== */
 .modal-overlay {
     position: fixed;
@@ -591,12 +634,11 @@
     max-height: 90vh;
     display: flex;
     flex-direction: column;
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-xl);
     animation: slideUp 0.3s ease;
     overflow: hidden;
 }
 
-/* MODAL HEADER - FIJO */
 .modal-header {
     display: flex;
     justify-content: space-between;
@@ -635,11 +677,15 @@
     justify-content: center;
 }
 
+.modal-close:hover {
+    background: var(--gray-200);
+    transform: rotate(90deg);
+}
+
 .modal-close:active {
     transform: scale(0.9);
 }
 
-/* MODAL BODY - SCROLLABLE */
 .modal-body {
     padding: 24px;
     overflow-y: auto;
@@ -659,7 +705,6 @@
     border-radius: 10px;
 }
 
-/* MODAL FOOTER - FIJO */
 .modal-footer {
     padding: 14px 24px 18px;
     border-top: 1px solid var(--gray-200);
@@ -668,14 +713,75 @@
     z-index: 1;
 }
 
+/* ==========================================================================
+   BOTONES DEL MODAL - ESTILO UNIFICADO CON BOTONES EXPANDIDOS
+   ========================================================================== */
 .modal-footer .form-actions {
     display: flex;
     gap: 12px;
-    justify-content: flex-end;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.modal-footer .form-actions .btn-cancelar {
+    padding: 10px 24px;
+    border-radius: 10px;
+    border: 1.5px solid var(--gray-200);
+    background: transparent;
+    color: var(--gray-600);
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition);
+    flex: 1;
+    text-align: center;
+    justify-content: center;
+}
+
+.modal-footer .form-actions .btn-cancelar:hover {
+    background: var(--gray-50);
+    border-color: var(--gray-300);
+}
+
+.modal-footer .form-actions .btn-cancelar:active {
+    transform: scale(0.95);
+}
+
+.modal-footer .form-actions .btn-guardar {
+    padding: 10px 28px;
+    border-radius: 10px;
+    border: none;
+    background: var(--primary-gradient);
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 16px rgba(176, 0, 30, 0.3);
+    flex: 1;
+    justify-content: center;
+    text-align: center;
+}
+
+.modal-footer .form-actions .btn-guardar:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(176, 0, 30, 0.4);
+}
+
+.modal-footer .form-actions .btn-guardar:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.modal-footer .form-actions .btn-guardar:active:not(:disabled) {
+    transform: scale(0.95);
 }
 
 /* ==========================================================================
-   FORMULARIO DEL MODAL AGENDAR
+   FORMULARIO
    ========================================================================== */
 .form-group {
     margin-bottom: 16px;
@@ -717,7 +823,6 @@
     margin-top: 3px;
 }
 
-/* TEXTAREA FIJO SIN EXPANSION */
 .textarea-fixed {
     resize: none;
     min-height: 60px;
@@ -739,7 +844,9 @@
     border-radius: 10px;
 }
 
-/* BOTONES DEL MODAL */
+/* ==========================================================================
+   BOTONES GENERALES
+   ========================================================================== */
 .btn-cancelar {
     padding: 10px 24px;
     border-radius: 10px;
@@ -750,6 +857,11 @@
     font-size: 0.9rem;
     cursor: pointer;
     transition: var(--transition);
+}
+
+.btn-cancelar:hover {
+    background: var(--gray-50);
+    border-color: var(--gray-300);
 }
 
 .btn-cancelar:active {
@@ -769,6 +881,12 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    box-shadow: 0 4px 16px rgba(176, 0, 30, 0.3);
+}
+
+.btn-guardar:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(176, 0, 30, 0.4);
 }
 
 .btn-guardar:disabled {
@@ -828,20 +946,44 @@
     display: flex;
     gap: 12px;
     flex-wrap: wrap;
+    width: 100%;
 }
 
-.detalle-acciones .btn-cancelar {
-    background: #ef444415;
-    border-color: var(--danger);
-    color: var(--danger);
+.detalle-acciones .btn-cancelar-cita {
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none;
+    background: var(--danger);
+    color: white;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
 }
 
-.detalle-acciones .btn-cancelar:active {
-    background: #ef444430;
+.detalle-acciones .btn-cancelar-cita:hover:not(:disabled) {
+    background: var(--danger-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(239, 68, 68, 0.4);
 }
 
-.btn-cerrar {
-    padding: 10px 28px;
+.detalle-acciones .btn-cancelar-cita:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.detalle-acciones .btn-cancelar-cita:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.detalle-acciones .btn-cerrar {
+    padding: 10px 20px;
     border-radius: 10px;
     border: none;
     background: var(--gray-200);
@@ -853,47 +995,118 @@
     flex: 1;
 }
 
-.btn-cerrar:active {
+.detalle-acciones .btn-cerrar:hover {
+    background: var(--gray-300);
+}
+
+.detalle-acciones .btn-cerrar:active {
     transform: scale(0.95);
 }
 
 /* ==========================================================================
-   MODAL CONFIRMACION
+   MODAL DE CONFIRMACION PARA CANCELAR CITA
    ========================================================================== */
 .modal-confirmacion .modal-body {
-    text-align: center;
-    padding: 30px 24px;
-}
-
-.modal-confirmacion .modal-body i {
-    font-size: 3.5rem;
-    color: var(--success);
-    margin-bottom: 12px;
+    text-align: left;
+    padding: 24px;
 }
 
 .modal-confirmacion .modal-body p {
     font-size: 0.95rem;
     color: var(--gray-600);
     line-height: 1.5;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.modal-confirmacion .modal-body .detalle-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.modal-confirmacion .modal-body .detalle-item:last-child {
+    border-bottom: none;
+}
+
+.modal-confirmacion .modal-body .detalle-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--gray-500);
+}
+
+.modal-confirmacion .modal-body .detalle-valor {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--gray-800);
+    text-align: right;
 }
 
 .modal-confirmacion .modal-footer .form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.modal-confirmacion .modal-footer .form-actions .btn-cancelar {
+    padding: 10px 24px;
+    border-radius: 10px;
+    border: 1.5px solid var(--gray-200);
+    background: transparent;
+    color: var(--gray-600);
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition);
+    flex: 1;
+    text-align: center;
     justify-content: center;
 }
 
-.modal-confirmacion .btn-cancelar {
-    padding: 10px 36px;
-    background: var(--primary);
-    color: white;
-    border: none;
+.modal-confirmacion .modal-footer .form-actions .btn-cancelar:hover {
+    background: var(--gray-50);
+    border-color: var(--gray-300);
 }
 
-.modal-confirmacion .btn-cancelar:active {
-    opacity: 0.8;
+.modal-confirmacion .modal-footer .form-actions .btn-confirmar-eliminar {
+    padding: 10px 24px;
+    border-radius: 10px;
+    border: none;
+    background: var(--danger);
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
+    flex: 1;
+    justify-content: center;
+    text-align: center;
+}
+
+.modal-confirmacion .modal-footer .form-actions .btn-confirmar-eliminar:hover:not(:disabled) {
+    background: var(--danger-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(239, 68, 68, 0.4);
+}
+
+.modal-confirmacion .modal-footer .form-actions .btn-confirmar-eliminar:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.modal-confirmacion .modal-footer .form-actions .btn-confirmar-eliminar:active:not(:disabled) {
+    transform: scale(0.95);
 }
 
 /* ==========================================================================
-   ESTILOS PARA FLATPICKR EN MODAL
+   INPUT PICKER
    ========================================================================== */
 .input-picker-wrapper {
     position: relative;
@@ -928,7 +1141,9 @@
     color: var(--gray-800);
 }
 
-/* Flatpickr sobreescritura */
+/* ==========================================================================
+   FLATPICKR
+   ========================================================================== */
 .flatpickr-calendar {
     z-index: 9999 !important;
 }
@@ -951,15 +1166,184 @@
     box-shadow: 0 0 0 2px white, 0 0 0 4px var(--primary) !important;
 }
 
-.flatpickr-calendar .flatpickr-time input:hover,
-.flatpickr-calendar .flatpickr-time input:focus {
-    background: white !important;
+/* ==========================================================================
+   NOTIFICACIONES TOAST
+   ========================================================================== */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 400px;
+    width: 100%;
+    pointer-events: none;
+}
+
+.toast-notification {
+    background: white;
+    border-radius: 12px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow-xl);
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    pointer-events: all;
+    animation: slideInRight 0.4s ease;
+    position: relative;
+    overflow: hidden;
+    border-left: 4px solid var(--gray-400);
+    transition: all 0.3s ease;
+}
+
+.toast-notification:hover {
+    transform: translateX(-4px);
+}
+
+.toast-notification.toast-exit {
+    animation: slideOutRight 0.3s ease forwards;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+}
+
+.toast-success {
+    border-left-color: var(--success);
+}
+
+.toast-success .toast-icon i {
+    color: var(--success);
+}
+
+.toast-success .toast-progress {
+    background: var(--success);
+}
+
+.toast-error {
+    border-left-color: var(--danger);
+}
+
+.toast-error .toast-icon i {
+    color: var(--danger);
+}
+
+.toast-error .toast-progress {
+    background: var(--danger);
+}
+
+.toast-warning {
+    border-left-color: var(--warning);
+}
+
+.toast-warning .toast-icon i {
+    color: var(--warning);
+}
+
+.toast-warning .toast-progress {
+    background: var(--warning);
+}
+
+.toast-info {
+    border-left-color: var(--info);
+}
+
+.toast-info .toast-icon i {
+    color: var(--info);
+}
+
+.toast-info .toast-progress {
+    background: var(--info);
+}
+
+.toast-icon {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+}
+
+.toast-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.toast-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--gray-800);
+    margin-bottom: 2px;
+}
+
+.toast-message {
+    font-size: 0.85rem;
+    color: var(--gray-600);
+    line-height: 1.4;
+}
+
+.toast-close {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: var(--gray-400);
+    cursor: pointer;
+    padding: 4px;
+    font-size: 0.9rem;
+    transition: var(--transition);
+}
+
+.toast-close:hover {
+    color: var(--gray-600);
+    transform: rotate(90deg);
+}
+
+.toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: var(--gray-400);
+    animation: progressBar linear forwards;
+}
+
+@keyframes progressBar {
+    from {
+        width: 100%;
+    }
+
+    to {
+        width: 0%;
+    }
 }
 
 /* ==========================================================================
    RESPONSIVE
    ========================================================================== */
-
 @media screen and (min-width: 1025px) {
     .citas-page {
         padding: 24px 32px 100px;
@@ -1032,6 +1416,41 @@
     .modal-content {
         max-width: 95%;
         margin: 10px;
+    }
+
+    .toast-container {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+
+    .modal-confirmacion .modal-body .detalle-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+    }
+
+    .modal-confirmacion .modal-body .detalle-valor {
+        text-align: left;
+        width: 100%;
+    }
+
+    .modal-confirmacion .modal-footer .form-actions {
+        flex-direction: column;
+    }
+
+    .modal-confirmacion .modal-footer .form-actions button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .modal-footer .form-actions {
+        flex-direction: column;
+    }
+
+    .modal-footer .form-actions button {
+        width: 100%;
+        justify-content: center;
     }
 }
 
@@ -1162,6 +1581,25 @@
         justify-content: center;
     }
 
+    .toast-container {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+    }
+
+    .toast-notification {
+        padding: 12px 14px;
+        font-size: 0.85rem;
+    }
+
+    .toast-title {
+        font-size: 0.85rem;
+    }
+
+    .toast-message {
+        font-size: 0.8rem;
+    }
+
     .flatpickr-calendar {
         width: 100% !important;
         max-width: 320px !important;
@@ -1172,6 +1610,26 @@
     .textarea-fixed {
         min-height: 50px;
         max-height: 50px;
+    }
+
+    .modal-confirmacion .modal-body .detalle-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+    }
+
+    .modal-confirmacion .modal-body .detalle-valor {
+        text-align: left;
+        width: 100%;
+    }
+
+    .modal-confirmacion .modal-footer .form-actions {
+        flex-direction: column;
+    }
+
+    .modal-confirmacion .modal-footer .form-actions button {
+        width: 100%;
+        justify-content: center;
     }
 }
 
@@ -1217,5 +1675,25 @@
 
     .flatpickr-calendar {
         max-width: 280px !important;
+    }
+
+    .toast-notification {
+        padding: 10px 12px;
+    }
+
+    .modal-confirmacion .modal-body {
+        padding: 16px;
+    }
+
+    .modal-confirmacion .modal-footer .form-actions .btn-cancelar,
+    .modal-confirmacion .modal-footer .form-actions .btn-confirmar-eliminar {
+        padding: 8px 16px;
+        font-size: 0.8rem;
+    }
+
+    .modal-footer .form-actions .btn-cancelar,
+    .modal-footer .form-actions .btn-guardar {
+        padding: 8px 16px;
+        font-size: 0.8rem;
     }
 }

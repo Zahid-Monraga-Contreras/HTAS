@@ -10,6 +10,14 @@ import { Spanish } from 'flatpickr/dist/l10n/es.js';
 
 declare var flatpickr: any;
 
+interface ToastNotification {
+    id: number;
+    type: 'success' | 'error' | 'warning' | 'info';
+    title: string;
+    message: string;
+    duration?: number;
+}
+
 @Component({
     selector: 'app-patient-citas',
     standalone: true,
@@ -24,8 +32,15 @@ export class PatientCitas implements OnInit {
     private platformId = inject(PLATFORM_ID);
     private fb = inject(FormBuilder);
 
+    // Notificaciones Toast
+    notifications: ToastNotification[] = [];
+    private notificationCounter = 0;
+
+    // Estados
     isLoading = true;
     cargandoAgendar = false;
+    cargandoCancelar = false;
+
     userEmail: string = '';
     patientName: string = '';
     patientFullName: string = '';
@@ -46,12 +61,15 @@ export class PatientCitas implements OnInit {
 
     mostrarModalAgendar = false;
     mostrarModalDetalle = false;
-    mostrarModalConfirmacion = false;
+    mostrarModalConfirmacionCancelar = false;
     citaSeleccionada: any = null;
+    citaParaCancelar: any = null;
+
     modalConfirmacion = {
         titulo: '',
         mensaje: '',
-        icono: ''
+        icono: '',
+        accion: ''
     };
 
     citaForm: FormGroup;
@@ -71,6 +89,72 @@ export class PatientCitas implements OnInit {
         this.fechaMinima = hoy.toISOString().split('T')[0];
     }
 
+    // ==========================================
+    // SISTEMA DE NOTIFICACIONES TOAST
+    // ==========================================
+    private showToast(type: ToastNotification['type'], title: string, message: string, duration: number = 5000) {
+        const id = ++this.notificationCounter;
+        const notification: ToastNotification = {
+            id,
+            type,
+            title,
+            message,
+            duration
+        };
+
+        this.notifications.unshift(notification);
+        this.cdr.detectChanges();
+
+        setTimeout(() => {
+            this.removeToast(id);
+        }, duration);
+    }
+
+    removeToast(id: number) {
+        this.notifications = this.notifications.filter(n => n.id !== id);
+        this.cdr.detectChanges();
+    }
+
+    showSuccess(title: string, message: string, duration: number = 5000) {
+        this.showToast('success', title, message, duration);
+    }
+
+    showError(title: string, message: string, duration: number = 7000) {
+        this.showToast('error', title, message, duration);
+    }
+
+    showWarning(title: string, message: string, duration: number = 5000) {
+        this.showToast('warning', title, message, duration);
+    }
+
+    showInfo(title: string, message: string, duration: number = 4000) {
+        this.showToast('info', title, message, duration);
+    }
+
+    // ==========================================
+    // MODAL DE CONFIRMACION PERSONALIZADO
+    // ==========================================
+    mostrarConfirmacionCancelar(cita: any) {
+        this.citaParaCancelar = cita;
+        this.modalConfirmacion = {
+            titulo: 'Cancelar Cita',
+            mensaje: '¿Estas seguro de que deseas cancelar esta cita? Esta accion no se puede deshacer.',
+            icono: 'bi-exclamation-triangle-fill',
+            accion: 'cancelar'
+        };
+        this.mostrarModalConfirmacionCancelar = true;
+        document.body.style.overflow = 'hidden';
+    }
+
+    cerrarModalConfirmacionCancelar() {
+        this.mostrarModalConfirmacionCancelar = false;
+        this.citaParaCancelar = null;
+        document.body.style.overflow = '';
+    }
+
+    // ==========================================
+    // NGONINIT
+    // ==========================================
     async ngOnInit() {
         if (!isPlatformBrowser(this.platformId)) return;
 
@@ -104,18 +188,20 @@ export class PatientCitas implements OnInit {
             await this.cargarCitas();
 
         } catch (error) {
-            // Error general
+            this.showError('Error', 'No se pudieron cargar tus citas');
         } finally {
             this.isLoading = false;
             this.cdr.detectChanges();
         }
     }
 
+    // ==========================================
+    // CARGA DE CITAS
+    // ==========================================
     private async cargarCitas() {
         try {
             let citasData: any[] = [];
 
-            // PRIMERO: Intentar obtener solo las citas del paciente
             try {
                 if (this.userEmail) {
                     citasData = await firstValueFrom(
@@ -143,11 +229,9 @@ export class PatientCitas implements OnInit {
                     }
                 }
             } catch (error) {
-                // Si falla getMisCitas, usar getAllCitas como fallback
-                console.warn('getMisCitas falló, usando getAllCitas como fallback');
+                // Fallback
             }
 
-            // FALLBACK: Si no hay citas o falló, usar getAllCitas
             try {
                 const todasLasCitas = await firstValueFrom(this.usersService.getAllCitas());
 
@@ -207,9 +291,12 @@ export class PatientCitas implements OnInit {
         }
     }
 
+    // ==========================================
+    // MODAL AGENDAR
+    // ==========================================
     abrirModalAgendar() {
         if (!this.userEmail) {
-            this.mostrarConfirmacion('Error', 'No se pudo identificar al usuario. Por favor inicia sesion nuevamente.', 'bi-exclamation-triangle-fill');
+            this.showError('Error de Identificacion', 'No se pudo identificar al usuario. Por favor inicia sesion nuevamente.');
             return;
         }
 
@@ -229,7 +316,7 @@ export class PatientCitas implements OnInit {
 
         document.body.style.overflow = 'hidden';
         this.cdr.detectChanges();
-        this.inicializarCalendario();
+        setTimeout(() => this.inicializarCalendario(), 100);
     }
 
     cerrarModalAgendar() {
@@ -238,6 +325,9 @@ export class PatientCitas implements OnInit {
         this.destruirCalendarios();
     }
 
+    // ==========================================
+    // MODAL DETALLE
+    // ==========================================
     verDetalleCita(cita: any) {
         this.citaSeleccionada = cita;
         this.mostrarModalDetalle = true;
@@ -250,17 +340,9 @@ export class PatientCitas implements OnInit {
         document.body.style.overflow = '';
     }
 
-    mostrarConfirmacion(titulo: string, mensaje: string, icono: string = 'bi-check-circle-fill') {
-        this.modalConfirmacion.titulo = titulo;
-        this.modalConfirmacion.mensaje = mensaje;
-        this.modalConfirmacion.icono = icono;
-        this.mostrarModalConfirmacion = true;
-    }
-
-    cerrarModalConfirmacion() {
-        this.mostrarModalConfirmacion = false;
-    }
-
+    // ==========================================
+    // CALENDARIOS
+    // ==========================================
     inicializarCalendario() {
         if (isPlatformBrowser(this.platformId)) {
             setTimeout(() => {
@@ -269,38 +351,45 @@ export class PatientCitas implements OnInit {
 
                 this.destruirCalendarios();
 
-                this.fpFechaInstance = flatpickr("#fechaCitaInput", {
-                    locale: Spanish,
-                    dateFormat: "Y-m-d",
-                    defaultDate: this.citaForm.get('fechaCita')?.value || "today",
-                    minDate: "today",
-                    maxDate: fechaMaximaCita,
-                    appendTo: document.body,
-                    static: false,
-                    disableMobile: true,
-                    onChange: (selectedDates: any, dateStr: string) => {
-                        this.citaForm.patchValue({ fechaCita: dateStr });
-                        this.citaForm.get('fechaCita')?.markAsTouched();
-                        this.cdr.detectChanges();
-                    }
-                });
+                const fechaInput = document.getElementById('fechaCitaInput');
+                const horaInput = document.getElementById('horaCitaInput');
 
-                this.fpHoraInstance = flatpickr("#horaCitaInput", {
-                    locale: Spanish,
-                    enableTime: true,
-                    noCalendar: true,
-                    dateFormat: "H:i",
-                    time_24hr: true,
-                    defaultDate: this.citaForm.get('horaCita')?.value || "10:00",
-                    appendTo: document.body,
-                    static: false,
-                    disableMobile: true,
-                    onChange: (selectedDates: any, dateStr: string) => {
-                        this.citaForm.patchValue({ horaCita: dateStr });
-                        this.citaForm.get('horaCita')?.markAsTouched();
-                        this.cdr.detectChanges();
-                    }
-                });
+                if (fechaInput) {
+                    this.fpFechaInstance = flatpickr(fechaInput, {
+                        locale: Spanish,
+                        dateFormat: "Y-m-d",
+                        defaultDate: this.citaForm.get('fechaCita')?.value || "today",
+                        minDate: "today",
+                        maxDate: fechaMaximaCita,
+                        appendTo: document.body,
+                        static: false,
+                        disableMobile: true,
+                        onChange: (selectedDates: any, dateStr: string) => {
+                            this.citaForm.patchValue({ fechaCita: dateStr });
+                            this.citaForm.get('fechaCita')?.markAsTouched();
+                            this.cdr.detectChanges();
+                        }
+                    });
+                }
+
+                if (horaInput) {
+                    this.fpHoraInstance = flatpickr(horaInput, {
+                        locale: Spanish,
+                        enableTime: true,
+                        noCalendar: true,
+                        dateFormat: "H:i",
+                        time_24hr: true,
+                        defaultDate: this.citaForm.get('horaCita')?.value || "10:00",
+                        appendTo: document.body,
+                        static: false,
+                        disableMobile: true,
+                        onChange: (selectedDates: any, dateStr: string) => {
+                            this.citaForm.patchValue({ horaCita: dateStr });
+                            this.citaForm.get('horaCita')?.markAsTouched();
+                            this.cdr.detectChanges();
+                        }
+                    });
+                }
             }, 100);
         }
     }
@@ -316,13 +405,16 @@ export class PatientCitas implements OnInit {
         }
     }
 
+    // ==========================================
+    // AGENDAR CITA
+    // ==========================================
     async agendarCita() {
         if (this.citaForm.invalid) {
             this.citaForm.markAllAsTouched();
+            this.showWarning('Formulario Incompleto', 'Por favor, completa todos los campos requeridos.');
             return;
         }
 
-        // ✅ IMPORTANTE: Deshabilitar el botón inmediatamente
         this.cargandoAgendar = true;
         this.cdr.detectChanges();
 
@@ -330,13 +422,8 @@ export class PatientCitas implements OnInit {
             const formData = this.citaForm.value;
 
             if (!this.userEmail) {
-                this.mostrarConfirmacion(
-                    'Error',
-                    'No se pudo identificar al usuario. Por favor inicia sesion nuevamente.',
-                    'bi-exclamation-triangle-fill'
-                );
+                this.showError('Error de Identificacion', 'No se pudo identificar al usuario.');
                 this.cargandoAgendar = false;
-                this.cdr.detectChanges();
                 return;
             }
 
@@ -372,21 +459,16 @@ export class PatientCitas implements OnInit {
                 this.usersService.crearCita(datosCita)
             );
 
-            // ✅ Cerrar modal de agendar ANTES de mostrar confirmación
             this.cerrarModalAgendar();
-
-            // ✅ Mostrar confirmación
-            this.mostrarConfirmacion(
+            this.showSuccess(
                 'Cita Agendada',
-                'Tu cita ha sido agendada exitosamente. Recibiras un recordatorio 24 horas antes.',
-                'bi-check-circle-fill'
+                'Tu cita ha sido agendada exitosamente. Recibiras un recordatorio 24 horas antes.'
             );
 
-            // ✅ Recargar citas
             await this.cargarCitas();
 
         } catch (error: any) {
-            let mensajeError = 'Ocurrio un error al agendar tu cita. Por favor intenta de nuevo.';
+            let mensajeError = 'Ocurrio un error al agendar tu cita.';
 
             if (error.error && error.error.error) {
                 mensajeError = error.error.error;
@@ -396,56 +478,99 @@ export class PatientCitas implements OnInit {
                 mensajeError = error.message;
             }
 
-            this.mostrarConfirmacion(
-                'Error al Agendar',
-                mensajeError,
-                'bi-exclamation-triangle-fill'
-            );
+            this.showError('Error al Agendar', mensajeError);
         } finally {
-            // ✅ Asegurar que el estado de carga siempre se reinicie
             this.cargandoAgendar = false;
             this.destruirCalendarios();
             this.cdr.detectChanges();
         }
     }
 
-    async cancelarCita(cita: any) {
-        if (!confirm('¿Estas seguro de que deseas cancelar esta cita?')) {
+    // ==========================================
+    // CANCELAR CITA - CON MODAL PERSONALIZADO
+    // ==========================================
+    confirmarCancelarCita(cita: any) {
+        const estado = (cita.estado || '').toLowerCase();
+        if (estado === 'cancelada') {
+            this.showWarning('Cita ya cancelada', 'Esta cita ya ha sido cancelada anteriormente.');
+            return;
+        }
+        if (estado === 'completada' || estado === 'realizada' || estado === 'finalizada') {
+            this.showWarning('No se puede cancelar', 'No se puede cancelar una cita que ya ha sido completada.');
             return;
         }
 
+        this.mostrarConfirmacionCancelar(cita);
+    }
+
+    async ejecutarCancelarCita() {
+        if (!this.citaParaCancelar) {
+            this.cerrarModalConfirmacionCancelar();
+            return;
+        }
+
+        this.cargandoCancelar = true;
+        this.cdr.detectChanges();
+
         try {
+            const cita = this.citaParaCancelar;
             const idCita = cita.idcita || cita.id;
+
+            if (!idCita) {
+                this.showError('Error', 'No se pudo identificar la cita a cancelar.');
+                this.cargandoCancelar = false;
+                this.cerrarModalConfirmacionCancelar();
+                return;
+            }
+
+            const idNumerico = typeof idCita === 'string' ? parseInt(idCita, 10) : idCita;
+
+            if (isNaN(idNumerico) || idNumerico <= 0) {
+                this.showError('Error', 'ID de cita invalido.');
+                this.cargandoCancelar = false;
+                this.cerrarModalConfirmacionCancelar();
+                return;
+            }
+
             await firstValueFrom(
-                this.usersService.cancelarCita(idCita, 'Cancelada por el paciente')
+                this.usersService.cancelarCita(idNumerico, 'Cancelada por el paciente')
             );
 
-            this.mostrarConfirmacion(
-                'Cita Cancelada',
-                'Tu cita ha sido cancelada exitosamente.',
-                'bi-check-circle-fill'
-            );
-
+            this.cerrarModalConfirmacionCancelar();
             this.cerrarModalDetalle();
-            await this.cargarCitas();
+
+            this.showSuccess(
+                'Cita Cancelada',
+                'Tu cita ha sido cancelada exitosamente. Si necesitas reagendar, hazlo desde el menu principal.'
+            );
+
+            setTimeout(async () => {
+                await this.cargarCitas();
+                this.cdr.detectChanges();
+            }, 300);
 
         } catch (error: any) {
-            let mensajeError = 'Ocurrio un error al cancelar tu cita. Por favor intenta de nuevo.';
+            let mensajeError = 'Ocurrio un error al cancelar tu cita.';
 
             if (error.error && error.error.error) {
                 mensajeError = error.error.error;
             } else if (error.error && typeof error.error === 'string') {
                 mensajeError = error.error;
+            } else if (error.message) {
+                mensajeError = error.message;
             }
 
-            this.mostrarConfirmacion(
-                'Error al Cancelar',
-                mensajeError,
-                'bi-exclamation-triangle-fill'
-            );
+            this.showError('Error al Cancelar', mensajeError);
+            this.cerrarModalConfirmacionCancelar();
+        } finally {
+            this.cargandoCancelar = false;
+            this.cdr.detectChanges();
         }
     }
 
+    // ==========================================
+    // METODOS DE UTILIDAD
+    // ==========================================
     getEstadoClass(estado: string): string {
         if (!estado) return 'estado-info';
         const estadoLower = estado.toLowerCase();

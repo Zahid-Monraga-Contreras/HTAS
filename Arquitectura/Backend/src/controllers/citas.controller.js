@@ -101,7 +101,7 @@ const citasController = {
     },
 
     // ==========================================================================
-    // OBTENER TODAS LAS CITAS - CORREGIDO
+    // OBTENER TODAS LAS CITAS
     // ==========================================================================
     getAllCitas: async (req, res) => {
         const { fecha, estado, modalidad, busqueda } = req.query;
@@ -201,7 +201,7 @@ const citasController = {
     },
 
     // ==========================================================================
-    // OBTENER CITAS DE USUARIO - CORREGIDO (eliminado EXTRACT)
+    // OBTENER CITAS DE USUARIO
     // ==========================================================================
     getCitasUsuario: async (req, res) => {
         const { email } = req.params;
@@ -381,34 +381,83 @@ const citasController = {
     },
 
     // ==========================================================================
-    // CANCELAR CITA
+    // ✅ CANCELAR CITA - CON fechacancelacion
     // ==========================================================================
     cancelarCita: async (req, res) => {
         const { idCita } = req.params;
         const { motivoCancelacion } = req.body;
 
+        console.log(`[cancelarCita] ID recibido: ${idCita}, Motivo: ${motivoCancelacion || 'No especificado'}`);
+
+        // Validar que el ID sea válido
+        if (!idCita) {
+            return res.status(400).json({ error: "ID de cita requerido" });
+        }
+
+        // Convertir a número si es string
+        const idNumerico = typeof idCita === 'string' ? parseInt(idCita) : idCita;
+
+        if (isNaN(idNumerico) || idNumerico <= 0) {
+            return res.status(400).json({ error: "ID de cita inválido" });
+        }
+
         try {
-            const result = await db.query(
-                `UPDATE citas 
-                SET estado = 'Cancelada', 
-                    notasdoctor = COALESCE($2, CONCAT('Cancelada por: ', $2)), 
-                    updated_at = CURRENT_TIMESTAMP
-                WHERE idcita = $1 
-                RETURNING *`,
-                [idCita, motivoCancelacion || 'Cancelada por el paciente']
+            // Primero verificar que la cita existe
+            const citaExistente = await db.query(
+                `SELECT idcita, estado, fechacita FROM citas WHERE idcita = $1`,
+                [idNumerico]
             );
 
-            if (result.rows.length === 0) {
+            if (citaExistente.rows.length === 0) {
                 return res.status(404).json({ error: "Cita no encontrada" });
             }
 
+            const cita = citaExistente.rows[0];
+
+            // Verificar estado
+            const estadoActual = cita.estado.toLowerCase();
+            if (estadoActual === 'cancelada') {
+                return res.status(400).json({ error: "Esta cita ya ha sido cancelada" });
+            }
+
+            if (estadoActual === 'completada' || estadoActual === 'realizada' || estadoActual === 'finalizada') {
+                return res.status(400).json({ error: "No se puede cancelar una cita completada" });
+            }
+
+            // Asegurar que el motivo sea un string válido
+            const motivo = (motivoCancelacion || 'Cancelada por el paciente').trim();
+
+            // ✅ ACTUALIZAR CON fechacancelacion
+            const result = await db.query(
+                `UPDATE citas 
+                SET 
+                    estado = 'Cancelada',
+                    notasdoctor = $1,
+                    fechacancelacion = CURRENT_TIMESTAMP,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE idcita = $2 
+                RETURNING *`,
+                [motivo, idNumerico]
+            );
+
+            if (result.rows.length === 0) {
+                return res.status(404).json({ error: "No se pudo cancelar la cita" });
+            }
+
+            console.log(`[cancelarCita] Cita ${idNumerico} cancelada exitosamente`);
+
             res.json({
+                success: true,
                 message: "Cita cancelada con éxito",
                 cita: result.rows[0]
             });
+
         } catch (error) {
             console.error("Error al cancelar cita:", error);
-            res.status(500).json({ error: "Error al cancelar la cita" });
+            res.status(500).json({
+                error: "Error interno del servidor al cancelar la cita",
+                details: error.message
+            });
         }
     },
 
@@ -441,9 +490,10 @@ const citasController = {
                 return res.status(404).json({ error: "Cita no encontrada" });
             }
 
-            if (citaExists.rows[0].estado === 'Cancelada' || citaExists.rows[0].estado === 'Completada') {
+            const estadoActual = citaExists.rows[0].estado.toLowerCase();
+            if (estadoActual === 'cancelada' || estadoActual === 'completada') {
                 return res.status(400).json({
-                    error: `No se puede modificar una cita que ya está ${citaExists.rows[0].estado.toLowerCase()}`
+                    error: `No se puede modificar una cita que ya está ${estadoActual}`
                 });
             }
 

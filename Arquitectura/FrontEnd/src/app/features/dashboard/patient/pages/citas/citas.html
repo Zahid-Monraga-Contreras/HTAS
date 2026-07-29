@@ -1,5 +1,33 @@
 <app-patient-menu></app-patient-menu>
 
+<!-- ============================================ -->
+<!-- NOTIFICACIONES TOAST -->
+<!-- ============================================ -->
+<div class="toast-container" *ngIf="notifications.length > 0">
+    <div *ngFor="let notif of notifications; let i = index" class="toast-notification toast-{{ notif.type }}"
+        [class.toast-exit]="i > 0">
+        <div class="toast-icon">
+            <i class="bi" [class]="
+                notif.type === 'success' ? 'bi-check-circle-fill' :
+                notif.type === 'error' ? 'bi-x-circle-fill' :
+                notif.type === 'warning' ? 'bi-exclamation-triangle-fill' :
+                'bi-info-circle-fill'
+            "></i>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title">{{ notif.title }}</div>
+            <div class="toast-message">{{ notif.message }}</div>
+        </div>
+        <button class="toast-close" (click)="removeToast(notif.id)">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        <div class="toast-progress" [style.animation-duration]="(notif.duration || 5000) + 'ms'"></div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- PAGINA PRINCIPAL -->
+<!-- ============================================ -->
 <div class="citas-page">
 
     <header class="citas-header">
@@ -10,7 +38,7 @@
             </div>
             <button class="btn-agendar" (click)="abrirModalAgendar()">
                 <i class="bi bi-plus-lg"></i>
-                <span>Nueva</span>
+                <span>Nueva Cita</span>
             </button>
         </div>
     </header>
@@ -22,23 +50,24 @@
 
     <div *ngIf="!isLoading" class="citas-content">
 
+        <!-- Estadisticas -->
         <section class="stats-section">
             <div class="stats-grid">
                 <div class="stat-card" (click)="aplicarFiltro('todas')" [class.active]="filterEstado === 'todas'">
                     <span class="stat-number">{{ citasEstadisticas.total }}</span>
                     <span class="stat-label">Total</span>
                 </div>
-                <div class="stat-card contador-programada" (click)="aplicarFiltro('programada')"
+                <div class="stat-card stat-programada" (click)="aplicarFiltro('programada')"
                     [class.active]="filterEstado === 'programada'">
                     <span class="stat-number">{{ citasEstadisticas.programadas }}</span>
                     <span class="stat-label">Programadas</span>
                 </div>
-                <div class="stat-card contador-completada" (click)="aplicarFiltro('completada')"
+                <div class="stat-card stat-completada" (click)="aplicarFiltro('completada')"
                     [class.active]="filterEstado === 'completada'">
                     <span class="stat-number">{{ citasEstadisticas.completadas }}</span>
                     <span class="stat-label">Completadas</span>
                 </div>
-                <div class="stat-card contador-cancelada" (click)="aplicarFiltro('cancelada')"
+                <div class="stat-card stat-cancelada" (click)="aplicarFiltro('cancelada')"
                     [class.active]="filterEstado === 'cancelada'">
                     <span class="stat-number">{{ citasEstadisticas.canceladas }}</span>
                     <span class="stat-label">Canceladas</span>
@@ -46,10 +75,12 @@
             </div>
         </section>
 
+        <!-- Lista de Citas -->
         <section class="citas-section">
             <div class="section-header">
                 <h2><i class="bi bi-list-ul"></i> Lista de Citas</h2>
-                <span class="citas-count">{{ citasFiltradas.length }} citas</span>
+                <span class="citas-count">{{ citasFiltradas.length }} cita{{ citasFiltradas.length !== 1 ? 's' : ''
+                    }}</span>
             </div>
 
             <div class="filtros-rapidos">
@@ -134,11 +165,10 @@
 </div>
 
 <!-- ============================================ -->
-<!-- MODAL PARA AGENDAR CITA CON FLATPICKR -->
+<!-- MODAL PARA AGENDAR CITA -->
 <!-- ============================================ -->
 <div class="modal-overlay" *ngIf="mostrarModalAgendar" (click)="cerrarModalAgendar()">
     <div class="modal-content" (click)="$event.stopPropagation()">
-        <!-- HEADER FIJO -->
         <div class="modal-header">
             <h2><i class="bi bi-calendar-plus"></i> Agendar Cita</h2>
             <button class="modal-close" (click)="cerrarModalAgendar()">
@@ -146,7 +176,6 @@
             </button>
         </div>
 
-        <!-- BODY SCROLLABLE -->
         <div class="modal-body">
             <div class="modal-patient-info">
                 <strong>Paciente:</strong> {{ patientFullName || patientName }}
@@ -170,10 +199,6 @@
                             placeholder="Seleccione fecha..." readonly>
                         <i class="bi bi-calendar3 icon-embed"></i>
                     </div>
-                    <small class="error-text"
-                        *ngIf="citaForm.get('fechaCita')?.touched && citaForm.get('fechaCita')?.invalid">
-                        Selecciona una fecha valida
-                    </small>
                 </div>
 
                 <div class="form-group">
@@ -183,10 +208,6 @@
                             placeholder="Seleccione hora..." readonly>
                         <i class="bi bi-clock icon-embed"></i>
                     </div>
-                    <small class="error-text"
-                        *ngIf="citaForm.get('horaCita')?.touched && citaForm.get('horaCita')?.invalid">
-                        Selecciona una hora valida (8:00 AM - 7:00 PM)
-                    </small>
                 </div>
 
                 <div class="form-group">
@@ -206,7 +227,6 @@
             </form>
         </div>
 
-        <!-- FOOTER FIJO -->
         <div class="modal-footer">
             <div class="form-actions">
                 <button type="button" class="btn-cancelar" (click)="cerrarModalAgendar()">Cancelar</button>
@@ -222,11 +242,10 @@
 </div>
 
 <!-- ============================================ -->
-<!-- MODAL PARA DETALLE DE CITA (CON HEADER Y FOOTER FIJOS) -->
+<!-- MODAL PARA DETALLE DE CITA -->
 <!-- ============================================ -->
 <div class="modal-overlay" *ngIf="mostrarModalDetalle" (click)="cerrarModalDetalle()">
     <div class="modal-content modal-detalle" (click)="$event.stopPropagation()">
-        <!-- HEADER FIJO -->
         <div class="modal-header">
             <h2><i class="bi bi-calendar-event"></i> Detalle de Cita</h2>
             <button class="modal-close" (click)="cerrarModalDetalle()">
@@ -234,7 +253,6 @@
             </button>
         </div>
 
-        <!-- BODY SCROLLABLE -->
         <div class="modal-body" *ngIf="citaSeleccionada">
             <div class="detalle-item">
                 <span class="detalle-label">Motivo</span>
@@ -283,13 +301,14 @@
             </div>
         </div>
 
-        <!-- FOOTER FIJO -->
         <div class="modal-footer">
             <div class="detalle-acciones">
-                <button class="btn-cancelar"
-                    *ngIf="citaSeleccionada.estado !== 'Cancelada' && citaSeleccionada.estado !== 'Completada'"
-                    (click)="cancelarCita(citaSeleccionada)">
-                    <i class="bi bi-x-circle"></i> Cancelar Cita
+                <button class="btn-cancelar-cita"
+                    *ngIf="citaSeleccionada?.estado !== 'Cancelada' && citaSeleccionada?.estado !== 'Completada'"
+                    (click)="confirmarCancelarCita(citaSeleccionada)" [disabled]="cargandoCancelar">
+                    <i class="bi bi-x-circle" *ngIf="!cargandoCancelar"></i>
+                    <span class="spinner-small" *ngIf="cargandoCancelar"></span>
+                    {{ cargandoCancelar ? 'Cancelando...' : 'Cancelar Cita' }}
                 </button>
                 <button class="btn-cerrar" (click)="cerrarModalDetalle()">Cerrar</button>
             </div>
@@ -298,20 +317,41 @@
 </div>
 
 <!-- ============================================ -->
-<!-- MODAL DE CONFIRMACION -->
+<!-- MODAL DE CONFIRMACION PARA CANCELAR CITA -->
 <!-- ============================================ -->
-<div class="modal-overlay" *ngIf="mostrarModalConfirmacion" (click)="cerrarModalConfirmacion()">
+<div class="modal-overlay" *ngIf="mostrarModalConfirmacionCancelar" (click)="cerrarModalConfirmacionCancelar()">
     <div class="modal-content modal-confirmacion" (click)="$event.stopPropagation()">
         <div class="modal-header">
-            <h2><i class="bi" [class]="modalConfirmacion.icono"></i> {{ modalConfirmacion.titulo }}</h2>
-            <button class="modal-close" (click)="cerrarModalConfirmacion()">
+            <h2><i class="bi bi-exclamation-triangle-fill" style="color: var(--warning);"></i> {{
+                modalConfirmacion.titulo }}</h2>
+            <button class="modal-close" (click)="cerrarModalConfirmacionCancelar()">
                 <i class="bi bi-x-lg"></i>
             </button>
         </div>
         <div class="modal-body">
             <p>{{ modalConfirmacion.mensaje }}</p>
+            <div class="detalle-item" *ngIf="citaParaCancelar">
+                <span class="detalle-label">Fecha</span>
+                <span class="detalle-valor">{{ formatearFecha(citaParaCancelar.fechacita || citaParaCancelar.fecha)
+                    }}</span>
+            </div>
+            <div class="detalle-item" *ngIf="citaParaCancelar">
+                <span class="detalle-label">Hora</span>
+                <span class="detalle-valor">{{ formatearHora(citaParaCancelar.horacita || citaParaCancelar.hora)
+                    }}</span>
+            </div>
+            <div class="detalle-item" *ngIf="citaParaCancelar">
+                <span class="detalle-label">Motivo</span>
+                <span class="detalle-valor">{{ citaParaCancelar.motivo || 'Consulta Medica' }}</span>
+            </div>
+        </div>
+        <div class="modal-footer">
             <div class="form-actions">
-                <button class="btn-cancelar" (click)="cerrarModalConfirmacion()">Cerrar</button>
+                <button class="btn-cancelar" (click)="cerrarModalConfirmacionCancelar()">Cancelar</button>
+                <button class="btn-confirmar-eliminar" (click)="ejecutarCancelarCita()" [disabled]="cargandoCancelar">
+                    <span class="spinner-small" *ngIf="cargandoCancelar"></span>
+                    {{ cargandoCancelar ? 'Cancelando...' : 'Si, Cancelar Cita' }}
+                </button>
             </div>
         </div>
     </div>
