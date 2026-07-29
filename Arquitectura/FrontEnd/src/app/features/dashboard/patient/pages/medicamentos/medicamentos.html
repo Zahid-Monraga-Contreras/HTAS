@@ -1,0 +1,186 @@
+<app-patient-menu></app-patient-menu>
+
+<div class="medicamentos-page">
+    <header class="medicamentos-header">
+        <div class="header-top">
+            <div class="header-info">
+                <h1>Mis Medicamentos</h1>
+                <p>Consulta los medicamentos asociados a tus tratamientos</p>
+            </div>
+        </div>
+    </header>
+
+    <div *ngIf="isLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Cargando tus medicamentos...</p>
+    </div>
+
+    <div *ngIf="!isLoading" class="medicamentos-content">
+
+        <section class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card" (click)="aplicarFiltro('todos')" [class.active]="filterEstado === 'todos'">
+                    <span class="stat-number">{{ estadisticas.total }}</span>
+                    <span class="stat-label">Total</span>
+                </div>
+                <div class="stat-card stat-activo" (click)="aplicarFiltro('activos')"
+                    [class.active]="filterEstado === 'activos'">
+                    <span class="stat-number">{{ estadisticas.activos }}</span>
+                    <span class="stat-label">Con Tratamiento</span>
+                </div>
+                <div class="stat-card stat-inactivo" (click)="aplicarFiltro('inactivos')"
+                    [class.active]="filterEstado === 'inactivos'">
+                    <span class="stat-number">{{ estadisticas.inactivos }}</span>
+                    <span class="stat-label">Sin Tratamiento</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="medicamentos-section">
+            <div class="section-header">
+                <h2><i class="bi bi-list-ul"></i> Lista de Medicamentos</h2>
+                <span class="medicamentos-count">{{ medicamentosPaginados.length }} medicamento{{
+                    medicamentosPaginados.length !== 1 ? 's' : '' }}</span>
+            </div>
+
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar por nombre, sustancia o laboratorio...">
+            </div>
+
+            <div class="medicamentos-list">
+                <div *ngFor="let m of medicamentosPaginados" class="medicamento-card" (click)="verDetalle(m)">
+                    <div class="medicamento-card-header">
+                        <div class="medicamento-info-principal">
+                            <h3>{{ m.nombrecomercial }}</h3>
+                            <p class="medicamento-sustancia">
+                                <i class="bi bi-flask"></i> {{ m.sustanciaactiva }}
+                            </p>
+                            <p class="medicamento-laboratorio">
+                                <i class="bi bi-building"></i> {{ m.laboratorio }}
+                            </p>
+                            <p class="medicamento-presentacion">
+                                <i class="bi bi-capsule"></i> {{ m.presentacion }} {{ m.concentracion }}
+                            </p>
+                        </div>
+                        <span class="estado-badge" [class]="getEstadoClass(m.tratamientosactivos > 0)">
+                            <i class="bi" [class]="getEstadoIcon(m.tratamientosactivos > 0)"></i>
+                            {{ getEstadoTexto(m.tratamientosactivos > 0) }}
+                        </span>
+                    </div>
+
+                    <div class="medicamento-card-body">
+                        <div class="medicamento-detalles">
+                            <div class="medicamento-detalle">
+                                <i class="bi bi-clipboard-data"></i>
+                                <span>{{ m.totaltratamientos }} tratamiento{{ m.totaltratamientos !== 1 ? 's' : ''
+                                    }}</span>
+                            </div>
+                            <div class="medicamento-detalle" *ngIf="m.tratamientosactivos > 0">
+                                <i class="bi bi-check-circle"></i>
+                                <span>{{ m.tratamientosactivos }} activo{{ m.tratamientosactivos !== 1 ? 's' : ''
+                                    }}</span>
+                            </div>
+                        </div>
+
+                        <div class="medicamento-acciones">
+                            <button class="btn-detalle" (click)="$event.stopPropagation(); verDetalle(m)"
+                                title="Ver detalle">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="!medicamentosPaginados.length" class="empty-state">
+                    <i class="bi bi-capsule"></i>
+                    <p>No tienes medicamentos {{ filterEstado !== 'todos' ? filterEstado : '' }}</p>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- MODAL DETALLE DE MEDICAMENTO -->
+<!-- ============================================ -->
+<div class="modal-overlay" *ngIf="mostrarModalDetalle" (click)="cerrarModalDetalle()">
+    <div class="modal-content modal-detalle modal-detalle-grande" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2><i class="bi bi-capsule"></i> Detalle de Medicamento</h2>
+            <button class="modal-close" (click)="cerrarModalDetalle()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="modal-body" *ngIf="medicamentoSeleccionado">
+            <div class="detalle-grid">
+                <div class="detalle-item">
+                    <span class="detalle-label">Nombre Comercial</span>
+                    <span class="detalle-valor">{{ medicamentoSeleccionado.nombrecomercial }}</span>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-label">Sustancia Activa</span>
+                    <span class="detalle-valor">{{ medicamentoSeleccionado.sustanciaactiva }}</span>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-label">Presentacion</span>
+                    <span class="detalle-valor">{{ medicamentoSeleccionado.presentacion }}</span>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-label">Concentracion</span>
+                    <span class="detalle-valor">{{ medicamentoSeleccionado.concentracion }}</span>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-label">Laboratorio</span>
+                    <span class="detalle-valor">{{ medicamentoSeleccionado.laboratorio }}</span>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-label">Total Tratamientos</span>
+                    <span class="detalle-valor">{{ medicamentoSeleccionado.totaltratamientos }}</span>
+                </div>
+                <div class="detalle-item" *ngIf="medicamentoSeleccionado.indicacionesgenerales">
+                    <span class="detalle-label">Indicaciones</span>
+                    <span class="detalle-valor">{{ medicamentoSeleccionado.indicacionesgenerales }}</span>
+                </div>
+            </div>
+
+            <hr class="section-divider" *ngIf="tratamientosRelacionados.length > 0">
+
+            <div class="tratamientos-relacionados" *ngIf="tratamientosRelacionados.length > 0">
+                <h4 class="section-title">
+                    <i class="bi bi-list-check"></i>
+                    Tratamientos Relacionados
+                    <span class="badge-tratamientos">{{ tratamientosRelacionados.length }}</span>
+                </h4>
+
+                <div *ngIf="cargandoDetalle" class="loading-detalle">
+                    <div class="spinner-small"></div>
+                    <p>Cargando tratamientos...</p>
+                </div>
+
+                <div class="tratamientos-lista" *ngIf="!cargandoDetalle">
+                    <div *ngFor="let t of tratamientosRelacionados" class="tratamiento-item">
+                        <div class="tratamiento-info">
+                            <span class="tratamiento-paciente">{{ t.paciente }}</span>
+                            <span class="tratamiento-fechas">
+                                {{ t.fechainicio ? formatearFecha(t.fechainicio) : 'Sin fecha' }} -
+                                {{ t.fechafin ? formatearFecha(t.fechafin) : 'Sin fecha' }}
+                            </span>
+                        </div>
+                        <span class="estado-badge" [class]="getEstadoClass(t.activo)">
+                            <i class="bi" [class]="getEstadoIcon(t.activo)"></i>
+                            {{ getEstadoTexto(t.activo) }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <div class="detalle-acciones">
+                <button class="btn-cerrar" (click)="cerrarModalDetalle()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
