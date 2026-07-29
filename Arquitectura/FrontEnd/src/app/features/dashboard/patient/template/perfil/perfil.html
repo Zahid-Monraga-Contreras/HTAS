@@ -1,1 +1,361 @@
-<p>perfil works!</p>
+<app-patient-menu></app-patient-menu>
+
+<div class="perfil-page">
+    <div *ngIf="isLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Cargando tu perfil...</p>
+    </div>
+
+    <div *ngIf="!isLoading" class="perfil-content">
+        <header class="perfil-header">
+            <div class="header-top">
+                <div class="header-info">
+                    <h1>Mi Perfil</h1>
+                    <p>Administra tu informacion personal</p>
+                </div>
+                <button class="btn-editar" (click)="abrirModalEditar()">
+                    <i class="bi bi-pencil"></i>
+                    <span>Editar</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="perfil-card">
+            <div class="perfil-avatar">
+                <div class="avatar-circle" [style.background]="getColorIniciales(patientFullName || patientName)">
+                    {{ getIniciales(patientFullName || patientName) }}
+                </div>
+                <div class="avatar-rol">
+                    <span class="rol-badge">{{ getRolTexto(perfil.rol) }}</span>
+                </div>
+            </div>
+
+            <div class="perfil-nombre">
+                <h2>{{ patientFullName || patientName }}</h2>
+                <p class="perfil-email">{{ perfil.correo }}</p>
+            </div>
+
+            <div class="perfil-estado">
+                <span class="estado-badge" [class.estado-activo]="perfil.activo"
+                    [class.estado-inactivo]="!perfil.activo">
+                    <i class="bi" [class]="perfil.activo ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
+                    {{ perfil.activo ? 'Activo' : 'Inactivo' }}
+                </span>
+            </div>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-card">
+                <h3><i class="bi bi-person"></i> Informacion Personal</h3>
+                <div class="info-item">
+                    <span class="info-label">Nombre</span>
+                    <span class="info-value">{{ perfil.nombre }} {{ perfil.apPaterno }} {{ perfil.apMaterno }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Correo Electronico</span>
+                    <span class="info-value">{{ perfil.correo }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Telefono</span>
+                    <span class="info-value">{{ perfil.telefono || 'No especificado' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Fecha de Nacimiento</span>
+                    <span class="info-value">{{ formatearFecha(perfil.fechaNacimiento) }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Genero</span>
+                    <span class="info-value">{{ perfil.genero || 'No especificado' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">CURP</span>
+                    <span class="info-value">{{ perfil.curp || 'No especificado' }}</span>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h3><i class="bi bi-geo-alt"></i> Domicilio</h3>
+                <div class="info-item">
+                    <span class="info-label">Domicilio</span>
+                    <span class="info-value">{{ perfil.domicilio || 'No especificado' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Codigo Postal</span>
+                    <span class="info-value">{{ perfil.codigoPostal || 'No especificado' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Localidad</span>
+                    <span class="info-value">{{ perfil.localidad || 'No especificado' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Municipio</span>
+                    <span class="info-value">{{ perfil.municipio || 'No especificado' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Estado</span>
+                    <span class="info-value">{{ perfil.estado || 'No especificado' }}</span>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h3><i class="bi bi-heart-pulse"></i> Informacion Medica</h3>
+                <div class="info-item">
+                    <span class="info-label">NSS</span>
+                    <span class="info-value">{{ perfil.nss || 'No especificado' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Tipo de Sangre</span>
+                    <span class="info-value">{{ perfil.tipoSangre || 'No especificado' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Peso</span>
+                    <span class="info-value">{{ perfil.peso ? perfil.peso + ' kg' : 'No especificado' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Altura</span>
+                    <span class="info-value">{{ perfil.altura ? perfil.altura + ' cm' : 'No especificado' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Alergias</span>
+                    <span class="info-value">{{ perfil.alergias || 'Ninguna' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Enfermedades Cronicas</span>
+                    <span class="info-value">{{ perfil.enfermedadesCronicas || 'Ninguna' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Antecedentes Familiares</span>
+                    <span class="info-value">{{ perfil.antecedentesFamiliares || 'Ninguno' }}</span>
+                </div>
+            </div>
+
+            <!-- Tarjeta de Acciones -->
+            <div class="info-card acciones-card">
+                <h3><i class="bi bi-gear"></i> Acciones</h3>
+
+                <div class="accion-item" (click)="irANotificaciones()">
+                    <div class="accion-icon">
+                        <i class="bi bi-bell"></i>
+                    </div>
+                    <div class="accion-info">
+                        <span class="accion-titulo">Notificaciones</span>
+                        <span class="accion-descripcion">Ver tus notificaciones</span>
+                    </div>
+                    <i class="bi bi-chevron-right accion-flecha"></i>
+                </div>
+
+                <div class="accion-item accion-cerrar" (click)="abrirModalCerrarSesion()">
+                    <div class="accion-icon" style="background: #ef444415; color: #ef4444;">
+                        <i class="bi bi-box-arrow-right"></i>
+                    </div>
+                    <div class="accion-info">
+                        <span class="accion-titulo" style="color: #ef4444;">Cerrar Sesion</span>
+                        <span class="accion-descripcion">Salir de tu cuenta</span>
+                    </div>
+                    <i class="bi bi-chevron-right accion-flecha"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- MODAL DE EDICION DE PERFIL CON CALENDARIO MEJORADO -->
+<!-- ============================================ -->
+<div class="modal-overlay" *ngIf="mostrarModalEditar" (click)="cerrarModalEditar()">
+    <div class="modal-content modal-editar" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2><i class="bi bi-pencil"></i> Editar Perfil</h2>
+            <button class="modal-close" (click)="cerrarModalEditar()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="modal-body" *ngIf="perfilEditado">
+            <div class="form-grid">
+                <div class="form-section">
+                    <h4><i class="bi bi-person"></i> Informacion Personal</h4>
+                    <div class="form-group">
+                        <label for="editNombre">Nombre</label>
+                        <input type="text" id="editNombre" [(ngModel)]="perfilEditado.nombre" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="editApPaterno">Apellido Paterno</label>
+                        <input type="text" id="editApPaterno" [(ngModel)]="perfilEditado.apPaterno"
+                            class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="editApMaterno">Apellido Materno</label>
+                        <input type="text" id="editApMaterno" [(ngModel)]="perfilEditado.apMaterno"
+                            class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="editTelefono">Telefono</label>
+                        <input type="tel" id="editTelefono" [(ngModel)]="perfilEditado.telefono" class="form-control"
+                            placeholder="Ej: 555-123-4567">
+                    </div>
+
+                    <!-- ✅ CAMPO DE FECHA CON FLATPICKR MEJORADO -->
+                    <div class="form-group">
+                        <label for="editFechaNacimiento">Fecha de Nacimiento</label>
+                        <div class="input-picker-wrapper">
+                            <input type="text" id="editFechaNacimiento"
+                                class="form-control picker-custom datepicker-input" placeholder="Seleccione fecha..."
+                                readonly>
+                            <i class="bi bi-calendar3 icon-embed"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editGenero">Genero</label>
+                        <select id="editGenero" [(ngModel)]="perfilEditado.genero" class="form-control">
+                            <option value="">Selecciona...</option>
+                            <option value="Masculino">Masculino</option>
+                            <option value="Femenino">Femenino</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editCURP">CURP</label>
+                        <input type="text" id="editCURP" [(ngModel)]="perfilEditado.curp" class="form-control"
+                            placeholder="Ej: ABC123456789XYZ01">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4><i class="bi bi-geo-alt"></i> Domicilio</h4>
+                    <div class="form-group">
+                        <label for="editDomicilio">Domicilio</label>
+                        <input type="text" id="editDomicilio" [(ngModel)]="perfilEditado.domicilio" class="form-control"
+                            placeholder="Ej: Calle, numero, colonia">
+                    </div>
+                    <div class="form-group">
+                        <label for="editCodigoPostal">Codigo Postal</label>
+                        <input type="text" id="editCodigoPostal" [(ngModel)]="perfilEditado.codigoPostal"
+                            class="form-control" placeholder="Ej: 12345">
+                    </div>
+                    <div class="form-group">
+                        <label for="editLocalidad">Localidad</label>
+                        <input type="text" id="editLocalidad" [(ngModel)]="perfilEditado.localidad"
+                            class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="editMunicipio">Municipio</label>
+                        <input type="text" id="editMunicipio" [(ngModel)]="perfilEditado.municipio"
+                            class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="editEstado">Estado</label>
+                        <input type="text" id="editEstado" [(ngModel)]="perfilEditado.estado" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-section full-width">
+                    <h4><i class="bi bi-heart-pulse"></i> Informacion Medica</h4>
+                    <div class="form-group">
+                        <label for="editNSS">NSS</label>
+                        <input type="text" id="editNSS" [(ngModel)]="perfilEditado.nss" class="form-control"
+                            placeholder="Ej: 12345678901">
+                    </div>
+                    <div class="form-group">
+                        <label for="editTipoSangre">Tipo de Sangre</label>
+                        <select id="editTipoSangre" [(ngModel)]="perfilEditado.tipoSangre" class="form-control">
+                            <option value="">Selecciona...</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editPeso">Peso (kg)</label>
+                        <input type="number" id="editPeso" [(ngModel)]="perfilEditado.peso" class="form-control"
+                            step="0.1" min="0" max="300">
+                    </div>
+                    <div class="form-group">
+                        <label for="editAltura">Altura (cm)</label>
+                        <input type="number" id="editAltura" [(ngModel)]="perfilEditado.altura" class="form-control"
+                            step="0.1" min="0" max="300">
+                    </div>
+                    <div class="form-group">
+                        <label for="editAlergias">Alergias</label>
+                        <textarea id="editAlergias" [(ngModel)]="perfilEditado.alergias"
+                            class="form-control textarea-fixed" rows="2"
+                            placeholder="Ej: Penicilina, polen, etc."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="editEnfermedadesCronicas">Enfermedades Cronicas</label>
+                        <textarea id="editEnfermedadesCronicas" [(ngModel)]="perfilEditado.enfermedadesCronicas"
+                            class="form-control textarea-fixed" rows="2"
+                            placeholder="Ej: Diabetes, hipertension, etc."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="editAntecedentesFamiliares">Antecedentes Familiares</label>
+                        <textarea id="editAntecedentesFamiliares" [(ngModel)]="perfilEditado.antecedentesFamiliares"
+                            class="form-control textarea-fixed" rows="2"
+                            placeholder="Ej: Enfermedades hereditarias en la familia"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <div class="form-actions">
+                <button type="button" class="btn-cancelar" (click)="cerrarModalEditar()">Cancelar</button>
+                <button type="button" class="btn-guardar" (click)="guardarPerfil()" [disabled]="isSaving">
+                    <i class="bi bi-check-lg" *ngIf="!isSaving"></i>
+                    <span class="spinner-small" *ngIf="isSaving"></span>
+                    {{ isSaving ? 'Guardando...' : 'Guardar Cambios' }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- MODAL DE CERRAR SESION -->
+<!-- ============================================ -->
+<div class="modal-overlay" *ngIf="mostrarModalCerrarSesion" (click)="cerrarModalCerrarSesion()">
+    <div class="modal-content modal-confirmacion" (click)="$event.stopPropagation()">
+        <div class="modal-header modal-header-danger">
+            <div class="modal-icon modal-icon-danger">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+            </div>
+            <h2>Cerrar Sesion</h2>
+            <button class="modal-close" (click)="cerrarModalCerrarSesion()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p class="modal-mensaje">¿Estas seguro de que deseas cerrar sesion?</p>
+            <p class="modal-mensaje text-muted">Tendras que iniciar sesion nuevamente para acceder a tu cuenta.</p>
+        </div>
+        <div class="modal-footer modal-footer-danger">
+            <div class="form-actions">
+                <button class="btn-cancelar" (click)="cerrarModalCerrarSesion()">Cancelar</button>
+                <button class="btn-danger-confirm" (click)="cerrarSesion()">
+                    <i class="bi bi-box-arrow-right"></i>
+                    Cerrar Sesion
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- NOTIFICACIONES TOAST -->
+<!-- ============================================ -->
+<div class="toast-premium-container" *ngIf="mostrarToast" [class]="tipoToast">
+    <div class="toast-content">
+        <i class="bi" [class]="
+            tipoToast === 'success' ? 'bi-check-circle-fill icon-toast' :
+            tipoToast === 'error' ? 'bi-exclamation-triangle-fill icon-toast' :
+            'bi-exclamation-circle-fill icon-toast'
+        "></i>
+        <span class="toast-message">{{ mensajeToast }}</span>
+    </div>
+</div>
