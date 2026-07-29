@@ -1,0 +1,105 @@
+<!-- Menu al inicio -->
+<app-doctor-menu></app-doctor-menu>
+
+<div class="pacientes-container">
+    <!-- ============================================ -->
+    <!-- HEADER -->
+    <!-- ============================================ -->
+    <header class="page-header">
+        <div class="header-content">
+            <div class="header-text">
+                <h1>Pacientes</h1>
+                <p>Gestión de tus pacientes</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- ============================================ -->
+    <!-- BARRA DE BÚSQUEDA -->
+    <!-- ============================================ -->
+    <div class="search-section">
+        <div class="search-box">
+            <i class="bi bi-search"></i>
+            <input type="text" [(ngModel)]="searchTerm" (input)="buscarPacientes()"
+                placeholder="Buscar por nombre, correo o NSS..." class="search-input" />
+            <button *ngIf="searchTerm" class="btn-clear" (click)="limpiarFiltros()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="filter-section">
+            <select class="filter-select" [(ngModel)]="filterGenero" (change)="buscarPacientes()">
+                <option value="">Todos los géneros</option>
+                <option value="Masculino">Masculino</option>
+                <option value="Femenino">Femenino</option>
+                <option value="Otro">Otro</option>
+            </select>
+
+            <select class="filter-select" [(ngModel)]="filterEstado" (change)="buscarPacientes()">
+                <option value="">Todos los estados</option>
+                <option value="activo">Activos</option>
+                <option value="inactivo">Inactivos</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- ESTADO DE CARGA -->
+    <!-- ============================================ -->
+    <div *ngIf="isLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Cargando pacientes...</p>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- LISTA DE PACIENTES -->
+    <!-- ============================================ -->
+    <div *ngIf="!isLoading" class="pacientes-content">
+
+        <!-- Contador de resultados -->
+        <div class="results-count" *ngIf="filteredPacientes.length > 0">
+            <span>{{ filteredPacientes.length }} pacientes encontrados</span>
+        </div>
+
+        <!-- Lista de pacientes -->
+        <div class="pacientes-list">
+            <div *ngFor="let paciente of filteredPacientes" class="paciente-card" (click)="verDetalle(paciente)">
+                <div class="paciente-avatar">
+                    <img [src]="getAvatarUrl(paciente.nombre, paciente.apPaterno)" alt="Avatar">
+                    <span class="estado-indicador" [class.activo]="paciente.activo"
+                        [class.inactivo]="!paciente.activo"></span>
+                </div>
+                <div class="paciente-info">
+                    <h3>{{ paciente.nombre }} {{ paciente.apPaterno }} {{ paciente.apMaterno }}</h3>
+                    <p class="paciente-email">
+                        <i class="bi bi-envelope"></i> {{ paciente.correo }}
+                    </p>
+                    <div class="paciente-detalles">
+                        <span *ngIf="paciente.telefono" class="detalle">
+                            <i class="bi bi-phone"></i> {{ paciente.telefono }}
+                        </span>
+                        <span *ngIf="paciente.nss" class="detalle">
+                            <i class="bi bi-card-text"></i> NSS: {{ paciente.nss }}
+                        </span>
+                        <span *ngIf="paciente.genero" class="detalle">
+                            <i class="bi bi-gender-ambiguous"></i> {{ paciente.genero }}
+                        </span>
+                    </div>
+                </div>
+                <div class="paciente-actions">
+                    <span class="badge" [class]="getEstadoClass(paciente.activo)">
+                        {{ getEstadoTexto(paciente.activo) }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="filteredPacientes.length === 0" class="empty-state">
+            <i class="bi bi-people"></i>
+            <h3>No se encontraron pacientes</h3>
+            <p>Intenta con otros filtros o busca por otro término</p>
+            <button class="btn-primary" (click)="limpiarFiltros()">Limpiar filtros</button>
+        </div>
+    </div>
+</div>

@@ -61,11 +61,13 @@ export const routes: Routes = [
     path: 'patient',
     loadChildren: () => import('./features/dashboard/patient/patient.routes').then(m => m.PATIENT_ROUTES)
   },
-  /*
+
   {
     path: 'doctor',
     loadChildren: () => import('./features/dashboard/doctor/doctor.routes').then(m => m.DOCTOR_ROUTES)
   },
+
+  /*
   {
     path: 'caregiver',
     loadChildren: () => import('./features/dashboard/caregiver/caregiver.routes').then(m => m.CAREGIVER_ROUTES)

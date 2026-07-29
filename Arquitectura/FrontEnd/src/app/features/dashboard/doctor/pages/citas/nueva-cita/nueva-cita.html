@@ -1,0 +1,133 @@
+<!-- Menu al inicio -->
+<app-doctor-menu></app-doctor-menu>
+
+<!-- Notificaciones Toast -->
+<div class="toast-container" *ngIf="notifications.length > 0">
+    <div *ngFor="let notif of notifications; let i = index" class="toast-notification toast-{{ notif.type }}"
+        [class.toast-exit]="i > 0">
+        <div class="toast-icon">
+            <i class="bi" [class]="
+                notif.type === 'success' ? 'bi-check-circle-fill' :
+                notif.type === 'error' ? 'bi-x-circle-fill' :
+                notif.type === 'warning' ? 'bi-exclamation-triangle-fill' :
+                'bi-info-circle-fill'
+            "></i>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title">{{ notif.title }}</div>
+            <div class="toast-message">{{ notif.message }}</div>
+        </div>
+        <button class="toast-close" (click)="removeToast(notif.id)">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        <div class="toast-progress" [style.animation-duration]="(notif.duration || 5000) + 'ms'"></div>
+    </div>
+</div>
+
+<div class="nueva-cita-container">
+    <!-- HEADER -->
+    <header class="page-header">
+        <div class="header-top">
+            <div class="header-info">
+                <h1>Nueva Cita</h1>
+                <p>Agenda una cita para tu paciente</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- FORMULARIO -->
+    <div class="form-card">
+        <form [formGroup]="citaForm" (ngSubmit)="agendarCita()">
+
+            <!-- Buscador de Pacientes -->
+            <div class="form-group">
+                <label>Buscar Paciente *</label>
+                <div class="search-paciente-wrapper">
+                    <div class="search-box">
+                        <i class="bi bi-search"></i>
+                        <input type="text" [(ngModel)]="searchTerm" (input)="buscarPacientes()"
+                            (focus)="!searchTerm && (pacientesFiltrados = [...pacientes])"
+                            placeholder="Buscar por nombre o correo..." class="search-input"
+                            [ngModelOptions]="{standalone: true}" />
+                    </div>
+                    <div class="pacientes-dropdown" *ngIf="pacientesFiltrados.length > 0 && searchTerm">
+                        <div *ngFor="let p of pacientesFiltrados" class="paciente-option"
+                            (click)="seleccionarPaciente(p)">
+                            <img [src]="getAvatarUrl(p.nombre, p.apPaterno)" alt="Avatar" class="option-avatar">
+                            <div class="option-info">
+                                <span class="option-nombre">{{ p.nombre }} {{ p.apPaterno }}</span>
+                                <span class="option-email">{{ p.correo }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="paciente-seleccionado" *ngIf="citaForm.get('idPaciente')?.value">
+                        <i class="bi bi-check-circle-fill" style="color: #10b981;"></i>
+                        <span>Paciente seleccionado: <strong>{{ searchTerm }}</strong></span>
+                        <button type="button" class="btn-cambiar"
+                            (click)="citaForm.patchValue({idPaciente: ''}); searchTerm = '';">Cambiar</button>
+                    </div>
+                </div>
+                <small class="error-text"
+                    *ngIf="citaForm.get('idPaciente')?.touched && !citaForm.get('idPaciente')?.value">
+                    Debes seleccionar un paciente
+                </small>
+            </div>
+
+            <!-- Motivo -->
+            <div class="form-group">
+                <label for="motivo">Motivo de la consulta *</label>
+                <input type="text" id="motivo" formControlName="motivo" class="form-control"
+                    placeholder="Ej: Revision, Dolor de cabeza...">
+                <small class="error-text" *ngIf="citaForm.get('motivo')?.touched && citaForm.get('motivo')?.invalid">
+                    El motivo es obligatorio (mínimo 3 caracteres)
+                </small>
+            </div>
+
+            <!-- Fecha y Hora -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="fechaCitaInput">Fecha *</label>
+                    <div class="input-picker-wrapper">
+                        <input type="text" id="fechaCitaInput" class="form-control picker-custom"
+                            placeholder="Seleccione fecha..." readonly (focus)="abrirCalendarios()">
+                        <i class="bi bi-calendar3 icon-embed"></i>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="horaCitaInput">Hora *</label>
+                    <div class="input-picker-wrapper">
+                        <input type="text" id="horaCitaInput" class="form-control picker-custom"
+                            placeholder="Seleccione hora..." readonly (focus)="abrirCalendarios()">
+                        <i class="bi bi-clock icon-embed"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modalidad -->
+            <div class="form-group">
+                <label for="modalidad">Modalidad</label>
+                <select id="modalidad" formControlName="modalidad" class="form-control">
+                    <option value="Presencial">Presencial</option>
+                    <option value="Virtual">Virtual</option>
+                </select>
+            </div>
+
+            <!-- Sintomas -->
+            <div class="form-group">
+                <label for="sintomas">Sintomas actuales</label>
+                <textarea id="sintomas" formControlName="sintomas" rows="3" class="form-control textarea-fixed"
+                    placeholder="Describe los sintomas del paciente..."></textarea>
+            </div>
+
+            <!-- Botones -->
+            <div class="form-actions">
+                <button type="button" class="btn-cancelar" (click)="cancelar()">Cancelar</button>
+                <button type="submit" class="btn-guardar" [disabled]="isLoading || citaForm.invalid">
+                    <i class="bi bi-check-lg" *ngIf="!isLoading"></i>
+                    <span class="spinner-small" *ngIf="isLoading"></span>
+                    {{ isLoading ? 'Guardando...' : 'Agendar Cita' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

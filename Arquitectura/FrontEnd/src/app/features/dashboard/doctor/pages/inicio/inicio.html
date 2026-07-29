@@ -1,0 +1,164 @@
+<!-- Menu al inicio -->
+<app-doctor-menu></app-doctor-menu>
+
+<div class="doctor-dashboard">
+    <!-- HEADER CON SALUDO -->
+    <header class="dashboard-header">
+        <div class="header-top">
+            <div class="greeting-section">
+                <p class="greeting-label">Hola</p>
+                <h1 class="greeting-name">{{ doctorFullName || doctorName || 'Doctor' }}</h1>
+                <p class="greeting-sub">Bienvenido a tu panel médico</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn-fab" routerLink="/doctor/perfil" aria-label="Ver perfil">
+                    <i class="bi bi-person-fill"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ESTADO DE CARGA -->
+    <div *ngIf="isLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Cargando tu información...</p>
+    </div>
+
+    <!-- CONTENIDO DEL DASHBOARD -->
+    <div *ngIf="!isLoading" class="dashboard-content">
+
+        <!-- TARJETA DE BIENVENIDA CON METRICAS -->
+        <section class="welcome-card">
+            <div class="welcome-bg"></div>
+            <div class="welcome-content">
+                <div class="welcome-text">
+                    <span class="welcome-badge">Doctor</span>
+                    <h2>Resumen Médico</h2>
+                    <p>Aquí tienes un resumen de tu actividad</p>
+                </div>
+                <div class="welcome-stats">
+                    <div class="stat-item" routerLink="/doctor/pacientes" style="cursor: pointer;">
+                        <span class="stat-number">{{ metrics.totalPacientes }}</span>
+                        <span class="stat-label">Pacientes</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item" routerLink="/doctor/citas" style="cursor: pointer;">
+                        <span class="stat-number">{{ metrics.citasProgramadas }}</span>
+                        <span class="stat-label">Citas Programadas</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item" routerLink="/doctor/tratamientos" style="cursor: pointer;">
+                        <span class="stat-number">{{ metrics.tratamientosActivos }}</span>
+                        <span class="stat-label">Tratamientos</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- METRICAS RAPIDAS -->
+        <section class="quick-metrics">
+            <div class="metric-item" routerLink="/doctor/pacientes">
+                <div class="metric-icon" style="background: #b0001e15; color: #b0001e;">
+                    <i class="bi bi-people"></i>
+                </div>
+                <div class="metric-info">
+                    <span class="metric-value">{{ metrics.totalPacientes }}</span>
+                    <span class="metric-label">Total Pacientes</span>
+                </div>
+                <i class="bi bi-chevron-right metric-arrow"></i>
+            </div>
+
+            <div class="metric-item" routerLink="/doctor/citas">
+                <div class="metric-icon" style="background: #f59e0b15; color: #f59e0b;">
+                    <i class="bi bi-calendar-check"></i>
+                </div>
+                <div class="metric-info">
+                    <span class="metric-value">{{ metrics.citasProgramadas }}</span>
+                    <span class="metric-label">Citas Programadas</span>
+                </div>
+                <i class="bi bi-chevron-right metric-arrow"></i>
+            </div>
+
+            <div class="metric-item" routerLink="/doctor/citas">
+                <div class="metric-icon" style="background: #ef444415; color: #ef4444;">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+                <div class="metric-info">
+                    <span class="metric-value">{{ metrics.citasPendientes }}</span>
+                    <span class="metric-label">Pendientes</span>
+                </div>
+                <i class="bi bi-chevron-right metric-arrow"></i>
+            </div>
+
+            <div class="metric-item" routerLink="/doctor/tratamientos">
+                <div class="metric-icon" style="background: #10b98115; color: #10b981;">
+                    <i class="bi bi-heart-pulse"></i>
+                </div>
+                <div class="metric-info">
+                    <span class="metric-value">{{ metrics.tratamientosActivos }}</span>
+                    <span class="metric-label">Tratamientos</span>
+                </div>
+                <i class="bi bi-chevron-right metric-arrow"></i>
+            </div>
+        </section>
+
+        <!-- CITAS PROGRAMADAS -->
+        <section class="section-card">
+            <div class="section-header">
+                <h2><i class="bi bi-calendar-event"></i> Citas Programadas</h2>
+                <a routerLink="/doctor/citas" class="view-all">Ver todas</a>
+            </div>
+            <div class="citas-list">
+                <div *ngFor="let cita of citasProgramadas" class="cita-item" (click)="verDetalleCita(cita)">
+                    <div class="cita-date-badge">
+                        <span class="cita-day">{{ obtenerDia(cita.fechacita || cita.fecha) }}</span>
+                        <span class="cita-month">{{ obtenerMes(cita.fechacita || cita.fecha) }}</span>
+                    </div>
+                    <div class="cita-info">
+                        <h4>{{ cita.motivo || 'Consulta Médica' }}</h4>
+                        <p>
+                            <i class="bi bi-person"></i> {{ cita.paciente || cita.pacienteNombre || cita.nombrePaciente
+                            || 'Paciente' }}
+                            <span class="dot">•</span>
+                            <i class="bi bi-clock"></i> {{ cita.horacita || cita.hora || 'S/H' }}
+                        </p>
+                        <span class="badge" [class]="getEstadoClass(cita.estado)">
+                            {{ cita.estado || 'Programada' }}
+                        </span>
+                    </div>
+                </div>
+                <div *ngIf="!citasProgramadas.length" class="empty-state">
+                    <i class="bi bi-calendar-x"></i>
+                    <p>No tienes citas programadas</p>
+                    <button class="btn-primary" routerLink="/doctor/citas/nueva">Agendar Cita</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- PACIENTES RECIENTES -->
+        <section class="section-card">
+            <div class="section-header">
+                <h2><i class="bi bi-people"></i> Pacientes Recientes</h2>
+                <a routerLink="/doctor/pacientes" class="view-all">Ver todos</a>
+            </div>
+            <div class="pacientes-list">
+                <div *ngFor="let paciente of pacientesRecientes" class="paciente-item"
+                    (click)="verDetallePaciente(paciente)">
+                    <div class="paciente-avatar">
+                        <img [src]="getAvatarUrl(paciente.nombre, paciente.apPaterno)" alt="Avatar">
+                    </div>
+                    <div class="paciente-info">
+                        <h4>{{ paciente.nombre }} {{ paciente.apPaterno }} {{ paciente.apMaterno }}</h4>
+                        <p><i class="bi bi-envelope"></i> {{ paciente.correo }}</p>
+                    </div>
+                    <i class="bi bi-chevron-right paciente-arrow"></i>
+                </div>
+                <div *ngIf="!pacientesRecientes.length" class="empty-state">
+                    <i class="bi bi-people"></i>
+                    <p>No tienes pacientes registrados</p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>

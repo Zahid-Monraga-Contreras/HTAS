@@ -1,0 +1,263 @@
+<!-- Menu al inicio -->
+<app-doctor-menu></app-doctor-menu>
+
+<div class="detalle-container">
+    <!-- ============================================ -->
+    <!-- BOTÓN VOLVER -->
+    <!-- ============================================ -->
+    <div class="back-section">
+        <button class="btn-back" (click)="volver()">
+            <i class="bi bi-arrow-left"></i>
+            <span>Volver a pacientes</span>
+        </button>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- ESTADO DE CARGA -->
+    <!-- ============================================ -->
+    <div *ngIf="isLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Cargando información del paciente...</p>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- CONTENIDO -->
+    <!-- ============================================ -->
+    <div *ngIf="!isLoading && paciente" class="detalle-content">
+
+        <!-- ========================================== -->
+        <!-- PERFIL DEL PACIENTE -->
+        <!-- ========================================== -->
+        <section class="perfil-section">
+            <div class="perfil-header">
+                <div class="perfil-avatar">
+                    <img [src]="getAvatarUrl(paciente.nombre, paciente.apPaterno)" alt="Avatar">
+                    <span class="estado-badge" [class]="getEstadoClassActivo(paciente.activo)">
+                        {{ getEstadoTextoActivo(paciente.activo) }}
+                    </span>
+                </div>
+                <div class="perfil-info">
+                    <h1>{{ paciente.nombre }} {{ paciente.apPaterno }} {{ paciente.apMaterno }}</h1>
+                    <p class="perfil-email"><i class="bi bi-envelope"></i> {{ paciente.correo }}</p>
+                    <div class="perfil-detalles">
+                        <span *ngIf="paciente.telefono"><i class="bi bi-phone"></i> {{ paciente.telefono }}</span>
+                        <span *ngIf="paciente.genero"><i class="bi bi-gender-ambiguous"></i> {{ paciente.genero
+                            }}</span>
+                        <span *ngIf="paciente.nss"><i class="bi bi-card-text"></i> NSS: {{ paciente.nss }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats rápidos -->
+            <div class="perfil-stats">
+                <div class="stat-item">
+                    <span class="stat-number">{{ stats.totalCitas }}</span>
+                    <span class="stat-label">Citas</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ stats.tratamientosActivos }}</span>
+                    <span class="stat-label">Tratamientos</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ stats.medicacionesActivas }}</span>
+                    <span class="stat-label">Medicamentos</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TABS DE NAVEGACIÓN -->
+        <!-- ========================================== -->
+        <div class="tabs-section">
+            <div class="tabs">
+                <button class="tab" [class.active]="activeTab === 'info'" (click)="cambiarTab('info')">
+                    <i class="bi bi-person"></i> Información
+                </button>
+                <button class="tab" [class.active]="activeTab === 'citas'" (click)="cambiarTab('citas')">
+                    <i class="bi bi-calendar-check"></i> Citas
+                    <span class="tab-badge">{{ citasPaciente.length }}</span>
+                </button>
+                <button class="tab" [class.active]="activeTab === 'tratamientos'" (click)="cambiarTab('tratamientos')">
+                    <i class="bi bi-heart-pulse"></i> Tratamientos
+                    <span class="tab-badge">{{ tratamientosPaciente.length }}</span>
+                </button>
+                <button class="tab" [class.active]="activeTab === 'medicaciones'" (click)="cambiarTab('medicaciones')">
+                    <i class="bi bi-capsule"></i> Medicamentos
+                    <span class="tab-badge">{{ medicacionesPaciente.length }}</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- CONTENIDO DE TABS -->
+        <!-- ========================================== -->
+
+        <!-- TAB: INFORMACIÓN -->
+        <div *ngIf="activeTab === 'info'" class="tab-content">
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3><i class="bi bi-person-badge"></i> Datos Personales</h3>
+                    <div class="info-row">
+                        <span class="info-label">Nombre completo</span>
+                        <span class="info-value">{{ paciente.nombre }} {{ paciente.apPaterno }} {{ paciente.apMaterno
+                            }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Correo electrónico</span>
+                        <span class="info-value">{{ paciente.correo }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Teléfono</span>
+                        <span class="info-value">{{ paciente.telefono || 'No registrado' }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Género</span>
+                        <span class="info-value">{{ paciente.genero || 'No especificado' }}</span>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3><i class="bi bi-card-text"></i> Datos Médicos</h3>
+                    <div class="info-row">
+                        <span class="info-label">NSS</span>
+                        <span class="info-value">{{ paciente.nss || 'No registrado' }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Tipo de sangre</span>
+                        <span class="info-value">{{ paciente.tipoSangre || 'No registrado' }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Peso</span>
+                        <span class="info-value">{{ paciente.peso ? paciente.peso + ' kg' : 'No registrado' }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Altura</span>
+                        <span class="info-value">{{ paciente.altura ? paciente.altura + ' cm' : 'No registrado'
+                            }}</span>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3><i class="bi bi-house"></i> Domicilio</h3>
+                    <div class="info-row">
+                        <span class="info-label">Dirección</span>
+                        <span class="info-value">{{ paciente.domicilio || 'No registrado' }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Código Postal</span>
+                        <span class="info-value">{{ paciente.codigoPostal || 'No registrado' }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Localidad</span>
+                        <span class="info-value">{{ paciente.localidad || 'No registrado' }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Municipio / Estado</span>
+                        <span class="info-value">{{ paciente.municipio || 'No registrado' }}{{ paciente.municipio &&
+                            paciente.estado ? ', ' : '' }}{{ paciente.estado || '' }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: CITAS -->
+        <div *ngIf="activeTab === 'citas'" class="tab-content">
+            <div *ngIf="citasPaciente.length === 0" class="empty-state">
+                <i class="bi bi-calendar-x"></i>
+                <p>Este paciente no tiene citas registradas</p>
+            </div>
+            <div class="citas-list" *ngIf="citasPaciente.length > 0">
+                <div *ngFor="let cita of citasPaciente" class="cita-item" (click)="irACita(cita)">
+                    <div class="cita-date">
+                        <span class="cita-day">{{ obtenerDia(cita.fechacita || cita.fecha) }}</span>
+                        <span class="cita-month">{{ obtenerMes(cita.fechacita || cita.fecha) }}</span>
+                    </div>
+                    <div class="cita-info">
+                        <h4>{{ cita.motivo || 'Consulta Médica' }}</h4>
+                        <p><i class="bi bi-clock"></i> {{ cita.horacita || cita.hora || 'S/H' }}</p>
+                    </div>
+                    <span class="badge" [class]="getEstadoClass(cita.estado)">
+                        {{ cita.estado || 'Programada' }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: TRATAMIENTOS (CORREGIDO) -->
+        <div *ngIf="activeTab === 'tratamientos'" class="tab-content">
+            <div *ngIf="tratamientosPaciente.length === 0" class="empty-state">
+                <i class="bi bi-heart-pulse"></i>
+                <p>Este paciente no tiene tratamientos registrados</p>
+            </div>
+            <div class="tratamientos-list" *ngIf="tratamientosPaciente.length > 0">
+                <div *ngFor="let t of tratamientosPaciente" class="tratamiento-item" (click)="irATratamiento(t)">
+                    <div class="tratamiento-icon">
+                        <i class="bi bi-prescription"></i>
+                    </div>
+                    <div class="tratamiento-info">
+                        <h4>{{ t.nombreMedicamento || t.nombre_medicamento || 'Medicamento' }}</h4>
+                        <p>
+                            <i class="bi bi-droplet"></i>
+                            {{ t.dosis || 'Dosis no especificada' }}
+                            <span class="dot">•</span>
+                            <i class="bi bi-clock"></i>
+                            {{ t.frecuenciaHoras || t.frecuencia_horas ? 'Cada ' + (t.frecuenciaHoras ||
+                            t.frecuencia_horas) + 'h' : 'Frecuencia no especificada' }}
+                        </p>
+                        <p class="tratamiento-fechas">
+                            <i class="bi bi-calendar3"></i>
+                            Inicio: {{ (t.fechaInicio || t.fecha_inicio) | date:'dd/MM/yyyy' }}
+                            <span *ngIf="t.fechaFin || t.fecha_fin"> - Fin: {{ (t.fechaFin || t.fecha_fin) |
+                                date:'dd/MM/yyyy' }}</span>
+                            <span *ngIf="!t.fechaFin && !t.fecha_fin" class="sin-fecha"> (Sin fecha de fin)</span>
+                        </p>
+                        <p class="tratamiento-instrucciones" *ngIf="t.notasInstrucciones || t.notas_instrucciones">
+                            <i class="bi bi-info-circle"></i>
+                            {{ t.notasInstrucciones || t.notas_instrucciones }}
+                        </p>
+                    </div>
+                    <div class="tratamiento-actions">
+                        <span class="badge" [class]="getEstadoClassActivo(t.activo !== false && t.activo !== 0)">
+                            {{ (t.activo !== false && t.activo !== 0) ? 'Activo' : 'Inactivo' }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: MEDICAMENTOS -->
+        <div *ngIf="activeTab === 'medicaciones'" class="tab-content">
+            <div *ngIf="medicacionesPaciente.length === 0" class="empty-state">
+                <i class="bi bi-capsule"></i>
+                <p>Este paciente no tiene medicamentos recetados</p>
+            </div>
+            <div class="medicamentos-list" *ngIf="medicacionesPaciente.length > 0">
+                <div *ngFor="let m of medicacionesPaciente" class="medicamento-item">
+                    <div class="medicamento-icon">
+                        <i class="bi bi-capsule"></i>
+                    </div>
+                    <div class="medicamento-info">
+                        <h4>{{ m.nombreComercial || m.nombre_comercial || 'Medicamento' }}</h4>
+                        <p *ngIf="m.sustanciaActiva || m.sustancia_activa">{{ m.sustanciaActiva || m.sustancia_activa }}
+                        </p>
+                        <p class="medicamento-detalle" *ngIf="m.presentacion">
+                            {{ m.presentacion }}{{ m.concentracion ? ' - ' + m.concentracion : '' }}
+                        </p>
+                    </div>
+                    <span class="badge badge-info">{{ m.laboratorio || 'Sin laboratorio' }}</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Paciente no encontrado -->
+    <div *ngIf="!isLoading && !paciente" class="error-state">
+        <i class="bi bi-person-x"></i>
+        <h3>Paciente no encontrado</h3>
+        <p>El paciente que buscas no existe o ha sido eliminado</p>
+        <button class="btn-primary" (click)="volver()">Volver a pacientes</button>
+    </div>
+</div>

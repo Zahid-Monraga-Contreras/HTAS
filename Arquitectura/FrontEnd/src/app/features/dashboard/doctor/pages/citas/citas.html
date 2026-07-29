@@ -1,0 +1,141 @@
+<!-- Menu al inicio -->
+<app-doctor-menu></app-doctor-menu>
+
+<div class="citas-page">
+    <!-- HEADER -->
+    <header class="citas-header">
+        <div class="header-top">
+            <div class="header-info">
+                <h1>Mis Citas</h1>
+                <p>Gestiona las citas de tus pacientes</p>
+            </div>
+            <button class="btn-agendar" routerLink="/doctor/citas/nueva">
+                <i class="bi bi-plus-lg"></i>
+                <span>Nueva Cita</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- LOADING -->
+    <div *ngIf="isLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Cargando tus citas...</p>
+    </div>
+
+    <!-- CONTENIDO -->
+    <div *ngIf="!isLoading" class="citas-content">
+
+        <!-- Estadisticas -->
+        <section class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card" (click)="aplicarFiltro('todas')" [class.active]="filterEstado === 'todas'">
+                    <span class="stat-number">{{ citasEstadisticas.total }}</span>
+                    <span class="stat-label">Total</span>
+                </div>
+                <div class="stat-card stat-programada" (click)="aplicarFiltro('programada')"
+                    [class.active]="filterEstado === 'programada'">
+                    <span class="stat-number">{{ citasEstadisticas.programadas }}</span>
+                    <span class="stat-label">Programadas</span>
+                </div>
+                <div class="stat-card stat-completada" (click)="aplicarFiltro('completada')"
+                    [class.active]="filterEstado === 'completada'">
+                    <span class="stat-number">{{ citasEstadisticas.completadas }}</span>
+                    <span class="stat-label">Completadas</span>
+                </div>
+                <div class="stat-card stat-cancelada" (click)="aplicarFiltro('cancelada')"
+                    [class.active]="filterEstado === 'cancelada'">
+                    <span class="stat-number">{{ citasEstadisticas.canceladas }}</span>
+                    <span class="stat-label">Canceladas</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Lista de Citas -->
+        <section class="citas-section">
+            <div class="section-header">
+                <h2><i class="bi bi-list-ul"></i> Lista de Citas</h2>
+                <span class="citas-count">{{ citasFiltradas.length }} cita{{ citasFiltradas.length !== 1 ? 's' : ''
+                    }}</span>
+            </div>
+
+            <div class="filtros-rapidos">
+                <button class="filtro-btn" [class.active]="filterEstado === 'todas'" (click)="aplicarFiltro('todas')">
+                    <i class="bi bi-grid-3x3-gap-fill"></i> Todas
+                </button>
+                <button class="filtro-btn" [class.active]="filterEstado === 'programada'"
+                    (click)="aplicarFiltro('programada')">
+                    <i class="bi bi-calendar-plus"></i> Programadas
+                </button>
+                <button class="filtro-btn" [class.active]="filterEstado === 'completada'"
+                    (click)="aplicarFiltro('completada')">
+                    <i class="bi bi-check2-circle"></i> Completadas
+                </button>
+                <button class="filtro-btn" [class.active]="filterEstado === 'cancelada'"
+                    (click)="aplicarFiltro('cancelada')">
+                    <i class="bi bi-x-circle"></i> Canceladas
+                </button>
+            </div>
+
+            <div class="citas-list">
+                <div *ngFor="let cita of citasFiltradas" class="cita-card" (click)="verDetalleCita(cita)">
+                    <div class="cita-card-header">
+                        <div class="cita-fecha-badge">
+                            <span class="cita-dia">{{ obtenerDia(cita.fechacita || cita.fecha) }}</span>
+                            <span class="cita-mes">{{ obtenerMes(cita.fechacita || cita.fecha) }}</span>
+                        </div>
+                        <div class="cita-info-principal">
+                            <h3>{{ cita.motivo || 'Consulta Medica' }}</h3>
+                            <p class="cita-paciente">
+                                <i class="bi bi-person"></i> {{ cita.paciente || cita.pacienteNombre || 'Paciente' }}
+                            </p>
+                            <p class="cita-especialidad" *ngIf="cita.especialidad">
+                                <i class="bi bi-briefcase"></i> {{ cita.especialidad }}
+                            </p>
+                        </div>
+                        <span class="badge-tiempo" [class]="getBadgeTiempoClass(cita.fechacita || cita.fecha)">
+                            {{ obtenerBadgeTiempo(cita.fechacita || cita.fecha) }}
+                        </span>
+                    </div>
+
+                    <div class="cita-card-body">
+                        <div class="cita-detalles">
+                            <div class="cita-detalle">
+                                <i class="bi bi-clock"></i>
+                                <span>{{ formatearHora(cita.horacita || cita.hora) }}</span>
+                            </div>
+                            <div class="cita-detalle">
+                                <i class="bi bi-calendar3"></i>
+                                <span>{{ formatearFecha(cita.fechacita || cita.fecha) }}</span>
+                            </div>
+                            <div class="cita-detalle">
+                                <i class="bi" [class]="cita.modalidad === 'Virtual' ? 'bi-laptop' : 'bi-building'"></i>
+                                <span class="modalidad-badge"
+                                    [class]="cita.modalidad === 'Virtual' ? 'modalidad-virtual' : 'modalidad-presencial'">
+                                    {{ cita.modalidad || 'Presencial' }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="cita-acciones">
+                            <span class="estado-badge" [class]="getEstadoClass(cita.estado)">
+                                <i class="bi" [class]="getEstadoIcon(cita.estado)"></i>
+                                {{ cita.estado || 'Programada' }}
+                            </span>
+                            <button class="btn-detalle" [routerLink]="['/doctor/citas/detalle', cita.idcita || cita.id]"
+                                title="Ver detalle">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="!citasFiltradas.length" class="empty-state">
+                    <i class="bi bi-calendar-x"></i>
+                    <p>No tienes citas {{ filterEstado !== 'todas' ? filterEstado : '' }}</p>
+                    <button class="btn-primary" routerLink="/doctor/citas/nueva">Agendar Cita</button>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>

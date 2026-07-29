@@ -1,0 +1,164 @@
+<!-- Menu al inicio -->
+<app-doctor-menu></app-doctor-menu>
+
+<!-- Notificaciones Toast -->
+<div class="toast-container" *ngIf="notifications.length > 0">
+    <div *ngFor="let notif of notifications; let i = index" class="toast-notification toast-{{ notif.type }}"
+        [class.toast-exit]="i > 0">
+        <div class="toast-icon">
+            <i class="bi" [class]="
+                notif.type === 'success' ? 'bi-check-circle-fill' :
+                notif.type === 'error' ? 'bi-x-circle-fill' :
+                notif.type === 'warning' ? 'bi-exclamation-triangle-fill' :
+                'bi-info-circle-fill'
+            "></i>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title">{{ notif.title }}</div>
+            <div class="toast-message">{{ notif.message }}</div>
+        </div>
+        <button class="toast-close" (click)="removeToast(notif.id)">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        <div class="toast-progress" [style.animation-duration]="(notif.duration || 5000) + 'ms'"></div>
+    </div>
+</div>
+
+<div class="detalle-container">
+    <!-- BOTON VOLVER -->
+    <div class="back-section">
+        <button class="btn-back" (click)="volver()">
+            <i class="bi bi-arrow-left"></i>
+            <span>Volver a citas</span>
+        </button>
+    </div>
+
+    <!-- LOADING -->
+    <div *ngIf="isLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Cargando informacion de la cita...</p>
+    </div>
+
+    <!-- CONTENIDO -->
+    <div *ngIf="!isLoading && cita" class="detalle-content">
+
+        <div class="detalle-card">
+            <!-- Header de la cita -->
+            <div class="detalle-header">
+                <div class="cita-fecha-badge">
+                    <span class="cita-dia">{{ cita.fechacita || cita.fecha | date:'dd' }}</span>
+                    <span class="cita-mes">{{ cita.fechacita || cita.fecha | date:'MMM' }}</span>
+                </div>
+                <div class="cita-info-principal">
+                    <h1>{{ cita.motivo || 'Consulta Medica' }}</h1>
+                    <p class="cita-paciente">
+                        <i class="bi bi-person"></i> {{ cita.pacienteNombre || cita.nombrePaciente || 'Paciente' }}
+                    </p>
+                    <p class="cita-especialidad" *ngIf="cita.especialidad">
+                        <i class="bi bi-briefcase"></i> {{ cita.especialidad }}
+                    </p>
+                </div>
+                <span class="estado-badge" [class]="getEstadoClass(cita.estado)">
+                    <i class="bi" [class]="getEstadoIcon(cita.estado)"></i>
+                    {{ cita.estado || 'Programada' }}
+                </span>
+            </div>
+
+            <!-- Detalles de la cita -->
+            <div class="detalle-body">
+                <div class="detalle-grid">
+                    <div class="detalle-item">
+                        <span class="detalle-label">Fecha</span>
+                        <span class="detalle-valor">{{ formatearFecha(cita.fechacita || cita.fecha) }}</span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-label">Hora</span>
+                        <span class="detalle-valor">{{ formatearHora(cita.horacita || cita.hora) }}</span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-label">Modalidad</span>
+                        <span class="detalle-valor">
+                            <span class="modalidad-badge" [class]="getModalidadClass(cita.modalidad)">
+                                {{ cita.modalidad || 'Presencial' }}
+                            </span>
+                        </span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-label">Doctor</span>
+                        <span class="detalle-valor">{{ cita.medico || cita.nombreDoctor || 'No asignado' }}</span>
+                    </div>
+                    <div class="detalle-item" *ngIf="cita.sintomas">
+                        <span class="detalle-label">Sintomas</span>
+                        <span class="detalle-valor">{{ cita.sintomas }}</span>
+                    </div>
+                    <div class="detalle-item" *ngIf="cita.notasdoctor">
+                        <span class="detalle-label">Notas del Doctor</span>
+                        <span class="detalle-valor">{{ cita.notasdoctor }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="detalle-acciones">
+            <button class="btn-cancelar-cita"
+                *ngIf="cita.estado !== 'Cancelada' && cita.estado !== 'Completada' && cita.estado !== 'Realizada' && cita.estado !== 'Finalizada'"
+                (click)="mostrarConfirmacionCancelar(cita)" [disabled]="cargandoCancelar">
+                <i class="bi bi-x-circle" *ngIf="!cargandoCancelar"></i>
+                <span class="spinner-small" *ngIf="cargandoCancelar"></span>
+                {{ cargandoCancelar ? 'Cancelando...' : 'Cancelar Cita' }}
+            </button>
+            <button class="btn-volver" (click)="volver()">
+                <i class="bi bi-arrow-left"></i> Volver
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Cita no encontrada -->
+    <div *ngIf="!isLoading && !cita" class="error-state">
+        <i class="bi bi-calendar-x"></i>
+        <h3>Cita no encontrada</h3>
+        <p>La cita que buscas no existe o ha sido eliminada</p>
+        <button class="btn-primary" (click)="volver()">Volver a citas</button>
+    </div>
+</div>
+
+<!-- Modal de Confirmacion para Cancelar Cita -->
+<div class="modal-overlay" *ngIf="mostrarModalConfirmacionCancelar" (click)="cerrarModalConfirmacionCancelar()">
+    <div class="modal-content modal-confirmacion" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2><i class="bi bi-exclamation-triangle-fill" style="color: var(--warning);"></i> {{
+                modalConfirmacion.titulo }}</h2>
+            <button class="modal-close" (click)="cerrarModalConfirmacionCancelar()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p>{{ modalConfirmacion.mensaje }}</p>
+            <div class="detalle-item" *ngIf="citaParaCancelar">
+                <span class="detalle-label">Fecha</span>
+                <span class="detalle-valor">{{ formatearFecha(citaParaCancelar.fechacita || citaParaCancelar.fecha)
+                    }}</span>
+            </div>
+            <div class="detalle-item" *ngIf="citaParaCancelar">
+                <span class="detalle-label">Hora</span>
+                <span class="detalle-valor">{{ formatearHora(citaParaCancelar.horacita || citaParaCancelar.hora)
+                    }}</span>
+            </div>
+            <div class="detalle-item" *ngIf="citaParaCancelar">
+                <span class="detalle-label">Motivo</span>
+                <span class="detalle-valor">{{ citaParaCancelar.motivo || 'Consulta Medica' }}</span>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="form-actions">
+                <button class="btn-cancelar" (click)="cerrarModalConfirmacionCancelar()">Cancelar</button>
+                <button class="btn-confirmar-eliminar" (click)="ejecutarCancelarCita()" [disabled]="cargandoCancelar">
+                    <span class="spinner-small" *ngIf="cargandoCancelar"></span>
+                    {{ cargandoCancelar ? 'Cancelando...' : 'Si, Cancelar Cita' }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
