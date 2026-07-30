@@ -1,3 +1,7 @@
+/* ==========================================================================
+   PAGINA DE TRATAMIENTOS DEL DOCTOR - COMPLETA
+   ========================================================================== */
+
 :host {
     --primary: #b0001e;
     --primary-dark: #8a0017;
@@ -41,15 +45,22 @@
     background: var(--gray-50);
 }
 
+/* ==========================================================================
+   TRATAMIENTOS CONTAINER - SIN ESPACIOS EN BLANCO EN PANTALLAS GRANDES
+   ========================================================================== */
 .tratamientos-container {
     min-height: 100vh;
     background: var(--gray-50);
     padding: 16px 16px 100px;
     margin: 0 auto;
     width: 100%;
-    max-width: 680px;
+    max-width: 100%;
+    /* Eliminamos el max-width fijo */
 }
 
+/* ==========================================================================
+   HEADER
+   ========================================================================== */
 .page-header {
     padding: 0 0 16px;
 }
@@ -100,6 +111,9 @@
     transform: scale(0.95);
 }
 
+/* ==========================================================================
+   LOADING
+   ========================================================================== */
 .loading-container {
     display: flex;
     flex-direction: column;
@@ -129,6 +143,9 @@
     font-size: 0.9rem;
 }
 
+/* ==========================================================================
+   ESTADISTICAS
+   ========================================================================== */
 .stats-section {
     margin-bottom: 20px;
 }
@@ -188,6 +205,9 @@
     color: var(--warning);
 }
 
+/* ==========================================================================
+   SECCION DE TRATAMIENTOS
+   ========================================================================== */
 .tratamientos-section {
     background: white;
     padding: 16px;
@@ -223,6 +243,9 @@
     border-radius: 20px;
 }
 
+/* ==========================================================================
+   SEARCH
+   ========================================================================== */
 .search-section {
     margin-bottom: 16px;
 }
@@ -270,6 +293,9 @@
     color: var(--gray-600);
 }
 
+/* ==========================================================================
+   LISTA DE TRATAMIENTOS
+   ========================================================================== */
 .tratamientos-list {
     display: flex;
     flex-direction: column;
@@ -424,6 +450,9 @@
     transform: scale(1.05);
 }
 
+/* ==========================================================================
+   EMPTY STATE
+   ========================================================================== */
 .empty-state {
     display: flex;
     flex-direction: column;
@@ -461,7 +490,9 @@
     box-shadow: 0 4px 16px rgba(176, 0, 30, 0.3);
 }
 
-/* Toast Notifications */
+/* ==========================================================================
+   TOAST NOTIFICATIONS
+   ========================================================================== */
 .toast-container {
     position: fixed;
     top: 20px;
@@ -634,7 +665,9 @@
     }
 }
 
-/* Modal de Confirmacion */
+/* ==========================================================================
+   MODAL DE CONFIRMACION
+   ========================================================================== */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -843,26 +876,310 @@
     display: inline-block;
 }
 
-@media screen and (max-width: 480px) {
+/* ==========================================================================
+   RESPONSIVE - AJUSTES PARA PANTALLAS GRANDES Y PEQUEÑAS
+   ========================================================================== */
+
+/* Pantallas grandes (web) - Aprovecha todo el espacio */
+@media screen and (min-width: 1025px) {
+    .tratamientos-container {
+        padding: 24px 32px 100px;
+        max-width: 100%;
+    }
+
+    .page-header {
+        padding: 0 0 20px;
+    }
+
+    .header-info h1 {
+        font-size: 1.8rem;
+    }
+
+    .header-info p {
+        font-size: 0.95rem;
+    }
+
+    .btn-nuevo {
+        padding: 12px 24px;
+        font-size: 0.95rem;
+        border-radius: 14px;
+    }
+
+    .btn-nuevo i {
+        font-size: 1.2rem;
+    }
+
+    .stats-section {
+        margin-bottom: 24px;
+    }
+
     .stats-grid {
-        gap: 4px;
+        gap: 12px;
     }
 
     .stat-card {
-        padding: 8px 2px;
-        border-radius: 8px;
+        padding: 20px 16px;
+        border-radius: var(--border-radius-sm);
     }
 
     .stat-number {
-        font-size: 1rem;
+        font-size: 1.8rem;
     }
 
     .stat-label {
-        font-size: 0.5rem;
+        font-size: 0.7rem;
+    }
+
+    .tratamientos-section {
+        padding: 24px 28px;
+        border-radius: var(--border-radius);
+    }
+
+    .section-header {
+        margin-bottom: 18px;
+    }
+
+    .section-header h2 {
+        font-size: 1.1rem;
+    }
+
+    .section-header h2 i {
+        font-size: 1.1rem;
+    }
+
+    .tratamientos-count {
+        font-size: 0.9rem;
+        padding: 4px 18px;
+    }
+
+    .search-section {
+        margin-bottom: 20px;
+    }
+
+    .search-box {
+        border-radius: 12px;
+        padding: 0 16px;
+        border-width: 2px;
+    }
+
+    .search-box i {
+        font-size: 1.1rem;
+    }
+
+    .search-input {
+        padding: 12px 14px;
+        font-size: 1rem;
+    }
+
+    .tratamientos-list {
+        gap: 14px;
+    }
+
+    .tratamiento-card {
+        padding: 18px 20px;
+        border-radius: var(--border-radius-sm);
+    }
+
+    .tratamiento-header {
+        gap: 16px;
+        margin-bottom: 12px;
+    }
+
+    .tratamiento-icon {
+        width: 46px;
+        height: 46px;
+        font-size: 1.15rem;
+    }
+
+    .tratamiento-info h3 {
+        font-size: 0.95rem;
+    }
+
+    .tratamiento-paciente {
+        font-size: 0.8rem;
+    }
+
+    .badge {
+        font-size: 0.65rem;
+        padding: 3px 12px;
+    }
+
+    .detalle {
+        font-size: 0.75rem;
+    }
+
+    .detalle i {
+        font-size: 0.75rem;
+    }
+
+    .btn-detalle {
+        width: 32px;
+        height: 32px;
+        font-size: 0.95rem;
+    }
+
+    .badge-vencido {
+        font-size: 0.65rem;
+        padding: 3px 10px;
+    }
+
+    .modal-content {
+        max-width: 520px;
+        border-radius: var(--border-radius);
+    }
+
+    .modal-header {
+        padding: 20px 28px 16px;
+    }
+
+    .modal-header h2 {
+        font-size: 1.2rem;
+    }
+
+    .modal-body {
+        padding: 28px;
+    }
+
+    .modal-footer {
+        padding: 16px 28px 20px;
+    }
+
+    .toast-container {
+        max-width: 480px;
+        top: 24px;
+        right: 24px;
+        gap: 14px;
+    }
+
+    .toast-notification {
+        padding: 18px 22px;
+        border-radius: 14px;
+        border-left-width: 5px;
+    }
+
+    .toast-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 1.6rem;
+    }
+
+    .toast-title {
+        font-size: 0.95rem;
+    }
+
+    .toast-message {
+        font-size: 0.9rem;
+    }
+
+    .toast-close {
+        font-size: 1rem;
+        padding: 6px;
+    }
+
+    .toast-progress {
+        height: 4px;
+    }
+}
+
+/* Tablets y pantallas medianas */
+@media screen and (max-width: 1024px) and (min-width: 769px) {
+    .tratamientos-container {
+        padding: 20px 24px 90px;
+        max-width: 100%;
+    }
+
+    .stats-grid {
+        gap: 10px;
+    }
+
+    .stat-card {
+        padding: 16px 12px;
+    }
+
+    .stat-number {
+        font-size: 1.6rem;
+    }
+
+    .tratamientos-section {
+        padding: 20px 24px;
+    }
+
+    .tratamiento-card {
+        padding: 16px 18px;
+    }
+
+    .header-info h1 {
+        font-size: 1.6rem;
+    }
+
+    .btn-nuevo {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+
+    .modal-content {
+        max-width: 90%;
+    }
+}
+
+/* Moviles y pantallas pequenas */
+@media screen and (max-width: 768px) {
+    .tratamientos-container {
+        padding: 16px 16px 85px;
+        max-width: 100%;
+    }
+
+    .header-info h1 {
+        font-size: 1.3rem;
+    }
+
+    .header-info p {
+        font-size: 0.8rem;
+    }
+
+    .btn-nuevo {
+        padding: 8px 14px;
+        font-size: 0.8rem;
+        border-radius: 10px;
     }
 
     .btn-nuevo span {
         display: none;
+    }
+
+    .stats-grid {
+        gap: 6px;
+    }
+
+    .stat-card {
+        padding: 10px 4px;
+    }
+
+    .stat-number {
+        font-size: 1.15rem;
+    }
+
+    .tratamientos-section {
+        padding: 14px;
+        border-radius: var(--border-radius-sm);
+    }
+
+    .tratamiento-card {
+        padding: 12px;
+    }
+
+    .tratamiento-header {
+        gap: 10px;
+    }
+
+    .tratamiento-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 0.9rem;
+    }
+
+    .tratamiento-info h3 {
+        font-size: 0.8rem;
     }
 
     .tratamiento-body {
@@ -876,15 +1193,10 @@
         width: 100%;
     }
 
-    .toast-container {
-        right: 10px;
-        left: 10px;
-        max-width: none;
-    }
-
     .modal-content {
         max-width: 95%;
         margin: 10px;
+        border-radius: 12px;
     }
 
     .modal-footer .form-actions {
@@ -905,5 +1217,449 @@
     .modal-body .detalle-valor {
         text-align: left;
         width: 100%;
+    }
+
+    .toast-container {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        top: 10px;
+    }
+
+    .toast-notification {
+        padding: 12px 14px;
+        border-radius: 10px;
+    }
+
+    .toast-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 1.2rem;
+    }
+
+    .toast-title {
+        font-size: 0.8rem;
+    }
+
+    .toast-message {
+        font-size: 0.75rem;
+    }
+}
+
+/* Moviles muy pequenos */
+@media screen and (max-width: 480px) {
+    .tratamientos-container {
+        padding: 12px 12px 80px;
+    }
+
+    .header-info h1 {
+        font-size: 1.1rem;
+    }
+
+    .header-info p {
+        font-size: 0.7rem;
+    }
+
+    .btn-nuevo {
+        padding: 8px 12px;
+        font-size: 0.75rem;
+        border-radius: 8px;
+    }
+
+    .btn-nuevo i {
+        font-size: 0.9rem;
+    }
+
+    .stats-grid {
+        gap: 4px;
+    }
+
+    .stat-card {
+        padding: 8px 2px;
+        border-radius: 8px;
+        border-width: 1.5px;
+    }
+
+    .stat-number {
+        font-size: 1rem;
+    }
+
+    .stat-label {
+        font-size: 0.5rem;
+    }
+
+    .tratamientos-section {
+        padding: 12px;
+    }
+
+    .section-header h2 {
+        font-size: 0.8rem;
+    }
+
+    .section-header h2 i {
+        font-size: 0.8rem;
+    }
+
+    .tratamientos-count {
+        font-size: 0.65rem;
+        padding: 1px 10px;
+    }
+
+    .search-box {
+        border-radius: 8px;
+        padding: 0 10px;
+    }
+
+    .search-input {
+        padding: 8px 10px;
+        font-size: 0.85rem;
+    }
+
+    .tratamientos-list {
+        gap: 10px;
+    }
+
+    .tratamiento-card {
+        padding: 10px;
+        border-radius: 8px;
+    }
+
+    .tratamiento-header {
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+
+    .tratamiento-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 0.8rem;
+    }
+
+    .tratamiento-info h3 {
+        font-size: 0.75rem;
+    }
+
+    .tratamiento-paciente {
+        font-size: 0.65rem;
+    }
+
+    .badge {
+        font-size: 0.5rem;
+        padding: 1px 8px;
+    }
+
+    .tratamiento-body {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+    }
+
+    .tratamiento-detalles {
+        gap: 4px 10px;
+    }
+
+    .detalle {
+        font-size: 0.6rem;
+    }
+
+    .detalle i {
+        font-size: 0.6rem;
+    }
+
+    .badge-vencido {
+        font-size: 0.5rem;
+        padding: 1px 6px;
+    }
+
+    .tratamiento-acciones {
+        justify-content: space-between;
+        width: 100%;
+        gap: 6px;
+    }
+
+    .btn-detalle {
+        width: 24px;
+        height: 24px;
+        font-size: 0.75rem;
+    }
+
+    .modal-content {
+        max-width: 100%;
+        margin: 10px;
+        border-radius: 10px;
+    }
+
+    .modal-header {
+        padding: 14px 16px 12px;
+    }
+
+    .modal-header h2 {
+        font-size: 1rem;
+    }
+
+    .modal-close {
+        width: 30px;
+        height: 30px;
+        font-size: 0.85rem;
+    }
+
+    .modal-body {
+        padding: 16px;
+    }
+
+    .modal-body p {
+        font-size: 0.85rem;
+        margin-bottom: 12px;
+    }
+
+    .modal-body .detalle-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+        padding: 6px 0;
+    }
+
+    .modal-body .detalle-label {
+        font-size: 0.75rem;
+    }
+
+    .modal-body .detalle-valor {
+        font-size: 0.8rem;
+        text-align: left;
+        width: 100%;
+    }
+
+    .modal-footer {
+        padding: 12px 16px 14px;
+    }
+
+    .modal-footer .form-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .modal-footer .form-actions button {
+        width: 100%;
+        justify-content: center;
+        padding: 8px 16px;
+        font-size: 0.8rem;
+        border-radius: 8px;
+    }
+
+    .toast-container {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        top: 10px;
+    }
+
+    .toast-notification {
+        padding: 10px 12px;
+        border-radius: 8px;
+        gap: 10px;
+    }
+
+    .toast-icon {
+        width: 24px;
+        height: 24px;
+        font-size: 1rem;
+    }
+
+    .toast-title {
+        font-size: 0.75rem;
+    }
+
+    .toast-message {
+        font-size: 0.7rem;
+    }
+
+    .toast-close {
+        font-size: 0.8rem;
+        padding: 2px;
+    }
+
+    .empty-state {
+        padding: 30px 12px;
+    }
+
+    .empty-state i {
+        font-size: 2.5rem;
+    }
+
+    .empty-state p {
+        font-size: 0.8rem;
+    }
+
+    .btn-primary {
+        padding: 8px 18px;
+        font-size: 0.75rem;
+        border-radius: 8px;
+    }
+}
+
+/* Pantallas muy pequenas (menos de 360px) */
+@media screen and (max-width: 360px) {
+    .tratamientos-container {
+        padding: 10px 10px 75px;
+    }
+
+    .header-info h1 {
+        font-size: 0.95rem;
+    }
+
+    .header-info p {
+        font-size: 0.65rem;
+    }
+
+    .btn-nuevo {
+        padding: 6px 10px;
+        font-size: 0.65rem;
+        border-radius: 6px;
+    }
+
+    .btn-nuevo i {
+        font-size: 0.8rem;
+    }
+
+    .stats-grid {
+        gap: 3px;
+    }
+
+    .stat-card {
+        padding: 6px 2px;
+        border-radius: 6px;
+    }
+
+    .stat-number {
+        font-size: 0.9rem;
+    }
+
+    .stat-label {
+        font-size: 0.45rem;
+    }
+
+    .tratamientos-section {
+        padding: 10px;
+    }
+
+    .section-header h2 {
+        font-size: 0.7rem;
+    }
+
+    .tratamientos-count {
+        font-size: 0.55rem;
+        padding: 1px 8px;
+    }
+
+    .search-box {
+        padding: 0 8px;
+    }
+
+    .search-input {
+        padding: 6px 8px;
+        font-size: 0.8rem;
+    }
+
+    .tratamiento-card {
+        padding: 8px;
+    }
+
+    .tratamiento-header {
+        gap: 6px;
+    }
+
+    .tratamiento-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 0.7rem;
+    }
+
+    .tratamiento-info h3 {
+        font-size: 0.7rem;
+    }
+
+    .tratamiento-paciente {
+        font-size: 0.6rem;
+    }
+
+    .badge {
+        font-size: 0.45rem;
+        padding: 1px 6px;
+    }
+
+    .detalle {
+        font-size: 0.55rem;
+    }
+
+    .detalle i {
+        font-size: 0.55rem;
+    }
+
+    .badge-vencido {
+        font-size: 0.45rem;
+        padding: 1px 4px;
+    }
+
+    .btn-detalle {
+        width: 20px;
+        height: 20px;
+        font-size: 0.65rem;
+    }
+
+    .modal-header h2 {
+        font-size: 0.85rem;
+    }
+
+    .modal-close {
+        width: 26px;
+        height: 26px;
+        font-size: 0.75rem;
+    }
+
+    .modal-body {
+        padding: 12px;
+    }
+
+    .modal-body p {
+        font-size: 0.75rem;
+    }
+
+    .modal-body .detalle-label {
+        font-size: 0.65rem;
+    }
+
+    .modal-body .detalle-valor {
+        font-size: 0.7rem;
+    }
+
+    .modal-footer .form-actions .btn-cancelar,
+    .modal-footer .form-actions .btn-confirmar-eliminar {
+        padding: 6px 14px;
+        font-size: 0.7rem;
+    }
+
+    .toast-notification {
+        padding: 8px 10px;
+    }
+
+    .toast-title {
+        font-size: 0.7rem;
+    }
+
+    .toast-message {
+        font-size: 0.65rem;
+    }
+
+    .empty-state i {
+        font-size: 2rem;
+    }
+
+    .empty-state p {
+        font-size: 0.7rem;
+    }
+
+    .btn-primary {
+        padding: 6px 14px;
+        font-size: 0.65rem;
     }
 }

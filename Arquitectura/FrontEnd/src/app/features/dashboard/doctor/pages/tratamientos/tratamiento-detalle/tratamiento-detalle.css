@@ -1,3 +1,7 @@
+/* ==========================================================================
+   DETALLE DE TRATAMIENTO DEL DOCTOR - COMPLETA
+   ========================================================================== */
+
 :host {
     --primary: #b0001e;
     --primary-dark: #8a0017;
@@ -10,7 +14,6 @@
     --danger-dark: #dc2626;
     --info: #3b82f6;
     --info-dark: #2563eb;
-    /* AÑADIDA PARA EL HOVER DEL BOTÓN */
     --gray-50: #f8fafc;
     --gray-100: #f1f5f9;
     --gray-200: #e2e8f0;
@@ -43,15 +46,22 @@
     background: var(--gray-50);
 }
 
+/* ==========================================================================
+   DETALLE CONTAINER - SIN ESPACIOS EN BLANCO EN PANTALLAS GRANDES
+   ========================================================================== */
 .detalle-container {
     min-height: 100vh;
     background: var(--gray-50);
     padding: 16px 16px 100px;
     margin: 0 auto;
     width: 100%;
-    max-width: 680px;
+    max-width: 100%;
+    /* Eliminamos el max-width fijo */
 }
 
+/* ==========================================================================
+   BOTÓN VOLVER
+   ========================================================================== */
 .back-section {
     margin-bottom: 12px;
 }
@@ -73,6 +83,9 @@
     color: var(--primary);
 }
 
+/* ==========================================================================
+   LOADING
+   ========================================================================== */
 .loading-container {
     display: flex;
     flex-direction: column;
@@ -102,6 +115,9 @@
     font-size: 0.9rem;
 }
 
+/* ==========================================================================
+   DETALLE CARD
+   ========================================================================== */
 .detalle-card {
     background: white;
     border-radius: var(--border-radius);
@@ -193,6 +209,9 @@
     color: var(--danger);
 }
 
+/* ==========================================================================
+   DETALLE BODY
+   ========================================================================== */
 .detalle-body {
     padding: 24px;
 }
@@ -230,6 +249,9 @@
     word-break: break-word;
 }
 
+/* ==========================================================================
+   ACCIONES
+   ========================================================================== */
 .detalle-acciones {
     display: flex;
     gap: 12px;
@@ -256,7 +278,6 @@
     transform: scale(0.95);
 }
 
-/* --- BOTÓN CAMBIAR ESTADO MEJORADO --- */
 .btn-cambiar-estado {
     background: var(--info);
     color: white;
@@ -265,14 +286,10 @@
 
 .btn-cambiar-estado:hover:not(:disabled) {
     background: var(--info-dark);
-    /* Ahora usa el azul más oscuro */
     color: white;
-    /* Asegura que el texto se mantenga blanco */
     transform: translateY(-2px);
     box-shadow: 0 6px 24px rgba(59, 130, 246, 0.4);
 }
-
-/* ------------------------------------- */
 
 .btn-eliminar {
     background: var(--danger);
@@ -313,6 +330,9 @@
     background: var(--primary-dark);
 }
 
+/* ==========================================================================
+   ERROR STATE
+   ========================================================================== */
 .error-state {
     display: flex;
     flex-direction: column;
@@ -337,7 +357,9 @@
     margin: 0 0 16px;
 }
 
-/* Toast Notifications */
+/* ==========================================================================
+   TOAST NOTIFICATIONS
+   ========================================================================== */
 .toast-container {
     position: fixed;
     top: 20px;
@@ -510,7 +532,9 @@
     }
 }
 
-/* Modal de Confirmacion */
+/* ==========================================================================
+   MODAL DE CONFIRMACION
+   ========================================================================== */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -745,7 +769,9 @@
     display: inline-block;
 }
 
-/* Modal Estado */
+/* ==========================================================================
+   MODAL ESTADO
+   ========================================================================== */
 .estado-options {
     display: flex;
     gap: 16px;
@@ -783,76 +809,9 @@
     color: var(--gray-700);
 }
 
-@media screen and (max-width: 480px) {
-    .detalle-header {
-        flex-wrap: wrap;
-        padding: 16px;
-    }
-
-    .detalle-body {
-        padding: 16px;
-    }
-
-    .detalle-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 2px;
-    }
-
-    .detalle-valor {
-        text-align: left;
-        max-width: 100%;
-    }
-
-    .detalle-acciones {
-        flex-direction: column;
-    }
-
-    .detalle-acciones button {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .toast-container {
-        right: 10px;
-        left: 10px;
-        max-width: none;
-    }
-
-    .modal-content {
-        max-width: 95%;
-        margin: 10px;
-    }
-
-    .modal-footer .form-actions {
-        flex-direction: column;
-    }
-
-    .modal-footer .form-actions button {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .modal-body .detalle-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 2px;
-    }
-
-    .modal-body .detalle-valor {
-        text-align: left;
-        width: 100%;
-    }
-
-    .estado-options {
-        flex-direction: column;
-    }
-}
-
 /* ==========================================================================
    SECCION DE TOMAS
    ========================================================================== */
-
 .tomas-section {
     background: white;
     border-radius: var(--border-radius);
@@ -950,23 +909,9 @@
     color: var(--gray-500);
 }
 
-.spinner-small {
-    width: 20px;
-    height: 20px;
-    border: 2px solid var(--gray-200);
-    border-top: 2px solid var(--primary);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    display: inline-block;
-}
-
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-/* Estadisticas de Tomas */
+/* ==========================================================================
+   ESTADISTICAS DE TOMAS
+   ========================================================================== */
 .tomas-estadisticas {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
@@ -1016,7 +961,80 @@
     color: var(--primary);
 }
 
-/* Lista de Tomas */
+/* ==========================================================================
+   BUSCADOR DE TOMAS CON FLATPICKR
+   ========================================================================== */
+.buscador-tomas {
+    margin-bottom: 16px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.buscador-tomas label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--gray-600);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.buscador-tomas input.flatpickr-input {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--gray-300);
+    font-size: 0.85rem;
+    background: white;
+    flex: 1;
+    min-width: 150px;
+    max-width: 250px;
+    transition: var(--transition);
+    outline: none;
+    color: var(--gray-800);
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.buscador-tomas input.flatpickr-input:focus {
+    border-color: var(--info);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.buscador-tomas input.flatpickr-input::placeholder {
+    color: var(--gray-400);
+}
+
+.buscador-tomas .btn-limpiar-filtro {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--gray-300);
+    background: var(--gray-50);
+    color: var(--gray-600);
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.buscador-tomas .btn-limpiar-filtro:hover {
+    background: var(--gray-200);
+    border-color: var(--gray-400);
+}
+
+.buscador-tomas .contador-filtro {
+    font-size: 0.8rem;
+    color: var(--gray-500);
+    white-space: nowrap;
+}
+
+/* ==========================================================================
+   LISTA DE TOMAS
+   ========================================================================== */
 .tomas-list {
     display: flex;
     flex-direction: column;
@@ -1129,7 +1147,9 @@
     transform: scale(1.05);
 }
 
-/* Sin Tomas */
+/* ==========================================================================
+   SIN TOMAS
+   ========================================================================== */
 .sin-tomas {
     display: flex;
     flex-direction: column;
@@ -1156,79 +1176,7 @@
 }
 
 /* ==========================================================================
-   ESTILOS PARA EL BUSCADOR DE FECHAS CON FLATPICKR
-   ========================================================================== */
-.buscador-tomas {
-    margin-bottom: 16px;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.buscador-tomas label {
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--gray-600);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    white-space: nowrap;
-}
-
-/* Estilos específicos para el input de Flatpickr (type="text") */
-.buscador-tomas input.flatpickr-input {
-    padding: 6px 12px;
-    border-radius: 8px;
-    border: 1px solid var(--gray-300);
-    font-size: 0.85rem;
-    background: white;
-    flex: 1;
-    min-width: 150px;
-    max-width: 250px;
-    transition: var(--transition);
-    outline: none;
-    color: var(--gray-800);
-    font-family: inherit;
-    cursor: pointer;
-}
-
-.buscador-tomas input.flatpickr-input:focus {
-    border-color: var(--info);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-}
-
-.buscador-tomas input.flatpickr-input::placeholder {
-    color: var(--gray-400);
-}
-
-.buscador-tomas .btn-limpiar-filtro {
-    padding: 6px 12px;
-    border-radius: 8px;
-    border: 1px solid var(--gray-300);
-    background: var(--gray-50);
-    color: var(--gray-600);
-    cursor: pointer;
-    font-size: 0.8rem;
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.buscador-tomas .btn-limpiar-filtro:hover {
-    background: var(--gray-200);
-    border-color: var(--gray-400);
-}
-
-.buscador-tomas .contador-filtro {
-    font-size: 0.8rem;
-    color: var(--gray-500);
-    white-space: nowrap;
-}
-
-/* ==========================================================================
-   ESTILOS PARA EL CALENDARIO EMERGENTE DE FLATPICKR
+   FLATPICKR
    ========================================================================== */
 .flatpickr-calendar {
     box-shadow: var(--shadow-lg) !important;
@@ -1293,8 +1241,274 @@
     fill: var(--primary) !important;
 }
 
-/* RESPONSIVE TOMAS */
+/* ==========================================================================
+   RESPONSIVE - AJUSTES PARA PANTALLAS GRANDES Y PEQUEÑAS
+   ========================================================================== */
+
+/* Pantallas grandes (web) - Aprovecha todo el espacio */
+@media screen and (min-width: 1025px) {
+    .detalle-container {
+        padding: 24px 32px 100px;
+        max-width: 100%;
+    }
+
+    .back-section {
+        margin-bottom: 16px;
+    }
+
+    .btn-back {
+        font-size: 0.95rem;
+        padding: 6px 0;
+        gap: 10px;
+    }
+
+    .btn-back i {
+        font-size: 1.1rem;
+    }
+
+    .detalle-card {
+        border-radius: var(--border-radius);
+    }
+
+    .detalle-header {
+        padding: 28px 32px;
+        gap: 20px;
+    }
+
+    .tratamiento-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+
+    .tratamiento-info-principal h1 {
+        font-size: 1.3rem;
+    }
+
+    .tratamiento-paciente {
+        font-size: 0.95rem;
+    }
+
+    .tratamiento-doctor {
+        font-size: 0.85rem;
+    }
+
+    .estado-badge {
+        font-size: 0.8rem;
+        padding: 6px 18px;
+        border-radius: 14px;
+    }
+
+    .estado-badge i {
+        font-size: 0.7rem;
+    }
+
+    .detalle-body {
+        padding: 32px;
+    }
+
+    .detalle-item {
+        padding: 12px 0;
+    }
+
+    .detalle-label {
+        font-size: 0.9rem;
+    }
+
+    .detalle-valor {
+        font-size: 0.95rem;
+    }
+
+    .detalle-acciones {
+        gap: 16px;
+        margin-top: 20px;
+    }
+
+    .detalle-acciones button {
+        padding: 12px 24px;
+        font-size: 0.95rem;
+        border-radius: 12px;
+    }
+
+    .tomas-section {
+        padding: 24px 28px;
+        border-radius: var(--border-radius);
+        margin-top: 20px;
+    }
+
+    .tomas-header h2 {
+        font-size: 1rem;
+    }
+
+    .tomas-estadisticas {
+        gap: 12px;
+    }
+
+    .toma-stat {
+        padding: 12px 10px;
+    }
+
+    .stat-numero {
+        font-size: 1.2rem;
+    }
+
+    .stat-label {
+        font-size: 0.65rem;
+    }
+
+    .buscador-tomas input.flatpickr-input {
+        padding: 8px 14px;
+        font-size: 0.9rem;
+        max-width: 280px;
+    }
+
+    .toma-item {
+        padding: 12px 16px;
+        border-radius: var(--border-radius-sm);
+    }
+
+    .toma-dia {
+        font-size: 0.95rem;
+    }
+
+    .toma-hora {
+        font-size: 0.85rem;
+    }
+
+    .btn-eliminar-toma {
+        width: 32px;
+        height: 32px;
+        font-size: 0.95rem;
+    }
+
+    .modal-content {
+        max-width: 520px;
+        border-radius: var(--border-radius);
+    }
+
+    .modal-header {
+        padding: 20px 28px 16px;
+    }
+
+    .modal-header h2 {
+        font-size: 1.2rem;
+    }
+
+    .modal-body {
+        padding: 28px;
+    }
+
+    .modal-footer {
+        padding: 16px 28px 20px;
+    }
+
+    .toast-container {
+        max-width: 480px;
+        top: 24px;
+        right: 24px;
+        gap: 14px;
+    }
+
+    .toast-notification {
+        padding: 18px 22px;
+        border-radius: 14px;
+        border-left-width: 5px;
+    }
+
+    .toast-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 1.6rem;
+    }
+
+    .toast-title {
+        font-size: 0.95rem;
+    }
+
+    .toast-message {
+        font-size: 0.9rem;
+    }
+
+    .toast-close {
+        font-size: 1rem;
+        padding: 6px;
+    }
+
+    .toast-progress {
+        height: 4px;
+    }
+}
+
+/* Tablets y pantallas medianas */
+@media screen and (max-width: 1024px) and (min-width: 769px) {
+    .detalle-container {
+        padding: 20px 24px 90px;
+        max-width: 100%;
+    }
+
+    .detalle-header {
+        padding: 24px 28px;
+        gap: 18px;
+    }
+
+    .detalle-body {
+        padding: 28px;
+    }
+
+    .tratamiento-icon {
+        width: 54px;
+        height: 54px;
+        font-size: 1.3rem;
+    }
+
+    .tratamiento-info-principal h1 {
+        font-size: 1.2rem;
+    }
+
+    .estado-badge {
+        font-size: 0.75rem;
+    }
+
+    .tomas-estadisticas {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .modal-content {
+        max-width: 90%;
+    }
+}
+
+/* Moviles y pantallas pequenas */
 @media screen and (max-width: 768px) {
+    .detalle-container {
+        padding: 16px 16px 85px;
+        max-width: 100%;
+    }
+
+    .detalle-header {
+        padding: 18px 20px;
+        gap: 14px;
+    }
+
+    .detalle-body {
+        padding: 20px;
+    }
+
+    .tratamiento-icon {
+        width: 44px;
+        height: 44px;
+        font-size: 1.1rem;
+    }
+
+    .tratamiento-info-principal h1 {
+        font-size: 1rem;
+    }
+
+    .estado-badge {
+        font-size: 0.65rem;
+        padding: 3px 12px;
+    }
+
     .tomas-estadisticas {
         grid-template-columns: repeat(3, 1fr);
     }
@@ -1303,9 +1517,137 @@
         max-width: 100%;
         flex: 1;
     }
+
+    .tomas-actions {
+        flex-wrap: wrap;
+    }
+
+    .modal-content {
+        max-width: 95%;
+        margin: 10px;
+        border-radius: 12px;
+    }
 }
 
+/* Moviles muy pequenos */
 @media screen and (max-width: 480px) {
+    .detalle-container {
+        padding: 12px 12px 80px;
+    }
+
+    .back-section {
+        margin-bottom: 10px;
+    }
+
+    .btn-back {
+        font-size: 0.75rem;
+        gap: 6px;
+        padding: 3px 0;
+    }
+
+    .btn-back i {
+        font-size: 0.85rem;
+    }
+
+    .detalle-header {
+        flex-wrap: wrap;
+        padding: 14px 16px;
+        gap: 12px;
+    }
+
+    .tratamiento-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+
+    .tratamiento-info-principal h1 {
+        font-size: 0.9rem;
+    }
+
+    .tratamiento-paciente {
+        font-size: 0.75rem;
+    }
+
+    .tratamiento-doctor {
+        font-size: 0.7rem;
+    }
+
+    .estado-badge {
+        font-size: 0.6rem;
+        padding: 2px 10px;
+        border-radius: 10px;
+    }
+
+    .estado-badge i {
+        font-size: 0.5rem;
+    }
+
+    .detalle-body {
+        padding: 14px;
+    }
+
+    .detalle-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+        padding: 8px 0;
+    }
+
+    .detalle-label {
+        font-size: 0.75rem;
+    }
+
+    .detalle-valor {
+        font-size: 0.8rem;
+        text-align: left;
+        max-width: 100%;
+    }
+
+    .detalle-acciones {
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 14px;
+    }
+
+    .detalle-acciones button {
+        width: 100%;
+        justify-content: center;
+        padding: 8px 16px;
+        font-size: 0.8rem;
+        border-radius: 8px;
+    }
+
+    /* Tomas */
+    .tomas-section {
+        padding: 12px;
+        border-radius: var(--border-radius-sm);
+        margin-top: 12px;
+    }
+
+    .tomas-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .tomas-header h2 {
+        font-size: 0.85rem;
+    }
+
+    .tomas-actions {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .tomas-actions button {
+        width: 100%;
+        justify-content: center;
+        padding: 8px 14px;
+        font-size: 0.75rem;
+        border-radius: 8px;
+    }
+
     .tomas-estadisticas {
         grid-template-columns: repeat(3, 1fr);
         gap: 4px;
@@ -1313,33 +1655,86 @@
 
     .toma-stat {
         padding: 6px 4px;
+        border-radius: 8px;
     }
 
     .stat-numero {
         font-size: 0.9rem;
     }
 
-    .tomas-header {
+    .stat-label {
+        font-size: 0.5rem;
+    }
+
+    .buscador-tomas {
         flex-direction: column;
         align-items: stretch;
+        gap: 6px;
     }
 
-    .tomas-actions {
-        flex-direction: column;
+    .buscador-tomas label {
+        white-space: normal;
+        font-size: 0.8rem;
     }
 
-    .tomas-actions button {
-        width: 100%;
+    .buscador-tomas input.flatpickr-input {
+        max-width: 100%;
+        min-width: unset;
+        padding: 8px 12px;
+        font-size: 0.8rem;
+    }
+
+    .buscador-tomas .btn-limpiar-filtro {
         justify-content: center;
+        padding: 6px 12px;
+        font-size: 0.75rem;
+    }
+
+    .buscador-tomas .contador-filtro {
+        text-align: center;
+        font-size: 0.7rem;
+    }
+
+    .tomas-list {
+        gap: 6px;
     }
 
     .toma-item {
         flex-wrap: wrap;
         gap: 8px;
+        padding: 8px 10px;
+        border-radius: 8px;
+        border-left-width: 3px;
     }
 
     .toma-izquierda {
         flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .toma-fecha {
+        min-width: 30px;
+        padding: 2px 4px;
+    }
+
+    .toma-dia {
+        font-size: 0.75rem;
+    }
+
+    .toma-mes {
+        font-size: 0.45rem;
+    }
+
+    .toma-hora {
+        font-size: 0.7rem;
+    }
+
+    .toma-estado {
+        font-size: 0.55rem;
+    }
+
+    .toma-realizada {
+        font-size: 0.55rem;
     }
 
     .toma-derecha {
@@ -1347,31 +1742,328 @@
         justify-content: flex-end;
     }
 
-    .buscador-tomas {
-        flex-direction: column;
-        align-items: stretch;
+    .btn-eliminar-toma {
+        width: 24px;
+        height: 24px;
+        font-size: 0.7rem;
     }
 
-    .buscador-tomas label {
-        white-space: normal;
+    .sin-tomas {
+        padding: 20px 12px;
     }
 
-    .buscador-tomas input.flatpickr-input {
+    .sin-tomas i {
+        font-size: 2rem;
+    }
+
+    .sin-tomas p {
+        font-size: 0.75rem;
+    }
+
+    .sin-tomas-sub {
+        font-size: 0.65rem !important;
+    }
+
+    /* Modal */
+    .modal-content {
         max-width: 100%;
-        min-width: unset;
+        margin: 10px;
+        border-radius: 10px;
     }
 
-    .buscador-tomas .btn-limpiar-filtro {
+    .modal-header {
+        padding: 14px 16px 12px;
+    }
+
+    .modal-header h2 {
+        font-size: 1rem;
+    }
+
+    .modal-close {
+        width: 30px;
+        height: 30px;
+        font-size: 0.85rem;
+    }
+
+    .modal-body {
+        padding: 16px;
+    }
+
+    .modal-body p {
+        font-size: 0.85rem;
+        margin-bottom: 12px;
+    }
+
+    .modal-body .detalle-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+        padding: 6px 0;
+    }
+
+    .modal-body .detalle-label {
+        font-size: 0.75rem;
+    }
+
+    .modal-body .detalle-valor {
+        font-size: 0.8rem;
+        text-align: left;
+        width: 100%;
+    }
+
+    .modal-footer {
+        padding: 12px 16px 14px;
+    }
+
+    .modal-footer .form-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .modal-footer .form-actions button {
+        width: 100%;
         justify-content: center;
+        padding: 8px 16px;
+        font-size: 0.8rem;
+        border-radius: 8px;
     }
 
-    .buscador-tomas .contador-filtro {
-        text-align: center;
+    .estado-options {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .estado-option {
+        padding: 12px;
+        border-radius: 10px;
+    }
+
+    .estado-option i {
+        font-size: 1.4rem;
+    }
+
+    .estado-option span {
+        font-size: 0.8rem;
+    }
+
+    .toast-container {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        top: 10px;
+        gap: 10px;
+    }
+
+    .toast-notification {
+        padding: 12px 14px;
+        border-radius: 10px;
+        gap: 10px;
+        border-left-width: 4px;
+    }
+
+    .toast-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 1.2rem;
+    }
+
+    .toast-title {
+        font-size: 0.8rem;
+    }
+
+    .toast-message {
+        font-size: 0.75rem;
+    }
+
+    .toast-close {
+        font-size: 0.8rem;
+        padding: 2px;
+    }
+
+    .toast-progress {
+        height: 3px;
+    }
+
+    .spinner-small {
+        width: 16px;
+        height: 16px;
+        border-width: 2px;
+    }
+
+    .error-state {
+        padding: 40px 16px;
+    }
+
+    .error-state i {
+        font-size: 2.5rem;
+    }
+
+    .error-state h3 {
+        font-size: 0.95rem;
+    }
+
+    .error-state p {
+        font-size: 0.75rem;
+    }
+
+    .btn-primary {
+        padding: 8px 18px;
+        font-size: 0.8rem;
+        border-radius: 8px;
     }
 }
 
+/* Pantallas muy pequenas (menos de 360px) */
 @media screen and (max-width: 360px) {
+    .detalle-container {
+        padding: 10px 10px 75px;
+    }
+
+    .detalle-header {
+        padding: 12px;
+        gap: 10px;
+    }
+
+    .tratamiento-icon {
+        width: 34px;
+        height: 34px;
+        font-size: 0.85rem;
+    }
+
+    .tratamiento-info-principal h1 {
+        font-size: 0.8rem;
+    }
+
+    .tratamiento-paciente {
+        font-size: 0.65rem;
+    }
+
+    .tratamiento-doctor {
+        font-size: 0.6rem;
+    }
+
+    .estado-badge {
+        font-size: 0.55rem;
+        padding: 1px 8px;
+    }
+
+    .detalle-body {
+        padding: 10px;
+    }
+
+    .detalle-label {
+        font-size: 0.65rem;
+    }
+
+    .detalle-valor {
+        font-size: 0.7rem;
+    }
+
+    .detalle-acciones button {
+        padding: 6px 14px;
+        font-size: 0.7rem;
+    }
+
     .tomas-estadisticas {
         grid-template-columns: repeat(2, 1fr);
+        gap: 3px;
+    }
+
+    .toma-stat {
+        padding: 4px 2px;
+    }
+
+    .stat-numero {
+        font-size: 0.8rem;
+    }
+
+    .stat-label {
+        font-size: 0.45rem;
+    }
+
+    .toma-item {
+        padding: 6px 8px;
+    }
+
+    .toma-dia {
+        font-size: 0.65rem;
+    }
+
+    .toma-hora {
+        font-size: 0.6rem;
+    }
+
+    .toma-estado {
+        font-size: 0.5rem;
+    }
+
+    .btn-eliminar-toma {
+        width: 20px;
+        height: 20px;
+        font-size: 0.6rem;
+    }
+
+    .modal-header h2 {
+        font-size: 0.85rem;
+    }
+
+    .modal-close {
+        width: 26px;
+        height: 26px;
+        font-size: 0.75rem;
+    }
+
+    .modal-body {
+        padding: 12px;
+    }
+
+    .modal-body p {
+        font-size: 0.75rem;
+    }
+
+    .modal-body .detalle-label {
+        font-size: 0.65rem;
+    }
+
+    .modal-body .detalle-valor {
+        font-size: 0.7rem;
+    }
+
+    .modal-footer .form-actions .btn-cancelar,
+    .modal-footer .form-actions .btn-confirmar-eliminar,
+    .modal-footer .form-actions .btn-guardar {
+        padding: 6px 14px;
+        font-size: 0.7rem;
+    }
+
+    .estado-option {
+        padding: 10px;
+    }
+
+    .estado-option i {
+        font-size: 1.2rem;
+    }
+
+    .estado-option span {
+        font-size: 0.7rem;
+    }
+
+    .toast-notification {
+        padding: 8px 12px;
+        gap: 8px;
+    }
+
+    .toast-title {
+        font-size: 0.7rem;
+    }
+
+    .toast-message {
+        font-size: 0.65rem;
+    }
+
+    .toast-icon {
+        width: 24px;
+        height: 24px;
+        font-size: 1rem;
     }
 }

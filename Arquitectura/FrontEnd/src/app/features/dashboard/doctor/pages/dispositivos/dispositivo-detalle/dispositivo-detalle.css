@@ -1,3 +1,7 @@
+/* ==========================================================================
+   DETALLE DE DISPOSITIVO DEL DOCTOR - COMPLETA
+   ========================================================================== */
+
 :host {
     --primary: #b0001e;
     --primary-dark: #8a0017;
@@ -47,15 +51,22 @@
     background: var(--gray-50);
 }
 
+/* ==========================================================================
+   DETALLE CONTAINER - SIN ESPACIOS EN BLANCO EN PANTALLAS GRANDES
+   ========================================================================== */
 .detalle-container {
     min-height: 100vh;
     background: var(--gray-50);
     padding: 16px 16px 100px;
     margin: 0 auto;
     width: 100%;
-    max-width: 680px;
+    max-width: 100%;
+    /* Eliminamos el max-width fijo */
 }
 
+/* ==========================================================================
+   BOTÓN VOLVER
+   ========================================================================== */
 .back-section {
     margin-bottom: 12px;
 }
@@ -77,6 +88,9 @@
     color: var(--primary);
 }
 
+/* ==========================================================================
+   LOADING
+   ========================================================================== */
 .loading-container {
     display: flex;
     flex-direction: column;
@@ -106,6 +120,9 @@
     font-size: 0.9rem;
 }
 
+/* ==========================================================================
+   DETALLE CARD
+   ========================================================================== */
 .detalle-card {
     background: white;
     border-radius: var(--border-radius);
@@ -196,6 +213,9 @@
     color: var(--gray-500);
 }
 
+/* ==========================================================================
+   DETALLE BODY
+   ========================================================================== */
 .detalle-body {
     padding: 24px;
 }
@@ -233,6 +253,9 @@
     word-break: break-word;
 }
 
+/* ==========================================================================
+   ACCIONES
+   ========================================================================== */
 .detalle-acciones {
     display: flex;
     gap: 12px;
@@ -315,6 +338,9 @@
     border-color: var(--gray-300);
 }
 
+/* ==========================================================================
+   ERROR STATE
+   ========================================================================== */
 .error-state {
     display: flex;
     flex-direction: column;
@@ -355,6 +381,9 @@
     background: var(--primary-dark);
 }
 
+/* ==========================================================================
+   TOAST NOTIFICATIONS
+   ========================================================================== */
 .toast-container {
     position: fixed;
     top: 20px;
@@ -527,6 +556,9 @@
     }
 }
 
+/* ==========================================================================
+   MODAL DE CONFIRMACION
+   ========================================================================== */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -731,70 +763,8 @@
     display: inline-block;
 }
 
-@media screen and (max-width: 480px) {
-    .detalle-header {
-        flex-wrap: wrap;
-        padding: 16px;
-    }
-
-    .detalle-body {
-        padding: 16px;
-    }
-
-    .detalle-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 2px;
-    }
-
-    .detalle-valor {
-        text-align: left;
-        max-width: 100%;
-    }
-
-    .detalle-acciones {
-        flex-direction: column;
-    }
-
-    .detalle-acciones button {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .toast-container {
-        right: 10px;
-        left: 10px;
-        max-width: none;
-    }
-
-    .modal-content {
-        max-width: 95%;
-        margin: 10px;
-    }
-
-    .modal-footer .form-actions {
-        flex-direction: column;
-    }
-
-    .modal-footer .form-actions button {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .modal-body .detalle-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 2px;
-    }
-
-    .modal-body .detalle-valor {
-        text-align: left;
-        width: 100%;
-    }
-}
-
 /* ==========================================================================
-   SECCION DE MEDICION - MEJORADA
+   SECCION DE MEDICION
    ========================================================================== */
 .medicion-section {
     background: white;
@@ -876,7 +846,7 @@
 }
 
 /* ==========================================================================
-   HISTORIAL DE MEDICIONES - MEJORADO
+   HISTORIAL DE MEDICIONES
    ========================================================================== */
 .historial-section {
     background: white;
@@ -1082,7 +1052,7 @@
 }
 
 /* ==========================================================================
-   MODAL DE MEDICION - MEJORADO
+   MODAL DE MEDICION
    ========================================================================== */
 .modal-medicion-grande {
     max-width: 560px;
@@ -1302,9 +1272,6 @@
     color: var(--gray-800);
 }
 
-/* ==========================================================================
-   BOTONES DEL MODAL - MEJORADOS
-   ========================================================================== */
 .modal-footer .form-actions .btn-cerrar {
     padding: 10px 28px;
     border-radius: 10px;
@@ -1333,9 +1300,315 @@
 }
 
 /* ==========================================================================
-   RESPONSIVE - MEJORADO
+   RESPONSIVE - AJUSTES PARA PANTALLAS GRANDES Y PEQUEÑAS
    ========================================================================== */
-@media screen and (max-width: 480px) {
+
+/* Pantallas grandes (web) - Aprovecha todo el espacio */
+@media screen and (min-width: 1025px) {
+    .detalle-container {
+        padding: 24px 32px 100px;
+        max-width: 100%;
+    }
+
+    .back-section {
+        margin-bottom: 16px;
+    }
+
+    .btn-back {
+        font-size: 0.95rem;
+        padding: 6px 0;
+        gap: 10px;
+    }
+
+    .btn-back i {
+        font-size: 1.1rem;
+    }
+
+    .detalle-card {
+        border-radius: var(--border-radius);
+    }
+
+    .detalle-header {
+        padding: 28px 32px;
+        gap: 20px;
+    }
+
+    .dispositivo-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+
+    .dispositivo-info-principal h1 {
+        font-size: 1.3rem;
+    }
+
+    .dispositivo-mac {
+        font-size: 0.95rem;
+    }
+
+    .dispositivo-paciente {
+        font-size: 0.85rem;
+    }
+
+    .estado-badge {
+        font-size: 0.8rem;
+        padding: 6px 18px;
+        border-radius: 14px;
+    }
+
+    .detalle-body {
+        padding: 32px;
+    }
+
+    .detalle-item {
+        padding: 12px 0;
+    }
+
+    .detalle-label {
+        font-size: 0.9rem;
+    }
+
+    .detalle-valor {
+        font-size: 0.95rem;
+    }
+
+    .detalle-acciones {
+        gap: 16px;
+        margin-top: 20px;
+    }
+
+    .detalle-acciones button {
+        padding: 12px 24px;
+        font-size: 0.95rem;
+        border-radius: 12px;
+    }
+
+    .medicion-section {
+        padding: 20px 24px;
+        border-radius: var(--border-radius);
+        margin-top: 20px;
+    }
+
+    .medicion-header h2 {
+        font-size: 1rem;
+    }
+
+    .btn-medicion {
+        padding: 12px 28px;
+        font-size: 0.95rem;
+        border-radius: 12px;
+    }
+
+    .btn-medicion i {
+        font-size: 1.2rem;
+    }
+
+    .historial-section {
+        padding: 20px 24px;
+        border-radius: var(--border-radius);
+        margin-top: 20px;
+    }
+
+    .historial-header h2 {
+        font-size: 1rem;
+    }
+
+    .historial-count {
+        font-size: 0.9rem;
+        padding: 4px 18px;
+    }
+
+    .medicion-item {
+        padding: 16px 20px;
+        border-radius: var(--border-radius-sm);
+        gap: 20px;
+    }
+
+    .medicion-fecha {
+        min-width: 90px;
+    }
+
+    .medicion-dia {
+        font-size: 0.9rem;
+    }
+
+    .medicion-dia small {
+        font-size: 0.7rem;
+    }
+
+    .medicion-valor .valor {
+        font-size: 1.2rem;
+    }
+
+    .medicion-valor .label {
+        font-size: 0.6rem;
+    }
+
+    .clasificacion-badge {
+        padding: 6px 18px;
+        font-size: 0.75rem;
+        border-radius: 14px;
+    }
+
+    .modal-content {
+        max-width: 520px;
+        border-radius: var(--border-radius);
+    }
+
+    .modal-medicion-grande {
+        max-width: 620px;
+    }
+
+    .modal-header {
+        padding: 20px 28px 16px;
+    }
+
+    .modal-header h2 {
+        font-size: 1.2rem;
+    }
+
+    .modal-body {
+        padding: 28px;
+    }
+
+    .modal-footer {
+        padding: 16px 28px 20px;
+    }
+
+    .medicion-valor.principal .valor {
+        font-size: 3.2rem;
+    }
+
+    .medicion-separador {
+        font-size: 3.2rem;
+    }
+
+    .medicion-detalles {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        padding: 20px 24px;
+    }
+
+    .toast-container {
+        max-width: 480px;
+        top: 24px;
+        right: 24px;
+        gap: 14px;
+    }
+
+    .toast-notification {
+        padding: 18px 22px;
+        border-radius: 14px;
+        border-left-width: 5px;
+    }
+
+    .toast-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 1.6rem;
+    }
+
+    .toast-title {
+        font-size: 0.95rem;
+    }
+
+    .toast-message {
+        font-size: 0.9rem;
+    }
+
+    .toast-close {
+        font-size: 1rem;
+        padding: 6px;
+    }
+
+    .toast-progress {
+        height: 4px;
+    }
+}
+
+/* Tablets y pantallas medianas */
+@media screen and (max-width: 1024px) and (min-width: 769px) {
+    .detalle-container {
+        padding: 20px 24px 90px;
+        max-width: 100%;
+    }
+
+    .detalle-header {
+        padding: 24px 28px;
+        gap: 18px;
+    }
+
+    .detalle-body {
+        padding: 28px;
+    }
+
+    .dispositivo-icon {
+        width: 54px;
+        height: 54px;
+        font-size: 1.3rem;
+    }
+
+    .dispositivo-info-principal h1 {
+        font-size: 1.2rem;
+    }
+
+    .estado-badge {
+        font-size: 0.75rem;
+    }
+
+    .medicion-item {
+        padding: 14px 18px;
+        gap: 16px;
+    }
+
+    .modal-content {
+        max-width: 90%;
+    }
+
+    .modal-medicion-grande {
+        max-width: 95%;
+    }
+
+    .medicion-valor.principal .valor {
+        font-size: 2.8rem;
+    }
+
+    .medicion-separador {
+        font-size: 2.8rem;
+    }
+}
+
+/* Moviles y pantallas pequenas */
+@media screen and (max-width: 768px) {
+    .detalle-container {
+        padding: 16px 16px 85px;
+        max-width: 100%;
+    }
+
+    .detalle-header {
+        padding: 18px 20px;
+        gap: 14px;
+    }
+
+    .detalle-body {
+        padding: 20px;
+    }
+
+    .dispositivo-icon {
+        width: 44px;
+        height: 44px;
+        font-size: 1.1rem;
+    }
+
+    .dispositivo-info-principal h1 {
+        font-size: 1rem;
+    }
+
+    .estado-badge {
+        font-size: 0.65rem;
+        padding: 3px 12px;
+    }
+
     .medicion-header {
         flex-direction: column;
         align-items: stretch;
@@ -1344,8 +1617,6 @@
     .btn-medicion {
         width: 100%;
         justify-content: center;
-        padding: 12px;
-        font-size: 0.9rem;
     }
 
     .medicion-item {
@@ -1366,32 +1637,8 @@
         min-width: auto;
     }
 
-    .medicion-dia {
-        font-size: 0.85rem;
-    }
-
     .clasificacion-badge {
         align-self: center;
-    }
-
-    .medicion-valores {
-        gap: 8px;
-    }
-
-    .medicion-separador {
-        font-size: 0.9rem;
-    }
-
-    .medicion-valor.principal .valor {
-        font-size: 2.2rem;
-    }
-
-    .medicion-separador {
-        font-size: 2.2rem;
-    }
-
-    .modal-medicion-grande {
-        max-width: 95%;
     }
 
     .medicion-valor.pulso {
@@ -1399,50 +1646,332 @@
         padding-left: 0;
     }
 
+    .modal-content {
+        max-width: 95%;
+        margin: 10px;
+        border-radius: 12px;
+    }
+
+    .modal-medicion-grande {
+        max-width: 95%;
+    }
+
+    .modal-footer .form-actions {
+        flex-direction: column;
+    }
+
+    .modal-footer .form-actions button {
+        width: 100%;
+        justify-content: center;
+    }
+
     .medicion-detalles {
         grid-template-columns: 1fr 1fr;
     }
 
-    .medicion-section,
-    .historial-section {
-        padding: 14px 16px;
+    .toast-container {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        top: 10px;
     }
 
-    .detalle-acciones button {
-        padding: 12px;
-        font-size: 0.85rem;
+    .toast-notification {
+        padding: 12px 14px;
+        border-radius: 10px;
     }
 
-    .modal-footer .form-actions .btn-cerrar {
-        padding: 10px 20px;
-        font-size: 0.85rem;
+    .toast-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 1.2rem;
+    }
+
+    .toast-title {
+        font-size: 0.8rem;
+    }
+
+    .toast-message {
+        font-size: 0.75rem;
     }
 }
 
-@media screen and (max-width: 360px) {
-    .medicion-valor.principal .valor {
-        font-size: 1.8rem;
+/* Moviles muy pequenos */
+@media screen and (max-width: 480px) {
+    .detalle-container {
+        padding: 12px 12px 80px;
     }
 
-    .medicion-separador {
-        font-size: 1.8rem;
+    .back-section {
+        margin-bottom: 10px;
     }
 
-    .medicion-detalles {
-        grid-template-columns: 1fr;
+    .btn-back {
+        font-size: 0.75rem;
+        gap: 6px;
+        padding: 3px 0;
+    }
+
+    .btn-back i {
+        font-size: 0.85rem;
+    }
+
+    .detalle-header {
+        flex-wrap: wrap;
+        padding: 14px 16px;
+        gap: 12px;
+    }
+
+    .dispositivo-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+
+    .dispositivo-info-principal h1 {
+        font-size: 0.9rem;
+    }
+
+    .dispositivo-mac {
+        font-size: 0.75rem;
+    }
+
+    .dispositivo-paciente {
+        font-size: 0.7rem;
+    }
+
+    .estado-badge {
+        font-size: 0.6rem;
+        padding: 2px 10px;
+        border-radius: 10px;
+    }
+
+    .detalle-body {
+        padding: 14px;
+    }
+
+    .detalle-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+        padding: 8px 0;
+    }
+
+    .detalle-label {
+        font-size: 0.75rem;
+    }
+
+    .detalle-valor {
+        font-size: 0.8rem;
+        text-align: left;
+        max-width: 100%;
+    }
+
+    .detalle-acciones {
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 14px;
+    }
+
+    .detalle-acciones button {
+        width: 100%;
+        justify-content: center;
+        padding: 10px 16px;
+        font-size: 0.8rem;
+        border-radius: 8px;
+    }
+
+    .medicion-section {
+        padding: 14px 16px;
+        border-radius: var(--border-radius-sm);
+        margin-top: 12px;
+    }
+
+    .medicion-header h2 {
+        font-size: 0.85rem;
+    }
+
+    .btn-medicion {
+        padding: 12px;
+        font-size: 0.85rem;
+        border-radius: 8px;
+        justify-content: center;
+    }
+
+    .btn-medicion i {
+        font-size: 1rem;
+    }
+
+    .medicion-aviso {
+        font-size: 0.75rem;
+        padding: 8px 12px;
+        gap: 8px;
+    }
+
+    .historial-section {
+        padding: 14px 16px;
+        border-radius: var(--border-radius-sm);
+        margin-top: 12px;
+    }
+
+    .historial-header h2 {
+        font-size: 0.85rem;
+    }
+
+    .historial-count {
+        font-size: 0.65rem;
+        padding: 1px 10px;
+    }
+
+    .medicion-item {
+        padding: 12px 14px;
+        border-radius: 8px;
+        gap: 10px;
+    }
+
+    .medicion-fecha {
+        text-align: center;
+        min-width: auto;
+    }
+
+    .medicion-dia {
+        font-size: 0.8rem;
+    }
+
+    .medicion-dia small {
+        font-size: 0.6rem;
     }
 
     .medicion-valores {
-        gap: 6px;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .medicion-valor {
+        min-width: 38px;
     }
 
     .medicion-valor .valor {
         font-size: 0.95rem;
     }
 
+    .medicion-valor .label {
+        font-size: 0.5rem;
+    }
+
+    .medicion-separador {
+        font-size: 0.95rem;
+    }
+
+    .medicion-valor.pulso {
+        border-left: none;
+        padding-left: 0;
+    }
+
+    .clasificacion-badge {
+        align-self: center;
+        padding: 3px 12px;
+        font-size: 0.6rem;
+    }
+
+    .modal-content {
+        max-width: 100%;
+        margin: 10px;
+        border-radius: 10px;
+    }
+
+    .modal-medicion-grande {
+        max-width: 100%;
+    }
+
+    .modal-header {
+        padding: 14px 16px 12px;
+    }
+
+    .modal-header h2 {
+        font-size: 1rem;
+    }
+
+    .modal-close {
+        width: 30px;
+        height: 30px;
+        font-size: 0.85rem;
+    }
+
+    .modal-body {
+        padding: 16px;
+    }
+
+    .modal-body p {
+        font-size: 0.85rem;
+        margin-bottom: 12px;
+    }
+
+    .modal-body .detalle-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+        padding: 6px 0;
+    }
+
+    .modal-body .detalle-label {
+        font-size: 0.75rem;
+    }
+
+    .modal-body .detalle-valor {
+        font-size: 0.8rem;
+        text-align: left;
+        width: 100%;
+    }
+
+    .modal-footer {
+        padding: 12px 16px 14px;
+    }
+
+    .modal-footer .form-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .modal-footer .form-actions button {
+        width: 100%;
+        justify-content: center;
+        padding: 8px 16px;
+        font-size: 0.8rem;
+        border-radius: 8px;
+    }
+
+    .modal-footer .form-actions .btn-cerrar {
+        padding: 8px 16px;
+        font-size: 0.8rem;
+    }
+
+    .medicion-valor.principal .valor {
+        font-size: 2.2rem;
+    }
+
+    .medicion-separador {
+        font-size: 2.2rem;
+    }
+
+    .medicion-detalles {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        padding: 12px 16px;
+    }
+
+    .medicion-detalle .valor {
+        font-size: 0.9rem;
+    }
+
+    .medicion-detalle .label {
+        font-size: 0.6rem;
+    }
+
     .medicion-logs {
-        font-size: 0.65rem;
-        padding: 10px 12px;
+        font-size: 0.7rem;
+        padding: 10px 14px;
         max-height: 150px;
     }
 
@@ -1456,8 +1985,230 @@
         padding: 8px;
     }
 
-    .btn-medicion {
+    .medicion-error i {
+        font-size: 2.5rem;
+    }
+
+    .medicion-error p {
+        font-size: 0.9rem;
+    }
+
+    .empty-mediciones i {
+        font-size: 2.5rem;
+    }
+
+    .empty-mediciones p {
+        font-size: 0.85rem;
+    }
+
+    .empty-mediciones small {
+        font-size: 0.7rem;
+    }
+
+    .toast-container {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        top: 10px;
+        gap: 10px;
+    }
+
+    .toast-notification {
+        padding: 10px 12px;
+        border-radius: 8px;
+        gap: 10px;
+        border-left-width: 3px;
+    }
+
+    .toast-icon {
+        width: 24px;
+        height: 24px;
+        font-size: 1rem;
+    }
+
+    .toast-title {
+        font-size: 0.75rem;
+    }
+
+    .toast-message {
+        font-size: 0.7rem;
+    }
+
+    .toast-close {
+        font-size: 0.7rem;
+        padding: 2px;
+    }
+
+    .spinner-small {
+        width: 16px;
+        height: 16px;
+        border-width: 2px;
+    }
+}
+
+/* Pantallas muy pequenas (menos de 360px) */
+@media screen and (max-width: 360px) {
+    .detalle-container {
+        padding: 10px 10px 75px;
+    }
+
+    .detalle-header {
+        padding: 12px;
+        gap: 10px;
+    }
+
+    .dispositivo-icon {
+        width: 34px;
+        height: 34px;
+        font-size: 0.85rem;
+    }
+
+    .dispositivo-info-principal h1 {
         font-size: 0.8rem;
+    }
+
+    .dispositivo-mac {
+        font-size: 0.65rem;
+    }
+
+    .dispositivo-paciente {
+        font-size: 0.6rem;
+    }
+
+    .estado-badge {
+        font-size: 0.55rem;
+        padding: 1px 8px;
+    }
+
+    .detalle-body {
         padding: 10px;
+    }
+
+    .detalle-label {
+        font-size: 0.65rem;
+    }
+
+    .detalle-valor {
+        font-size: 0.7rem;
+    }
+
+    .detalle-acciones button {
+        padding: 8px 14px;
+        font-size: 0.75rem;
+    }
+
+    .medicion-section {
+        padding: 10px 12px;
+    }
+
+    .medicion-header h2 {
+        font-size: 0.75rem;
+    }
+
+    .btn-medicion {
+        padding: 8px 12px;
+        font-size: 0.75rem;
+        border-radius: 6px;
+    }
+
+    .btn-medicion i {
+        font-size: 0.9rem;
+    }
+
+    .historial-section {
+        padding: 10px 12px;
+    }
+
+    .historial-header h2 {
+        font-size: 0.75rem;
+    }
+
+    .medicion-item {
+        padding: 10px 12px;
+        gap: 8px;
+    }
+
+    .medicion-valor .valor {
+        font-size: 0.85rem;
+    }
+
+    .medicion-valor.principal .valor {
+        font-size: 1.8rem;
+    }
+
+    .medicion-separador {
+        font-size: 1.8rem;
+    }
+
+    .medicion-detalles {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-header h2 {
+        font-size: 0.85rem;
+    }
+
+    .modal-close {
+        width: 26px;
+        height: 26px;
+        font-size: 0.75rem;
+    }
+
+    .modal-body {
+        padding: 12px;
+    }
+
+    .modal-body p {
+        font-size: 0.75rem;
+    }
+
+    .modal-body .detalle-label {
+        font-size: 0.65rem;
+    }
+
+    .modal-body .detalle-valor {
+        font-size: 0.7rem;
+    }
+
+    .modal-footer .form-actions .btn-cancelar,
+    .modal-footer .form-actions .btn-confirmar-eliminar,
+    .modal-footer .form-actions .btn-cerrar {
+        padding: 6px 14px;
+        font-size: 0.7rem;
+    }
+
+    .medicion-logs {
+        font-size: 0.6rem;
+        padding: 8px 10px;
+        max-height: 120px;
+    }
+
+    .log-line {
+        padding: 2px 0;
+        gap: 4px;
+    }
+
+    .log-hint {
+        font-size: 0.6rem;
+        padding: 6px;
+    }
+
+    .toast-notification {
+        padding: 8px 10px;
+        gap: 8px;
+    }
+
+    .toast-title {
+        font-size: 0.7rem;
+    }
+
+    .toast-message {
+        font-size: 0.65rem;
+    }
+
+    .toast-icon {
+        width: 20px;
+        height: 20px;
+        font-size: 0.9rem;
     }
 }

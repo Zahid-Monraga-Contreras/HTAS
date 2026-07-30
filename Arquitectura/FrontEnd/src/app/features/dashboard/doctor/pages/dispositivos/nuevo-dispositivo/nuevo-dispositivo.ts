@@ -34,6 +34,8 @@ export class DoctorNuevoDispositivo implements OnInit {
     pacientes: any[] = [];
     pacientesFiltrados: any[] = [];
     searchTermPaciente: string = '';
+    mostrarListaPacientes: boolean = false;
+    pacienteSeleccionado: any = null;
 
     notifications: ToastNotification[] = [];
     private notificationCounter = 0;
@@ -101,7 +103,8 @@ export class DoctorNuevoDispositivo implements OnInit {
                     ...p,
                     nombreCompleto: `${p.nombre || ''} ${p.apPaterno || ''} ${p.apMaterno || ''}`.trim() || p.correo || 'Paciente'
                 }));
-                this.pacientesFiltrados = [...this.pacientes];
+                this.pacientesFiltrados = [];
+                this.mostrarListaPacientes = false;
             }
         } catch (error) {
             console.error('Error al cargar pacientes:', error);
@@ -112,30 +115,82 @@ export class DoctorNuevoDispositivo implements OnInit {
         }
     }
 
-    buscarPacientes() {
-        const term = this.searchTermPaciente.toLowerCase().trim();
-        if (!term) {
-            this.pacientesFiltrados = [...this.pacientes];
+    onFocusPaciente() {
+        // Solo mostrar la lista si hay texto en la búsqueda y no hay un paciente seleccionado
+        if (this.pacienteSeleccionado) {
             return;
         }
+
+        if (this.searchTermPaciente.trim().length > 0) {
+            this.mostrarListaPacientes = true;
+            this.buscarPacientes();
+        } else {
+            this.mostrarListaPacientes = false;
+            this.pacientesFiltrados = [];
+        }
+    }
+
+    buscarPacientes() {
+        const term = this.searchTermPaciente.toLowerCase().trim();
+
+        if (!term || this.pacienteSeleccionado) {
+            this.pacientesFiltrados = [];
+            this.mostrarListaPacientes = false;
+            return;
+        }
+
+        this.mostrarListaPacientes = true;
         this.pacientesFiltrados = this.pacientes.filter(p =>
             p.nombre?.toLowerCase().includes(term) ||
             p.apPaterno?.toLowerCase().includes(term) ||
-            p.correo?.toLowerCase().includes(term)
+            p.correo?.toLowerCase().includes(term) ||
+            p.nombreCompleto?.toLowerCase().includes(term)
         );
     }
 
     seleccionarPaciente(paciente: any) {
+        this.pacienteSeleccionado = paciente;
         this.dispositivoForm.patchValue({ idPacienteAsociado: paciente.idusuario });
         this.searchTermPaciente = paciente.nombreCompleto || `${paciente.nombre} ${paciente.apPaterno}`;
         this.pacientesFiltrados = [];
+        this.mostrarListaPacientes = false;
         this.cdr.detectChanges();
     }
 
     limpiarPaciente() {
+        this.pacienteSeleccionado = null;
         this.dispositivoForm.patchValue({ idPacienteAsociado: null });
         this.searchTermPaciente = '';
+        this.pacientesFiltrados = [];
+        this.mostrarListaPacientes = false;
         this.cdr.detectChanges();
+    }
+
+    ocultarListaPacientes() {
+        setTimeout(() => {
+            if (!this.pacienteSeleccionado) {
+                this.mostrarListaPacientes = false;
+                // Si no hay texto de búsqueda, limpiar filtrados
+                if (!this.searchTermPaciente.trim()) {
+                    this.pacientesFiltrados = [];
+                }
+                this.cdr.detectChanges();
+            }
+        }, 200);
+    }
+
+    // Método para verificar si hay pacientes disponibles
+    tienePacientesDisponibles(): boolean {
+        return this.pacientes.length > 0;
+    }
+
+    // Método para verificar si se debe mostrar "No se encontraron pacientes"
+    mostrarNoEncontrados(): boolean {
+        return !this.loadingPacientes &&
+            this.pacientes.length > 0 &&
+            this.searchTermPaciente.trim().length > 0 &&
+            this.pacientesFiltrados.length === 0 &&
+            !this.pacienteSeleccionado;
     }
 
     async crearDispositivo() {

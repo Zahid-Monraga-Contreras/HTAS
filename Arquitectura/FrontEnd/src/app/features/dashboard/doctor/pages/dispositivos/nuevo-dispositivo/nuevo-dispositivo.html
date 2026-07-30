@@ -42,6 +42,7 @@
         </div>
 
         <form [formGroup]="dispositivoForm" (ngSubmit)="crearDispositivo()" class="nuevo-dispositivo-form">
+            <!-- Nombre del Dispositivo -->
             <div class="form-group">
                 <label for="nombre">
                     Nombre del Dispositivo <span class="required">*</span>
@@ -55,6 +56,7 @@
                 </div>
             </div>
 
+            <!-- Dirección MAC -->
             <div class="form-group">
                 <label for="direccionMac">
                     Direccion MAC <span class="required">*</span>
@@ -69,42 +71,92 @@
                 <small class="text-muted">Formato: AA:BB:CC:DD:EE:FF (mayusculas o minusculas)</small>
             </div>
 
+            <!-- Asignar a Paciente -->
             <div class="form-group">
                 <label>Asignar a Paciente</label>
                 <div class="search-paciente-container">
+                    <!-- Buscador -->
                     <div class="search-box">
                         <i class="bi bi-search"></i>
                         <input type="text" [(ngModel)]="searchTermPaciente" (input)="buscarPacientes()"
-                            (focus)="buscarPacientes()" placeholder="Buscar paciente por nombre o correo..."
-                            class="search-input" [ngModelOptions]="{standalone: true}" />
-                        <button *ngIf="searchTermPaciente" class="btn-clear" (click)="limpiarPaciente()">
+                            (focus)="onFocusPaciente()" placeholder="Buscar paciente por nombre o correo..."
+                            class="search-input" [ngModelOptions]="{standalone: true}"
+                            [disabled]="pacienteSeleccionado !== null" autocomplete="off" />
+                        <button *ngIf="searchTermPaciente && !pacienteSeleccionado" class="btn-clear"
+                            (click)="limpiarPaciente()">
                             <i class="bi bi-x-lg"></i>
                         </button>
                     </div>
-                    <div class="pacientes-list" *ngIf="pacientesFiltrados.length > 0">
-                        <div *ngFor="let p of pacientesFiltrados" class="paciente-item"
-                            (click)="seleccionarPaciente(p)">
-                            <img [src]="getAvatarUrl(p.nombre, p.apPaterno)" alt="Avatar" class="paciente-avatar">
-                            <div class="paciente-info">
-                                <span class="paciente-nombre">{{ p.nombreCompleto || p.nombre + ' ' + p.apPaterno
-                                    }}</span>
-                                <span class="paciente-correo">{{ p.correo }}</span>
+
+                    <!-- Lista de pacientes (solo mostrar cuando no hay paciente seleccionado) -->
+                    <ng-container *ngIf="!pacienteSeleccionado">
+                        <!-- Loading -->
+                        <div *ngIf="loadingPacientes" class="pacientes-loading">
+                            <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                            <span class="ms-2">Cargando pacientes...</span>
+                        </div>
+
+                        <!-- Resultados de búsqueda -->
+                        <div *ngIf="!loadingPacientes && searchTermPaciente.trim().length > 0 && pacientesFiltrados.length > 0"
+                            class="pacientes-list">
+                            <div *ngFor="let p of pacientesFiltrados" class="paciente-item"
+                                (click)="seleccionarPaciente(p)">
+                                <img [src]="getAvatarUrl(p.nombre, p.apPaterno)" alt="Avatar" class="paciente-avatar">
+                                <div class="paciente-info">
+                                    <span class="paciente-nombre">{{ p.nombreCompleto || p.nombre + ' ' + p.apPaterno
+                                        }}</span>
+                                    <span class="paciente-correo">{{ p.correo }}</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div *ngIf="pacientesFiltrados.length === 0 && searchTermPaciente" class="no-resultados">
-                        <i class="bi bi-exclamation-circle"></i>
-                        <span>No se encontraron pacientes</span>
+
+                        <!-- No se encontraron pacientes (con búsqueda activa) -->
+                        <div *ngIf="!loadingPacientes && searchTermPaciente.trim().length > 0 && pacientesFiltrados.length === 0"
+                            class="no-resultados">
+                            <i class="bi bi-exclamation-circle"></i>
+                            <span>No se encontraron pacientes</span>
+                        </div>
+
+                        <!-- No hay pacientes en el sistema -->
+                        <div *ngIf="!loadingPacientes && pacientes.length === 0 && searchTermPaciente.trim().length === 0"
+                            class="no-resultados">
+                            <i class="bi bi-people"></i>
+                            <span>No hay pacientes registrados en el sistema</span>
+                        </div>
+                    </ng-container>
+
+                    <!-- Paciente seleccionado -->
+                    <div *ngIf="pacienteSeleccionado" class="paciente-seleccionado">
+                        <div class="paciente-seleccionado-info">
+                            <img [src]="getAvatarUrl(pacienteSeleccionado.nombre, pacienteSeleccionado.apPaterno)"
+                                alt="Avatar" class="paciente-avatar">
+                            <div>
+                                <span class="paciente-nombre">{{ pacienteSeleccionado.nombreCompleto ||
+                                    pacienteSeleccionado.nombre + ' ' + pacienteSeleccionado.apPaterno }}</span>
+                                <span class="paciente-correo d-block">{{ pacienteSeleccionado.correo }}</span>
+                            </div>
+                        </div>
+                        <button class="btn-remove-paciente" (click)="limpiarPaciente()" title="Deseleccionar paciente">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
                     </div>
                 </div>
-                <small class="text-muted" *ngIf="!dispositivoForm.get('idPacienteAsociado')?.value">Opcional - Dejar
-                    vacio para no asignar</small>
-                <small class="text-muted text-success" *ngIf="dispositivoForm.get('idPacienteAsociado')?.value">
+
+                <!-- Mensaje de estado -->
+                <small class="text-muted"
+                    *ngIf="!dispositivoForm.get('idPacienteAsociado')?.value && !pacienteSeleccionado">
+                    Opcional - Dejar vacio para no asignar
+                </small>
+                <small class="text-success" *ngIf="pacienteSeleccionado">
                     <i class="bi bi-check-circle-fill"></i>
-                    Paciente seleccionado
+                    Paciente seleccionado: {{ pacienteSeleccionado.nombreCompleto || pacienteSeleccionado.nombre + ' ' +
+                    pacienteSeleccionado.apPaterno }}
                 </small>
             </div>
 
+            <!-- Botones de acción -->
             <div class="form-actions">
                 <button type="button" class="btn-cancelar" (click)="cancelar()">
                     <i class="bi bi-x-lg"></i>

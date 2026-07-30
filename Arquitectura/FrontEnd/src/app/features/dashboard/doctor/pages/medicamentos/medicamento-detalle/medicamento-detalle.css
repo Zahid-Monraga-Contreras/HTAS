@@ -1,3 +1,7 @@
+/* ==========================================================================
+   DETALLE DE MEDICAMENTO DEL DOCTOR - COMPLETA
+   ========================================================================== */
+
 :host {
     --primary: #b0001e;
     --primary-dark: #8a0017;
@@ -42,15 +46,22 @@
     background: var(--gray-50);
 }
 
+/* ==========================================================================
+   DETALLE CONTAINER - SIN ESPACIOS EN BLANCO EN PANTALLAS GRANDES
+   ========================================================================== */
 .detalle-container {
     min-height: 100vh;
     background: var(--gray-50);
     padding: 16px 16px 100px;
     margin: 0 auto;
     width: 100%;
-    max-width: 680px;
+    max-width: 100%;
+    /* Eliminamos el max-width fijo */
 }
 
+/* ==========================================================================
+   BOTÓN VOLVER
+   ========================================================================== */
 .back-section {
     margin-bottom: 12px;
 }
@@ -72,6 +83,9 @@
     color: var(--primary);
 }
 
+/* ==========================================================================
+   LOADING
+   ========================================================================== */
 .loading-container {
     display: flex;
     flex-direction: column;
@@ -101,6 +115,9 @@
     font-size: 0.9rem;
 }
 
+/* ==========================================================================
+   DETALLE CARD
+   ========================================================================== */
 .detalle-card {
     background: white;
     border-radius: var(--border-radius);
@@ -187,6 +204,9 @@
     color: var(--danger);
 }
 
+/* ==========================================================================
+   DETALLE BODY
+   ========================================================================== */
 .detalle-body {
     padding: 24px;
 }
@@ -224,6 +244,9 @@
     word-break: break-word;
 }
 
+/* ==========================================================================
+   ACCIONES
+   ========================================================================== */
 .detalle-acciones {
     display: flex;
     gap: 12px;
@@ -306,22 +329,9 @@
     font-size: 1rem;
 }
 
-.btn-primary {
-    background: var(--primary);
-    color: white;
-    border: none;
-    padding: 10px 24px;
-    border-radius: 10px;
-    font-weight: 500;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.btn-primary:hover {
-    background: var(--primary-dark);
-}
-
+/* ==========================================================================
+   ERROR STATE
+   ========================================================================== */
 .error-state {
     display: flex;
     flex-direction: column;
@@ -346,6 +356,9 @@
     margin: 0 0 16px;
 }
 
+/* ==========================================================================
+   TOAST NOTIFICATIONS
+   ========================================================================== */
 .toast-container {
     position: fixed;
     top: 20px;
@@ -518,6 +531,9 @@
     }
 }
 
+/* ==========================================================================
+   MODAL DE CONFIRMACION
+   ========================================================================== */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -752,6 +768,9 @@
     display: inline-block;
 }
 
+/* ==========================================================================
+   FORMULARIO
+   ========================================================================== */
 .form-group {
     margin-bottom: 14px;
 }
@@ -795,7 +814,9 @@ textarea.form-control {
     min-height: 60px;
 }
 
-/* Estadisticas Section */
+/* ==========================================================================
+   ESTADISTICAS
+   ========================================================================== */
 .estadisticas-section {
     background: white;
     border-radius: var(--border-radius);
@@ -864,7 +885,9 @@ textarea.form-control {
     color: var(--gray-600);
 }
 
-/* Tratamientos relacionados */
+/* ==========================================================================
+   TRATAMIENTOS RELACIONADOS
+   ========================================================================== */
 .tratamientos-section {
     background: white;
     border-radius: var(--border-radius);
@@ -972,65 +995,430 @@ textarea.form-control {
     flex-shrink: 0;
 }
 
-@media screen and (max-width: 480px) {
+/* ==========================================================================
+   RESPONSIVE - AJUSTES PARA PANTALLAS GRANDES Y PEQUEÑAS
+   ========================================================================== */
+
+/* Pantallas grandes (web) - Aprovecha todo el espacio */
+@media screen and (min-width: 1025px) {
+    .detalle-container {
+        padding: 24px 32px 100px;
+        max-width: 100%;
+    }
+
+    .back-section {
+        margin-bottom: 16px;
+    }
+
+    .btn-back {
+        font-size: 0.95rem;
+        padding: 6px 0;
+        gap: 10px;
+    }
+
+    .btn-back i {
+        font-size: 1.1rem;
+    }
+
+    .detalle-card {
+        border-radius: var(--border-radius);
+    }
+
     .detalle-header {
-        flex-wrap: wrap;
-        padding: 16px;
+        padding: 28px 32px;
+        gap: 20px;
+    }
+
+    .medicamento-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+
+    .medicamento-info-principal h1 {
+        font-size: 1.3rem;
+    }
+
+    .medicamento-sustancia {
+        font-size: 0.95rem;
+    }
+
+    .medicamento-laboratorio {
+        font-size: 0.85rem;
+    }
+
+    .uso-badge {
+        font-size: 0.8rem;
+        padding: 6px 18px;
+        border-radius: 14px;
     }
 
     .detalle-body {
-        padding: 16px;
+        padding: 32px;
+    }
+
+    .detalle-item {
+        padding: 12px 0;
+    }
+
+    .detalle-label {
+        font-size: 0.9rem;
+    }
+
+    .detalle-valor {
+        font-size: 0.95rem;
+    }
+
+    .detalle-acciones {
+        gap: 16px;
+        margin-top: 20px;
+    }
+
+    .detalle-acciones button {
+        padding: 12px 24px;
+        font-size: 0.95rem;
+        border-radius: 12px;
+    }
+
+    .aviso-eliminar {
+        padding: 10px 18px;
+        font-size: 0.85rem;
+        border-radius: 10px;
+    }
+
+    .estadisticas-section {
+        padding: 24px 28px;
+        border-radius: var(--border-radius);
+        margin-top: 20px;
+    }
+
+    .estadisticas-header h2 {
+        font-size: 1rem;
+    }
+
+    .estadisticas-grid {
+        gap: 12px;
+    }
+
+    .estadistica-item {
+        padding: 14px 12px;
+    }
+
+    .estadistica-numero {
+        font-size: 1.4rem;
+    }
+
+    .estadistica-label {
+        font-size: 0.65rem;
+    }
+
+    .tratamientos-section {
+        padding: 24px 28px;
+        border-radius: var(--border-radius);
+        margin-top: 20px;
+    }
+
+    .tratamientos-header h2 {
+        font-size: 1rem;
+    }
+
+    .tratamientos-count {
+        font-size: 0.9rem;
+        padding: 4px 18px;
+    }
+
+    .tratamiento-item {
+        padding: 12px 16px;
+        border-radius: var(--border-radius-sm);
+        gap: 14px;
+    }
+
+    .tratamiento-info h4 {
+        font-size: 0.9rem;
+    }
+
+    .tratamiento-info p {
+        font-size: 0.75rem;
+    }
+
+    .tratamiento-arrow {
+        font-size: 0.85rem;
+    }
+
+    .modal-content {
+        max-width: 520px;
+        border-radius: var(--border-radius);
+    }
+
+    .modal-header {
+        padding: 20px 28px 16px;
+    }
+
+    .modal-header h2 {
+        font-size: 1.2rem;
+    }
+
+    .modal-body {
+        padding: 28px;
+    }
+
+    .modal-footer {
+        padding: 16px 28px 20px;
+    }
+
+    .toast-container {
+        max-width: 480px;
+        top: 24px;
+        right: 24px;
+        gap: 14px;
+    }
+
+    .toast-notification {
+        padding: 18px 22px;
+        border-radius: 14px;
+        border-left-width: 5px;
+    }
+
+    .toast-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 1.6rem;
+    }
+
+    .toast-title {
+        font-size: 0.95rem;
+    }
+
+    .toast-message {
+        font-size: 0.9rem;
+    }
+
+    .toast-close {
+        font-size: 1rem;
+        padding: 6px;
+    }
+
+    .toast-progress {
+        height: 4px;
+    }
+
+    .form-group label {
+        font-size: 0.9rem;
+    }
+
+    .form-control {
+        padding: 12px 16px;
+        font-size: 0.95rem;
+        border-radius: 12px;
+        border-width: 2px;
+    }
+
+    textarea.form-control {
+        min-height: 80px;
+    }
+}
+
+/* Tablets y pantallas medianas */
+@media screen and (max-width: 1024px) and (min-width: 769px) {
+    .detalle-container {
+        padding: 20px 24px 90px;
+        max-width: 100%;
+    }
+
+    .detalle-header {
+        padding: 24px 28px;
+        gap: 18px;
+    }
+
+    .detalle-body {
+        padding: 28px;
+    }
+
+    .medicamento-icon {
+        width: 54px;
+        height: 54px;
+        font-size: 1.3rem;
+    }
+
+    .medicamento-info-principal h1 {
+        font-size: 1.2rem;
+    }
+
+    .uso-badge {
+        font-size: 0.75rem;
+    }
+
+    .estadisticas-grid {
+        gap: 10px;
+    }
+
+    .estadistica-item {
+        padding: 12px 10px;
+    }
+
+    .estadistica-numero {
+        font-size: 1.3rem;
+    }
+
+    .modal-content {
+        max-width: 90%;
+    }
+}
+
+/* Moviles y pantallas pequenas */
+@media screen and (max-width: 768px) {
+    .detalle-container {
+        padding: 16px 16px 85px;
+        max-width: 100%;
+    }
+
+    .detalle-header {
+        padding: 18px 20px;
+        gap: 14px;
+    }
+
+    .detalle-body {
+        padding: 20px;
+    }
+
+    .medicamento-icon {
+        width: 44px;
+        height: 44px;
+        font-size: 1.1rem;
+    }
+
+    .medicamento-info-principal h1 {
+        font-size: 1rem;
+    }
+
+    .uso-badge {
+        font-size: 0.65rem;
+        padding: 3px 12px;
+    }
+
+    .estadisticas-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    .estadistica-item {
+        padding: 10px 8px;
+    }
+
+    .estadistica-numero {
+        font-size: 1.1rem;
+    }
+
+    .tratamiento-item {
+        flex-wrap: wrap;
+    }
+
+    .modal-content {
+        max-width: 95%;
+        margin: 10px;
+        border-radius: 12px;
+    }
+}
+
+/* Moviles muy pequenos */
+@media screen and (max-width: 480px) {
+    .detalle-container {
+        padding: 12px 12px 80px;
+    }
+
+    .back-section {
+        margin-bottom: 10px;
+    }
+
+    .btn-back {
+        font-size: 0.75rem;
+        gap: 6px;
+        padding: 3px 0;
+    }
+
+    .btn-back i {
+        font-size: 0.85rem;
+    }
+
+    .detalle-header {
+        flex-wrap: wrap;
+        padding: 14px 16px;
+        gap: 12px;
+    }
+
+    .medicamento-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+
+    .medicamento-info-principal h1 {
+        font-size: 0.9rem;
+    }
+
+    .medicamento-sustancia {
+        font-size: 0.75rem;
+    }
+
+    .medicamento-laboratorio {
+        font-size: 0.7rem;
+    }
+
+    .uso-badge {
+        font-size: 0.6rem;
+        padding: 2px 10px;
+        border-radius: 10px;
+    }
+
+    .detalle-body {
+        padding: 14px;
     }
 
     .detalle-item {
         flex-direction: column;
         align-items: flex-start;
         gap: 2px;
+        padding: 8px 0;
+    }
+
+    .detalle-label {
+        font-size: 0.75rem;
     }
 
     .detalle-valor {
+        font-size: 0.8rem;
         text-align: left;
         max-width: 100%;
     }
 
     .detalle-acciones {
         flex-direction: column;
+        gap: 10px;
+        margin-top: 14px;
     }
 
     .detalle-acciones button {
         width: 100%;
         justify-content: center;
+        padding: 8px 16px;
+        font-size: 0.8rem;
+        border-radius: 8px;
     }
 
-    .toast-container {
-        right: 10px;
-        left: 10px;
-        max-width: none;
+    .aviso-eliminar {
+        padding: 6px 12px;
+        font-size: 0.7rem;
+        border-radius: 6px;
     }
 
-    .modal-content {
-        max-width: 95%;
-        margin: 10px;
+    .estadisticas-section {
+        padding: 12px;
+        border-radius: var(--border-radius-sm);
+        margin-top: 12px;
     }
 
-    .modal-footer .form-actions {
-        flex-direction: column;
-    }
-
-    .modal-footer .form-actions button {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .modal-body .detalle-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 2px;
-    }
-
-    .modal-body .detalle-valor {
-        text-align: left;
-        width: 100%;
+    .estadisticas-header h2 {
+        font-size: 0.85rem;
     }
 
     .estadisticas-grid {
@@ -1040,19 +1428,356 @@ textarea.form-control {
 
     .estadistica-item {
         padding: 8px 4px;
+        border-radius: 8px;
     }
 
     .estadistica-numero {
         font-size: 1rem;
     }
 
+    .estadistica-label {
+        font-size: 0.5rem;
+    }
+
+    .tratamientos-section {
+        padding: 12px;
+        border-radius: var(--border-radius-sm);
+        margin-top: 12px;
+    }
+
+    .tratamientos-header h2 {
+        font-size: 0.85rem;
+    }
+
+    .tratamientos-count {
+        font-size: 0.65rem;
+        padding: 1px 10px;
+    }
+
     .tratamiento-item {
+        padding: 8px 10px;
+        gap: 8px;
+        border-radius: 8px;
         flex-wrap: wrap;
+    }
+
+    .tratamiento-info h4 {
+        font-size: 0.8rem;
+    }
+
+    .tratamiento-info p {
+        font-size: 0.65rem;
+    }
+
+    .tratamiento-arrow {
+        font-size: 0.7rem;
+    }
+
+    .modal-content {
+        max-width: 100%;
+        margin: 10px;
+        border-radius: 10px;
+    }
+
+    .modal-header {
+        padding: 14px 16px 12px;
+    }
+
+    .modal-header h2 {
+        font-size: 1rem;
+    }
+
+    .modal-close {
+        width: 30px;
+        height: 30px;
+        font-size: 0.85rem;
+    }
+
+    .modal-body {
+        padding: 16px;
+    }
+
+    .modal-body p {
+        font-size: 0.85rem;
+        margin-bottom: 12px;
+    }
+
+    .modal-body .detalle-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+        padding: 6px 0;
+    }
+
+    .modal-body .detalle-label {
+        font-size: 0.75rem;
+    }
+
+    .modal-body .detalle-valor {
+        font-size: 0.8rem;
+        text-align: left;
+        width: 100%;
+    }
+
+    .modal-footer {
+        padding: 12px 16px 14px;
+    }
+
+    .modal-footer .form-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .modal-footer .form-actions button {
+        width: 100%;
+        justify-content: center;
+        padding: 8px 16px;
+        font-size: 0.8rem;
+        border-radius: 8px;
+    }
+
+    .form-group {
+        margin-bottom: 12px;
+    }
+
+    .form-group label {
+        font-size: 0.8rem;
+    }
+
+    .form-control {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+        border-radius: 8px;
+    }
+
+    textarea.form-control {
+        min-height: 50px;
+    }
+
+    .toast-container {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        top: 10px;
+        gap: 10px;
+    }
+
+    .toast-notification {
+        padding: 12px 14px;
+        border-radius: 10px;
+        gap: 10px;
+        border-left-width: 4px;
+    }
+
+    .toast-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 1.2rem;
+    }
+
+    .toast-title {
+        font-size: 0.8rem;
+    }
+
+    .toast-message {
+        font-size: 0.75rem;
+    }
+
+    .toast-close {
+        font-size: 0.8rem;
+        padding: 2px;
+    }
+
+    .toast-progress {
+        height: 3px;
+    }
+
+    .spinner-small {
+        width: 16px;
+        height: 16px;
+        border-width: 2px;
+    }
+
+    .error-state {
+        padding: 40px 16px;
+    }
+
+    .error-state i {
+        font-size: 2.5rem;
+    }
+
+    .error-state h3 {
+        font-size: 0.95rem;
+    }
+
+    .error-state p {
+        font-size: 0.75rem;
+    }
+
+    .btn-primary {
+        padding: 8px 18px;
+        font-size: 0.8rem;
+        border-radius: 8px;
     }
 }
 
+/* Pantallas muy pequenas (menos de 360px) */
 @media screen and (max-width: 360px) {
+    .detalle-container {
+        padding: 10px 10px 75px;
+    }
+
+    .detalle-header {
+        padding: 12px;
+        gap: 10px;
+    }
+
+    .medicamento-icon {
+        width: 34px;
+        height: 34px;
+        font-size: 0.85rem;
+    }
+
+    .medicamento-info-principal h1 {
+        font-size: 0.8rem;
+    }
+
+    .medicamento-sustancia {
+        font-size: 0.65rem;
+    }
+
+    .medicamento-laboratorio {
+        font-size: 0.6rem;
+    }
+
+    .uso-badge {
+        font-size: 0.55rem;
+        padding: 1px 8px;
+    }
+
+    .detalle-body {
+        padding: 10px;
+    }
+
+    .detalle-label {
+        font-size: 0.65rem;
+    }
+
+    .detalle-valor {
+        font-size: 0.7rem;
+    }
+
+    .detalle-acciones button {
+        padding: 6px 14px;
+        font-size: 0.7rem;
+    }
+
     .estadisticas-grid {
         grid-template-columns: 1fr 1fr;
+        gap: 3px;
+    }
+
+    .estadistica-item {
+        padding: 6px 2px;
+    }
+
+    .estadistica-numero {
+        font-size: 0.9rem;
+    }
+
+    .estadistica-label {
+        font-size: 0.45rem;
+    }
+
+    .tratamiento-item {
+        padding: 6px 8px;
+        gap: 6px;
+    }
+
+    .tratamiento-info h4 {
+        font-size: 0.7rem;
+    }
+
+    .tratamiento-info p {
+        font-size: 0.6rem;
+    }
+
+    .modal-header h2 {
+        font-size: 0.85rem;
+    }
+
+    .modal-close {
+        width: 26px;
+        height: 26px;
+        font-size: 0.75rem;
+    }
+
+    .modal-body {
+        padding: 12px;
+    }
+
+    .modal-body p {
+        font-size: 0.75rem;
+    }
+
+    .modal-body .detalle-label {
+        font-size: 0.65rem;
+    }
+
+    .modal-body .detalle-valor {
+        font-size: 0.7rem;
+    }
+
+    .modal-footer .form-actions .btn-cancelar,
+    .modal-footer .form-actions .btn-confirmar-eliminar,
+    .modal-footer .form-actions .btn-guardar {
+        padding: 6px 14px;
+        font-size: 0.7rem;
+    }
+
+    .form-group {
+        margin-bottom: 10px;
+    }
+
+    .form-group label {
+        font-size: 0.7rem;
+    }
+
+    .form-control {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+        border-radius: 6px;
+    }
+
+    textarea.form-control {
+        min-height: 40px;
+    }
+
+    .toast-notification {
+        padding: 8px 10px;
+        gap: 8px;
+    }
+
+    .toast-title {
+        font-size: 0.7rem;
+    }
+
+    .toast-message {
+        font-size: 0.65rem;
+    }
+
+    .toast-icon {
+        width: 24px;
+        height: 24px;
+        font-size: 1rem;
+    }
+
+    .aviso-eliminar {
+        padding: 4px 10px;
+        font-size: 0.6rem;
+    }
+
+    .aviso-eliminar i {
+        font-size: 0.8rem;
     }
 }
