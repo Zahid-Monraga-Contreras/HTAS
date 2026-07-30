@@ -52,7 +52,7 @@
 }
 
 /* ==========================================================================
-   PAGINA PRINCIPAL
+   PAGINA PRINCIPAL - SIN ESPACIOS EN BLANCO EN PANTALLAS GRANDES
    ========================================================================== */
 .notificaciones-page {
     min-height: 100vh;
@@ -60,7 +60,8 @@
     padding: 16px 16px 100px;
     margin: 0 auto;
     width: 100%;
-    max-width: 680px;
+    max-width: 100%;
+    /* Eliminamos el max-width fijo */
 }
 
 /* ==========================================================================
@@ -768,7 +769,7 @@
     border-top-color: var(--danger-light);
 }
 
-/* ✅ CORREGIDO: Botones alineados correctamente */
+/* CORREGIDO: Botones alineados correctamente */
 .modal-confirmacion .modal-footer .form-actions {
     display: flex;
     gap: 12px;
@@ -902,12 +903,196 @@
 }
 
 /* ==========================================================================
-   RESPONSIVE
+   RESPONSIVE - AJUSTES PARA PANTALLAS GRANDES Y PEQUEÑAS
    ========================================================================== */
+
+/* Pantallas grandes (web) - Aprovecha todo el espacio */
 @media screen and (min-width: 1025px) {
     .notificaciones-page {
         padding: 24px 32px 100px;
-        max-width: 780px;
+        max-width: 100%;
+    }
+
+    .notificaciones-header {
+        padding: 0 0 20px;
+    }
+
+    .header-info h1 {
+        font-size: 1.8rem;
+    }
+
+    .header-info p {
+        font-size: 0.95rem;
+    }
+
+    .btn-marcar-todas {
+        padding: 10px 20px;
+        font-size: 0.85rem;
+        border-radius: 12px;
+    }
+
+    .btn-eliminar-leidas {
+        padding: 10px 20px;
+        font-size: 0.85rem;
+        border-radius: 12px;
+    }
+
+    .stats-section {
+        margin-bottom: 20px;
+    }
+
+    .stats-grid {
+        gap: 12px;
+    }
+
+    .stat-card {
+        padding: 18px 14px;
+        border-radius: var(--border-radius-sm);
+    }
+
+    .stat-number {
+        font-size: 1.8rem;
+    }
+
+    .stat-label {
+        font-size: 0.7rem;
+    }
+
+    .filtros-tipo {
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .filtro-btn {
+        padding: 8px 16px;
+        font-size: 0.75rem;
+        border-radius: 10px;
+    }
+
+    .filtro-btn i {
+        font-size: 0.8rem;
+    }
+
+    .notificaciones-section {
+        border-radius: var(--border-radius);
+    }
+
+    .notificacion-item {
+        padding: 18px 20px;
+        gap: 16px;
+    }
+
+    .notificacion-icon {
+        width: 44px;
+        height: 44px;
+        font-size: 1.3rem;
+    }
+
+    .notificacion-titulo {
+        font-size: 0.95rem;
+    }
+
+    .notificacion-fecha {
+        font-size: 0.7rem;
+    }
+
+    .notificacion-mensaje {
+        font-size: 0.85rem;
+    }
+
+    .notificacion-tipo {
+        font-size: 0.65rem;
+        padding: 2px 12px;
+    }
+
+    .notificacion-estado {
+        font-size: 0.65rem;
+    }
+
+    .btn-eliminar {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+    }
+
+    .modal-content {
+        max-width: 520px;
+        border-radius: var(--border-radius);
+    }
+
+    .modal-header {
+        padding: 20px 28px 16px;
+    }
+
+    .modal-header h2 {
+        font-size: 1.2rem;
+    }
+
+    .modal-body {
+        padding: 28px;
+    }
+
+    .modal-footer {
+        padding: 16px 28px 20px;
+    }
+
+    .modal-detalle {
+        max-width: 480px;
+    }
+
+    .detalle-icono {
+        width: 72px;
+        height: 72px;
+        font-size: 2rem;
+    }
+
+    .detalle-header h3 {
+        font-size: 1.2rem;
+    }
+
+    .detalle-fecha {
+        font-size: 0.85rem;
+    }
+
+    .detalle-mensaje p {
+        font-size: 0.95rem;
+    }
+
+    .detalle-item {
+        padding: 8px 0;
+    }
+
+    .detalle-label {
+        font-size: 0.85rem;
+    }
+
+    .detalle-valor {
+        font-size: 0.9rem;
+    }
+
+    .toast-premium-container {
+        max-width: 480px;
+        top: 24px;
+        right: 24px;
+        padding: 16px 24px;
+        border-radius: 14px;
+        border-left-width: 5px;
+    }
+
+    .toast-premium-container .icon-toast {
+        font-size: 1.4rem;
+    }
+
+    .toast-premium-container .toast-message {
+        font-size: 0.9rem;
+    }
+}
+
+/* Tablets y pantallas medianas */
+@media screen and (max-width: 1024px) and (min-width: 769px) {
+    .notificaciones-page {
+        padding: 20px 24px 90px;
+        max-width: 100%;
     }
 
     .stats-grid {
@@ -915,25 +1100,27 @@
     }
 
     .stat-card {
-        padding: 16px 10px;
+        padding: 14px 10px;
     }
 
     .stat-number {
         font-size: 1.5rem;
     }
 
+    .notificacion-item {
+        padding: 16px 18px;
+    }
+
+    .header-info h1 {
+        font-size: 1.6rem;
+    }
+
     .modal-content {
-        max-width: 520px;
+        max-width: 90%;
     }
 }
 
-@media screen and (max-width: 1024px) {
-    .notificaciones-page {
-        padding: 18px 20px 90px;
-        max-width: 640px;
-    }
-}
-
+/* Moviles y pantallas pequenas */
 @media screen and (max-width: 768px) {
     .notificaciones-page {
         padding: 16px 16px 85px;
@@ -942,6 +1129,10 @@
 
     .header-info h1 {
         font-size: 1.3rem;
+    }
+
+    .header-info p {
+        font-size: 0.8rem;
     }
 
     .header-top {
@@ -957,6 +1148,8 @@
     .btn-eliminar-leidas {
         flex: 1;
         justify-content: center;
+        padding: 8px 14px;
+        font-size: 0.7rem;
     }
 
     .stats-grid {
@@ -967,27 +1160,27 @@
         padding: 10px 4px;
     }
 
+    .stat-number {
+        font-size: 1.15rem;
+    }
+
     .filtros-tipo {
         gap: 4px;
+        margin-bottom: 12px;
     }
 
     .filtro-btn {
         font-size: 0.6rem;
         padding: 4px 10px;
+        border-radius: 6px;
     }
 
-    .modal-content {
-        max-width: 95%;
-        margin: 10px;
+    .filtro-btn i {
+        font-size: 0.6rem;
     }
 
-    .detalle-acciones {
-        flex-direction: column;
-    }
-
-    .detalle-acciones button {
-        width: 100%;
-        justify-content: center;
+    .notificaciones-section {
+        border-radius: var(--border-radius-sm);
     }
 
     .notificacion-item {
@@ -1003,6 +1196,25 @@
         font-size: 0.75rem;
     }
 
+    .notificacion-fecha {
+        font-size: 0.6rem;
+    }
+
+    .modal-content {
+        max-width: 95%;
+        margin: 10px;
+        border-radius: 12px;
+    }
+
+    .detalle-acciones {
+        flex-direction: column;
+    }
+
+    .detalle-acciones button {
+        width: 100%;
+        justify-content: center;
+    }
+
     .modal-confirmacion .modal-footer .form-actions {
         flex-direction: column;
     }
@@ -1013,6 +1225,7 @@
     }
 }
 
+/* Moviles muy pequenos */
 @media screen and (max-width: 480px) {
     .notificaciones-page {
         padding: 12px 12px 80px;
@@ -1022,6 +1235,22 @@
         font-size: 1.1rem;
     }
 
+    .header-info p {
+        font-size: 0.7rem;
+    }
+
+    .btn-marcar-todas,
+    .btn-eliminar-leidas {
+        font-size: 0.65rem;
+        padding: 6px 10px;
+        border-radius: 8px;
+    }
+
+    .btn-marcar-todas i,
+    .btn-eliminar-leidas i {
+        font-size: 0.8rem;
+    }
+
     .stats-grid {
         gap: 4px;
     }
@@ -1029,6 +1258,7 @@
     .stat-card {
         padding: 8px 2px;
         border-radius: 8px;
+        border-width: 1.5px;
     }
 
     .stat-number {
@@ -1047,37 +1277,11 @@
     .filtro-btn {
         font-size: 0.55rem;
         padding: 4px 8px;
+        border-width: 1px;
     }
 
-    .modal-content {
-        max-width: 100%;
-        margin: 10px;
-        border-radius: 12px;
-    }
-
-    .modal-header {
-        padding: 14px 16px 12px;
-    }
-
-    .modal-header h2 {
-        font-size: 1rem;
-    }
-
-    .modal-body {
-        padding: 16px;
-    }
-
-    .modal-footer {
-        padding: 12px 16px 14px;
-    }
-
-    .form-actions {
-        flex-direction: column;
-    }
-
-    .form-actions button {
-        width: 100%;
-        justify-content: center;
+    .filtro-btn i {
+        font-size: 0.55rem;
     }
 
     .notificacion-item {
@@ -1088,6 +1292,17 @@
 
     .notificacion-header {
         flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .notificacion-titulo {
+        font-size: 0.75rem;
+    }
+
+    .notificacion-mensaje {
+        font-size: 0.7rem;
+        -webkit-line-clamp: 3;
+        line-clamp: 3;
     }
 
     .notificacion-acciones {
@@ -1100,17 +1315,102 @@
         display: flex;
     }
 
+    .btn-eliminar {
+        width: 24px;
+        height: 24px;
+        font-size: 0.7rem;
+    }
+
+    .modal-content {
+        max-width: 100%;
+        margin: 10px;
+        border-radius: 10px;
+    }
+
+    .modal-header {
+        padding: 14px 16px 12px;
+    }
+
+    .modal-header h2 {
+        font-size: 1rem;
+    }
+
+    .modal-close {
+        width: 30px;
+        height: 30px;
+        font-size: 0.85rem;
+    }
+
+    .modal-body {
+        padding: 16px;
+    }
+
+    .modal-footer {
+        padding: 12px 16px 14px;
+    }
+
     .toast-premium-container {
         top: 10px;
         right: 10px;
         left: 10px;
         max-width: none;
+        padding: 12px 16px;
+        border-radius: 10px;
+        border-left-width: 4px;
+    }
+
+    .toast-premium-container .icon-toast {
+        font-size: 1rem;
+    }
+
+    .toast-premium-container .toast-message {
+        font-size: 0.8rem;
     }
 
     .detalle-icono {
         width: 48px;
         height: 48px;
         font-size: 1.4rem;
+    }
+
+    .detalle-header h3 {
+        font-size: 1rem;
+    }
+
+    .detalle-fecha {
+        font-size: 0.7rem;
+    }
+
+    .detalle-mensaje {
+        padding: 10px 12px;
+    }
+
+    .detalle-mensaje p {
+        font-size: 0.85rem;
+    }
+
+    .detalle-item {
+        padding: 5px 0;
+    }
+
+    .detalle-label {
+        font-size: 0.7rem;
+    }
+
+    .detalle-valor {
+        font-size: 0.75rem;
+    }
+
+    .btn-accion {
+        padding: 8px 16px;
+        font-size: 0.8rem;
+        border-radius: 8px;
+    }
+
+    .btn-cerrar {
+        padding: 8px 16px;
+        font-size: 0.8rem;
+        border-radius: 8px;
     }
 
     .modal-confirmacion .modal-footer .form-actions {
@@ -1121,11 +1421,49 @@
         width: 100%;
         justify-content: center;
     }
+
+    .modal-confirmacion .modal-footer .form-actions .btn-cancelar,
+    .modal-confirmacion .modal-footer .form-actions .btn-danger-confirm {
+        padding: 8px 16px;
+        font-size: 0.8rem;
+        border-radius: 8px;
+    }
+
+    .empty-state {
+        padding: 30px 16px;
+    }
+
+    .empty-state i {
+        font-size: 2.5rem;
+    }
+
+    .empty-state p {
+        font-size: 0.85rem;
+    }
+
+    .empty-sub {
+        font-size: 0.7rem;
+    }
 }
 
+/* Pantallas muy pequenas (menos de 360px) */
 @media screen and (max-width: 360px) {
     .notificaciones-page {
         padding: 10px 10px 75px;
+    }
+
+    .header-info h1 {
+        font-size: 0.95rem;
+    }
+
+    .header-info p {
+        font-size: 0.65rem;
+    }
+
+    .btn-marcar-todas,
+    .btn-eliminar-leidas {
+        font-size: 0.55rem;
+        padding: 5px 8px;
     }
 
     .stats-grid {
@@ -1148,18 +1486,85 @@
     .filtro-btn {
         font-size: 0.5rem;
         padding: 3px 6px;
+        border-radius: 4px;
     }
 
     .filtro-btn i {
-        font-size: 0.55rem;
+        font-size: 0.5rem;
     }
 
-    .modal-confirmacion .modal-footer .form-actions {
-        flex-direction: column;
+    .notificacion-item {
+        padding: 8px 10px;
+        gap: 6px;
     }
 
-    .modal-confirmacion .modal-footer .form-actions button {
-        width: 100%;
-        justify-content: center;
+    .notificacion-titulo {
+        font-size: 0.7rem;
+    }
+
+    .notificacion-mensaje {
+        font-size: 0.65rem;
+    }
+
+    .notificacion-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+    }
+
+    .modal-header h2 {
+        font-size: 0.85rem;
+    }
+
+    .modal-close {
+        width: 26px;
+        height: 26px;
+        font-size: 0.75rem;
+    }
+
+    .modal-body {
+        padding: 12px;
+    }
+
+    .detalle-icono {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+
+    .detalle-header h3 {
+        font-size: 0.9rem;
+    }
+
+    .detalle-mensaje p {
+        font-size: 0.8rem;
+    }
+
+    .btn-accion {
+        padding: 6px 14px;
+        font-size: 0.7rem;
+    }
+
+    .btn-cerrar {
+        padding: 6px 14px;
+        font-size: 0.7rem;
+    }
+
+    .modal-confirmacion .modal-footer .form-actions .btn-cancelar,
+    .modal-confirmacion .modal-footer .form-actions .btn-danger-confirm {
+        padding: 6px 14px;
+        font-size: 0.7rem;
+    }
+
+    .toast-premium-container {
+        padding: 10px 14px;
+    }
+
+    .toast-premium-container .icon-toast {
+        font-size: 0.9rem;
+    }
+
+    .toast-premium-container .toast-message {
+        font-size: 0.7rem;
     }
 }

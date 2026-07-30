@@ -35,7 +35,7 @@
 }
 
 /* ==========================================================================
-   ESTILO DEL COMPONENTE - CON MARGENES LATERALES
+   ESTILO DEL COMPONENTE
    ========================================================================== */
 :host {
     display: block;
@@ -47,7 +47,7 @@
 }
 
 /* ==========================================================================
-   DASHBOARD - CON MARGENES LATERALES REDUCIDOS
+   DASHBOARD - DISEÑO RESPONSIVE SIN ESPACIOS EN BLANCO
    ========================================================================== */
 .doctor-dashboard {
     min-height: 100vh;
@@ -55,7 +55,6 @@
     padding: 16px 16px 100px;
     margin: 0 auto;
     width: 100%;
-    max-width: 680px;
 }
 
 /* ==========================================================================
@@ -600,30 +599,80 @@
 }
 
 /* ==========================================================================
-   RESPONSIVE - AJUSTES PARA MOVIL
+   RESPONSIVE - SIN ESPACIOS EN BLANCO EN PANTALLAS GRANDES
    ========================================================================== */
 
-/* Pantallas grandes (web) */
+/* Pantallas grandes (web) - Aprovecha todo el espacio */
 @media screen and (min-width: 1025px) {
     .doctor-dashboard {
         padding: 24px 32px 100px;
-        max-width: 780px;
+        max-width: 100%;
+        /* Eliminamos el max-width fijo para que ocupe todo el ancho */
     }
 
     .greeting-name {
-        font-size: 1.6rem;
+        font-size: 1.8rem;
     }
 
     .welcome-content {
-        padding: 20px 24px 24px;
+        padding: 24px 28px 28px;
     }
 
     .welcome-text h2 {
-        font-size: 1.3rem;
+        font-size: 1.4rem;
     }
 
     .stat-number {
+        font-size: 1.5rem;
+    }
+
+    .quick-metrics {
+        gap: 14px;
+    }
+
+    .metric-item {
+        padding: 18px 22px;
+        border-radius: var(--border-radius-sm);
+    }
+
+    .metric-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 1.3rem;
+        border-radius: 12px;
+    }
+
+    .metric-value {
         font-size: 1.4rem;
+    }
+
+    .metric-label {
+        font-size: 0.7rem;
+    }
+
+    .section-card {
+        padding: 20px 24px;
+        border-radius: var(--border-radius-sm);
+    }
+
+    .section-header h2 {
+        font-size: 1rem;
+    }
+
+    .cita-item {
+        padding: 12px 16px;
+    }
+
+    .paciente-item {
+        padding: 12px 16px;
+    }
+}
+
+/* Tablets y pantallas medianas */
+@media screen and (max-width: 1024px) and (min-width: 769px) {
+    .doctor-dashboard {
+        padding: 20px 24px 90px;
+        max-width: 100%;
     }
 
     .quick-metrics {
@@ -631,25 +680,17 @@
     }
 
     .metric-item {
-        padding: 16px 20px;
+        padding: 14px 18px;
     }
 
     .metric-icon {
-        width: 44px;
-        height: 44px;
-        font-size: 1.2rem;
+        width: 42px;
+        height: 42px;
+        font-size: 1.1rem;
     }
 
     .metric-value {
-        font-size: 1.3rem;
-    }
-}
-
-/* Tablets y pantallas medianas */
-@media screen and (max-width: 1024px) {
-    .doctor-dashboard {
-        padding: 18px 20px 90px;
-        max-width: 640px;
+        font-size: 1.2rem;
     }
 }
 

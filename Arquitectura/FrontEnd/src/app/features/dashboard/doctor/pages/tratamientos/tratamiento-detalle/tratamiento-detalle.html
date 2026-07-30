@@ -1,0 +1,370 @@
+<app-doctor-menu></app-doctor-menu>
+
+<div class="toast-container" *ngIf="notifications.length > 0">
+    <div *ngFor="let notif of notifications; let i = index" class="toast-notification toast-{{ notif.type }}"
+        [class.toast-exit]="i > 0">
+        <div class="toast-icon">
+            <i class="bi" [class]="
+                notif.type === 'success' ? 'bi-check-circle-fill' :
+                notif.type === 'error' ? 'bi-x-circle-fill' :
+                notif.type === 'warning' ? 'bi-exclamation-triangle-fill' :
+                'bi-info-circle-fill'
+            "></i>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title">{{ notif.title }}</div>
+            <div class="toast-message">{{ notif.message }}</div>
+        </div>
+        <button class="toast-close" (click)="removeToast(notif.id)">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        <div class="toast-progress" [style.animation-duration]="(notif.duration || 5000) + 'ms'"></div>
+    </div>
+</div>
+
+<div class="detalle-container">
+    <!-- BOTON VOLVER -->
+    <div class="back-section">
+        <button class="btn-back" (click)="volver()">
+            <i class="bi bi-arrow-left"></i>
+            <span>Volver a tratamientos</span>
+        </button>
+    </div>
+
+    <!-- LOADING -->
+    <div *ngIf="isLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Cargando informacion del tratamiento...</p>
+    </div>
+
+    <!-- CONTENIDO -->
+    <div *ngIf="!isLoading && tratamiento" class="detalle-content">
+
+        <div class="detalle-card">
+            <!-- Header del tratamiento -->
+            <div class="detalle-header">
+                <div class="tratamiento-icon">
+                    <i class="bi bi-prescription"></i>
+                </div>
+                <div class="tratamiento-info-principal">
+                    <h1>{{ tratamiento.nombreMedicamento || 'Medicamento' }}</h1>
+                    <p class="tratamiento-paciente" (click)="irAPaciente()" style="cursor: pointer;">
+                        <i class="bi bi-person"></i> {{ tratamiento.nombrePaciente || 'Paciente' }}
+                    </p>
+                    <p class="tratamiento-doctor">
+                        <i class="bi bi-person-badge"></i> {{ tratamiento.nombreDoctor || 'Doctor' }}
+                    </p>
+                </div>
+                <span class="estado-badge"
+                    [class]="getEstadoClass(tratamiento.activo !== false && tratamiento.activo !== 0)">
+                    {{ getEstadoTexto(tratamiento.activo !== false && tratamiento.activo !== 0) }}
+                </span>
+            </div>
+
+            <!-- Detalles del tratamiento -->
+            <div class="detalle-body">
+                <div class="detalle-grid">
+                    <div class="detalle-item">
+                        <span class="detalle-label">Medicamento</span>
+                        <span class="detalle-valor">{{ tratamiento.nombreMedicamento || 'Medicamento' }}</span>
+                    </div>
+                    <div class="detalle-item" *ngIf="tratamiento.sustanciaActiva || tratamiento.SustanciaActiva">
+                        <span class="detalle-label">Sustancia Activa</span>
+                        <span class="detalle-valor">{{ tratamiento.sustanciaActiva || tratamiento.SustanciaActiva
+                            }}</span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-label">Dosis</span>
+                        <span class="detalle-valor">{{ tratamiento.dosis || 'No especificada' }}</span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-label">Frecuencia</span>
+                        <span class="detalle-valor">{{ tratamiento.frecuenciaHoras || tratamiento.frecuenciashoras ?
+                            'Cada ' + (tratamiento.frecuenciaHoras || tratamiento.frecuenciashoras) + ' horas' : 'No
+                            especificada' }}</span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-label">Fecha de Inicio</span>
+                        <span class="detalle-valor">{{ formatearFechaCompleta(tratamiento.fechaInicio ||
+                            tratamiento.fechainicio) }}</span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-label">Fecha de Fin</span>
+                        <span class="detalle-valor">{{ formatearFechaCompleta(tratamiento.fechaFin ||
+                            tratamiento.fechafin) }}</span>
+                    </div>
+                    <div class="detalle-item"
+                        *ngIf="esTratamientoVencido(tratamiento.fechaFin || tratamiento.fechafin)">
+                        <span class="detalle-label">Estado</span>
+                        <span class="detalle-valor" style="color: var(--warning); font-weight: 600;">Vencido</span>
+                    </div>
+                    <div class="detalle-item" *ngIf="tratamiento.notasInstrucciones || tratamiento.notasinstrucciones">
+                        <span class="detalle-label">Instrucciones</span>
+                        <span class="detalle-valor" style="text-align: left; max-width: 70%;">{{
+                            tratamiento.notasInstrucciones || tratamiento.notasinstrucciones }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCION DE TOMAS -->
+        <div class="tomas-section">
+            <div class="tomas-header">
+                <h2><i class="bi bi-check2-square"></i> Registro de Tomas</h2>
+                <div class="tomas-actions">
+                    <button class="btn-generar-tomas" (click)="generarTomas()" [disabled]="isBotonGenerarDisabled()">
+                        <i class="bi bi-plus-circle"></i>
+                        {{ getMensajeBotonGenerar() }}
+                    </button>
+                    <button class="btn-eliminar-todas" *ngIf="tieneTomasGeneradas()"
+                        (click)="confirmarEliminarTodasTomas()" [disabled]="eliminandoTomas">
+                        <i class="bi bi-trash"></i>
+                        Eliminar Todas
+                    </button>
+                </div>
+            </div>
+
+            <!-- BUSCADOR POR FECHA CON FLATPICKR (SOLO CALENDARIO) -->
+            <div class="buscador-tomas" *ngIf="registrosTomas.length > 0">
+                <label for="filtroFecha">
+                    <i class="bi bi-calendar3"></i> Filtrar por fecha:
+                </label>
+                <input type="text" id="filtroFecha" #filtroFechaInput placeholder="Selecciona una fecha" readonly>
+                <button *ngIf="filtroFecha" class="btn-limpiar-filtro" (click)="filtroFecha = ''">
+                    <i class="bi bi-x-circle"></i> Limpiar filtro
+                </button>
+                <span *ngIf="filtroFecha" class="contador-filtro">
+                    (Mostrando {{ registrosTomasFiltrados.length }} de {{ registrosTomas.length }} tomas)
+                </span>
+            </div>
+
+            <div *ngIf="cargandoTomas" class="loading-tomas">
+                <div class="spinner-small"></div>
+                <span>Cargando tomas...</span>
+            </div>
+
+            <!-- Estadisticas de Tomas -->
+            <div *ngIf="!cargandoTomas && estadisticasTomas" class="tomas-estadisticas">
+                <div class="toma-stat">
+                    <span class="stat-numero">{{ estadisticasTomas.totalTomas || 0 }}</span>
+                    <span class="stat-label">Total</span>
+                </div>
+                <div class="toma-stat stat-completada">
+                    <span class="stat-numero">{{ estadisticasTomas.tomasCompletadas || 0 }}</span>
+                    <span class="stat-label">Completadas</span>
+                </div>
+                <div class="toma-stat stat-pendiente">
+                    <span class="stat-numero">{{ estadisticasTomas.tomasPendientes || 0 }}</span>
+                    <span class="stat-label">Pendientes</span>
+                </div>
+                <div class="toma-stat stat-omitida">
+                    <span class="stat-numero">{{ estadisticasTomas.tomasOmitidas || 0 }}</span>
+                    <span class="stat-label">Omitidas</span>
+                </div>
+                <div class="toma-stat stat-retrasada">
+                    <span class="stat-numero">{{ estadisticasTomas.tomasRetrasadas || 0 }}</span>
+                    <span class="stat-label">Retrasadas</span>
+                </div>
+                <div class="toma-stat stat-cumplimiento">
+                    <span class="stat-numero">{{ estadisticasTomas.porcentajeCumplimiento || 0 }}%</span>
+                    <span class="stat-label">Cumplimiento</span>
+                </div>
+            </div>
+
+            <!-- Lista de Tomas (USA registrosTomasFiltrados) -->
+            <div *ngIf="!cargandoTomas && registrosTomasFiltrados.length > 0" class="tomas-list">
+                <div *ngFor="let toma of registrosTomasFiltrados" class="toma-item"
+                    [class.toma-eliminada]="toma.estado === 'Eliminada'">
+                    <div class="toma-izquierda">
+                        <div class="toma-fecha">
+                            <span class="toma-dia">{{ obtenerDia(toma.fechaProgramada) }}</span>
+                            <span class="toma-mes">{{ obtenerMes(toma.fechaProgramada) }}</span>
+                        </div>
+                        <div class="toma-info">
+                            <span class="toma-hora">{{ formatearHora(toma.fechaProgramada) }}</span>
+                            <span class="toma-estado" [style.color]="getEstadoColor(toma.estado)">
+                                <i class="bi" [class]="getEstadoIcono(toma.estado)"></i>
+                                {{ toma.estado }}
+                            </span>
+                            <span *ngIf="toma.fechaRealizada" class="toma-realizada">
+                                <i class="bi bi-check2"></i>
+                                {{ formatearFechaCompleta(toma.fechaRealizada) }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="toma-derecha">
+                        <button class="btn-eliminar-toma" *ngIf="toma.estado !== 'Eliminada'"
+                            (click)="confirmarEliminarToma(toma.id)" title="Eliminar toma">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mensajes cuando no hay resultados -->
+            <div *ngIf="!cargandoTomas && registrosTomas.length === 0 && !tieneTomasGeneradas()" class="sin-tomas">
+                <i class="bi bi-clock-history"></i>
+                <p>No hay tomas generadas para este tratamiento.</p>
+                <p class="sin-tomas-sub">Haz clic en "Generar Tomas" para crear el calendario de tomas.</p>
+            </div>
+
+            <div *ngIf="!cargandoTomas && registrosTomas.length > 0 && registrosTomasFiltrados.length === 0"
+                class="sin-tomas">
+                <i class="bi bi-search"></i>
+                <p>No hay tomas para la fecha seleccionada.</p>
+                <p class="sin-tomas-sub">Intenta con otra fecha o limpia el filtro.</p>
+            </div>
+
+            <div *ngIf="!cargandoTomas && registrosTomas.length === 0 && tieneTomasGeneradas()" class="sin-tomas">
+                <i class="bi bi-check2-circle"></i>
+                <p>No hay tomas activas para este tratamiento.</p>
+            </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="detalle-acciones">
+            <button class="btn-cambiar-estado" (click)="abrirModalEstado()">
+                <i class="bi bi-arrow-repeat"></i>
+                Cambiar Estado
+            </button>
+            <button class="btn-eliminar" (click)="mostrarConfirmacionEliminar()">
+                <i class="bi bi-trash"></i>
+                Eliminar
+            </button>
+            <button class="btn-volver" (click)="volver()">
+                <i class="bi bi-arrow-left"></i> Volver
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Tratamiento no encontrado -->
+    <div *ngIf="!isLoading && !tratamiento" class="error-state">
+        <i class="bi bi-prescription"></i>
+        <h3>Tratamiento no encontrado</h3>
+        <p>El tratamiento que buscas no existe o ha sido eliminado</p>
+        <button class="btn-primary" (click)="volver()">Volver a tratamientos</button>
+    </div>
+</div>
+
+<!-- Modal de Confirmacion para Eliminar Tratamiento -->
+<div class="modal-overlay" *ngIf="mostrarModalConfirmacion" (click)="cerrarModalConfirmacion()">
+    <div class="modal-content modal-confirmacion" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2><i class="bi bi-exclamation-triangle-fill" style="color: var(--warning);"></i> {{
+                modalConfirmacion.titulo }}</h2>
+            <button class="modal-close" (click)="cerrarModalConfirmacion()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p>{{ modalConfirmacion.mensaje }}</p>
+            <div class="detalle-item" *ngIf="tratamiento">
+                <span class="detalle-label">Medicamento</span>
+                <span class="detalle-valor">{{ tratamiento.nombreMedicamento || 'Medicamento' }}</span>
+            </div>
+            <div class="detalle-item" *ngIf="tratamiento">
+                <span class="detalle-label">Paciente</span>
+                <span class="detalle-valor">{{ tratamiento.nombrePaciente || 'Paciente' }}</span>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="form-actions">
+                <button class="btn-cancelar" (click)="cerrarModalConfirmacion()">Cancelar</button>
+                <button class="btn-confirmar-eliminar" (click)="ejecutarEliminarTratamiento()"
+                    [disabled]="cargandoEliminar">
+                    <span class="spinner-small" *ngIf="cargandoEliminar"></span>
+                    {{ cargandoEliminar ? 'Eliminando...' : 'Si, Eliminar' }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Cambiar Estado -->
+<div class="modal-overlay" *ngIf="mostrarModalEstado" (click)="cerrarModalEstado()">
+    <div class="modal-content modal-estado" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2><i class="bi bi-arrow-repeat" style="color: var(--primary);"></i> Cambiar Estado</h2>
+            <button class="modal-close" (click)="cerrarModalEstado()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p>Selecciona el nuevo estado del tratamiento.</p>
+            <div class="estado-options">
+                <div class="estado-option" (click)="nuevoEstado = true" [class.selected]="nuevoEstado === true">
+                    <i class="bi bi-check-circle-fill" style="color: var(--success);"></i>
+                    <span>Activo</span>
+                </div>
+                <div class="estado-option" (click)="nuevoEstado = false" [class.selected]="nuevoEstado === false">
+                    <i class="bi bi-x-circle-fill" style="color: var(--danger);"></i>
+                    <span>Inactivo</span>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="form-actions">
+                <button class="btn-cancelar" (click)="cerrarModalEstado()">Cancelar</button>
+                <button class="btn-guardar" (click)="ejecutarCambiarEstado()" [disabled]="cargandoAccion">
+                    <span class="spinner-small" *ngIf="cargandoAccion"></span>
+                    {{ cargandoAccion ? 'Guardando...' : 'Guardar Cambios' }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Eliminar Toma Individual -->
+<div class="modal-overlay" *ngIf="mostrarModalEliminarToma" (click)="cerrarModalEliminarToma()">
+    <div class="modal-content modal-confirmacion" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2><i class="bi bi-exclamation-triangle-fill" style="color: var(--warning);"></i> Eliminar Toma</h2>
+            <button class="modal-close" (click)="cerrarModalEliminarToma()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p>¿Estas seguro de que deseas eliminar esta toma? Esta accion no se puede deshacer.</p>
+        </div>
+        <div class="modal-footer">
+            <div class="form-actions">
+                <button class="btn-cancelar" (click)="cerrarModalEliminarToma()">Cancelar</button>
+                <button class="btn-confirmar-eliminar" (click)="ejecutarEliminarToma()">
+                    Si, Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Eliminar Todas las Tomas -->
+<div class="modal-overlay" *ngIf="mostrarModalEliminarTodas" (click)="cerrarModalEliminarTodas()">
+    <div class="modal-content modal-confirmacion" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2><i class="bi bi-exclamation-triangle-fill" style="color: var(--warning);"></i> Eliminar Todas las Tomas
+            </h2>
+            <button class="modal-close" (click)="cerrarModalEliminarTodas()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p>¿Estas seguro de que deseas eliminar TODAS las tomas de este tratamiento? Esta accion no se puede
+                deshacer.</p>
+            <div class="detalle-item" *ngIf="tratamiento">
+                <span class="detalle-label">Total de tomas</span>
+                <span class="detalle-valor">{{ registrosTomas.length }}</span>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="form-actions">
+                <button class="btn-cancelar" (click)="cerrarModalEliminarTodas()">Cancelar</button>
+                <button class="btn-confirmar-eliminar" (click)="ejecutarEliminarTodasTomas()"
+                    [disabled]="eliminandoTomas">
+                    <span class="spinner-small" *ngIf="eliminandoTomas"></span>
+                    {{ eliminandoTomas ? 'Eliminando...' : 'Si, Eliminar Todas' }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

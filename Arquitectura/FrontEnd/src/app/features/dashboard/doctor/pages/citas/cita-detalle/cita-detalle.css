@@ -1,3 +1,7 @@
+/* ==========================================================================
+   DETALLE DE CITA - ESTILOS
+   ========================================================================== */
+
 :host {
     --primary: #b0001e;
     --primary-dark: #8a0017;
@@ -40,15 +44,22 @@
     background: var(--gray-50);
 }
 
+/* ==========================================================================
+   DETALLE CONTAINER - SIN ESPACIOS EN BLANCO EN PANTALLAS GRANDES
+   ========================================================================== */
 .detalle-container {
     min-height: 100vh;
     background: var(--gray-50);
     padding: 16px 16px 100px;
     margin: 0 auto;
     width: 100%;
-    max-width: 680px;
+    max-width: 100%;
+    /* Eliminamos el max-width fijo */
 }
 
+/* ==========================================================================
+   BOTÓN VOLVER
+   ========================================================================== */
 .back-section {
     margin-bottom: 12px;
 }
@@ -70,6 +81,9 @@
     color: var(--primary);
 }
 
+/* ==========================================================================
+   LOADING
+   ========================================================================== */
 .loading-container {
     display: flex;
     flex-direction: column;
@@ -99,6 +113,9 @@
     font-size: 0.9rem;
 }
 
+/* ==========================================================================
+   DETALLE CARD
+   ========================================================================== */
 .detalle-card {
     background: white;
     border-radius: var(--border-radius);
@@ -206,6 +223,9 @@
     color: var(--gray-500);
 }
 
+/* ==========================================================================
+   DETALLE BODY
+   ========================================================================== */
 .detalle-body {
     padding: 24px;
 }
@@ -260,6 +280,9 @@
     color: #7c3aed;
 }
 
+/* ==========================================================================
+   ACCIONES
+   ========================================================================== */
 .detalle-acciones {
     display: flex;
     gap: 12px;
@@ -334,6 +357,9 @@
     background: var(--primary-dark);
 }
 
+/* ==========================================================================
+   ERROR STATE
+   ========================================================================== */
 .error-state {
     display: flex;
     flex-direction: column;
@@ -745,78 +771,254 @@
 }
 
 /* ==========================================================================
-   RESPONSIVE
+   RESPONSIVE - AJUSTES PARA PANTALLAS GRANDES Y PEQUEÑAS
    ========================================================================== */
-@media screen and (max-width: 480px) {
-    .detalle-header {
-        flex-wrap: wrap;
-        padding: 16px;
-    }
 
-    .detalle-body {
-        padding: 16px;
-    }
-
-    .detalle-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 2px;
-    }
-
-    .detalle-valor {
-        text-align: left;
+/* Pantallas grandes (web) - Aprovecha todo el espacio */
+@media screen and (min-width: 1025px) {
+    .detalle-container {
+        padding: 24px 32px 100px;
         max-width: 100%;
     }
 
-    .toast-container {
-        right: 10px;
-        left: 10px;
-        max-width: none;
+    .back-section {
+        margin-bottom: 16px;
     }
 
-    .modal-content {
-        max-width: 95%;
-        margin: 10px;
+    .btn-back {
+        font-size: 0.95rem;
+        padding: 6px 0;
+        gap: 10px;
     }
 
-    .modal-footer .form-actions {
-        flex-direction: column;
+    .btn-back i {
+        font-size: 1.1rem;
     }
 
-    .modal-footer .form-actions button {
-        width: 100%;
-        justify-content: center;
+    .detalle-card {
+        border-radius: var(--border-radius);
     }
 
-    .detalle-acciones {
-        flex-direction: column;
-    }
-
-    .detalle-acciones button {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .modal-body .detalle-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 2px;
-    }
-
-    .modal-body .detalle-valor {
-        text-align: left;
-        width: 100%;
-    }
-}
-
-@media screen and (max-width: 360px) {
-    .detalle-container {
-        padding: 10px 10px 75px;
+    .detalle-header {
+        padding: 28px 32px;
+        gap: 20px;
     }
 
     .cita-fecha-badge {
-        min-width: 36px;
-        padding: 4px 6px;
+        min-width: 56px;
+        padding: 8px 14px;
+        border-radius: 12px;
+    }
+
+    .cita-dia {
+        font-size: 1.4rem;
+    }
+
+    .cita-mes {
+        font-size: 0.7rem;
+    }
+
+    .cita-info-principal h1 {
+        font-size: 1.3rem;
+    }
+
+    .cita-paciente {
+        font-size: 0.95rem;
+    }
+
+    .cita-especialidad {
+        font-size: 0.85rem;
+    }
+
+    .estado-badge {
+        font-size: 0.8rem;
+        padding: 6px 18px;
+        border-radius: 14px;
+    }
+
+    .estado-badge i {
+        font-size: 0.7rem;
+    }
+
+    .detalle-body {
+        padding: 32px;
+    }
+
+    .detalle-item {
+        padding: 12px 0;
+    }
+
+    .detalle-label {
+        font-size: 0.9rem;
+    }
+
+    .detalle-valor {
+        font-size: 0.95rem;
+    }
+
+    .modalidad-badge {
+        font-size: 0.75rem;
+        padding: 3px 14px;
+        border-radius: 14px;
+    }
+
+    .detalle-acciones {
+        gap: 16px;
+        margin-top: 20px;
+    }
+
+    .btn-cancelar-cita {
+        padding: 12px 28px;
+        font-size: 0.95rem;
+        border-radius: 12px;
+    }
+
+    .btn-volver {
+        padding: 12px 28px;
+        font-size: 0.95rem;
+        border-radius: 12px;
+    }
+
+    .modal-content {
+        max-width: 520px;
+    }
+
+    .modal-header {
+        padding: 20px 28px 16px;
+    }
+
+    .modal-header h2 {
+        font-size: 1.2rem;
+    }
+
+    .modal-body {
+        padding: 28px;
+    }
+
+    .modal-footer {
+        padding: 16px 28px 20px;
+    }
+
+    .toast-container {
+        max-width: 450px;
+    }
+
+    .toast-notification {
+        padding: 18px 22px;
+        border-radius: 14px;
+    }
+
+    .toast-title {
+        font-size: 0.95rem;
+    }
+
+    .toast-message {
+        font-size: 0.9rem;
+    }
+}
+
+/* Tablets y pantallas medianas */
+@media screen and (max-width: 1024px) and (min-width: 769px) {
+    .detalle-container {
+        padding: 20px 24px 90px;
+        max-width: 100%;
+    }
+
+    .detalle-header {
+        padding: 24px 28px;
+        gap: 18px;
+    }
+
+    .detalle-body {
+        padding: 28px;
+    }
+
+    .cita-fecha-badge {
+        min-width: 52px;
+    }
+
+    .cita-dia {
+        font-size: 1.3rem;
+    }
+
+    .cita-info-principal h1 {
+        font-size: 1.2rem;
+    }
+
+    .estado-badge {
+        font-size: 0.75rem;
+    }
+}
+
+/* Moviles y pantallas pequenas */
+@media screen and (max-width: 768px) {
+    .detalle-container {
+        padding: 16px 16px 85px;
+        max-width: 100%;
+    }
+
+    .detalle-header {
+        padding: 18px 20px;
+        gap: 14px;
+    }
+
+    .detalle-body {
+        padding: 20px;
+    }
+
+    .cita-fecha-badge {
+        min-width: 44px;
+        padding: 5px 8px;
+    }
+
+    .cita-dia {
+        font-size: 1.1rem;
+    }
+
+    .cita-mes {
+        font-size: 0.6rem;
+    }
+
+    .cita-info-principal h1 {
+        font-size: 1rem;
+    }
+
+    .estado-badge {
+        font-size: 0.65rem;
+        padding: 3px 12px;
+    }
+}
+
+/* Moviles muy pequenos */
+@media screen and (max-width: 480px) {
+    .detalle-container {
+        padding: 12px 12px 80px;
+    }
+
+    .back-section {
+        margin-bottom: 10px;
+    }
+
+    .btn-back {
+        font-size: 0.75rem;
+        gap: 6px;
+        padding: 3px 0;
+    }
+
+    .btn-back i {
+        font-size: 0.85rem;
+    }
+
+    .detalle-header {
+        flex-wrap: wrap;
+        padding: 14px 16px;
+        gap: 12px;
+    }
+
+    .cita-fecha-badge {
+        min-width: 40px;
+        padding: 4px 8px;
+        border-radius: 8px;
     }
 
     .cita-dia {
@@ -828,7 +1030,192 @@
     }
 
     .cita-info-principal h1 {
+        font-size: 0.9rem;
+    }
+
+    .cita-paciente {
+        font-size: 0.75rem;
+    }
+
+    .cita-especialidad {
+        font-size: 0.7rem;
+    }
+
+    .estado-badge {
+        font-size: 0.6rem;
+        padding: 2px 10px;
+        border-radius: 10px;
+    }
+
+    .estado-badge i {
+        font-size: 0.5rem;
+    }
+
+    .detalle-body {
+        padding: 14px;
+    }
+
+    .detalle-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+        padding: 8px 0;
+    }
+
+    .detalle-label {
+        font-size: 0.75rem;
+    }
+
+    .detalle-valor {
+        font-size: 0.8rem;
+        text-align: left;
+        max-width: 100%;
+    }
+
+    .modalidad-badge {
+        font-size: 0.6rem;
+        padding: 1px 10px;
+        border-radius: 10px;
+    }
+
+    .detalle-acciones {
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 14px;
+    }
+
+    .detalle-acciones button {
+        width: 100%;
+        justify-content: center;
+        padding: 8px 18px;
+        font-size: 0.8rem;
+        border-radius: 8px;
+    }
+
+    /* Modal */
+    .modal-content {
+        max-width: 95%;
+        margin: 10px;
+        border-radius: var(--border-radius-sm);
+    }
+
+    .modal-header {
+        padding: 14px 16px 12px;
+    }
+
+    .modal-header h2 {
         font-size: 0.95rem;
+    }
+
+    .modal-close {
+        width: 30px;
+        height: 30px;
+        font-size: 0.85rem;
+    }
+
+    .modal-body {
+        padding: 16px;
+    }
+
+    .modal-body p {
+        font-size: 0.85rem;
+        margin-bottom: 12px;
+    }
+
+    .modal-body .detalle-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+        padding: 6px 0;
+    }
+
+    .modal-body .detalle-label {
+        font-size: 0.75rem;
+    }
+
+    .modal-body .detalle-valor {
+        font-size: 0.8rem;
+        text-align: left;
+        width: 100%;
+    }
+
+    .modal-footer {
+        padding: 12px 16px 16px;
+    }
+
+    .modal-footer .form-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .modal-footer .form-actions button {
+        width: 100%;
+        justify-content: center;
+        padding: 8px 18px;
+        font-size: 0.8rem;
+        border-radius: 8px;
+    }
+
+    /* Toast */
+    .toast-container {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        top: 10px;
+    }
+
+    .toast-notification {
+        padding: 12px 14px;
+        border-radius: 10px;
+        gap: 10px;
+    }
+
+    .toast-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 1.2rem;
+    }
+
+    .toast-title {
+        font-size: 0.8rem;
+    }
+
+    .toast-message {
+        font-size: 0.75rem;
+    }
+
+    .toast-close {
+        font-size: 0.8rem;
+    }
+
+    /* Error state */
+    .error-state {
+        padding: 40px 16px;
+    }
+
+    .error-state i {
+        font-size: 2.5rem;
+    }
+
+    .error-state h3 {
+        font-size: 0.95rem;
+    }
+
+    .error-state p {
+        font-size: 0.75rem;
+    }
+
+    .btn-primary {
+        padding: 8px 18px;
+        font-size: 0.8rem;
+        border-radius: 8px;
+    }
+}
+
+/* Pantallas muy pequenas (menos de 360px) */
+@media screen and (max-width: 360px) {
+    .detalle-container {
+        padding: 10px 10px 75px;
     }
 
     .detalle-header {
@@ -836,7 +1223,82 @@
         gap: 10px;
     }
 
+    .cita-fecha-badge {
+        min-width: 34px;
+        padding: 3px 6px;
+        border-radius: 6px;
+    }
+
+    .cita-dia {
+        font-size: 0.85rem;
+    }
+
+    .cita-mes {
+        font-size: 0.45rem;
+    }
+
+    .cita-info-principal h1 {
+        font-size: 0.8rem;
+    }
+
+    .cita-paciente {
+        font-size: 0.65rem;
+    }
+
+    .cita-especialidad {
+        font-size: 0.6rem;
+    }
+
+    .estado-badge {
+        font-size: 0.55rem;
+        padding: 1px 8px;
+        border-radius: 8px;
+    }
+
     .detalle-body {
-        padding: 12px;
+        padding: 10px;
+    }
+
+    .detalle-label {
+        font-size: 0.65rem;
+    }
+
+    .detalle-valor {
+        font-size: 0.7rem;
+    }
+
+    .detalle-acciones button {
+        padding: 6px 14px;
+        font-size: 0.7rem;
+        border-radius: 6px;
+    }
+
+    .modal-header h2 {
+        font-size: 0.85rem;
+    }
+
+    .modal-body p {
+        font-size: 0.75rem;
+    }
+
+    .modal-body .detalle-label {
+        font-size: 0.65rem;
+    }
+
+    .modal-body .detalle-valor {
+        font-size: 0.7rem;
+    }
+
+    .modal-footer .form-actions button {
+        padding: 6px 14px;
+        font-size: 0.7rem;
+    }
+
+    .btn-volver {
+        font-size: 0.7rem;
+    }
+
+    .btn-cancelar-cita {
+        font-size: 0.7rem;
     }
 }

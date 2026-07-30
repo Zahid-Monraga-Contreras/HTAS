@@ -40,13 +40,17 @@
     background: var(--gray-50);
 }
 
+/* ==========================================================================
+   DETALLE CONTAINER - SIN ESPACIOS EN BLANCO EN PANTALLAS GRANDES
+   ========================================================================== */
 .detalle-container {
     min-height: 100vh;
     background: var(--gray-50);
     padding: 16px 16px 100px;
     margin: 0 auto;
     width: 100%;
-    max-width: 680px;
+    max-width: 100%;
+    /* Eliminamos el max-width fijo */
 }
 
 /* ==========================================================================
@@ -676,11 +680,262 @@
 }
 
 /* ==========================================================================
-   RESPONSIVE
+   RESPONSIVE - AJUSTES PARA PANTALLAS GRANDES Y PEQUEÑAS
    ========================================================================== */
+
+/* Pantallas grandes (web) - Aprovecha todo el espacio */
+@media screen and (min-width: 1025px) {
+    .detalle-container {
+        padding: 24px 32px 100px;
+        max-width: 100%;
+    }
+
+    .btn-back {
+        font-size: 0.95rem;
+        padding: 6px 0;
+    }
+
+    .btn-back i {
+        font-size: 1.1rem;
+    }
+
+    .perfil-section {
+        padding: 28px 32px;
+        border-radius: var(--border-radius);
+        margin-bottom: 20px;
+    }
+
+    .perfil-header {
+        gap: 24px;
+    }
+
+    .perfil-avatar img {
+        width: 85px;
+        height: 85px;
+        border-width: 4px;
+    }
+
+    .estado-badge {
+        font-size: 0.6rem;
+        padding: 3px 12px;
+        bottom: -1px;
+        right: -1px;
+    }
+
+    .perfil-info h1 {
+        font-size: 1.5rem;
+    }
+
+    .perfil-email {
+        font-size: 0.9rem;
+    }
+
+    .perfil-detalles span {
+        font-size: 0.8rem;
+    }
+
+    .perfil-stats {
+        margin-top: 18px;
+        padding-top: 18px;
+    }
+
+    .stat-number {
+        font-size: 1.4rem;
+    }
+
+    .stat-label {
+        font-size: 0.7rem;
+    }
+
+    .tabs {
+        padding: 6px;
+        gap: 6px;
+        border-radius: var(--border-radius-sm);
+    }
+
+    .tab {
+        padding: 12px 16px;
+        font-size: 0.85rem;
+        border-radius: 10px;
+    }
+
+    .tab i {
+        font-size: 0.95rem;
+    }
+
+    .tab-content {
+        padding: 24px 28px;
+        border-radius: var(--border-radius-sm);
+    }
+
+    .info-card {
+        padding: 18px 20px;
+    }
+
+    .info-card h3 {
+        font-size: 0.95rem;
+    }
+
+    .info-label {
+        font-size: 0.85rem;
+    }
+
+    .info-value {
+        font-size: 0.9rem;
+    }
+
+    .cita-item {
+        padding: 12px 16px;
+        gap: 16px;
+    }
+
+    .cita-date {
+        min-width: 48px;
+        padding: 6px 10px;
+    }
+
+    .cita-day {
+        font-size: 1rem;
+    }
+
+    .cita-info h4 {
+        font-size: 0.9rem;
+    }
+
+    .cita-info p {
+        font-size: 0.75rem;
+    }
+
+    .tratamiento-item {
+        padding: 14px 18px;
+        gap: 16px;
+    }
+
+    .tratamiento-icon {
+        width: 46px;
+        height: 46px;
+        font-size: 1rem;
+    }
+
+    .tratamiento-info h4 {
+        font-size: 0.95rem;
+    }
+
+    .tratamiento-info p {
+        font-size: 0.8rem;
+    }
+
+    .medicamento-item {
+        padding: 12px 16px;
+        gap: 14px;
+    }
+
+    .medicamento-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 0.95rem;
+    }
+
+    .medicamento-info h4 {
+        font-size: 0.9rem;
+    }
+
+    .medicamento-info p {
+        font-size: 0.75rem;
+    }
+}
+
+/* Tablets y pantallas medianas */
+@media screen and (max-width: 1024px) and (min-width: 769px) {
+    .detalle-container {
+        padding: 20px 24px 90px;
+        max-width: 100%;
+    }
+
+    .perfil-section {
+        padding: 24px 28px;
+    }
+
+    .perfil-avatar img {
+        width: 75px;
+        height: 75px;
+    }
+
+    .perfil-info h1 {
+        font-size: 1.3rem;
+    }
+
+    .tab {
+        padding: 10px 14px;
+        font-size: 0.8rem;
+    }
+
+    .tab-content {
+        padding: 20px 24px;
+    }
+}
+
+/* Moviles y pantallas pequenas */
+@media screen and (max-width: 768px) {
+    .detalle-container {
+        padding: 16px 16px 85px;
+        max-width: 100%;
+    }
+
+    .perfil-header {
+        gap: 14px;
+    }
+
+    .perfil-avatar img {
+        width: 60px;
+        height: 60px;
+    }
+
+    .perfil-info h1 {
+        font-size: 1.1rem;
+    }
+
+    .tabs {
+        gap: 3px;
+        padding: 3px;
+    }
+
+    .tab {
+        padding: 8px 10px;
+        font-size: 0.7rem;
+    }
+
+    .tab i {
+        font-size: 0.75rem;
+    }
+
+    .tab-content {
+        padding: 14px;
+    }
+}
+
+/* Moviles muy pequenos */
 @media screen and (max-width: 480px) {
     .detalle-container {
         padding: 12px 12px 80px;
+    }
+
+    .back-section {
+        margin-bottom: 10px;
+    }
+
+    .btn-back {
+        font-size: 0.75rem;
+        gap: 6px;
+    }
+
+    .btn-back i {
+        font-size: 0.85rem;
+    }
+
+    .perfil-section {
+        padding: 14px;
+        border-radius: var(--border-radius-sm);
     }
 
     .perfil-header {
@@ -688,46 +943,338 @@
     }
 
     .perfil-avatar img {
-        width: 56px;
-        height: 56px;
+        width: 50px;
+        height: 50px;
+        border-width: 2px;
+    }
+
+    .estado-badge {
+        font-size: 0.45rem;
+        padding: 1px 8px;
+        bottom: -1px;
+        right: -1px;
     }
 
     .perfil-info h1 {
+        font-size: 0.95rem;
+    }
+
+    .perfil-email {
+        font-size: 0.7rem;
+    }
+
+    .perfil-detalles span {
+        font-size: 0.6rem;
+    }
+
+    .perfil-stats {
+        margin-top: 12px;
+        padding-top: 12px;
+    }
+
+    .stat-number {
         font-size: 1rem;
+    }
+
+    .stat-label {
+        font-size: 0.55rem;
     }
 
     .tabs {
         gap: 2px;
         padding: 3px;
+        border-radius: 10px;
     }
 
     .tab {
-        padding: 8px 8px;
-        font-size: 0.65rem;
+        padding: 6px 8px;
+        font-size: 0.6rem;
+        border-radius: 6px;
     }
 
     .tab i {
-        font-size: 0.7rem;
+        font-size: 0.65rem;
+    }
+
+    .tab-badge {
+        font-size: 0.5rem;
+        padding: 0 4px;
     }
 
     .tab-content {
         padding: 12px;
+        border-radius: 10px;
     }
 
     .info-card {
         padding: 10px 12px;
     }
+
+    .info-card h3 {
+        font-size: 0.75rem;
+        margin-bottom: 8px;
+    }
+
+    .info-label {
+        font-size: 0.65rem;
+    }
+
+    .info-value {
+        font-size: 0.7rem;
+    }
+
+    .cita-item {
+        padding: 8px 10px;
+        gap: 10px;
+    }
+
+    .cita-date {
+        min-width: 34px;
+        padding: 3px 6px;
+    }
+
+    .cita-day {
+        font-size: 0.8rem;
+    }
+
+    .cita-month {
+        font-size: 0.45rem;
+    }
+
+    .cita-info h4 {
+        font-size: 0.7rem;
+    }
+
+    .cita-info p {
+        font-size: 0.6rem;
+    }
+
+    .tratamiento-item {
+        padding: 10px 12px;
+        gap: 10px;
+    }
+
+    .tratamiento-icon {
+        width: 34px;
+        height: 34px;
+        font-size: 0.75rem;
+    }
+
+    .tratamiento-info h4 {
+        font-size: 0.75rem;
+    }
+
+    .tratamiento-info p {
+        font-size: 0.65rem;
+    }
+
+    .tratamiento-fechas {
+        font-size: 0.6rem !important;
+    }
+
+    .tratamiento-instrucciones {
+        font-size: 0.6rem !important;
+    }
+
+    .medicamento-item {
+        padding: 8px 10px;
+        gap: 10px;
+    }
+
+    .medicamento-icon {
+        width: 30px;
+        height: 30px;
+        font-size: 0.75rem;
+    }
+
+    .medicamento-info h4 {
+        font-size: 0.7rem;
+    }
+
+    .medicamento-info p {
+        font-size: 0.6rem;
+    }
+
+    .medicamento-detalle {
+        font-size: 0.55rem !important;
+    }
+
+    .arrow-icon {
+        font-size: 0.75rem;
+    }
+
+    .badge {
+        font-size: 0.5rem;
+        padding: 1px 8px;
+    }
+
+    .empty-state {
+        padding: 20px 12px;
+    }
+
+    .empty-state i {
+        font-size: 1.5rem;
+    }
+
+    .empty-state p {
+        font-size: 0.75rem;
+    }
+
+    .error-state {
+        padding: 40px 16px;
+    }
+
+    .error-state i {
+        font-size: 2.5rem;
+    }
+
+    .error-state h3 {
+        font-size: 0.95rem;
+    }
+
+    .error-state p {
+        font-size: 0.75rem;
+    }
+
+    .btn-primary {
+        font-size: 0.7rem;
+        padding: 6px 16px;
+    }
 }
 
+/* Pantallas muy pequenas (menos de 360px) */
 @media screen and (max-width: 360px) {
+    .detalle-container {
+        padding: 10px 10px 75px;
+    }
+
+    .perfil-section {
+        padding: 12px;
+    }
+
+    .perfil-header {
+        gap: 10px;
+    }
+
+    .perfil-avatar img {
+        width: 44px;
+        height: 44px;
+    }
+
+    .perfil-info h1 {
+        font-size: 0.85rem;
+    }
+
+    .perfil-email {
+        font-size: 0.6rem;
+    }
+
+    .perfil-detalles span {
+        font-size: 0.55rem;
+    }
+
     .tabs {
         flex-wrap: nowrap;
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+
+    .tabs::-webkit-scrollbar {
+        display: none;
     }
 
     .tab {
         flex: 0 0 auto;
-        padding: 6px 10px;
+        padding: 5px 8px;
+        font-size: 0.55rem;
+    }
+
+    .tab i {
         font-size: 0.6rem;
+    }
+
+    .tab-content {
+        padding: 10px;
+    }
+
+    .stat-number {
+        font-size: 0.85rem;
+    }
+
+    .stat-label {
+        font-size: 0.5rem;
+    }
+
+    .info-card {
+        padding: 8px 10px;
+    }
+
+    .info-label {
+        font-size: 0.6rem;
+    }
+
+    .info-value {
+        font-size: 0.65rem;
+    }
+
+    .cita-item {
+        padding: 6px 8px;
+        gap: 8px;
+    }
+
+    .cita-date {
+        min-width: 30px;
+        padding: 2px 4px;
+    }
+
+    .cita-day {
+        font-size: 0.7rem;
+    }
+
+    .cita-info h4 {
+        font-size: 0.65rem;
+    }
+
+    .cita-info p {
+        font-size: 0.55rem;
+    }
+
+    .tratamiento-item {
+        padding: 8px 10px;
+        gap: 8px;
+    }
+
+    .tratamiento-icon {
+        width: 30px;
+        height: 30px;
+        font-size: 0.65rem;
+    }
+
+    .tratamiento-info h4 {
+        font-size: 0.65rem;
+    }
+
+    .tratamiento-info p {
+        font-size: 0.6rem;
+    }
+
+    .medicamento-item {
+        padding: 6px 8px;
+        gap: 8px;
+    }
+
+    .medicamento-icon {
+        width: 26px;
+        height: 26px;
+        font-size: 0.65rem;
+    }
+
+    .medicamento-info h4 {
+        font-size: 0.6rem;
+    }
+
+    .medicamento-info p {
+        font-size: 0.55rem;
     }
 }

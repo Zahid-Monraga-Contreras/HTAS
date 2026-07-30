@@ -1,0 +1,177 @@
+<app-doctor-menu></app-doctor-menu>
+
+<div class="toast-container" *ngIf="notifications.length > 0">
+    <div *ngFor="let notif of notifications; let i = index" class="toast-notification toast-{{ notif.type }}"
+        [class.toast-exit]="i > 0">
+        <div class="toast-icon">
+            <i class="bi" [class]="
+                notif.type === 'success' ? 'bi-check-circle-fill' :
+                notif.type === 'error' ? 'bi-x-circle-fill' :
+                notif.type === 'warning' ? 'bi-exclamation-triangle-fill' :
+                'bi-info-circle-fill'
+            "></i>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title">{{ notif.title }}</div>
+            <div class="toast-message">{{ notif.message }}</div>
+        </div>
+        <button class="toast-close" (click)="removeToast(notif.id)">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        <div class="toast-progress" [style.animation-duration]="(notif.duration || 5000) + 'ms'"></div>
+    </div>
+</div>
+
+<div class="nuevo-tratamiento-container">
+    <header class="page-header">
+        <div class="header-top">
+            <div class="header-info">
+                <h1>Nuevo Tratamiento</h1>
+                <p>Registra un nuevo tratamiento para tu paciente</p>
+            </div>
+        </div>
+    </header>
+
+    <div class="form-card">
+        <form [formGroup]="tratamientoForm" (ngSubmit)="crearTratamiento()">
+
+            <div class="form-group">
+                <label>Buscar Paciente *</label>
+                <div class="search-wrapper">
+                    <div class="search-box">
+                        <i class="bi bi-search"></i>
+                        <input type="text" [(ngModel)]="searchTermPaciente" (input)="buscarPacientes()"
+                            (focus)="!searchTermPaciente && (pacientesFiltrados = [...pacientes])"
+                            placeholder="Buscar por nombre o correo..." class="search-input"
+                            [ngModelOptions]="{standalone: true}" />
+                    </div>
+                    <div class="dropdown" *ngIf="pacientesFiltrados.length > 0 && searchTermPaciente">
+                        <div *ngFor="let p of pacientesFiltrados" class="option-item" (click)="seleccionarPaciente(p)">
+                            <img [src]="getAvatarUrl(p.nombre, p.apPaterno)" alt="Avatar" class="option-avatar">
+                            <div class="option-info">
+                                <span class="option-nombre">{{ p.nombre }} {{ p.apPaterno }}</span>
+                                <span class="option-email">{{ p.correo }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="seleccionado" *ngIf="tratamientoForm.get('idPaciente')?.value">
+                        <i class="bi bi-check-circle-fill" style="color: #10b981;"></i>
+                        <span>Paciente seleccionado: <strong>{{ searchTermPaciente }}</strong></span>
+                        <button type="button" class="btn-cambiar"
+                            (click)="tratamientoForm.patchValue({idPaciente: ''}); searchTermPaciente = '';">Cambiar</button>
+                    </div>
+                </div>
+                <small class="error-text"
+                    *ngIf="tratamientoForm.get('idPaciente')?.touched && !tratamientoForm.get('idPaciente')?.value">
+                    Debes seleccionar un paciente
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label>Buscar Medicamento *</label>
+                <div class="search-wrapper">
+                    <div class="search-box">
+                        <i class="bi bi-search"></i>
+                        <input type="text" [(ngModel)]="searchTermMedicamento" (input)="buscarMedicamentos()"
+                            placeholder="Buscar por nombre o laboratorio..." class="search-input"
+                            [ngModelOptions]="{standalone: true}" />
+                    </div>
+                    <div class="dropdown" *ngIf="medicamentosFiltrados.length > 0 && searchTermMedicamento">
+                        <div *ngFor="let m of medicamentosFiltrados" class="option-item"
+                            (click)="seleccionarMedicamento(m)">
+                            <div class="option-icon">
+                                <i class="bi bi-capsule"></i>
+                            </div>
+                            <div class="option-info">
+                                <span class="option-nombre">{{ m.nombreMostrar || 'Medicamento' }}</span>
+                                <span class="option-email">{{ m.sustanciaMostrar || m.laboratorioMostrar || 'Sin datos'
+                                    }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="seleccionado" *ngIf="tratamientoForm.get('idMedicamento')?.value">
+                        <i class="bi bi-check-circle-fill" style="color: #10b981;"></i>
+                        <span>Medicamento seleccionado: <strong>{{ searchTermMedicamento }}</strong></span>
+                        <button type="button" class="btn-cambiar"
+                            (click)="tratamientoForm.patchValue({idMedicamento: ''}); searchTermMedicamento = '';">Cambiar</button>
+                    </div>
+                </div>
+                <small class="error-text"
+                    *ngIf="tratamientoForm.get('idMedicamento')?.touched && !tratamientoForm.get('idMedicamento')?.value">
+                    Debes seleccionar un medicamento
+                </small>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="dosis">Dosis *</label>
+                    <input type="text" id="dosis" formControlName="dosis" class="form-control"
+                        placeholder="Ej: 500mg, 1 tableta...">
+                    <small class="error-text"
+                        *ngIf="tratamientoForm.get('dosis')?.touched && tratamientoForm.get('dosis')?.invalid">
+                        La dosis es obligatoria
+                    </small>
+                </div>
+                <div class="form-group">
+                    <label for="frecuenciaHoras">Frecuencia (horas) *</label>
+                    <input type="number" id="frecuenciaHoras" formControlName="frecuenciaHoras" class="form-control"
+                        placeholder="Ej: 8, 12, 24...">
+                    <small class="error-text"
+                        *ngIf="tratamientoForm.get('frecuenciaHoras')?.touched && tratamientoForm.get('frecuenciaHoras')?.invalid">
+                        Frecuencia obligatoria (mínimo 1 hora)
+                    </small>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="fechaInicioInput">Fecha de Inicio *</label>
+                    <div class="input-picker-wrapper">
+                        <input type="text" id="fechaInicioInput" class="form-control picker-custom"
+                            placeholder="Seleccione fecha..." readonly (click)="abrirCalendarioInicio()">
+                        <i class="bi bi-calendar3 icon-embed"></i>
+                    </div>
+                    <small class="error-text"
+                        *ngIf="tratamientoForm.get('fechaInicio')?.touched && !tratamientoForm.get('fechaInicio')?.value">
+                        La fecha de inicio es obligatoria
+                    </small>
+                </div>
+                <div class="form-group">
+                    <label for="fechaFinInput">Fecha de Fin *</label>
+                    <div class="input-picker-wrapper">
+                        <input type="text" id="fechaFinInput" class="form-control picker-custom"
+                            placeholder="Seleccione fecha..." readonly (click)="abrirCalendarioFin()">
+                        <i class="bi bi-calendar3 icon-embed"></i>
+                    </div>
+                    <small class="error-text"
+                        *ngIf="tratamientoForm.get('fechaFin')?.touched && !tratamientoForm.get('fechaFin')?.value">
+                        La fecha de fin es obligatoria
+                    </small>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="notasInstrucciones">Instrucciones</label>
+                <textarea id="notasInstrucciones" formControlName="notasInstrucciones" rows="3"
+                    class="form-control textarea-fixed"
+                    placeholder="Instrucciones adicionales para el paciente..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" formControlName="activo" class="form-checkbox">
+                    Activo
+                </label>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn-cancelar" (click)="cancelar()">Cancelar</button>
+                <button type="submit" class="btn-guardar" [disabled]="isLoading || tratamientoForm.invalid">
+                    <i class="bi bi-check-lg" *ngIf="!isLoading"></i>
+                    <span class="spinner-small" *ngIf="isLoading"></span>
+                    {{ isLoading ? 'Guardando...' : 'Crear Tratamiento' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

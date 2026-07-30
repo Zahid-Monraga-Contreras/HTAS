@@ -1,3 +1,7 @@
+/* ==========================================================================
+   NUEVA CITA - ESTILOS
+   ========================================================================== */
+
 :host {
     --primary: #b0001e;
     --primary-dark: #8a0017;
@@ -41,15 +45,22 @@
     background: var(--gray-50);
 }
 
+/* ==========================================================================
+   NUEVA CITA CONTAINER - SIN ESPACIOS EN BLANCO EN PANTALLAS GRANDES
+   ========================================================================== */
 .nueva-cita-container {
     min-height: 100vh;
     background: var(--gray-50);
     padding: 16px 16px 100px;
     margin: 0 auto;
     width: 100%;
-    max-width: 680px;
+    max-width: 100%;
+    /* Eliminamos el max-width fijo */
 }
 
+/* ==========================================================================
+   HEADER
+   ========================================================================== */
 .page-header {
     padding: 0 0 16px;
 }
@@ -73,6 +84,9 @@
     margin: 2px 0 0;
 }
 
+/* ==========================================================================
+   FORMULARIO
+   ========================================================================== */
 .form-card {
     background: white;
     border-radius: var(--border-radius);
@@ -134,7 +148,9 @@
     margin-top: 3px;
 }
 
-/* INPUT PICKER */
+/* ==========================================================================
+   INPUT PICKER
+   ========================================================================== */
 .input-picker-wrapper {
     position: relative;
     width: 100%;
@@ -155,7 +171,9 @@
     pointer-events: none;
 }
 
-/* BUSCADOR DE PACIENTES */
+/* ==========================================================================
+   BUSCADOR DE PACIENTES
+   ========================================================================== */
 .search-paciente-wrapper {
     position: relative;
 }
@@ -298,7 +316,9 @@
     border-color: var(--gray-300);
 }
 
-/* BOTONES DEL FORMULARIO */
+/* ==========================================================================
+   BOTONES DEL FORMULARIO
+   ========================================================================== */
 .form-actions {
     display: flex;
     gap: 12px;
@@ -375,7 +395,9 @@
     }
 }
 
-/* FLATPICKR */
+/* ==========================================================================
+   FLATPICKR
+   ========================================================================== */
 .flatpickr-calendar {
     z-index: 9999 !important;
 }
@@ -569,37 +591,550 @@
     }
 }
 
-/* RESPONSIVE */
+/* ==========================================================================
+   RESPONSIVE - AJUSTES PARA PANTALLAS GRANDES Y PEQUEÑAS
+   ========================================================================== */
+
+/* Pantallas grandes (web) - Aprovecha todo el espacio */
+@media screen and (min-width: 1025px) {
+    .nueva-cita-container {
+        padding: 24px 32px 100px;
+        max-width: 100%;
+    }
+
+    .page-header {
+        padding: 0 0 20px;
+    }
+
+    .header-info h1 {
+        font-size: 1.8rem;
+    }
+
+    .header-info p {
+        font-size: 0.95rem;
+    }
+
+    .form-card {
+        padding: 32px 36px;
+        border-radius: var(--border-radius);
+    }
+
+    .form-group {
+        margin-bottom: 22px;
+    }
+
+    .form-group label {
+        font-size: 0.9rem;
+        margin-bottom: 6px;
+    }
+
+    .form-control {
+        padding: 12px 16px;
+        font-size: 1rem;
+        border-radius: 12px;
+        border-width: 2px;
+    }
+
+    .form-row {
+        gap: 20px;
+    }
+
+    .error-text {
+        font-size: 0.8rem;
+        margin-top: 4px;
+    }
+
+    .search-box {
+        padding: 0 16px;
+        border-radius: 12px;
+        border-width: 2px;
+    }
+
+    .search-input {
+        padding: 12px 12px;
+        font-size: 1rem;
+    }
+
+    .pacientes-dropdown {
+        max-height: 250px;
+        border-radius: 12px;
+    }
+
+    .paciente-option {
+        padding: 12px 16px;
+    }
+
+    .option-avatar {
+        width: 36px;
+        height: 36px;
+    }
+
+    .option-nombre {
+        font-size: 0.9rem;
+    }
+
+    .option-email {
+        font-size: 0.8rem;
+    }
+
+    .paciente-seleccionado {
+        padding: 12px 16px;
+        border-radius: 12px;
+        border-width: 2px;
+        margin-top: 8px;
+    }
+
+    .paciente-seleccionado span {
+        font-size: 0.95rem;
+    }
+
+    .btn-cambiar {
+        padding: 6px 14px;
+        font-size: 0.8rem;
+        border-radius: 8px;
+    }
+
+    .form-actions {
+        gap: 16px;
+        margin-top: 12px;
+    }
+
+    .btn-cancelar {
+        padding: 12px 28px;
+        font-size: 0.95rem;
+        border-radius: 12px;
+        border-width: 2px;
+    }
+
+    .btn-guardar {
+        padding: 12px 32px;
+        font-size: 0.95rem;
+        border-radius: 12px;
+    }
+
+    .btn-guardar i {
+        font-size: 1.1rem;
+    }
+
+    .spinner-small {
+        width: 20px;
+        height: 20px;
+        border-width: 2.5px;
+    }
+
+    .input-picker-wrapper .icon-embed {
+        right: 14px;
+        font-size: 1.2rem;
+    }
+
+    .toast-container {
+        max-width: 480px;
+        top: 24px;
+        right: 24px;
+        gap: 14px;
+    }
+
+    .toast-notification {
+        padding: 18px 22px;
+        border-radius: 14px;
+        border-left-width: 5px;
+    }
+
+    .toast-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 1.6rem;
+    }
+
+    .toast-title {
+        font-size: 0.95rem;
+    }
+
+    .toast-message {
+        font-size: 0.9rem;
+    }
+
+    .toast-close {
+        font-size: 1rem;
+        padding: 6px;
+    }
+
+    .toast-progress {
+        height: 4px;
+    }
+
+    .textarea-fixed {
+        min-height: 80px;
+        max-height: 80px;
+    }
+}
+
+/* Tablets y pantallas medianas */
+@media screen and (max-width: 1024px) and (min-width: 769px) {
+    .nueva-cita-container {
+        padding: 20px 24px 90px;
+        max-width: 100%;
+    }
+
+    .form-card {
+        padding: 28px 32px;
+    }
+
+    .form-row {
+        gap: 18px;
+    }
+
+    .header-info h1 {
+        font-size: 1.6rem;
+    }
+
+    .btn-guardar {
+        padding: 10px 26px;
+    }
+
+    .btn-cancelar {
+        padding: 10px 22px;
+    }
+}
+
+/* Moviles y pantallas pequenas */
+@media screen and (max-width: 768px) {
+    .nueva-cita-container {
+        padding: 16px 16px 85px;
+        max-width: 100%;
+    }
+
+    .form-card {
+        padding: 20px;
+    }
+
+    .header-info h1 {
+        font-size: 1.3rem;
+    }
+
+    .header-info p {
+        font-size: 0.8rem;
+    }
+
+    .form-row {
+        gap: 0;
+    }
+}
+
+/* Moviles muy pequenos */
 @media screen and (max-width: 480px) {
+    .nueva-cita-container {
+        padding: 12px 12px 80px;
+    }
+
+    .page-header {
+        padding: 0 0 12px;
+    }
+
+    .header-info h1 {
+        font-size: 1.1rem;
+    }
+
+    .header-info p {
+        font-size: 0.75rem;
+    }
+
+    .form-card {
+        padding: 16px;
+        border-radius: var(--border-radius-sm);
+    }
+
+    .form-group {
+        margin-bottom: 14px;
+    }
+
+    .form-group label {
+        font-size: 0.8rem;
+        margin-bottom: 3px;
+    }
+
+    .form-control {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+        border-radius: 8px;
+        border-width: 1.5px;
+    }
+
     .form-row {
         grid-template-columns: 1fr;
         gap: 0;
     }
 
-    .form-card {
-        padding: 16px;
+    .error-text {
+        font-size: 0.7rem;
+        margin-top: 2px;
+    }
+
+    .search-box {
+        padding: 0 12px;
+        border-radius: 8px;
+        border-width: 1.5px;
+    }
+
+    .search-box i {
+        font-size: 0.85rem;
+    }
+
+    .search-input {
+        padding: 8px 8px;
+        font-size: 0.9rem;
+    }
+
+    .pacientes-dropdown {
+        max-height: 150px;
+        border-radius: 8px;
+    }
+
+    .paciente-option {
+        padding: 8px 12px;
+        gap: 8px;
+    }
+
+    .option-avatar {
+        width: 28px;
+        height: 28px;
+    }
+
+    .option-nombre {
+        font-size: 0.8rem;
+    }
+
+    .option-email {
+        font-size: 0.7rem;
+    }
+
+    .paciente-seleccionado {
+        padding: 8px 12px;
+        border-radius: 8px;
+        border-width: 1.5px;
+        gap: 6px;
+        margin-top: 4px;
+    }
+
+    .paciente-seleccionado i {
+        font-size: 0.95rem;
+    }
+
+    .paciente-seleccionado span {
+        font-size: 0.8rem;
+    }
+
+    .btn-cambiar {
+        padding: 3px 10px;
+        font-size: 0.7rem;
+        border-radius: 4px;
     }
 
     .form-actions {
         flex-direction: column;
+        gap: 10px;
+        margin-top: 4px;
     }
 
     .form-actions button {
         width: 100%;
         justify-content: center;
+        padding: 8px 18px;
+        font-size: 0.85rem;
+        border-radius: 8px;
     }
 
-    .pacientes-dropdown {
-        max-height: 150px;
+    .btn-guardar {
+        padding: 8px 18px;
+        font-size: 0.85rem;
     }
 
+    .btn-guardar i {
+        font-size: 0.9rem;
+    }
+
+    .btn-cancelar {
+        padding: 8px 18px;
+        font-size: 0.85rem;
+        border-width: 1.5px;
+    }
+
+    .spinner-small {
+        width: 16px;
+        height: 16px;
+        border-width: 2px;
+    }
+
+    .input-picker-wrapper .icon-embed {
+        right: 10px;
+        font-size: 0.95rem;
+    }
+
+    /* Toast */
     .toast-container {
         right: 10px;
         left: 10px;
         max-width: none;
+        top: 10px;
+        gap: 10px;
     }
 
     .toast-notification {
         padding: 12px 14px;
+        border-radius: 10px;
+        gap: 10px;
+        border-left-width: 4px;
+    }
+
+    .toast-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 1.2rem;
+    }
+
+    .toast-title {
+        font-size: 0.8rem;
+    }
+
+    .toast-message {
+        font-size: 0.75rem;
+    }
+
+    .toast-close {
+        font-size: 0.8rem;
+        padding: 3px;
+    }
+
+    .toast-progress {
+        height: 3px;
+    }
+
+    .textarea-fixed {
+        min-height: 60px;
+        max-height: 60px;
+    }
+}
+
+/* Pantallas muy pequenas (menos de 360px) */
+@media screen and (max-width: 360px) {
+    .nueva-cita-container {
+        padding: 10px 10px 75px;
+    }
+
+    .header-info h1 {
+        font-size: 0.95rem;
+    }
+
+    .header-info p {
+        font-size: 0.7rem;
+    }
+
+    .form-card {
+        padding: 12px;
+        border-radius: 10px;
+    }
+
+    .form-group {
+        margin-bottom: 12px;
+    }
+
+    .form-group label {
+        font-size: 0.7rem;
+    }
+
+    .form-control {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+        border-radius: 6px;
+    }
+
+    .search-box {
+        padding: 0 10px;
+        border-radius: 6px;
+    }
+
+    .search-input {
+        padding: 6px 6px;
+        font-size: 0.8rem;
+    }
+
+    .paciente-option {
+        padding: 6px 10px;
+        gap: 6px;
+    }
+
+    .option-avatar {
+        width: 24px;
+        height: 24px;
+    }
+
+    .option-nombre {
+        font-size: 0.7rem;
+    }
+
+    .option-email {
+        font-size: 0.65rem;
+    }
+
+    .paciente-seleccionado {
+        padding: 6px 10px;
+        gap: 4px;
+    }
+
+    .paciente-seleccionado span {
+        font-size: 0.7rem;
+    }
+
+    .btn-cambiar {
+        padding: 2px 8px;
+        font-size: 0.6rem;
+    }
+
+    .form-actions button {
+        padding: 6px 14px;
+        font-size: 0.75rem;
+    }
+
+    .btn-guardar {
+        padding: 6px 14px;
+        font-size: 0.75rem;
+    }
+
+    .btn-cancelar {
+        padding: 6px 14px;
+        font-size: 0.75rem;
+    }
+
+    .input-picker-wrapper .icon-embed {
+        right: 8px;
+        font-size: 0.85rem;
+    }
+
+    .toast-notification {
+        padding: 10px 12px;
+        gap: 8px;
+    }
+
+    .toast-icon {
+        width: 24px;
+        height: 24px;
+        font-size: 1rem;
+    }
+
+    .toast-title {
+        font-size: 0.7rem;
+    }
+
+    .toast-message {
+        font-size: 0.65rem;
+    }
+
+    .toast-close {
+        font-size: 0.7rem;
+    }
+
+    .textarea-fixed {
+        min-height: 50px;
+        max-height: 50px;
     }
 }

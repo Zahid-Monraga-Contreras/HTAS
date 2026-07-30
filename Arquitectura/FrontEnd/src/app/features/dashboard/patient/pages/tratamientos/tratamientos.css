@@ -52,7 +52,7 @@
 }
 
 /* ==========================================================================
-   PAGINA PRINCIPAL
+   PAGINA PRINCIPAL - SIN ESPACIOS EN BLANCO EN PANTALLAS GRANDES
    ========================================================================== */
 .tratamientos-page {
     min-height: 100vh;
@@ -60,7 +60,8 @@
     padding: 16px 16px 100px;
     margin: 0 auto;
     width: 100%;
-    max-width: 680px;
+    max-width: 100%;
+    /* Eliminamos el max-width fijo */
 }
 
 /* ==========================================================================
@@ -1125,12 +1126,235 @@
 }
 
 /* ==========================================================================
-   RESPONSIVE
+   RESPONSIVE - AJUSTES PARA PANTALLAS GRANDES Y PEQUEÑAS
    ========================================================================== */
+
+/* Pantallas grandes (web) - Aprovecha todo el espacio */
 @media screen and (min-width: 1025px) {
     .tratamientos-page {
         padding: 24px 32px 100px;
-        max-width: 780px;
+        max-width: 100%;
+    }
+
+    .tratamientos-header {
+        padding: 0 0 20px;
+    }
+
+    .header-info h1 {
+        font-size: 1.8rem;
+    }
+
+    .header-info p {
+        font-size: 0.95rem;
+    }
+
+    .stats-section {
+        margin-bottom: 24px;
+    }
+
+    .stats-grid {
+        gap: 12px;
+    }
+
+    .stat-card {
+        padding: 20px 16px;
+        border-radius: var(--border-radius-sm);
+    }
+
+    .stat-number {
+        font-size: 1.8rem;
+    }
+
+    .stat-label {
+        font-size: 0.7rem;
+    }
+
+    .tratamientos-section {
+        padding: 24px 28px;
+        border-radius: var(--border-radius);
+    }
+
+    .section-header {
+        margin-bottom: 18px;
+    }
+
+    .section-header h2 {
+        font-size: 1.1rem;
+    }
+
+    .section-header h2 i {
+        font-size: 1.1rem;
+    }
+
+    .tratamientos-count {
+        font-size: 0.9rem;
+        padding: 4px 18px;
+    }
+
+    .search-box {
+        margin-bottom: 20px;
+    }
+
+    .search-box input {
+        padding: 12px 16px 12px 48px;
+        font-size: 1rem;
+        border-radius: 12px;
+        border-width: 2px;
+    }
+
+    .search-box i {
+        left: 16px;
+        font-size: 1.1rem;
+    }
+
+    .tratamientos-list {
+        gap: 14px;
+    }
+
+    .tratamiento-card {
+        padding: 18px 20px;
+        border-radius: var(--border-radius-sm);
+    }
+
+    .tratamiento-card-header {
+        margin-bottom: 12px;
+        gap: 16px;
+    }
+
+    .tratamiento-info-principal h3 {
+        font-size: 1rem;
+    }
+
+    .tratamiento-dosis {
+        font-size: 0.85rem;
+    }
+
+    .tratamiento-doctor {
+        font-size: 0.8rem;
+    }
+
+    .tratamiento-paciente {
+        font-size: 0.8rem;
+    }
+
+    .estado-badge {
+        font-size: 0.75rem;
+        padding: 4px 16px;
+        border-radius: 14px;
+    }
+
+    .estado-badge i {
+        font-size: 0.65rem;
+    }
+
+    .tratamiento-detalle {
+        font-size: 0.8rem;
+    }
+
+    .tratamiento-detalle i {
+        font-size: 0.8rem;
+    }
+
+    .dias-badge {
+        font-size: 0.7rem;
+        padding: 2px 10px;
+    }
+
+    .btn-detalle {
+        width: 34px;
+        height: 34px;
+        font-size: 1rem;
+    }
+
+    .modal-content {
+        max-width: 520px;
+        border-radius: var(--border-radius);
+    }
+
+    .modal-detalle-grande {
+        max-width: 760px;
+    }
+
+    .modal-header {
+        padding: 20px 28px 16px;
+    }
+
+    .modal-header h2 {
+        font-size: 1.2rem;
+    }
+
+    .modal-body {
+        padding: 28px;
+    }
+
+    .modal-footer {
+        padding: 16px 28px 20px;
+    }
+
+    .detalle-grid {
+        gap: 8px 24px;
+    }
+
+    .detalle-item {
+        padding: 10px 0;
+    }
+
+    .detalle-label {
+        font-size: 0.85rem;
+    }
+
+    .detalle-valor {
+        font-size: 0.9rem;
+    }
+
+    .tomas-stats-grid {
+        gap: 12px;
+    }
+
+    .tomas-stat-value {
+        font-size: 1.2rem;
+    }
+
+    .tomas-stat-label {
+        font-size: 0.6rem;
+    }
+
+    .toma-item {
+        padding: 10px 14px;
+        border-radius: 10px;
+    }
+
+    .toma-fecha {
+        font-size: 0.85rem;
+    }
+
+    .toma-hora {
+        font-size: 0.8rem;
+    }
+
+    .toast-premium-container {
+        max-width: 480px;
+        top: 24px;
+        right: 24px;
+        padding: 16px 24px;
+        border-radius: 14px;
+        border-left-width: 5px;
+    }
+
+    .toast-premium-container .icon-toast {
+        font-size: 1.4rem;
+    }
+
+    .toast-premium-container .toast-message {
+        font-size: 0.9rem;
+    }
+}
+
+/* Tablets y pantallas medianas */
+@media screen and (max-width: 1024px) and (min-width: 769px) {
+    .tratamientos-page {
+        padding: 20px 24px 90px;
+        max-width: 100%;
     }
 
     .stats-grid {
@@ -1138,37 +1362,35 @@
     }
 
     .stat-card {
-        padding: 16px 10px;
+        padding: 16px 12px;
     }
 
     .stat-number {
-        font-size: 1.5rem;
-    }
-
-    .stat-label {
-        font-size: 0.65rem;
+        font-size: 1.6rem;
     }
 
     .tratamientos-section {
-        padding: 20px;
+        padding: 20px 24px;
     }
 
-    .modal-content {
-        max-width: 520px;
+    .tratamiento-card {
+        padding: 16px 18px;
+    }
+
+    .header-info h1 {
+        font-size: 1.6rem;
     }
 
     .modal-detalle-grande {
-        max-width: 760px;
+        max-width: 90%;
+    }
+
+    .detalle-grid {
+        gap: 4px 12px;
     }
 }
 
-@media screen and (max-width: 1024px) {
-    .tratamientos-page {
-        padding: 18px 20px 90px;
-        max-width: 640px;
-    }
-}
-
+/* Moviles y pantallas pequenas */
 @media screen and (max-width: 768px) {
     .tratamientos-page {
         padding: 16px 16px 85px;
@@ -1177,6 +1399,10 @@
 
     .header-info h1 {
         font-size: 1.3rem;
+    }
+
+    .header-info p {
+        font-size: 0.8rem;
     }
 
     .stats-grid {
@@ -1189,6 +1415,19 @@
 
     .stat-number {
         font-size: 1.15rem;
+    }
+
+    .tratamientos-section {
+        padding: 14px;
+    }
+
+    .tratamiento-card {
+        padding: 12px;
+    }
+
+    .tratamiento-card-header {
+        flex-wrap: wrap;
+        gap: 8px;
     }
 
     .modal-content {
@@ -1232,6 +1471,7 @@
     }
 }
 
+/* Moviles muy pequenos */
 @media screen and (max-width: 480px) {
     .tratamientos-page {
         padding: 12px 12px 80px;
@@ -1241,6 +1481,10 @@
         font-size: 1.1rem;
     }
 
+    .header-info p {
+        font-size: 0.7rem;
+    }
+
     .stats-grid {
         gap: 4px;
     }
@@ -1248,6 +1492,7 @@
     .stat-card {
         padding: 8px 2px;
         border-radius: 8px;
+        border-width: 1.5px;
     }
 
     .stat-number {
@@ -1259,17 +1504,74 @@
         letter-spacing: 0.2px;
     }
 
+    .tratamientos-section {
+        padding: 12px;
+        border-radius: var(--border-radius-sm);
+    }
+
+    .section-header h2 {
+        font-size: 0.8rem;
+    }
+
+    .section-header h2 i {
+        font-size: 0.8rem;
+    }
+
+    .tratamientos-count {
+        font-size: 0.65rem;
+        padding: 1px 10px;
+    }
+
+    .search-box input {
+        padding: 8px 12px 8px 38px;
+        font-size: 0.85rem;
+        border-radius: 8px;
+    }
+
+    .search-box i {
+        left: 12px;
+        font-size: 0.9rem;
+    }
+
+    .tratamientos-list {
+        gap: 10px;
+    }
+
     .tratamiento-card {
         padding: 12px;
+        border-radius: 10px;
     }
 
     .tratamiento-card-header {
         flex-wrap: wrap;
         gap: 8px;
+        margin-bottom: 8px;
     }
 
     .tratamiento-info-principal h3 {
         font-size: 0.8rem;
+    }
+
+    .tratamiento-dosis {
+        font-size: 0.7rem;
+    }
+
+    .tratamiento-doctor {
+        font-size: 0.65rem;
+    }
+
+    .tratamiento-paciente {
+        font-size: 0.65rem;
+    }
+
+    .estado-badge {
+        font-size: 0.55rem;
+        padding: 2px 10px;
+        border-radius: 10px;
+    }
+
+    .estado-badge i {
+        font-size: 0.5rem;
     }
 
     .tratamiento-card-body {
@@ -1283,10 +1585,33 @@
         gap: 4px;
     }
 
+    .tratamiento-detalle {
+        font-size: 0.6rem;
+    }
+
+    .tratamiento-detalle i {
+        font-size: 0.6rem;
+    }
+
+    .dias-badge {
+        font-size: 0.55rem;
+        padding: 1px 6px;
+    }
+
+    .btn-detalle {
+        width: 24px;
+        height: 24px;
+        font-size: 0.75rem;
+    }
+
     .modal-content {
         max-width: 100%;
         margin: 10px;
         border-radius: 12px;
+    }
+
+    .modal-detalle-grande {
+        max-width: 100%;
     }
 
     .modal-header {
@@ -1295,6 +1620,12 @@
 
     .modal-header h2 {
         font-size: 1rem;
+    }
+
+    .modal-close {
+        width: 30px;
+        height: 30px;
+        font-size: 0.85rem;
     }
 
     .modal-body {
@@ -1311,6 +1642,11 @@
         justify-content: center;
     }
 
+    .detalle-grid {
+        grid-template-columns: 1fr;
+        gap: 2px;
+    }
+
     .detalle-item {
         flex-direction: column;
         align-items: flex-start;
@@ -1318,7 +1654,12 @@
         padding: 8px 0;
     }
 
+    .detalle-label {
+        font-size: 0.7rem;
+    }
+
     .detalle-valor {
+        font-size: 0.8rem;
         text-align: left;
         max-width: 100%;
     }
@@ -1332,9 +1673,58 @@
         justify-content: center;
     }
 
+    .detalle-acciones .btn-cerrar {
+        padding: 8px 16px;
+        font-size: 0.8rem;
+        border-radius: 8px;
+    }
+
     .tomas-stats-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 6px;
+    }
+
+    .tomas-stat-value {
+        font-size: 0.95rem;
+    }
+
+    .tomas-stat-label {
+        font-size: 0.5rem;
+    }
+
+    .tomas-actions {
+        flex-direction: column;
+    }
+
+    .tomas-actions button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .btn-generar-tomas {
+        padding: 8px 14px;
+        font-size: 0.75rem;
+        border-radius: 8px;
+    }
+
+    .spinner-save {
+        width: 12px;
+        height: 12px;
+    }
+
+    .toma-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+        padding: 8px 10px;
+        border-radius: 8px;
+        border-left-width: 3px;
+    }
+
+    .toma-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
     }
 
     .toma-fecha-hora {
@@ -1343,10 +1733,269 @@
         gap: 2px;
     }
 
+    .toma-fecha {
+        font-size: 0.7rem;
+    }
+
+    .toma-hora {
+        font-size: 0.65rem;
+    }
+
+    .toma-estado-badge {
+        font-size: 0.5rem;
+        padding: 1px 8px;
+    }
+
+    .toma-actions {
+        justify-content: flex-start;
+        gap: 4px;
+    }
+
+    .btn-toma-completar,
+    .btn-toma-omitir,
+    .btn-toma-retrasar {
+        width: 22px;
+        height: 22px;
+        font-size: 0.65rem;
+    }
+
+    .toma-estado-final {
+        font-size: 0.6rem;
+        padding: 1px 8px;
+    }
+
+    .toma-estado-eliminada {
+        font-size: 0.6rem;
+        padding: 1px 8px;
+    }
+
+    .toma-notas {
+        font-size: 0.6rem;
+    }
+
+    .tomas-vacio {
+        padding: 16px;
+    }
+
+    .tomas-vacio i {
+        font-size: 1.5rem;
+    }
+
+    .tomas-vacio p {
+        font-size: 0.75rem;
+    }
+
+    .tomas-vacio span {
+        font-size: 0.65rem;
+    }
+
     .toast-premium-container {
         top: 10px;
         right: 10px;
         left: 10px;
         max-width: none;
+        padding: 12px 16px;
+        border-radius: 10px;
+        border-left-width: 4px;
+    }
+
+    .toast-premium-container .icon-toast {
+        font-size: 1rem;
+    }
+
+    .toast-premium-container .toast-message {
+        font-size: 0.8rem;
+    }
+
+    .empty-state {
+        padding: 30px 12px;
+    }
+
+    .empty-state i {
+        font-size: 2.5rem;
+    }
+
+    .empty-state p {
+        font-size: 0.8rem;
+    }
+
+    .btn-primary {
+        padding: 8px 18px;
+        font-size: 0.75rem;
+        border-radius: 8px;
+    }
+}
+
+/* Pantallas muy pequenas (menos de 360px) */
+@media screen and (max-width: 360px) {
+    .tratamientos-page {
+        padding: 10px 10px 75px;
+    }
+
+    .header-info h1 {
+        font-size: 0.95rem;
+    }
+
+    .header-info p {
+        font-size: 0.65rem;
+    }
+
+    .stats-grid {
+        gap: 3px;
+    }
+
+    .stat-card {
+        padding: 6px 2px;
+        border-radius: 6px;
+    }
+
+    .stat-number {
+        font-size: 0.9rem;
+    }
+
+    .stat-label {
+        font-size: 0.45rem;
+    }
+
+    .tratamientos-section {
+        padding: 10px;
+        border-radius: 8px;
+    }
+
+    .section-header h2 {
+        font-size: 0.7rem;
+    }
+
+    .tratamientos-count {
+        font-size: 0.55rem;
+        padding: 1px 8px;
+    }
+
+    .search-box input {
+        padding: 6px 10px 6px 34px;
+        font-size: 0.75rem;
+    }
+
+    .search-box i {
+        left: 10px;
+        font-size: 0.8rem;
+    }
+
+    .tratamiento-card {
+        padding: 10px;
+        border-radius: 8px;
+    }
+
+    .tratamiento-info-principal h3 {
+        font-size: 0.7rem;
+    }
+
+    .tratamiento-dosis {
+        font-size: 0.6rem;
+    }
+
+    .tratamiento-doctor {
+        font-size: 0.55rem;
+    }
+
+    .tratamiento-paciente {
+        font-size: 0.55rem;
+    }
+
+    .estado-badge {
+        font-size: 0.5rem;
+        padding: 1px 8px;
+    }
+
+    .estado-badge i {
+        font-size: 0.45rem;
+    }
+
+    .tratamiento-detalle {
+        font-size: 0.55rem;
+    }
+
+    .tratamiento-detalle i {
+        font-size: 0.55rem;
+    }
+
+    .dias-badge {
+        font-size: 0.5rem;
+        padding: 1px 4px;
+    }
+
+    .btn-detalle {
+        width: 20px;
+        height: 20px;
+        font-size: 0.65rem;
+    }
+
+    .modal-header h2 {
+        font-size: 0.85rem;
+    }
+
+    .modal-close {
+        width: 26px;
+        height: 26px;
+        font-size: 0.75rem;
+    }
+
+    .detalle-label {
+        font-size: 0.65rem;
+    }
+
+    .detalle-valor {
+        font-size: 0.7rem;
+    }
+
+    .tomas-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 4px;
+    }
+
+    .tomas-stat-value {
+        font-size: 0.85rem;
+    }
+
+    .tomas-stat-label {
+        font-size: 0.45rem;
+    }
+
+    .btn-generar-tomas {
+        padding: 6px 12px;
+        font-size: 0.65rem;
+        border-radius: 6px;
+    }
+
+    .toma-fecha {
+        font-size: 0.65rem;
+    }
+
+    .toma-hora {
+        font-size: 0.6rem;
+    }
+
+    .btn-toma-completar,
+    .btn-toma-omitir,
+    .btn-toma-retrasar {
+        width: 20px;
+        height: 20px;
+        font-size: 0.55rem;
+    }
+
+    .toma-estado-final {
+        font-size: 0.55rem;
+    }
+
+    .toast-premium-container {
+        padding: 10px 14px;
+    }
+
+    .toast-premium-container .icon-toast {
+        font-size: 0.9rem;
+    }
+
+    .toast-premium-container .toast-message {
+        font-size: 0.7rem;
     }
 }

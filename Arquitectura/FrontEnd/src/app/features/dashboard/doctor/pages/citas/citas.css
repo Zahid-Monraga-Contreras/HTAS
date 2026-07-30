@@ -42,13 +42,17 @@
     background: var(--gray-50);
 }
 
+/* ==========================================================================
+   CITAS PAGE - SIN ESPACIOS EN BLANCO EN PANTALLAS GRANDES
+   ========================================================================== */
 .citas-page {
     min-height: 100vh;
     background: var(--gray-50);
     padding: 16px 16px 100px;
     margin: 0 auto;
     width: 100%;
-    max-width: 680px;
+    max-width: 100%;
+    /* Eliminamos el max-width fijo */
 }
 
 /* HEADER */
@@ -556,14 +560,308 @@
     transform: scale(0.95);
 }
 
-/* RESPONSIVE */
-@media screen and (max-width: 768px) {
-    .btn-agendar span {
-        display: none;
+/* ==========================================================================
+   RESPONSIVE - AJUSTES PARA PANTALLAS GRANDES Y PEQUEÑAS
+   ========================================================================== */
+
+/* Pantallas grandes (web) - Aprovecha todo el espacio */
+@media screen and (min-width: 1025px) {
+    .citas-page {
+        padding: 24px 32px 100px;
+        max-width: 100%;
+    }
+
+    .citas-header {
+        padding: 0 0 20px;
+    }
+
+    .header-info h1 {
+        font-size: 1.8rem;
+    }
+
+    .header-info p {
+        font-size: 0.95rem;
+    }
+
+    .btn-agendar {
+        padding: 14px 28px;
+        font-size: 0.95rem;
+        border-radius: 14px;
+    }
+
+    .btn-agendar i {
+        font-size: 1.2rem;
+    }
+
+    .stats-grid {
+        gap: 12px;
+    }
+
+    .stat-card {
+        padding: 20px 16px;
+        border-radius: var(--border-radius-sm);
+    }
+
+    .stat-number {
+        font-size: 1.8rem;
+    }
+
+    .stat-label {
+        font-size: 0.7rem;
+    }
+
+    .citas-section {
+        padding: 24px 28px;
+        border-radius: var(--border-radius);
+    }
+
+    .section-header h2 {
+        font-size: 1.1rem;
+    }
+
+    .section-header h2 i {
+        font-size: 1.1rem;
+    }
+
+    .citas-count {
+        font-size: 0.9rem;
+        padding: 4px 18px;
+    }
+
+    .filtros-rapidos {
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .filtro-btn {
+        padding: 10px 14px;
+        font-size: 0.7rem;
+        border-radius: 12px;
+    }
+
+    .filtro-btn i {
+        font-size: 0.8rem;
+    }
+
+    .citas-list {
+        gap: 14px;
+    }
+
+    .cita-card {
+        padding: 18px 20px;
+        border-radius: var(--border-radius-sm);
+    }
+
+    .cita-card-header {
+        gap: 16px;
+        margin-bottom: 12px;
+    }
+
+    .cita-fecha-badge {
+        min-width: 52px;
+        padding: 6px 10px;
+        border-radius: 10px;
+    }
+
+    .cita-dia {
+        font-size: 1.3rem;
+    }
+
+    .cita-mes {
+        font-size: 0.65rem;
+    }
+
+    .cita-info-principal h3 {
+        font-size: 1rem;
+    }
+
+    .cita-paciente {
+        font-size: 0.85rem;
+    }
+
+    .cita-especialidad {
+        font-size: 0.75rem;
+    }
+
+    .badge-tiempo {
+        font-size: 0.7rem;
+        padding: 4px 14px;
+    }
+
+    .cita-detalle {
+        font-size: 0.8rem;
+    }
+
+    .cita-detalle i {
+        font-size: 0.8rem;
+    }
+
+    .modalidad-badge {
+        font-size: 0.7rem;
+        padding: 2px 12px;
+        border-radius: 12px;
+    }
+
+    .estado-badge {
+        font-size: 0.75rem;
+        padding: 4px 16px;
+        border-radius: 14px;
+    }
+
+    .estado-badge i {
+        font-size: 0.65rem;
+    }
+
+    .btn-detalle {
+        width: 34px;
+        height: 34px;
+        font-size: 1rem;
+    }
+
+    .empty-state {
+        padding: 60px 20px;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+    }
+
+    .empty-state p {
+        font-size: 1.05rem;
     }
 }
 
+/* Tablets y pantallas medianas */
+@media screen and (max-width: 1024px) and (min-width: 769px) {
+    .citas-page {
+        padding: 20px 24px 90px;
+        max-width: 100%;
+    }
+
+    .stats-grid {
+        gap: 10px;
+    }
+
+    .stat-card {
+        padding: 16px 12px;
+    }
+
+    .stat-number {
+        font-size: 1.6rem;
+    }
+
+    .citas-section {
+        padding: 20px 24px;
+    }
+
+    .filtro-btn {
+        padding: 8px 10px;
+        font-size: 0.65rem;
+    }
+
+    .cita-card {
+        padding: 16px 18px;
+    }
+}
+
+/* Moviles y pantallas pequenas */
+@media screen and (max-width: 768px) {
+    .citas-page {
+        padding: 16px 16px 85px;
+        max-width: 100%;
+    }
+
+    .btn-agendar span {
+        display: none;
+    }
+
+    .btn-agendar {
+        padding: 10px 14px;
+        border-radius: 12px;
+    }
+
+    .citas-section {
+        padding: 14px;
+    }
+
+    .filtros-rapidos {
+        gap: 4px;
+    }
+
+    .filtro-btn {
+        padding: 6px 6px;
+        font-size: 0.55rem;
+        border-radius: 8px;
+    }
+
+    .filtro-btn i {
+        font-size: 0.6rem;
+    }
+
+    .cita-card-header {
+        gap: 10px;
+    }
+
+    .cita-fecha-badge {
+        min-width: 38px;
+        padding: 3px 6px;
+    }
+
+    .cita-dia {
+        font-size: 0.95rem;
+    }
+
+    .cita-mes {
+        font-size: 0.5rem;
+    }
+
+    .cita-info-principal h3 {
+        font-size: 0.8rem;
+    }
+
+    .badge-tiempo {
+        font-size: 0.55rem;
+        padding: 1px 8px;
+    }
+
+    .estado-badge {
+        font-size: 0.6rem;
+        padding: 2px 10px;
+    }
+
+    .cita-acciones {
+        gap: 6px;
+    }
+}
+
+/* Moviles muy pequenos */
 @media screen and (max-width: 480px) {
+    .citas-page {
+        padding: 12px 12px 80px;
+    }
+
+    .citas-header {
+        padding: 0 0 12px;
+    }
+
+    .header-info h1 {
+        font-size: 1.2rem;
+    }
+
+    .header-info p {
+        font-size: 0.7rem;
+    }
+
+    .btn-agendar {
+        padding: 8px 12px;
+        border-radius: 10px;
+        font-size: 0.75rem;
+    }
+
+    .btn-agendar i {
+        font-size: 0.9rem;
+    }
+
     .stats-grid {
         gap: 4px;
     }
@@ -581,14 +879,285 @@
         font-size: 0.5rem;
     }
 
+    .citas-section {
+        padding: 12px;
+        border-radius: var(--border-radius-sm);
+    }
+
+    .section-header h2 {
+        font-size: 0.8rem;
+    }
+
+    .section-header h2 i {
+        font-size: 0.8rem;
+    }
+
+    .citas-count {
+        font-size: 0.65rem;
+        padding: 1px 10px;
+    }
+
+    .filtros-rapidos {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 4px;
+        margin-bottom: 12px;
+    }
+
+    .filtro-btn {
+        padding: 5px 4px;
+        font-size: 0.5rem;
+        border-radius: 6px;
+        border-width: 1px;
+    }
+
+    .filtro-btn i {
+        font-size: 0.55rem;
+    }
+
+    .citas-list {
+        gap: 10px;
+    }
+
+    .cita-card {
+        padding: 12px;
+        border-radius: 10px;
+    }
+
+    .cita-card-header {
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+
+    .cita-fecha-badge {
+        min-width: 34px;
+        padding: 2px 4px;
+        border-radius: 6px;
+    }
+
+    .cita-dia {
+        font-size: 0.85rem;
+    }
+
+    .cita-mes {
+        font-size: 0.45rem;
+    }
+
+    .cita-info-principal h3 {
+        font-size: 0.75rem;
+    }
+
+    .cita-paciente {
+        font-size: 0.65rem;
+    }
+
+    .cita-especialidad {
+        font-size: 0.6rem;
+    }
+
+    .badge-tiempo {
+        font-size: 0.5rem;
+        padding: 1px 6px;
+        border-radius: 10px;
+    }
+
     .cita-card-body {
         flex-direction: column;
         align-items: stretch;
         gap: 8px;
     }
 
+    .cita-detalles {
+        gap: 4px 10px;
+    }
+
+    .cita-detalle {
+        font-size: 0.6rem;
+    }
+
+    .cita-detalle i {
+        font-size: 0.6rem;
+    }
+
+    .modalidad-badge {
+        font-size: 0.55rem;
+        padding: 1px 6px;
+        border-radius: 8px;
+    }
+
     .cita-acciones {
         justify-content: space-between;
         width: 100%;
+        gap: 6px;
+    }
+
+    .estado-badge {
+        font-size: 0.55rem;
+        padding: 2px 8px;
+        border-radius: 10px;
+    }
+
+    .estado-badge i {
+        font-size: 0.5rem;
+    }
+
+    .btn-detalle {
+        width: 24px;
+        height: 24px;
+        font-size: 0.75rem;
+    }
+
+    .empty-state {
+        padding: 30px 12px;
+    }
+
+    .empty-state i {
+        font-size: 2.5rem;
+    }
+
+    .empty-state p {
+        font-size: 0.8rem;
+    }
+
+    .btn-primary {
+        padding: 8px 18px;
+        font-size: 0.75rem;
+        border-radius: 8px;
+    }
+}
+
+/* Pantallas muy pequenas (menos de 360px) */
+@media screen and (max-width: 360px) {
+    .citas-page {
+        padding: 10px 10px 75px;
+    }
+
+    .header-info h1 {
+        font-size: 1rem;
+    }
+
+    .header-info p {
+        font-size: 0.65rem;
+    }
+
+    .btn-agendar {
+        padding: 6px 10px;
+        font-size: 0.65rem;
+    }
+
+    .btn-agendar i {
+        font-size: 0.8rem;
+    }
+
+    .stats-grid {
+        gap: 3px;
+    }
+
+    .stat-card {
+        padding: 6px 2px;
+        border-radius: 6px;
+    }
+
+    .stat-number {
+        font-size: 0.85rem;
+    }
+
+    .stat-label {
+        font-size: 0.45rem;
+    }
+
+    .citas-section {
+        padding: 10px;
+    }
+
+    .section-header h2 {
+        font-size: 0.7rem;
+    }
+
+    .citas-count {
+        font-size: 0.55rem;
+        padding: 1px 8px;
+    }
+
+    .filtro-btn {
+        font-size: 0.45rem;
+        padding: 4px 2px;
+    }
+
+    .filtro-btn i {
+        font-size: 0.5rem;
+    }
+
+    .cita-card {
+        padding: 10px;
+    }
+
+    .cita-card-header {
+        gap: 8px;
+    }
+
+    .cita-fecha-badge {
+        min-width: 30px;
+        padding: 2px 4px;
+    }
+
+    .cita-dia {
+        font-size: 0.75rem;
+    }
+
+    .cita-mes {
+        font-size: 0.4rem;
+    }
+
+    .cita-info-principal h3 {
+        font-size: 0.65rem;
+    }
+
+    .cita-paciente {
+        font-size: 0.55rem;
+    }
+
+    .cita-especialidad {
+        font-size: 0.5rem;
+    }
+
+    .badge-tiempo {
+        font-size: 0.45rem;
+        padding: 1px 4px;
+    }
+
+    .cita-detalle {
+        font-size: 0.5rem;
+    }
+
+    .cita-detalle i {
+        font-size: 0.5rem;
+    }
+
+    .estado-badge {
+        font-size: 0.5rem;
+        padding: 1px 6px;
+    }
+
+    .btn-detalle {
+        width: 20px;
+        height: 20px;
+        font-size: 0.65rem;
+    }
+
+    .empty-state {
+        padding: 20px 10px;
+    }
+
+    .empty-state i {
+        font-size: 2rem;
+    }
+
+    .empty-state p {
+        font-size: 0.7rem;
+    }
+
+    .btn-primary {
+        padding: 6px 14px;
+        font-size: 0.65rem;
     }
 }

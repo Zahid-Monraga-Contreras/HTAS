@@ -52,7 +52,7 @@
 }
 
 /* ==========================================================================
-   PAGINA PRINCIPAL
+   PAGINA PRINCIPAL - SIN ESPACIOS EN BLANCO EN PANTALLAS GRANDES
    ========================================================================== */
 .dispositivos-page {
     min-height: 100vh;
@@ -60,7 +60,8 @@
     padding: 16px 16px 100px;
     margin: 0 auto;
     width: 100%;
-    max-width: 680px;
+    max-width: 100%;
+    /* Eliminamos el max-width fijo */
 }
 
 /* ==========================================================================
@@ -1187,12 +1188,238 @@
 }
 
 /* ==========================================================================
-   RESPONSIVE - MEJORADO
+   RESPONSIVE - AJUSTES PARA PANTALLAS GRANDES Y PEQUEÑAS
    ========================================================================== */
+
+/* Pantallas grandes (web) - Aprovecha todo el espacio */
 @media screen and (min-width: 1025px) {
     .dispositivos-page {
         padding: 24px 32px 100px;
-        max-width: 780px;
+        max-width: 100%;
+    }
+
+    .dispositivos-header {
+        padding: 0 0 20px;
+    }
+
+    .header-info h1 {
+        font-size: 1.8rem;
+    }
+
+    .header-info p {
+        font-size: 0.95rem;
+    }
+
+    .btn-agendar {
+        padding: 12px 24px;
+        font-size: 0.95rem;
+        border-radius: 14px;
+    }
+
+    .btn-agendar i {
+        font-size: 1.2rem;
+    }
+
+    .stats-section {
+        margin-bottom: 24px;
+    }
+
+    .stats-grid {
+        gap: 12px;
+    }
+
+    .stat-card {
+        padding: 20px 16px;
+        border-radius: var(--border-radius-sm);
+    }
+
+    .stat-number {
+        font-size: 1.8rem;
+    }
+
+    .stat-label {
+        font-size: 0.7rem;
+    }
+
+    .medicion-rapida {
+        margin-bottom: 24px;
+    }
+
+    .btn-medicion {
+        padding: 18px;
+        font-size: 1.1rem;
+        border-radius: 14px;
+    }
+
+    .btn-medicion i {
+        font-size: 1.5rem;
+    }
+
+    .dispositivos-section {
+        padding: 24px 28px;
+        border-radius: var(--border-radius);
+    }
+
+    .section-header {
+        margin-bottom: 18px;
+    }
+
+    .section-header h2 {
+        font-size: 1.1rem;
+    }
+
+    .section-header h2 i {
+        font-size: 1.1rem;
+    }
+
+    .dispositivos-count {
+        font-size: 0.9rem;
+        padding: 4px 18px;
+    }
+
+    .search-box {
+        margin-bottom: 20px;
+    }
+
+    .search-box input {
+        padding: 12px 16px 12px 48px;
+        font-size: 1rem;
+        border-radius: 12px;
+        border-width: 2px;
+    }
+
+    .search-box i {
+        left: 16px;
+        font-size: 1.1rem;
+    }
+
+    .dispositivos-list {
+        gap: 14px;
+    }
+
+    .dispositivo-card {
+        padding: 18px 20px;
+        border-radius: var(--border-radius-sm);
+    }
+
+    .dispositivo-card-header {
+        margin-bottom: 12px;
+        gap: 16px;
+    }
+
+    .dispositivo-info-principal h3 {
+        font-size: 1rem;
+    }
+
+    .dispositivo-mac {
+        font-size: 0.85rem;
+    }
+
+    .dispositivo-sincronizacion {
+        font-size: 0.8rem;
+    }
+
+    .estado-badge {
+        font-size: 0.75rem;
+        padding: 4px 16px;
+        border-radius: 14px;
+    }
+
+    .estado-badge i {
+        font-size: 0.65rem;
+    }
+
+    .btn-sincronizar,
+    .btn-toggle,
+    .btn-detalle {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+
+    .modal-content {
+        max-width: 520px;
+        border-radius: var(--border-radius);
+    }
+
+    .modal-medicion-grande {
+        max-width: 600px;
+    }
+
+    .modal-header {
+        padding: 22px 28px 18px;
+    }
+
+    .modal-header h2 {
+        font-size: 1.2rem;
+    }
+
+    .modal-body {
+        padding: 28px;
+    }
+
+    .modal-footer {
+        padding: 18px 28px 22px;
+    }
+
+    .detalle-item {
+        padding: 12px 0;
+    }
+
+    .detalle-label {
+        font-size: 0.9rem;
+    }
+
+    .detalle-valor {
+        font-size: 0.95rem;
+    }
+
+    .medicion-valor.principal .valor {
+        font-size: 3rem;
+    }
+
+    .medicion-separador {
+        font-size: 3rem;
+    }
+
+    .medicion-detalles {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        padding: 20px;
+    }
+
+    .medicion-detalle .valor {
+        font-size: 1.1rem;
+    }
+
+    .medicion-logs {
+        max-height: 250px;
+        padding: 16px 20px;
+        font-size: 0.8rem;
+    }
+
+    .toast-premium-container {
+        max-width: 480px;
+        top: 24px;
+        right: 24px;
+        padding: 16px 24px;
+        border-radius: 14px;
+        border-left-width: 5px;
+    }
+
+    .toast-premium-container .icon-toast {
+        font-size: 1.4rem;
+    }
+
+    .toast-premium-container .toast-message {
+        font-size: 0.9rem;
+    }
+}
+
+/* Tablets y pantallas medianas */
+@media screen and (max-width: 1024px) and (min-width: 769px) {
+    .dispositivos-page {
+        padding: 20px 24px 90px;
+        max-width: 100%;
     }
 
     .stats-grid {
@@ -1200,37 +1427,40 @@
     }
 
     .stat-card {
-        padding: 16px 10px;
+        padding: 16px 12px;
     }
 
     .stat-number {
-        font-size: 1.5rem;
-    }
-
-    .stat-label {
-        font-size: 0.65rem;
+        font-size: 1.6rem;
     }
 
     .dispositivos-section {
-        padding: 20px;
+        padding: 20px 24px;
     }
 
-    .modal-content {
-        max-width: 520px;
+    .dispositivo-card {
+        padding: 16px 18px;
+    }
+
+    .header-info h1 {
+        font-size: 1.6rem;
+    }
+
+    .btn-agendar {
+        padding: 10px 20px;
+        font-size: 0.9rem;
     }
 
     .modal-medicion-grande {
-        max-width: 600px;
+        max-width: 90%;
+    }
+
+    .medicion-valor.principal .valor {
+        font-size: 2.8rem;
     }
 }
 
-@media screen and (max-width: 1024px) {
-    .dispositivos-page {
-        padding: 18px 20px 90px;
-        max-width: 640px;
-    }
-}
-
+/* Moviles y pantallas pequenas */
 @media screen and (max-width: 768px) {
     .dispositivos-page {
         padding: 16px 16px 85px;
@@ -1239,6 +1469,10 @@
 
     .header-info h1 {
         font-size: 1.3rem;
+    }
+
+    .header-info p {
+        font-size: 0.8rem;
     }
 
     .btn-agendar {
@@ -1260,6 +1494,19 @@
 
     .stat-number {
         font-size: 1.15rem;
+    }
+
+    .dispositivos-section {
+        padding: 14px;
+    }
+
+    .dispositivo-card {
+        padding: 12px;
+    }
+
+    .dispositivo-card-header {
+        flex-wrap: wrap;
+        gap: 8px;
     }
 
     .modal-content {
@@ -1294,6 +1541,7 @@
     }
 }
 
+/* Moviles muy pequenos */
 @media screen and (max-width: 480px) {
     .dispositivos-page {
         padding: 12px 12px 80px;
@@ -1303,6 +1551,20 @@
         font-size: 1.1rem;
     }
 
+    .header-info p {
+        font-size: 0.7rem;
+    }
+
+    .btn-agendar {
+        padding: 8px 12px;
+        border-radius: 10px;
+        font-size: 0.75rem;
+    }
+
+    .btn-agendar i {
+        font-size: 0.9rem;
+    }
+
     .stats-grid {
         gap: 4px;
     }
@@ -1310,6 +1572,7 @@
     .stat-card {
         padding: 8px 2px;
         border-radius: 8px;
+        border-width: 1.5px;
     }
 
     .stat-number {
@@ -1321,22 +1584,94 @@
         letter-spacing: 0.2px;
     }
 
+    .btn-medicion {
+        padding: 12px;
+        font-size: 0.9rem;
+        border-radius: 10px;
+    }
+
+    .btn-medicion i {
+        font-size: 1.1rem;
+    }
+
+    .dispositivos-section {
+        padding: 12px;
+        border-radius: var(--border-radius-sm);
+    }
+
+    .section-header h2 {
+        font-size: 0.8rem;
+    }
+
+    .section-header h2 i {
+        font-size: 0.8rem;
+    }
+
+    .dispositivos-count {
+        font-size: 0.65rem;
+        padding: 1px 10px;
+    }
+
+    .search-box input {
+        padding: 8px 12px 8px 38px;
+        font-size: 0.85rem;
+        border-radius: 8px;
+    }
+
+    .search-box i {
+        left: 12px;
+        font-size: 0.9rem;
+    }
+
+    .dispositivos-list {
+        gap: 10px;
+    }
+
     .dispositivo-card {
         padding: 12px;
+        border-radius: 10px;
     }
 
     .dispositivo-card-header {
         flex-wrap: wrap;
         gap: 8px;
+        margin-bottom: 8px;
     }
 
     .dispositivo-info-principal h3 {
         font-size: 0.8rem;
     }
 
+    .dispositivo-mac {
+        font-size: 0.7rem;
+    }
+
+    .dispositivo-sincronizacion {
+        font-size: 0.65rem;
+    }
+
+    .estado-badge {
+        font-size: 0.55rem;
+        padding: 2px 10px;
+        border-radius: 10px;
+    }
+
+    .estado-badge i {
+        font-size: 0.5rem;
+    }
+
     .dispositivo-acciones {
         justify-content: space-between;
         width: 100%;
+        gap: 6px;
+    }
+
+    .btn-sincronizar,
+    .btn-toggle,
+    .btn-detalle {
+        width: 28px;
+        height: 28px;
+        font-size: 0.8rem;
     }
 
     .modal-content {
@@ -1345,12 +1680,22 @@
         border-radius: 12px;
     }
 
+    .modal-medicion-grande {
+        max-width: 100%;
+    }
+
     .modal-header {
         padding: 14px 16px 12px;
     }
 
     .modal-header h2 {
         font-size: 1rem;
+    }
+
+    .modal-close {
+        width: 30px;
+        height: 30px;
+        font-size: 0.85rem;
     }
 
     .modal-body {
@@ -1368,9 +1713,23 @@
         padding: 8px 0;
     }
 
+    .detalle-label {
+        font-size: 0.75rem;
+    }
+
     .detalle-valor {
+        font-size: 0.8rem;
         text-align: left;
         max-width: 100%;
+    }
+
+    .detalle-acciones {
+        flex-direction: column;
+    }
+
+    .detalle-acciones button {
+        width: 100%;
+        justify-content: center;
     }
 
     .medicion-valor.principal .valor {
@@ -1384,31 +1743,11 @@
     .medicion-detalles {
         grid-template-columns: 1fr;
         gap: 8px;
+        padding: 12px;
     }
 
-    .toast-premium-container {
-        top: 10px;
-        right: 10px;
-        left: 10px;
-        max-width: none;
-    }
-
-    .form-actions {
-        flex-direction: column;
-    }
-
-    .form-actions button {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .detalle-acciones {
-        flex-direction: column;
-    }
-
-    .detalle-acciones button {
-        width: 100%;
-        justify-content: center;
+    .medicion-detalle .valor {
+        font-size: 0.9rem;
     }
 
     .medicion-logs {
@@ -1426,11 +1765,83 @@
         font-size: 0.7rem;
         padding: 6px;
     }
+
+    .toast-premium-container {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        padding: 12px 16px;
+        border-radius: 10px;
+        border-left-width: 4px;
+    }
+
+    .toast-premium-container .icon-toast {
+        font-size: 1rem;
+    }
+
+    .toast-premium-container .toast-message {
+        font-size: 0.8rem;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .form-actions button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .btn-cancelar,
+    .btn-guardar,
+    .btn-cerrar {
+        padding: 8px 16px;
+        font-size: 0.8rem;
+        border-radius: 8px;
+    }
+
+    .empty-state {
+        padding: 30px 12px;
+    }
+
+    .empty-state i {
+        font-size: 2.5rem;
+    }
+
+    .empty-state p {
+        font-size: 0.8rem;
+    }
+
+    .btn-primary {
+        padding: 8px 18px;
+        font-size: 0.75rem;
+        border-radius: 8px;
+    }
 }
 
+/* Pantallas muy pequenas (menos de 360px) */
 @media screen and (max-width: 360px) {
     .dispositivos-page {
         padding: 10px 10px 75px;
+    }
+
+    .header-info h1 {
+        font-size: 0.95rem;
+    }
+
+    .header-info p {
+        font-size: 0.65rem;
+    }
+
+    .btn-agendar {
+        padding: 6px 10px;
+        font-size: 0.65rem;
+        border-radius: 8px;
+    }
+
+    .btn-agendar i {
+        font-size: 0.8rem;
     }
 
     .stats-grid {
@@ -1450,6 +1861,67 @@
         font-size: 0.45rem;
     }
 
+    .btn-medicion {
+        padding: 10px;
+        font-size: 0.8rem;
+    }
+
+    .btn-medicion i {
+        font-size: 1rem;
+    }
+
+    .dispositivo-card {
+        padding: 10px;
+        border-radius: 8px;
+    }
+
+    .dispositivo-info-principal h3 {
+        font-size: 0.7rem;
+    }
+
+    .dispositivo-mac {
+        font-size: 0.6rem;
+    }
+
+    .dispositivo-sincronizacion {
+        font-size: 0.55rem;
+    }
+
+    .estado-badge {
+        font-size: 0.5rem;
+        padding: 1px 8px;
+    }
+
+    .estado-badge i {
+        font-size: 0.45rem;
+    }
+
+    .btn-sincronizar,
+    .btn-toggle,
+    .btn-detalle {
+        width: 24px;
+        height: 24px;
+        font-size: 0.7rem;
+    }
+
+    .modal-header h2 {
+        font-size: 0.85rem;
+    }
+
+    .modal-close {
+        width: 26px;
+        height: 26px;
+        font-size: 0.75rem;
+    }
+
+    .detalle-label {
+        font-size: 0.65rem;
+    }
+
+    .detalle-valor {
+        font-size: 0.7rem;
+    }
+
     .medicion-valor.principal .valor {
         font-size: 1.5rem;
     }
@@ -1458,20 +1930,56 @@
         font-size: 1.5rem;
     }
 
-    .modal-body {
-        padding: 12px;
-    }
-
-    .btn-cancelar,
-    .btn-guardar,
-    .btn-cerrar {
-        padding: 8px 16px;
-        font-size: 0.8rem;
+    .medicion-detalles {
+        padding: 10px;
+        gap: 6px;
     }
 
     .medicion-logs {
         max-height: 100px;
         font-size: 0.6rem;
         padding: 6px 10px;
+    }
+
+    .log-line {
+        padding: 1px 0;
+        gap: 4px;
+    }
+
+    .log-hint {
+        font-size: 0.6rem;
+        padding: 4px;
+    }
+
+    .toast-premium-container {
+        padding: 10px 14px;
+    }
+
+    .toast-premium-container .icon-toast {
+        font-size: 0.9rem;
+    }
+
+    .toast-premium-container .toast-message {
+        font-size: 0.7rem;
+    }
+
+    .btn-cancelar,
+    .btn-guardar,
+    .btn-cerrar {
+        padding: 6px 14px;
+        font-size: 0.7rem;
+    }
+
+    .empty-state i {
+        font-size: 2rem;
+    }
+
+    .empty-state p {
+        font-size: 0.7rem;
+    }
+
+    .btn-primary {
+        padding: 6px 14px;
+        font-size: 0.65rem;
     }
 }

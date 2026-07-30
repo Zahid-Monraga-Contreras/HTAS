@@ -52,7 +52,7 @@
 }
 
 /* ==========================================================================
-   PAGINA PRINCIPAL
+   PAGINA PRINCIPAL - SIN ESPACIOS EN BLANCO EN PANTALLAS GRANDES
    ========================================================================== */
 .citas-page {
     min-height: 100vh;
@@ -60,7 +60,8 @@
     padding: 16px 16px 100px;
     margin: 0 auto;
     width: 100%;
-    max-width: 680px;
+    max-width: 100%;
+    /* Eliminamos el max-width fijo */
 }
 
 /* ==========================================================================
@@ -1342,12 +1343,234 @@
 }
 
 /* ==========================================================================
-   RESPONSIVE
+   RESPONSIVE - AJUSTES PARA PANTALLAS GRANDES Y PEQUEÑAS
    ========================================================================== */
+
+/* Pantallas grandes (web) - Aprovecha todo el espacio */
 @media screen and (min-width: 1025px) {
     .citas-page {
         padding: 24px 32px 100px;
-        max-width: 780px;
+        max-width: 100%;
+    }
+
+    .citas-header {
+        padding: 0 0 20px;
+    }
+
+    .header-info h1 {
+        font-size: 1.8rem;
+    }
+
+    .header-info p {
+        font-size: 0.95rem;
+    }
+
+    .btn-agendar {
+        padding: 12px 24px;
+        font-size: 0.95rem;
+        border-radius: 14px;
+    }
+
+    .btn-agendar i {
+        font-size: 1.2rem;
+    }
+
+    .stats-section {
+        margin-bottom: 24px;
+    }
+
+    .stats-grid {
+        gap: 12px;
+    }
+
+    .stat-card {
+        padding: 20px 16px;
+        border-radius: var(--border-radius-sm);
+    }
+
+    .stat-number {
+        font-size: 1.8rem;
+    }
+
+    .stat-label {
+        font-size: 0.7rem;
+    }
+
+    .citas-section {
+        padding: 24px 28px;
+        border-radius: var(--border-radius);
+    }
+
+    .section-header {
+        margin-bottom: 18px;
+    }
+
+    .section-header h2 {
+        font-size: 1.1rem;
+    }
+
+    .section-header h2 i {
+        font-size: 1.1rem;
+    }
+
+    .citas-count {
+        font-size: 0.9rem;
+        padding: 4px 18px;
+    }
+
+    .filtros-rapidos {
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .filtro-btn {
+        padding: 10px 14px;
+        font-size: 0.7rem;
+        border-radius: 12px;
+    }
+
+    .filtro-btn i {
+        font-size: 0.8rem;
+    }
+
+    .citas-list {
+        gap: 14px;
+    }
+
+    .cita-card {
+        padding: 18px 20px;
+        border-radius: var(--border-radius-sm);
+    }
+
+    .cita-card-header {
+        gap: 16px;
+        margin-bottom: 12px;
+    }
+
+    .cita-fecha-badge {
+        min-width: 52px;
+        padding: 6px 10px;
+        border-radius: 10px;
+    }
+
+    .cita-dia {
+        font-size: 1.3rem;
+    }
+
+    .cita-mes {
+        font-size: 0.65rem;
+    }
+
+    .cita-info-principal h3 {
+        font-size: 1rem;
+    }
+
+    .cita-doctor {
+        font-size: 0.85rem;
+    }
+
+    .cita-especialidad {
+        font-size: 0.75rem;
+    }
+
+    .badge-tiempo {
+        font-size: 0.7rem;
+        padding: 4px 14px;
+    }
+
+    .cita-detalle {
+        font-size: 0.8rem;
+    }
+
+    .cita-detalle i {
+        font-size: 0.8rem;
+    }
+
+    .modalidad-badge {
+        font-size: 0.7rem;
+        padding: 2px 12px;
+        border-radius: 12px;
+    }
+
+    .estado-badge {
+        font-size: 0.75rem;
+        padding: 4px 16px;
+        border-radius: 14px;
+    }
+
+    .estado-badge i {
+        font-size: 0.65rem;
+    }
+
+    .btn-detalle {
+        width: 34px;
+        height: 34px;
+        font-size: 1rem;
+    }
+
+    .modal-content {
+        max-width: 520px;
+        border-radius: var(--border-radius);
+    }
+
+    .modal-header {
+        padding: 20px 28px 16px;
+    }
+
+    .modal-header h2 {
+        font-size: 1.2rem;
+    }
+
+    .modal-body {
+        padding: 28px;
+    }
+
+    .modal-footer {
+        padding: 16px 28px 20px;
+    }
+
+    .toast-container {
+        max-width: 480px;
+        top: 24px;
+        right: 24px;
+        gap: 14px;
+    }
+
+    .toast-notification {
+        padding: 18px 22px;
+        border-radius: 14px;
+        border-left-width: 5px;
+    }
+
+    .toast-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 1.6rem;
+    }
+
+    .toast-title {
+        font-size: 0.95rem;
+    }
+
+    .toast-message {
+        font-size: 0.9rem;
+    }
+
+    .toast-close {
+        font-size: 1rem;
+        padding: 6px;
+    }
+
+    .toast-progress {
+        height: 4px;
+    }
+}
+
+/* Tablets y pantallas medianas */
+@media screen and (max-width: 1024px) and (min-width: 769px) {
+    .citas-page {
+        padding: 20px 24px 90px;
+        max-width: 100%;
     }
 
     .stats-grid {
@@ -1355,33 +1578,37 @@
     }
 
     .stat-card {
-        padding: 16px 10px;
+        padding: 16px 12px;
     }
 
     .stat-number {
-        font-size: 1.5rem;
-    }
-
-    .stat-label {
-        font-size: 0.65rem;
+        font-size: 1.6rem;
     }
 
     .citas-section {
-        padding: 20px;
+        padding: 20px 24px;
     }
 
-    .modal-content {
-        max-width: 520px;
+    .filtro-btn {
+        padding: 8px 10px;
+        font-size: 0.65rem;
+    }
+
+    .cita-card {
+        padding: 16px 18px;
+    }
+
+    .header-info h1 {
+        font-size: 1.6rem;
+    }
+
+    .btn-agendar {
+        padding: 10px 20px;
+        font-size: 0.9rem;
     }
 }
 
-@media screen and (max-width: 1024px) {
-    .citas-page {
-        padding: 18px 20px 90px;
-        max-width: 640px;
-    }
-}
-
+/* Moviles y pantallas pequenas */
 @media screen and (max-width: 768px) {
     .citas-page {
         padding: 16px 16px 85px;
@@ -1411,6 +1638,59 @@
 
     .stat-number {
         font-size: 1.15rem;
+    }
+
+    .citas-section {
+        padding: 14px;
+    }
+
+    .filtros-rapidos {
+        gap: 4px;
+    }
+
+    .filtro-btn {
+        padding: 6px 6px;
+        font-size: 0.55rem;
+        border-radius: 8px;
+    }
+
+    .filtro-btn i {
+        font-size: 0.6rem;
+    }
+
+    .cita-card-header {
+        gap: 10px;
+    }
+
+    .cita-fecha-badge {
+        min-width: 38px;
+        padding: 3px 6px;
+    }
+
+    .cita-dia {
+        font-size: 0.95rem;
+    }
+
+    .cita-mes {
+        font-size: 0.5rem;
+    }
+
+    .cita-info-principal h3 {
+        font-size: 0.8rem;
+    }
+
+    .badge-tiempo {
+        font-size: 0.55rem;
+        padding: 1px 8px;
+    }
+
+    .estado-badge {
+        font-size: 0.6rem;
+        padding: 2px 10px;
+    }
+
+    .cita-acciones {
+        gap: 6px;
     }
 
     .modal-content {
@@ -1454,6 +1734,7 @@
     }
 }
 
+/* Moviles muy pequenos */
 @media screen and (max-width: 480px) {
     .citas-page {
         padding: 12px 12px 80px;
@@ -1461,6 +1742,20 @@
 
     .header-info h1 {
         font-size: 1.1rem;
+    }
+
+    .header-info p {
+        font-size: 0.7rem;
+    }
+
+    .btn-agendar {
+        padding: 8px 12px;
+        border-radius: 10px;
+        font-size: 0.75rem;
+    }
+
+    .btn-agendar i {
+        font-size: 0.9rem;
     }
 
     .stats-grid {
@@ -1481,41 +1776,85 @@
         letter-spacing: 0.2px;
     }
 
+    .citas-section {
+        padding: 12px;
+        border-radius: var(--border-radius-sm);
+    }
+
+    .section-header h2 {
+        font-size: 0.8rem;
+    }
+
+    .section-header h2 i {
+        font-size: 0.8rem;
+    }
+
+    .citas-count {
+        font-size: 0.65rem;
+        padding: 1px 10px;
+    }
+
     .filtros-rapidos {
         gap: 4px;
+        margin-bottom: 12px;
     }
 
     .filtro-btn {
-        font-size: 0.55rem;
-        padding: 5px 6px;
-        gap: 2px;
-        border-radius: 8px;
+        font-size: 0.5rem;
+        padding: 5px 4px;
+        border-radius: 6px;
+        border-width: 1px;
     }
 
     .filtro-btn i {
-        font-size: 0.6rem;
+        font-size: 0.55rem;
+    }
+
+    .citas-list {
+        gap: 10px;
     }
 
     .cita-card {
         padding: 12px;
+        border-radius: 10px;
     }
 
     .cita-card-header {
         flex-wrap: wrap;
         gap: 8px;
+        margin-bottom: 8px;
     }
 
     .cita-fecha-badge {
-        min-width: 36px;
-        padding: 2px 6px;
+        min-width: 34px;
+        padding: 2px 4px;
+        border-radius: 6px;
     }
 
     .cita-dia {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
+    }
+
+    .cita-mes {
+        font-size: 0.45rem;
     }
 
     .cita-info-principal h3 {
-        font-size: 0.8rem;
+        font-size: 0.75rem;
+    }
+
+    .cita-doctor {
+        font-size: 0.65rem;
+    }
+
+    .cita-especialidad {
+        font-size: 0.6rem;
+    }
+
+    .badge-tiempo {
+        font-size: 0.5rem;
+        padding: 1px 6px;
+        border-radius: 10px;
     }
 
     .cita-card-body {
@@ -1524,9 +1863,44 @@
         gap: 8px;
     }
 
+    .cita-detalles {
+        gap: 4px 10px;
+    }
+
+    .cita-detalle {
+        font-size: 0.6rem;
+    }
+
+    .cita-detalle i {
+        font-size: 0.6rem;
+    }
+
+    .modalidad-badge {
+        font-size: 0.55rem;
+        padding: 1px 6px;
+        border-radius: 8px;
+    }
+
     .cita-acciones {
         justify-content: space-between;
         width: 100%;
+        gap: 6px;
+    }
+
+    .estado-badge {
+        font-size: 0.55rem;
+        padding: 2px 8px;
+        border-radius: 10px;
+    }
+
+    .estado-badge i {
+        font-size: 0.5rem;
+    }
+
+    .btn-detalle {
+        width: 24px;
+        height: 24px;
+        font-size: 0.75rem;
     }
 
     .modal-content {
@@ -1541,6 +1915,12 @@
 
     .modal-header h2 {
         font-size: 1rem;
+    }
+
+    .modal-close {
+        width: 30px;
+        height: 30px;
+        font-size: 0.85rem;
     }
 
     .modal-body {
@@ -1567,7 +1947,12 @@
         padding: 8px 0;
     }
 
+    .detalle-label {
+        font-size: 0.75rem;
+    }
+
     .detalle-valor {
+        font-size: 0.8rem;
         text-align: left;
         max-width: 100%;
     }
@@ -1581,6 +1966,18 @@
         justify-content: center;
     }
 
+    .detalle-acciones .btn-cancelar-cita {
+        padding: 8px 16px;
+        font-size: 0.8rem;
+        border-radius: 8px;
+    }
+
+    .detalle-acciones .btn-cerrar {
+        padding: 8px 16px;
+        font-size: 0.8rem;
+        border-radius: 8px;
+    }
+
     .toast-container {
         top: 10px;
         right: 10px;
@@ -1590,6 +1987,7 @@
     .toast-notification {
         padding: 12px 14px;
         font-size: 0.85rem;
+        border-radius: 10px;
     }
 
     .toast-title {
@@ -1597,6 +1995,16 @@
     }
 
     .toast-message {
+        font-size: 0.8rem;
+    }
+
+    .toast-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 1.2rem;
+    }
+
+    .toast-close {
         font-size: 0.8rem;
     }
 
@@ -1631,11 +2039,62 @@
         width: 100%;
         justify-content: center;
     }
+
+    .modal-confirmacion .modal-footer .form-actions .btn-cancelar,
+    .modal-confirmacion .modal-footer .form-actions .btn-confirmar-eliminar {
+        padding: 8px 16px;
+        font-size: 0.8rem;
+        border-radius: 8px;
+    }
+
+    .modal-footer .form-actions .btn-cancelar,
+    .modal-footer .form-actions .btn-guardar {
+        padding: 8px 16px;
+        font-size: 0.8rem;
+        border-radius: 8px;
+    }
+
+    .empty-state {
+        padding: 30px 12px;
+    }
+
+    .empty-state i {
+        font-size: 2.5rem;
+    }
+
+    .empty-state p {
+        font-size: 0.8rem;
+    }
+
+    .btn-primary {
+        padding: 8px 18px;
+        font-size: 0.75rem;
+        border-radius: 8px;
+    }
 }
 
+/* Pantallas muy pequenas (menos de 360px) */
 @media screen and (max-width: 360px) {
     .citas-page {
         padding: 10px 10px 75px;
+    }
+
+    .header-info h1 {
+        font-size: 0.95rem;
+    }
+
+    .header-info p {
+        font-size: 0.65rem;
+    }
+
+    .btn-agendar {
+        padding: 6px 10px;
+        font-size: 0.65rem;
+        border-radius: 8px;
+    }
+
+    .btn-agendar i {
+        font-size: 0.8rem;
     }
 
     .stats-grid {
@@ -1660,17 +2119,74 @@
     }
 
     .filtro-btn {
-        font-size: 0.5rem;
-        padding: 4px 4px;
-        border-radius: 6px;
+        font-size: 0.45rem;
+        padding: 4px 3px;
+        border-radius: 4px;
     }
 
     .filtro-btn i {
+        font-size: 0.5rem;
+    }
+
+    .cita-card {
+        padding: 10px;
+    }
+
+    .cita-card-header {
+        gap: 6px;
+    }
+
+    .cita-fecha-badge {
+        min-width: 30px;
+        padding: 2px 4px;
+    }
+
+    .cita-dia {
+        font-size: 0.75rem;
+    }
+
+    .cita-mes {
+        font-size: 0.4rem;
+    }
+
+    .cita-info-principal h3 {
+        font-size: 0.65rem;
+    }
+
+    .cita-doctor {
+        font-size: 0.6rem;
+    }
+
+    .cita-especialidad {
         font-size: 0.55rem;
     }
 
-    .cita-detalles {
-        gap: 4px 10px;
+    .badge-tiempo {
+        font-size: 0.45rem;
+        padding: 1px 4px;
+    }
+
+    .cita-detalle {
+        font-size: 0.55rem;
+    }
+
+    .cita-detalle i {
+        font-size: 0.55rem;
+    }
+
+    .estado-badge {
+        font-size: 0.5rem;
+        padding: 1px 6px;
+    }
+
+    .estado-badge i {
+        font-size: 0.45rem;
+    }
+
+    .btn-detalle {
+        width: 20px;
+        height: 20px;
+        font-size: 0.65rem;
     }
 
     .flatpickr-calendar {
@@ -1681,19 +2197,56 @@
         padding: 10px 12px;
     }
 
+    .toast-title {
+        font-size: 0.7rem;
+    }
+
+    .toast-message {
+        font-size: 0.7rem;
+    }
+
+    .toast-icon {
+        width: 24px;
+        height: 24px;
+        font-size: 1rem;
+    }
+
     .modal-confirmacion .modal-body {
         padding: 16px;
     }
 
     .modal-confirmacion .modal-footer .form-actions .btn-cancelar,
     .modal-confirmacion .modal-footer .form-actions .btn-confirmar-eliminar {
-        padding: 8px 16px;
-        font-size: 0.8rem;
+        padding: 6px 14px;
+        font-size: 0.7rem;
     }
 
     .modal-footer .form-actions .btn-cancelar,
     .modal-footer .form-actions .btn-guardar {
-        padding: 8px 16px;
-        font-size: 0.8rem;
+        padding: 6px 14px;
+        font-size: 0.7rem;
+    }
+
+    .modal-header h2 {
+        font-size: 0.85rem;
+    }
+
+    .modal-close {
+        width: 26px;
+        height: 26px;
+        font-size: 0.75rem;
+    }
+
+    .empty-state i {
+        font-size: 2rem;
+    }
+
+    .empty-state p {
+        font-size: 0.7rem;
+    }
+
+    .btn-primary {
+        padding: 6px 14px;
+        font-size: 0.65rem;
     }
 }

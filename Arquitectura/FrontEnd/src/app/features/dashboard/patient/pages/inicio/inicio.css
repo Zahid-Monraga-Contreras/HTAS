@@ -35,7 +35,7 @@
 }
 
 /* ==========================================================================
-   ESTILO DEL COMPONENTE - CON MARGENES LATERALES
+   ESTILO DEL COMPONENTE
    ========================================================================== */
 :host {
     display: block;
@@ -47,7 +47,7 @@
 }
 
 /* ==========================================================================
-   DASHBOARD - CON MARGENES LATERALES REDUCIDOS
+   DASHBOARD - SIN ESPACIOS EN BLANCO EN PANTALLAS GRANDES
    ========================================================================== */
 .patient-dashboard {
     min-height: 100vh;
@@ -55,7 +55,8 @@
     padding: 16px 16px 100px;
     margin: 0 auto;
     width: 100%;
-    max-width: 680px;
+    max-width: 100%;
+    /* Eliminamos el max-width fijo */
 }
 
 /* ==========================================================================
@@ -523,14 +524,191 @@
 }
 
 /* ==========================================================================
-   RESPONSIVE - AJUSTES PARA MOVIL
+   RESPONSIVE - AJUSTES PARA PANTALLAS GRANDES Y PEQUEÑAS
    ========================================================================== */
 
-/* Pantallas grandes (web) */
+/* Pantallas grandes (web) - Aprovecha todo el espacio */
 @media screen and (min-width: 1025px) {
     .patient-dashboard {
         padding: 24px 32px 100px;
-        max-width: 780px;
+        max-width: 100%;
+    }
+
+    .greeting-label {
+        font-size: 0.95rem;
+    }
+
+    .greeting-name {
+        font-size: 1.8rem;
+    }
+
+    .greeting-sub {
+        font-size: 0.95rem;
+    }
+
+    .btn-fab {
+        width: 50px;
+        height: 50px;
+        font-size: 1.3rem;
+    }
+
+    .welcome-card {
+        border-radius: var(--border-radius);
+        margin-bottom: 22px;
+    }
+
+    .welcome-content {
+        padding: 24px 28px 28px;
+    }
+
+    .welcome-badge {
+        font-size: 0.7rem;
+        padding: 4px 16px;
+    }
+
+    .welcome-text h2 {
+        font-size: 1.4rem;
+    }
+
+    .welcome-text p {
+        font-size: 0.9rem;
+        margin-bottom: 18px;
+    }
+
+    .welcome-stats {
+        padding: 14px 10px;
+        border-radius: 12px;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+    }
+
+    .stat-label {
+        font-size: 0.7rem;
+    }
+
+    .stat-divider {
+        height: 32px;
+    }
+
+    .quick-metrics {
+        gap: 14px;
+        margin-bottom: 22px;
+    }
+
+    .metric-item {
+        padding: 18px 22px;
+        border-radius: var(--border-radius-sm);
+        gap: 14px;
+    }
+
+    .metric-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 1.3rem;
+        border-radius: 12px;
+    }
+
+    .metric-value {
+        font-size: 1.4rem;
+    }
+
+    .metric-label {
+        font-size: 0.7rem;
+    }
+
+    .metric-arrow {
+        font-size: 0.85rem;
+    }
+
+    .section-card {
+        padding: 20px 24px;
+        border-radius: var(--border-radius-sm);
+        margin-bottom: 18px;
+    }
+
+    .section-header {
+        margin-bottom: 16px;
+    }
+
+    .section-header h2 {
+        font-size: 1rem;
+    }
+
+    .section-header h2 i {
+        font-size: 1.05rem;
+    }
+
+    .view-all {
+        font-size: 0.8rem;
+    }
+
+    .citas-list {
+        gap: 10px;
+    }
+
+    .cita-item {
+        padding: 12px 16px;
+        gap: 14px;
+        border-radius: var(--border-radius-sm);
+    }
+
+    .cita-date-badge {
+        min-width: 48px;
+        padding: 4px 10px;
+        border-radius: 10px;
+    }
+
+    .cita-day {
+        font-size: 1.15rem;
+    }
+
+    .cita-month {
+        font-size: 0.6rem;
+    }
+
+    .cita-info h4 {
+        font-size: 0.9rem;
+    }
+
+    .cita-info p {
+        font-size: 0.75rem;
+    }
+
+    .cita-info p i {
+        font-size: 0.7rem;
+    }
+
+    .badge {
+        font-size: 0.65rem;
+        padding: 3px 10px;
+    }
+
+    .empty-state {
+        padding: 30px 16px;
+    }
+
+    .empty-state i {
+        font-size: 2rem;
+    }
+
+    .empty-state p {
+        font-size: 0.9rem;
+    }
+
+    .btn-primary {
+        padding: 8px 20px;
+        font-size: 0.8rem;
+        border-radius: 10px;
+    }
+}
+
+/* Tablets y pantallas medianas */
+@media screen and (max-width: 1024px) and (min-width: 769px) {
+    .patient-dashboard {
+        padding: 20px 24px 90px;
+        max-width: 100%;
     }
 
     .greeting-name {
@@ -538,11 +716,11 @@
     }
 
     .welcome-content {
-        padding: 20px 24px 24px;
+        padding: 22px 24px 24px;
     }
 
     .welcome-text h2 {
-        font-size: 1.3rem;
+        font-size: 1.35rem;
     }
 
     .stat-number {
@@ -554,25 +732,21 @@
     }
 
     .metric-item {
-        padding: 16px 20px;
+        padding: 16px 18px;
     }
 
     .metric-icon {
         width: 44px;
         height: 44px;
-        font-size: 1.2rem;
+        font-size: 1.15rem;
     }
 
     .metric-value {
         font-size: 1.3rem;
     }
-}
 
-/* Tablets y pantallas medianas */
-@media screen and (max-width: 1024px) {
-    .patient-dashboard {
-        padding: 18px 20px 90px;
-        max-width: 640px;
+    .section-card {
+        padding: 18px 22px;
     }
 }
 
@@ -623,12 +797,20 @@
     .metric-value {
         font-size: 1rem;
     }
+
+    .section-card {
+        padding: 14px;
+    }
 }
 
 /* Moviles muy pequenos */
 @media screen and (max-width: 480px) {
     .patient-dashboard {
         padding: 12px 12px 80px;
+    }
+
+    .greeting-label {
+        font-size: 0.75rem;
     }
 
     .greeting-name {
@@ -649,6 +831,11 @@
         padding: 12px 12px 14px;
     }
 
+    .welcome-badge {
+        font-size: 0.55rem;
+        padding: 2px 10px;
+    }
+
     .welcome-text h2 {
         font-size: 0.95rem;
     }
@@ -660,6 +847,7 @@
 
     .welcome-stats {
         padding: 6px 4px;
+        border-radius: 8px;
     }
 
     .stat-number {
@@ -670,14 +858,20 @@
         font-size: 0.55rem;
     }
 
+    .stat-divider {
+        height: 24px;
+    }
+
     .quick-metrics {
         grid-template-columns: 1fr 1fr;
         gap: 6px;
+        margin-bottom: 14px;
     }
 
     .metric-item {
         padding: 8px 10px;
         gap: 8px;
+        border-radius: 8px;
     }
 
     .metric-icon {
@@ -695,8 +889,17 @@
         font-size: 0.55rem;
     }
 
+    .metric-arrow {
+        font-size: 0.65rem;
+    }
+
     .section-card {
         padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 10px;
+    }
+
+    .section-header {
         margin-bottom: 10px;
     }
 
@@ -704,18 +907,36 @@
         font-size: 0.8rem;
     }
 
+    .section-header h2 i {
+        font-size: 0.8rem;
+    }
+
+    .view-all {
+        font-size: 0.65rem;
+    }
+
+    .citas-list {
+        gap: 6px;
+    }
+
     .cita-item {
         padding: 6px 8px;
         gap: 8px;
+        border-radius: 8px;
     }
 
     .cita-date-badge {
         min-width: 32px;
         padding: 2px 4px;
+        border-radius: 6px;
     }
 
     .cita-day {
         font-size: 0.85rem;
+    }
+
+    .cita-month {
+        font-size: 0.5rem;
     }
 
     .cita-info h4 {
@@ -725,6 +946,33 @@
     .cita-info p {
         font-size: 0.65rem;
     }
+
+    .cita-info p i {
+        font-size: 0.6rem;
+    }
+
+    .badge {
+        font-size: 0.5rem;
+        padding: 1px 6px;
+    }
+
+    .empty-state {
+        padding: 16px 10px;
+    }
+
+    .empty-state i {
+        font-size: 1.25rem;
+    }
+
+    .empty-state p {
+        font-size: 0.7rem;
+    }
+
+    .btn-primary {
+        padding: 5px 14px;
+        font-size: 0.65rem;
+        border-radius: 6px;
+    }
 }
 
 /* Pantallas muy pequenas (menos de 360px) */
@@ -733,8 +981,16 @@
         padding: 10px 10px 75px;
     }
 
+    .greeting-label {
+        font-size: 0.65rem;
+    }
+
     .greeting-name {
         font-size: 0.95rem;
+    }
+
+    .greeting-sub {
+        font-size: 0.65rem;
     }
 
     .btn-fab {
@@ -743,15 +999,37 @@
         font-size: 0.8rem;
     }
 
+    .welcome-content {
+        padding: 10px 10px 12px;
+    }
+
+    .welcome-text h2 {
+        font-size: 0.85rem;
+    }
+
+    .welcome-text p {
+        font-size: 0.65rem;
+        margin-bottom: 8px;
+    }
+
+    .stat-number {
+        font-size: 0.85rem;
+    }
+
+    .stat-label {
+        font-size: 0.5rem;
+    }
+
     .quick-metrics {
         grid-template-columns: 1fr 1fr;
         gap: 5px;
+        margin-bottom: 12px;
     }
 
     .metric-item {
         padding: 6px 8px;
         gap: 6px;
-        border-radius: 8px;
+        border-radius: 6px;
     }
 
     .metric-icon {
@@ -765,26 +1043,38 @@
         font-size: 0.85rem;
     }
 
-    .welcome-content {
-        padding: 10px 10px 12px;
+    .metric-label {
+        font-size: 0.5rem;
     }
 
-    .stat-number {
-        font-size: 0.85rem;
+    .metric-arrow {
+        font-size: 0.6rem;
+    }
+
+    .section-card {
+        padding: 8px;
+        margin-bottom: 8px;
+        border-radius: 8px;
     }
 
     .section-header h2 {
         font-size: 0.75rem;
     }
 
+    .view-all {
+        font-size: 0.6rem;
+    }
+
     .cita-item {
         padding: 5px 6px;
         gap: 6px;
+        border-radius: 6px;
     }
 
     .cita-date-badge {
         min-width: 28px;
         padding: 2px 4px;
+        border-radius: 4px;
     }
 
     .cita-day {
@@ -801,5 +1091,32 @@
 
     .cita-info p {
         font-size: 0.6rem;
+    }
+
+    .cita-info p i {
+        font-size: 0.55rem;
+    }
+
+    .badge {
+        font-size: 0.45rem;
+        padding: 1px 4px;
+    }
+
+    .empty-state {
+        padding: 12px 8px;
+    }
+
+    .empty-state i {
+        font-size: 1rem;
+    }
+
+    .empty-state p {
+        font-size: 0.65rem;
+    }
+
+    .btn-primary {
+        padding: 4px 12px;
+        font-size: 0.6rem;
+        border-radius: 4px;
     }
 }
