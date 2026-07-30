@@ -1,0 +1,215 @@
+<app-doctor-menu></app-doctor-menu>
+
+<div class="notificaciones-page">
+    <div *ngIf="isLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Cargando tus notificaciones...</p>
+    </div>
+
+    <div *ngIf="!isLoading" class="notificaciones-content">
+        <header class="notificaciones-header">
+            <div class="header-top">
+                <div class="header-info">
+                    <h1>Notificaciones</h1>
+                    <p>Mantente al tanto de tus actividades</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-marcar-todas" (click)="marcarTodasComoLeidas()"
+                        *ngIf="estadisticas.noLeidas > 0">
+                        <i class="bi bi-check2-all"></i>
+                        <span>Marcar todas</span>
+                    </button>
+                    <button class="btn-eliminar-leidas" (click)="eliminarTodasLeidas()" *ngIf="estadisticas.leidas > 0">
+                        <i class="bi bi-trash"></i>
+                        <span>Eliminar leidas</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <section class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card" (click)="aplicarFiltro('todas')" [class.active]="filterEstado === 'todas'">
+                    <span class="stat-number">{{ estadisticas.total }}</span>
+                    <span class="stat-label">Total</span>
+                </div>
+                <div class="stat-card stat-no-leidas" (click)="aplicarFiltro('noLeidas')"
+                    [class.active]="filterEstado === 'noLeidas'">
+                    <span class="stat-number">{{ estadisticas.noLeidas }}</span>
+                    <span class="stat-label">No leidas</span>
+                </div>
+                <div class="stat-card stat-leidas" (click)="aplicarFiltro('leidas')"
+                    [class.active]="filterEstado === 'leidas'">
+                    <span class="stat-number">{{ estadisticas.leidas }}</span>
+                    <span class="stat-label">Leidas</span>
+                </div>
+            </div>
+        </section>
+
+        <div class="filtros-tipo">
+            <button class="filtro-btn" [class.active]="filterEstado === 'todas'" (click)="aplicarFiltro('todas')">
+                <i class="bi bi-grid-3x3-gap-fill"></i> Todas
+            </button>
+            <button class="filtro-btn" [class.active]="filterEstado === 'cita'" (click)="aplicarFiltro('cita')">
+                <i class="bi bi-calendar-event"></i> Citas
+            </button>
+            <button class="filtro-btn" [class.active]="filterEstado === 'paciente'" (click)="aplicarFiltro('paciente')">
+                <i class="bi bi-person"></i> Pacientes
+            </button>
+            <button class="filtro-btn" [class.active]="filterEstado === 'tratamiento'"
+                (click)="aplicarFiltro('tratamiento')">
+                <i class="bi bi-capsule"></i> Tratamientos
+            </button>
+            <button class="filtro-btn" [class.active]="filterEstado === 'medicamento'"
+                (click)="aplicarFiltro('medicamento')">
+                <i class="bi bi-capsule"></i> Medicamentos
+            </button>
+            <button class="filtro-btn" [class.active]="filterEstado === 'dispositivo'"
+                (click)="aplicarFiltro('dispositivo')">
+                <i class="bi bi-device-hdd"></i> Dispositivos
+            </button>
+        </div>
+
+        <section class="notificaciones-section">
+            <div class="notificaciones-list">
+                <div *ngFor="let n of notificacionesFiltradas" class="notificacion-item" [class.no-leida]="!n.leida"
+                    [class.leida]="n.leida" (click)="verDetalle(n)">
+                    <div class="notificacion-icon" [style.background]="n.color + '20'" [style.color]="n.color">
+                        <i class="bi" [class]="n.icono"></i>
+                    </div>
+                    <div class="notificacion-content">
+                        <div class="notificacion-header">
+                            <span class="notificacion-titulo">{{ n.titulo }}</span>
+                            <span class="notificacion-fecha">{{ formatearFecha(n.fecha) }}</span>
+                        </div>
+                        <p class="notificacion-mensaje">{{ n.mensaje }}</p>
+                        <div class="notificacion-footer">
+                            <span class="notificacion-tipo">{{ getTipoTexto(n.tipo) }}</span>
+                            <span class="notificacion-estado" *ngIf="!n.leida">
+                                <i class="bi bi-circle-fill"></i> No leida
+                            </span>
+                            <span class="notificacion-estado leida" *ngIf="n.leida">
+                                <i class="bi bi-check-circle-fill"></i> Leida
+                            </span>
+                        </div>
+                    </div>
+                    <div class="notificacion-acciones">
+                        <button class="btn-eliminar" (click)="$event.stopPropagation(); abrirModalEliminar(n)"
+                            title="Eliminar">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div *ngIf="!notificacionesFiltradas.length" class="empty-state">
+                    <i class="bi bi-inbox"></i>
+                    <p>No tienes notificaciones</p>
+                    <span class="empty-sub">Las notificaciones de tus actividades apareceran aqui</span>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- MODAL DETALLE NOTIFICACION -->
+<!-- ============================================ -->
+<div class="modal-overlay" *ngIf="mostrarModalDetalle" (click)="cerrarModalDetalle()">
+    <div class="modal-content modal-detalle" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2><i class="bi bi-envelope"></i> Detalle de Notificacion</h2>
+            <button class="modal-close" (click)="cerrarModalDetalle()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="modal-body" *ngIf="notificacionSeleccionada">
+            <div class="detalle-icono" [style.background]="notificacionSeleccionada.color + '20'"
+                [style.color]="notificacionSeleccionada.color">
+                <i class="bi" [class]="notificacionSeleccionada.icono"></i>
+            </div>
+            <div class="detalle-header">
+                <h3>{{ notificacionSeleccionada.titulo }}</h3>
+                <span class="detalle-fecha">{{ formatearFecha(notificacionSeleccionada.fecha) }}</span>
+            </div>
+            <div class="detalle-mensaje">
+                <p>{{ notificacionSeleccionada.mensaje }}</p>
+            </div>
+            <div class="detalle-info">
+                <div class="detalle-item">
+                    <span class="detalle-label">Tipo</span>
+                    <span class="detalle-valor">{{ getTipoTexto(notificacionSeleccionada.tipo) }}</span>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-label">Estado</span>
+                    <span class="detalle-valor">
+                        <span class="estado-badge" [class.estado-no-leida]="!notificacionSeleccionada.leida"
+                            [class.estado-leida]="notificacionSeleccionada.leida">
+                            <i class="bi"
+                                [class]="notificacionSeleccionada.leida ? 'bi-check-circle-fill' : 'bi-circle-fill'"></i>
+                            {{ notificacionSeleccionada.leida ? 'Leida' : 'No leida' }}
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <div class="detalle-acciones">
+                <button class="btn-accion" *ngIf="notificacionSeleccionada?.accion"
+                    (click)="irAAccion(notificacionSeleccionada!)">
+                    <i class="bi bi-arrow-right"></i>
+                    Ir a la accion
+                </button>
+                <button class="btn-cerrar" (click)="cerrarModalDetalle()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- MODAL DE CONFIRMACION -->
+<!-- ============================================ -->
+<div class="modal-overlay" *ngIf="mostrarModalConfirmacion" (click)="cerrarModalConfirmacion()">
+    <div class="modal-content modal-confirmacion" (click)="$event.stopPropagation()">
+        <div class="modal-header modal-header-danger">
+            <div class="modal-icon modal-icon-danger">
+                <i class="bi" [class]="modalConfirmacion.icono"></i>
+            </div>
+            <h2>{{ modalConfirmacion.titulo }}</h2>
+            <button class="modal-close" (click)="cerrarModalConfirmacion()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p class="modal-mensaje">{{ modalConfirmacion.mensaje }}</p>
+            <p class="modal-mensaje text-muted" *ngIf="modalConfirmacion.accion === 'eliminar-todas'">
+                Esta accion no se puede deshacer.
+            </p>
+        </div>
+        <div class="modal-footer modal-footer-danger">
+            <div class="form-actions">
+                <button class="btn-cancelar" (click)="cerrarModalConfirmacion()">Cancelar</button>
+                <button class="btn-danger-confirm"
+                    (click)="modalConfirmacion.accion === 'eliminar-todas' ? confirmarEliminarTodasLeidas() : confirmarEliminar()">
+                    <i class="bi bi-trash"></i>
+                    Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- NOTIFICACIONES TOAST -->
+<!-- ============================================ -->
+<div class="toast-premium-container" *ngIf="mostrarToast" [class]="tipoToast">
+    <div class="toast-content">
+        <i class="bi" [class]="
+            tipoToast === 'success' ? 'bi-check-circle-fill icon-toast' :
+            tipoToast === 'error' ? 'bi-exclamation-triangle-fill icon-toast' :
+            'bi-exclamation-circle-fill icon-toast'
+        "></i>
+        <span class="toast-message">{{ mensajeToast }}</span>
+    </div>
+</div>

@@ -4,8 +4,8 @@ import { roleGuard } from '../../../core/guards/role.guard';
 
 // Template
 import { DoctorMenu } from './template/menu/menu';
-// import { DoctorNotificaciones } from './template/notificaciones/notificaciones';
-// import { DoctorPerfil } from './template/perfil/perfil';
+import { DoctorNotificaciones } from './template/notificaciones/notificaciones';
+import { DoctorPerfil } from './template/perfil/perfil';
 
 // Pages
 import { DoctorInicio } from './pages/inicio/inicio';
@@ -34,8 +34,8 @@ export const DOCTOR_ROUTES: Routes = [
             { path: '', redirectTo: 'inicio', pathMatch: 'full' },
 
             // Template
-            // { path: 'perfil', component: DoctorPerfil },
-            // { path: 'notificaciones', component: DoctorNotificaciones },
+            { path: 'perfil', component: DoctorPerfil },
+            { path: 'notificaciones', component: DoctorNotificaciones },
 
             // Páginas principales
             { path: 'inicio', component: DoctorInicio },
