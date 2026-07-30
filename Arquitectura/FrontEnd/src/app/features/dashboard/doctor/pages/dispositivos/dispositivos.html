@@ -1,0 +1,236 @@
+<app-doctor-menu></app-doctor-menu>
+
+<div class="toast-container" *ngIf="notifications.length > 0">
+    <div *ngFor="let notif of notifications; let i = index" class="toast-notification toast-{{ notif.type }}"
+        [class.toast-exit]="i > 0">
+        <div class="toast-icon">
+            <i class="bi" [class]="
+                notif.type === 'success' ? 'bi-check-circle-fill' :
+                notif.type === 'error' ? 'bi-x-circle-fill' :
+                notif.type === 'warning' ? 'bi-exclamation-triangle-fill' :
+                'bi-info-circle-fill'
+            "></i>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title">{{ notif.title }}</div>
+            <div class="toast-message">{{ notif.message }}</div>
+        </div>
+        <button class="toast-close" (click)="removeToast(notif.id)">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        <div class="toast-progress" [style.animation-duration]="(notif.duration || 5000) + 'ms'"></div>
+    </div>
+</div>
+
+<div class="dispositivos-container">
+    <header class="page-header">
+        <div class="header-top">
+            <div class="header-info">
+                <h1>Dispositivos</h1>
+                <p>Gestiona los dispositivos de tus pacientes</p>
+            </div>
+            <button class="btn-nuevo" (click)="irANuevo()">
+                <i class="bi bi-plus-lg"></i>
+                <span>Nuevo Dispositivo</span>
+            </button>
+        </div>
+    </header>
+
+    <div *ngIf="isLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Cargando dispositivos...</p>
+    </div>
+
+    <div *ngIf="!isLoading" class="dispositivos-content">
+        <section class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card" (click)="aplicarFiltro('todos')" [class.active]="filterEstado === 'todos'">
+                    <span class="stat-number">{{ estadisticas.total }}</span>
+                    <span class="stat-label">Total</span>
+                </div>
+                <div class="stat-card stat-activos" (click)="aplicarFiltro('activos')"
+                    [class.active]="filterEstado === 'activos'">
+                    <span class="stat-number">{{ estadisticas.activos }}</span>
+                    <span class="stat-label">Activos</span>
+                </div>
+                <div class="stat-card stat-inactivos" (click)="aplicarFiltro('inactivos')"
+                    [class.active]="filterEstado === 'inactivos'">
+                    <span class="stat-number">{{ estadisticas.inactivos }}</span>
+                    <span class="stat-label">Inactivos</span>
+                </div>
+                <div class="stat-card stat-sin-asignar" (click)="aplicarFiltro('sin-asignar')"
+                    [class.active]="filterEstado === 'sin-asignar'">
+                    <span class="stat-number">{{ estadisticas.sinAsignar }}</span>
+                    <span class="stat-label">Sin Asignar</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="dispositivos-section">
+            <div class="section-header">
+                <h2><i class="bi bi-list-ul"></i> Lista de Dispositivos</h2>
+                <span class="dispositivos-count">{{ dispositivosFiltrados.length }} dispositivo{{
+                    dispositivosFiltrados.length !== 1 ? 's' : '' }}</span>
+            </div>
+
+            <div class="search-section">
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" [(ngModel)]="searchTerm" (input)="buscarDispositivos()"
+                        placeholder="Buscar por nombre, MAC o paciente..." class="search-input" />
+                    <button *ngIf="searchTerm" class="btn-clear" (click)="searchTerm = ''; buscarDispositivos()">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="dispositivos-list">
+                <div *ngFor="let d of dispositivosFiltrados" class="dispositivo-card" (click)="verDetalle(d)">
+                    <div class="dispositivo-header">
+                        <div class="dispositivo-icon">
+                            <i class="bi bi-device-hdd"></i>
+                        </div>
+                        <div class="dispositivo-info">
+                            <h3>{{ d.nombre || 'Dispositivo' }}</h3>
+                            <p class="dispositivo-mac">
+                                <i class="bi bi-wifi"></i> {{ d.direccionmac }}
+                            </p>
+                            <p class="dispositivo-paciente" *ngIf="d.nombrepaciente">
+                                <i class="bi bi-person"></i> {{ d.nombrepaciente }}
+                            </p>
+                            <p class="dispositivo-paciente" *ngIf="!d.nombrepaciente">
+                                <i class="bi bi-person"></i> <span class="text-muted">Sin asignar</span>
+                            </p>
+                        </div>
+                        <span class="estado-badge" [class]="getEstadoClass(d.activo)">
+                            <i class="bi" [class]="getEstadoIcon(d.activo)"></i>
+                            {{ getEstadoTexto(d.activo) }}
+                        </span>
+                    </div>
+
+                    <div class="dispositivo-body">
+                        <div class="dispositivo-detalles">
+                            <div class="detalle" *ngIf="d.ultimasincronizacion">
+                                <i class="bi bi-clock"></i>
+                                <span>Ultima sincronizacion: {{ formatearFecha(d.ultimasincronizacion) }}</span>
+                            </div>
+                            <div class="detalle" *ngIf="!d.ultimasincronizacion">
+                                <i class="bi bi-clock"></i>
+                                <span>No sincronizado</span>
+                            </div>
+                        </div>
+
+                        <div class="dispositivo-acciones">
+                            <button class="btn-sincronizar"
+                                (click)="$event.stopPropagation(); sincronizarDispositivo(d.iddispositivo)"
+                                title="Sincronizar">
+                                <i class="bi bi-arrow-repeat"></i>
+                            </button>
+                            <button class="btn-toggle" (click)="$event.stopPropagation(); toggleEstadoDispositivo(d)"
+                                title="Cambiar estado">
+                                <i class="bi" [class]="d.activo ? 'bi-pause-circle' : 'bi-play-circle'"></i>
+                            </button>
+                            <button class="btn-detalle" (click)="$event.stopPropagation(); verDetalle(d)"
+                                title="Ver detalle">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="!dispositivosFiltrados.length" class="empty-state">
+                    <i class="bi bi-device-hdd"></i>
+                    <p>No hay dispositivos
+                        {{ filterEstado === 'activos' ? 'activos' : '' }}
+                        {{ filterEstado === 'inactivos' ? 'inactivos' : '' }}
+                        {{ filterEstado === 'sin-asignar' ? 'sin asignar' : '' }}
+                    </p>
+                    <button class="btn-primary" (click)="irANuevo()">Crear Dispositivo</button>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<!-- Modal de Confirmacion para Eliminar -->
+<div class="modal-overlay" *ngIf="mostrarModalConfirmacion" (click)="cerrarModalConfirmacion()">
+    <div class="modal-content modal-confirmacion" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2><i class="bi bi-exclamation-triangle-fill" style="color: var(--warning);"></i> {{
+                modalConfirmacion.titulo }}</h2>
+            <button class="modal-close" (click)="cerrarModalConfirmacion()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p>{{ modalConfirmacion.mensaje }}</p>
+            <div class="detalle-item" *ngIf="dispositivoParaEliminar">
+                <span class="detalle-label">Dispositivo</span>
+                <span class="detalle-valor">{{ dispositivoParaEliminar.nombre || 'Dispositivo' }}</span>
+            </div>
+            <div class="detalle-item" *ngIf="dispositivoParaEliminar">
+                <span class="detalle-label">MAC</span>
+                <span class="detalle-valor">{{ dispositivoParaEliminar.direccionmac }}</span>
+            </div>
+            <div class="detalle-item" *ngIf="dispositivoParaEliminar?.nombrepaciente">
+                <span class="detalle-label">Paciente</span>
+                <span class="detalle-valor">{{ dispositivoParaEliminar.nombrepaciente }}</span>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="form-actions">
+                <button class="btn-cancelar" (click)="cerrarModalConfirmacion()">Cancelar</button>
+                <button class="btn-confirmar-eliminar" (click)="ejecutarEliminarDispositivo()"
+                    [disabled]="cargandoEliminar">
+                    <span class="spinner-small" *ngIf="cargandoEliminar"></span>
+                    {{ cargandoEliminar ? 'Eliminando...' : 'Si, Eliminar' }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Detalle -->
+<div class="modal-overlay" *ngIf="mostrarModalDetalle" (click)="cerrarModalDetalle()">
+    <div class="modal-content modal-detalle" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2><i class="bi bi-device-hdd" style="color: var(--primary);"></i> Detalle de Dispositivo</h2>
+            <button class="modal-close" (click)="cerrarModalDetalle()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="modal-body" *ngIf="dispositivoSeleccionado">
+            <div class="detalle-item">
+                <span class="detalle-label">Nombre</span>
+                <span class="detalle-valor">{{ dispositivoSeleccionado.nombre }}</span>
+            </div>
+            <div class="detalle-item">
+                <span class="detalle-label">Direccion MAC</span>
+                <span class="detalle-valor">{{ dispositivoSeleccionado.direccionmac }}</span>
+            </div>
+            <div class="detalle-item">
+                <span class="detalle-label">Estado</span>
+                <span class="detalle-valor">
+                    <span class="estado-badge" [class]="getEstadoClass(dispositivoSeleccionado.activo)">
+                        <i class="bi" [class]="getEstadoIcon(dispositivoSeleccionado.activo)"></i>
+                        {{ getEstadoTexto(dispositivoSeleccionado.activo) }}
+                    </span>
+                </span>
+            </div>
+            <div class="detalle-item">
+                <span class="detalle-label">Paciente</span>
+                <span class="detalle-valor">{{ dispositivoSeleccionado.nombrepaciente || 'Sin asignar' }}</span>
+            </div>
+            <div class="detalle-item">
+                <span class="detalle-label">Ultima Sincronizacion</span>
+                <span class="detalle-valor">{{ dispositivoSeleccionado.ultimasincronizacion ?
+                    formatearFecha(dispositivoSeleccionado.ultimasincronizacion) : 'No sincronizado' }}</span>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="form-actions">
+                <button class="btn-cerrar" (click)="cerrarModalDetalle()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>

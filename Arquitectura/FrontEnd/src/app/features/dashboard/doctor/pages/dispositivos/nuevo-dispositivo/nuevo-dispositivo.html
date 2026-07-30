@@ -1,0 +1,121 @@
+<app-doctor-menu></app-doctor-menu>
+
+<div class="toast-container" *ngIf="notifications.length > 0">
+    <div *ngFor="let notif of notifications; let i = index" class="toast-notification toast-{{ notif.type }}"
+        [class.toast-exit]="i > 0">
+        <div class="toast-icon">
+            <i class="bi" [class]="
+                notif.type === 'success' ? 'bi-check-circle-fill' :
+                notif.type === 'error' ? 'bi-x-circle-fill' :
+                notif.type === 'warning' ? 'bi-exclamation-triangle-fill' :
+                'bi-info-circle-fill'
+            "></i>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title">{{ notif.title }}</div>
+            <div class="toast-message">{{ notif.message }}</div>
+        </div>
+        <button class="toast-close" (click)="removeToast(notif.id)">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        <div class="toast-progress" [style.animation-duration]="(notif.duration || 5000) + 'ms'"></div>
+    </div>
+</div>
+
+<div class="nuevo-dispositivo-container">
+    <div class="back-section">
+        <button class="btn-back" (click)="cancelar()">
+            <i class="bi bi-arrow-left"></i>
+            <span>Volver a dispositivos</span>
+        </button>
+    </div>
+
+    <div class="nuevo-dispositivo-card">
+        <div class="card-header">
+            <div class="header-icon">
+                <i class="bi bi-plus-circle"></i>
+            </div>
+            <div class="header-info">
+                <h1>Nuevo Dispositivo</h1>
+                <p>Registra un nuevo dispositivo para un paciente</p>
+            </div>
+        </div>
+
+        <form [formGroup]="dispositivoForm" (ngSubmit)="crearDispositivo()" class="nuevo-dispositivo-form">
+            <div class="form-group">
+                <label for="nombre">
+                    Nombre del Dispositivo <span class="required">*</span>
+                </label>
+                <input type="text" id="nombre" formControlName="nombre" placeholder="Ej: Tensiometro de brazo"
+                    class="form-control"
+                    [class.is-invalid]="dispositivoForm.get('nombre')?.invalid && dispositivoForm.get('nombre')?.touched" />
+                <div class="invalid-feedback"
+                    *ngIf="dispositivoForm.get('nombre')?.invalid && dispositivoForm.get('nombre')?.touched">
+                    El nombre es obligatorio y debe tener al menos 2 caracteres.
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="direccionMac">
+                    Direccion MAC <span class="required">*</span>
+                </label>
+                <input type="text" id="direccionMac" formControlName="direccionMac" placeholder="AA:BB:CC:DD:EE:FF"
+                    class="form-control"
+                    [class.is-invalid]="dispositivoForm.get('direccionMac')?.invalid && dispositivoForm.get('direccionMac')?.touched" />
+                <div class="invalid-feedback"
+                    *ngIf="dispositivoForm.get('direccionMac')?.invalid && dispositivoForm.get('direccionMac')?.touched">
+                    Formato MAC invalido. Ejemplo: AA:BB:CC:DD:EE:FF
+                </div>
+                <small class="text-muted">Formato: AA:BB:CC:DD:EE:FF (mayusculas o minusculas)</small>
+            </div>
+
+            <div class="form-group">
+                <label>Asignar a Paciente</label>
+                <div class="search-paciente-container">
+                    <div class="search-box">
+                        <i class="bi bi-search"></i>
+                        <input type="text" [(ngModel)]="searchTermPaciente" (input)="buscarPacientes()"
+                            (focus)="buscarPacientes()" placeholder="Buscar paciente por nombre o correo..."
+                            class="search-input" [ngModelOptions]="{standalone: true}" />
+                        <button *ngIf="searchTermPaciente" class="btn-clear" (click)="limpiarPaciente()">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                    <div class="pacientes-list" *ngIf="pacientesFiltrados.length > 0">
+                        <div *ngFor="let p of pacientesFiltrados" class="paciente-item"
+                            (click)="seleccionarPaciente(p)">
+                            <img [src]="getAvatarUrl(p.nombre, p.apPaterno)" alt="Avatar" class="paciente-avatar">
+                            <div class="paciente-info">
+                                <span class="paciente-nombre">{{ p.nombreCompleto || p.nombre + ' ' + p.apPaterno
+                                    }}</span>
+                                <span class="paciente-correo">{{ p.correo }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="pacientesFiltrados.length === 0 && searchTermPaciente" class="no-resultados">
+                        <i class="bi bi-exclamation-circle"></i>
+                        <span>No se encontraron pacientes</span>
+                    </div>
+                </div>
+                <small class="text-muted" *ngIf="!dispositivoForm.get('idPacienteAsociado')?.value">Opcional - Dejar
+                    vacio para no asignar</small>
+                <small class="text-muted text-success" *ngIf="dispositivoForm.get('idPacienteAsociado')?.value">
+                    <i class="bi bi-check-circle-fill"></i>
+                    Paciente seleccionado
+                </small>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn-cancelar" (click)="cancelar()">
+                    <i class="bi bi-x-lg"></i>
+                    Cancelar
+                </button>
+                <button type="submit" class="btn-guardar" [disabled]="isLoading || dispositivoForm.invalid">
+                    <span class="spinner-small" *ngIf="isLoading"></span>
+                    <i class="bi bi-check-lg" *ngIf="!isLoading"></i>
+                    {{ isLoading ? 'Guardando...' : 'Guardar Dispositivo' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

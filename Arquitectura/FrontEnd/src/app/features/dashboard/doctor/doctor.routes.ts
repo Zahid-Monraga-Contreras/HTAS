@@ -19,8 +19,10 @@ import { DoctorTratamientoDetalle } from './pages/tratamientos/tratamiento-detal
 import { DoctorNuevoTratamiento } from './pages/tratamientos/nuevo-tratamiento/nuevo-tratamiento';
 import { DoctorMedicamentos } from './pages/medicamentos/medicamentos';
 import { DoctorMedicamentoDetalle } from './pages/medicamentos/medicamento-detalle/medicamento-detalle';
-// import { DoctorDispositivos } from './pages/dispositivos/dispositivos';
-// import { DoctorDispositivoDetalle } from './pages/dispositivos/dispositivo-detalle/dispositivo-detalle';
+import { DoctorNuevoMedicamento } from './pages/medicamentos/nuevo-medicamento/nuevo-medicamento';
+import { DoctorDispositivos } from './pages/dispositivos/dispositivos';
+import { DoctorDispositivoDetalle } from './pages/dispositivos/dispositivo-detalle/dispositivo-detalle';
+import { DoctorNuevoDispositivo } from './pages/dispositivos/nuevo-dispositivo/nuevo-dispositivo';
 // import { DoctorHorarios } from './pages/horarios/horarios';
 
 export const DOCTOR_ROUTES: Routes = [
@@ -55,10 +57,12 @@ export const DOCTOR_ROUTES: Routes = [
             // Medicamentos
             { path: 'medicamentos', component: DoctorMedicamentos },
             { path: 'medicamentos/detalle/:id', component: DoctorMedicamentoDetalle },
+            { path: 'medicamentos/nuevo', component: DoctorNuevoMedicamento },
 
             // Dispositivos
-            // { path: 'dispositivos', component: DoctorDispositivos },
-            // { path: 'dispositivos/detalle/:id', component: DoctorDispositivoDetalle },
+            { path: 'dispositivos', component: DoctorDispositivos },
+            { path: 'dispositivos/detalle/:id', component: DoctorDispositivoDetalle },
+            { path: 'dispositivos/nuevo', component: DoctorNuevoDispositivo },
 
             // Horarios y configuración
             // { path: 'horarios', component: DoctorHorarios },
