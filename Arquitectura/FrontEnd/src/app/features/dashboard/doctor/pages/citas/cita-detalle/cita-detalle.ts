@@ -201,7 +201,36 @@ export class DoctorCitaDetalle implements OnInit {
         this.isLoading = true;
         try {
             const data = await firstValueFrom(this.usersService.getCitaById(id));
-            this.cita = data;
+
+            // CONSTRUIR NOMBRE COMPLETO DEL PACIENTE
+            // Los campos vienen del backend: nombrepaciente, appaternopaciente, apmaternopaciente
+            const nombre = data.nombrepaciente || data.nombrePaciente || data.NombrePaciente || '';
+            const apPaterno = data.appaternopaciente || data.apPaternoPaciente || data.ApPaternoPaciente || '';
+            const apMaterno = data.apmaternopaciente || data.apMaternoPaciente || data.ApMaternoPaciente || '';
+
+            let nombreCompleto = '';
+            if (nombre || apPaterno || apMaterno) {
+                nombreCompleto = `${nombre} ${apPaterno} ${apMaterno}`.trim();
+            } else {
+                // Fallback: usar el campo paciente si existe
+                nombreCompleto = data.paciente || data.pacienteNombre || data.nombrePaciente || 'Paciente';
+            }
+
+            // Si está vacío, usar 'Paciente'
+            if (!nombreCompleto || nombreCompleto.trim() === '') {
+                nombreCompleto = 'Paciente';
+            }
+
+            this.cita = {
+                ...data,
+                id: data.idcita || data.id,
+                // Guardar el nombre en todos los formatos posibles
+                paciente: nombreCompleto,
+                nombrePaciente: nombreCompleto,
+                NombrePaciente: nombreCompleto,
+                pacienteNombre: nombreCompleto,
+                nombreCompleto: nombreCompleto
+            };
         } catch (error) {
             console.error('Error al cargar cita:', error);
             this.showError('Error', 'No se pudo cargar la informacion de la cita.');

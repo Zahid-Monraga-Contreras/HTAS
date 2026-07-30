@@ -1,0 +1,280 @@
+<app-doctor-menu></app-doctor-menu>
+
+<div class="toast-container" *ngIf="notifications.length > 0">
+    <div *ngFor="let notif of notifications; let i = index" class="toast-notification toast-{{ notif.type }}"
+        [class.toast-exit]="i > 0">
+        <div class="toast-icon">
+            <i class="bi" [class]="
+                notif.type === 'success' ? 'bi-check-circle-fill' :
+                notif.type === 'error' ? 'bi-x-circle-fill' :
+                notif.type === 'warning' ? 'bi-exclamation-triangle-fill' :
+                'bi-info-circle-fill'
+            "></i>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title">{{ notif.title }}</div>
+            <div class="toast-message">{{ notif.message }}</div>
+        </div>
+        <button class="toast-close" (click)="removeToast(notif.id)">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        <div class="toast-progress" [style.animation-duration]="(notif.duration || 5000) + 'ms'"></div>
+    </div>
+</div>
+
+<div class="detalle-container">
+    <!-- BOTON VOLVER -->
+    <div class="back-section">
+        <button class="btn-back" (click)="volver()">
+            <i class="bi bi-arrow-left"></i>
+            <span>Volver a medicamentos</span>
+        </button>
+    </div>
+
+    <!-- LOADING -->
+    <div *ngIf="isLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Cargando informacion del medicamento...</p>
+    </div>
+
+    <!-- CONTENIDO -->
+    <div *ngIf="!isLoading && medicamento" class="detalle-content">
+
+        <div class="detalle-card">
+            <!-- Header del medicamento -->
+            <div class="detalle-header">
+                <div class="medicamento-icon">
+                    <i class="bi bi-capsule"></i>
+                </div>
+                <div class="medicamento-info-principal">
+                    <h1>{{ medicamento.nombreComercial || 'Medicamento' }}</h1>
+                    <p class="medicamento-sustancia">
+                        <i class="bi bi-flask"></i> {{ medicamento.sustanciaActiva || 'Sustancia no especificada' }}
+                    </p>
+                    <p class="medicamento-laboratorio" *ngIf="medicamento.laboratorio">
+                        <i class="bi bi-building"></i> {{ medicamento.laboratorio }}
+                    </p>
+                </div>
+                <span class="uso-badge" [class]="getUsoClass(medicamento.totalTratamientos)">
+                    {{ getUsoTexto(medicamento.totalTratamientos) }}
+                </span>
+            </div>
+
+            <!-- Detalles del medicamento -->
+            <div class="detalle-body">
+                <div class="detalle-grid">
+                    <div class="detalle-item">
+                        <span class="detalle-label">Nombre Comercial</span>
+                        <span class="detalle-valor">{{ medicamento.nombreComercial }}</span>
+                    </div>
+                    <div class="detalle-item" *ngIf="medicamento.sustanciaActiva">
+                        <span class="detalle-label">Sustancia Activa</span>
+                        <span class="detalle-valor">{{ medicamento.sustanciaActiva }}</span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-label">Presentacion</span>
+                        <span class="detalle-valor">{{ medicamento.presentacion }}</span>
+                    </div>
+                    <div class="detalle-item" *ngIf="medicamento.concentracion">
+                        <span class="detalle-label">Concentracion</span>
+                        <span class="detalle-valor">{{ medicamento.concentracion }}</span>
+                    </div>
+                    <div class="detalle-item" *ngIf="medicamento.laboratorio">
+                        <span class="detalle-label">Laboratorio</span>
+                        <span class="detalle-valor">{{ medicamento.laboratorio }}</span>
+                    </div>
+                    <div class="detalle-item" *ngIf="medicamento.indicacionesGenerales">
+                        <span class="detalle-label">Indicaciones</span>
+                        <span class="detalle-valor" style="text-align: left; max-width: 70%;">{{
+                            medicamento.indicacionesGenerales }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCION DE ESTADISTICAS -->
+        <div class="estadisticas-section" *ngIf="estadisticas">
+            <div class="estadisticas-header">
+                <h2><i class="bi bi-graph-up"></i> Estadisticas de Uso</h2>
+            </div>
+            <div class="estadisticas-grid">
+                <div class="estadistica-item">
+                    <span class="estadistica-numero">{{ estadisticas.totalTratamientos || 0 }}</span>
+                    <span class="estadistica-label">Total Tratamientos</span>
+                </div>
+                <div class="estadistica-item stat-activos">
+                    <span class="estadistica-numero">{{ estadisticas.tratamientosActivos || 0 }}</span>
+                    <span class="estadistica-label">Tratamientos Activos</span>
+                </div>
+                <div class="estadistica-item stat-pacientes">
+                    <span class="estadistica-numero">{{ estadisticas.pacientesActivos || 0 }}</span>
+                    <span class="estadistica-label">Pacientes Activos</span>
+                </div>
+                <div class="estadistica-item stat-ultimo" *ngIf="estadisticas.ultimoUso">
+                    <span class="estadistica-numero" style="font-size: 0.8rem;">{{
+                        formatearFecha(estadisticas.ultimoUso) }}</span>
+                    <span class="estadistica-label">Ultimo Uso</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCION DE TRATAMIENTOS RELACIONADOS -->
+        <div class="tratamientos-section" *ngIf="tratamientosRelacionados && tratamientosRelacionados.length > 0">
+            <div class="tratamientos-header">
+                <h2><i class="bi bi-prescription"></i> Tratamientos Asociados</h2>
+                <span class="tratamientos-count">{{ tratamientosRelacionados.length }}</span>
+            </div>
+            <div class="tratamientos-list">
+                <div *ngFor="let t of tratamientosRelacionados" class="tratamiento-item"
+                    (click)="verTratamiento(t.idtratamiento)">
+                    <div class="tratamiento-info">
+                        <h4>{{ t.paciente || t.nombrePaciente || t.NombrePaciente || 'Paciente sin nombre' }}</h4>
+                        <p>
+                            <i class="bi bi-calendar3"></i>
+                            <span *ngIf="t.fechainicio || t.FechaInicio || t.fechaInicio">
+                                {{ formatearFecha(t.fechainicio || t.FechaInicio || t.fechaInicio) }}
+                            </span>
+                            <span
+                                *ngIf="(t.fechainicio || t.FechaInicio || t.fechaInicio) && (t.fechafin || t.FechaFin || t.fechaFin)">
+                                -
+                            </span>
+                            <span *ngIf="t.fechafin || t.FechaFin || t.fechaFin">
+                                {{ formatearFecha(t.fechafin || t.FechaFin || t.fechaFin) }}
+                            </span>
+                            <span
+                                *ngIf="!t.fechainicio && !t.FechaInicio && !t.fechaInicio && !t.fechafin && !t.FechaFin && !t.fechaFin">
+                                Sin fechas definidas
+                            </span>
+                        </p>
+                    </div>
+                    <span class="badge" [class]="getEstadoClass(t.activo)">
+                        {{ getEstadoTexto(t.activo) }}
+                    </span>
+                    <i class="bi bi-chevron-right tratamiento-arrow"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="detalle-acciones">
+            <button class="btn-editar" (click)="abrirModalEdicion()">
+                <i class="bi bi-pencil"></i>
+                Editar
+            </button>
+            <button class="btn-eliminar" (click)="mostrarConfirmacionEliminar()"
+                [disabled]="medicamento.totalTratamientos > 0">
+                <i class="bi bi-trash"></i>
+                Eliminar
+            </button>
+            <button class="btn-volver" (click)="volver()">
+                <i class="bi bi-arrow-left"></i> Volver
+            </button>
+        </div>
+        <div *ngIf="medicamento.totalTratamientos > 0" class="aviso-eliminar">
+            <i class="bi bi-info-circle"></i>
+            No se puede eliminar porque tiene {{ medicamento.totalTratamientos }} tratamiento(s) asociado(s)
+        </div>
+
+    </div>
+
+    <!-- Medicamento no encontrado -->
+    <div *ngIf="!isLoading && !medicamento" class="error-state">
+        <i class="bi bi-capsule"></i>
+        <h3>Medicamento no encontrado</h3>
+        <p>El medicamento que buscas no existe o ha sido eliminado</p>
+        <button class="btn-primary" (click)="volver()">Volver a medicamentos</button>
+    </div>
+</div>
+
+<!-- Modal de Confirmacion para Eliminar -->
+<div class="modal-overlay" *ngIf="mostrarModalConfirmacion" (click)="cerrarModalConfirmacion()">
+    <div class="modal-content modal-confirmacion" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2><i class="bi bi-exclamation-triangle-fill" style="color: var(--warning);"></i> {{
+                modalConfirmacion.titulo }}</h2>
+            <button class="modal-close" (click)="cerrarModalConfirmacion()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p>{{ modalConfirmacion.mensaje }}</p>
+            <div class="detalle-item" *ngIf="medicamento">
+                <span class="detalle-label">Medicamento</span>
+                <span class="detalle-valor">{{ medicamento.nombreComercial }}</span>
+            </div>
+            <div class="detalle-item" *ngIf="medicamento">
+                <span class="detalle-label">Tratamientos asociados</span>
+                <span class="detalle-valor"
+                    [style.color]="medicamento.totalTratamientos > 0 ? 'var(--warning)' : 'var(--success)'">
+                    {{ medicamento.totalTratamientos || 0 }}
+                </span>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="form-actions">
+                <button class="btn-cancelar" (click)="cerrarModalConfirmacion()">Cancelar</button>
+                <button class="btn-confirmar-eliminar" (click)="ejecutarEliminarMedicamento()"
+                    [disabled]="cargandoEliminar || medicamento.totalTratamientos > 0">
+                    <span class="spinner-small" *ngIf="cargandoEliminar"></span>
+                    {{ cargandoEliminar ? 'Eliminando...' : 'Si, Eliminar' }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Edicion -->
+<div class="modal-overlay" *ngIf="mostrarModalEdicion" (click)="cerrarModalEdicion()">
+    <div class="modal-content modal-edicion" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2><i class="bi bi-pencil" style="color: var(--primary);"></i> Editar Medicamento</h2>
+            <button class="modal-close" (click)="cerrarModalEdicion()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form (ngSubmit)="ejecutarActualizarMedicamento()" #editForm="ngForm">
+                <div class="form-group">
+                    <label>Nombre Comercial *</label>
+                    <input type="text" [(ngModel)]="editandoMedicamento.nombreComercial" name="nombreComercial" required
+                        placeholder="Ej: Paracetamol" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>Sustancia Activa</label>
+                    <input type="text" [(ngModel)]="editandoMedicamento.sustanciaActiva" name="sustanciaActiva"
+                        placeholder="Ej: Acetaminofen" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>Presentacion *</label>
+                    <input type="text" [(ngModel)]="editandoMedicamento.presentacion" name="presentacion" required
+                        placeholder="Ej: Tabletas 500 mg" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>Concentracion</label>
+                    <input type="text" [(ngModel)]="editandoMedicamento.concentracion" name="concentracion"
+                        placeholder="Ej: 500 mg" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>Laboratorio</label>
+                    <input type="text" [(ngModel)]="editandoMedicamento.laboratorio" name="laboratorio"
+                        placeholder="Ej: Bayer" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>Indicaciones Generales</label>
+                    <textarea [(ngModel)]="editandoMedicamento.indicacionesGenerales" name="indicacionesGenerales"
+                        placeholder="Indicaciones adicionales..." class="form-control" rows="3"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <div class="form-actions">
+                <button class="btn-cancelar" (click)="cerrarModalEdicion()">Cancelar</button>
+                <button class="btn-guardar" (click)="ejecutarActualizarMedicamento()"
+                    [disabled]="cargandoAccion || !editForm.form.valid">
+                    <span class="spinner-small" *ngIf="cargandoAccion"></span>
+                    {{ cargandoAccion ? 'Guardando...' : 'Guardar Cambios' }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

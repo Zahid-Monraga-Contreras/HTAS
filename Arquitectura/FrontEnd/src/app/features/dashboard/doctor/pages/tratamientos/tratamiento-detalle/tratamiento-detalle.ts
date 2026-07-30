@@ -86,14 +86,10 @@ export class DoctorTratamientoDetalle implements OnInit {
     private flatpickrInstance: any = null;
     @ViewChild('filtroFechaInput', { static: false }) set filtroFechaInput(element: ElementRef) {
         if (element && !this.flatpickrInstance) {
-            // Esperamos un tick para asegurar que el DOM está listo
             setTimeout(() => {
-                // Obtenemos las fechas del tratamiento para limitar el calendario
-                // Usamos undefined en lugar de null para evitar errores de TypeScript
                 let minDate: Date | string | undefined = undefined;
                 let maxDate: Date | string | undefined = undefined;
 
-                // Solo definimos los límites si el tratamiento ya está cargado
                 if (this.tratamiento) {
                     const inicio = this.tratamiento.fechaInicio || this.tratamiento.fechainicio;
                     const fin = this.tratamiento.fechaFin || this.tratamiento.fechafin;
@@ -115,10 +111,10 @@ export class DoctorTratamientoDetalle implements OnInit {
                 this.flatpickrInstance = flatpickr(element.nativeElement, {
                     locale: Spanish,
                     dateFormat: 'Y-m-d',
-                    allowInput: false, // Prohibe escribir a mano
+                    allowInput: false,
                     disableMobile: true,
-                    minDate: minDate, // Fecha mínima permitida (undefined si no hay)
-                    maxDate: maxDate, // Fecha máxima permitida (undefined si no hay)
+                    minDate: minDate,
+                    maxDate: maxDate,
                     onChange: (selectedDates: Date[], dateStr: string) => {
                         this.filtroFecha = dateStr;
                         this.cdr.detectChanges();
@@ -134,10 +130,9 @@ export class DoctorTratamientoDetalle implements OnInit {
             return this.registrosTomas;
         }
 
-        // Parseo manual para evitar errores de zona horaria (UTC vs Local)
         const partes = this.filtroFecha.split('-').map(Number);
         const filtroAnio = partes[0];
-        const filtroMes = partes[1] - 1; // En JS los meses van de 0 a 11
+        const filtroMes = partes[1] - 1;
         const filtroDia = partes[2];
 
         return this.registrosTomas.filter(toma => {
@@ -147,7 +142,6 @@ export class DoctorTratamientoDetalle implements OnInit {
                 const tomaMes = fechaToma.getMonth();
                 const tomaDia = fechaToma.getDate();
 
-                // Comparar año, mes y día exactamente
                 return tomaAnio === filtroAnio && tomaMes === filtroMes && tomaDia === filtroDia;
             } catch {
                 return false;
@@ -208,14 +202,89 @@ export class DoctorTratamientoDetalle implements OnInit {
     async cargarTratamiento(id: number) {
         this.isLoading = true;
         try {
+            // Obtener el tratamiento
             const data = await firstValueFrom(this.usersService.getTratamientoById(id));
+
+            // Obtener el ID del paciente del tratamiento
+            const idPaciente = data.idpaciente || data.IdPaciente || data.idPaciente;
+
+            let nombreCompleto = 'Paciente';
+            let nombreDoctor = 'Doctor';
+
+            // Si tenemos ID del paciente, obtener sus datos completos
+            if (idPaciente) {
+                try {
+                    const pacienteData = await firstValueFrom(this.usersService.getUsuarioById(idPaciente));
+                    if (pacienteData) {
+                        const nombre = pacienteData.nombre || '';
+                        const apPaterno = pacienteData.apPaterno || '';
+                        const apMaterno = pacienteData.apMaterno || '';
+                        nombreCompleto = `${nombre} ${apPaterno} ${apMaterno}`.trim();
+                        if (!nombreCompleto) {
+                            nombreCompleto = pacienteData.correo || 'Paciente';
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error al obtener datos del paciente:', error);
+                    // Fallback: usar los datos que vienen en el tratamiento
+                    const nombre = data.nombre || data.Nombre || '';
+                    const apPaterno = data.appaterno || data.ApPaterno || data.apPaterno || '';
+                    const apMaterno = data.apmaterno || data.ApMaterno || data.apMaterno || '';
+                    if (nombre || apPaterno || apMaterno) {
+                        nombreCompleto = `${nombre} ${apPaterno} ${apMaterno}`.trim();
+                    } else {
+                        nombreCompleto = data.nombrepaciente || data.NombrePaciente || data.paciente || data.Paciente || 'Paciente';
+                    }
+                }
+            } else {
+                // Si no hay ID de paciente, intentar usar los campos del tratamiento
+                const nombre = data.nombre || data.Nombre || '';
+                const apPaterno = data.appaterno || data.ApPaterno || data.apPaterno || '';
+                const apMaterno = data.apmaterno || data.ApMaterno || data.apMaterno || '';
+                if (nombre || apPaterno || apMaterno) {
+                    nombreCompleto = `${nombre} ${apPaterno} ${apMaterno}`.trim();
+                } else {
+                    nombreCompleto = data.nombrepaciente || data.NombrePaciente || data.paciente || data.Paciente || 'Paciente';
+                }
+            }
+
+            // Obtener nombre del doctor si está disponible
+            const idDoctor = data.iddoctor || data.IdDoctor || data.idDoctor;
+            if (idDoctor) {
+                try {
+                    const doctorData = await firstValueFrom(this.usersService.getUsuarioById(idDoctor));
+                    if (doctorData) {
+                        const nombre = doctorData.nombre || '';
+                        const apPaterno = doctorData.apPaterno || '';
+                        const apMaterno = doctorData.apMaterno || '';
+                        nombreDoctor = `${nombre} ${apPaterno} ${apMaterno}`.trim();
+                        if (!nombreDoctor) {
+                            nombreDoctor = doctorData.correo || 'Doctor';
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error al obtener datos del doctor:', error);
+                    nombreDoctor = data.nombredoctor || data.NombreDoctor || data.nombreDoctor || 'Doctor';
+                }
+            } else {
+                nombreDoctor = data.nombredoctor || data.NombreDoctor || data.nombreDoctor || 'Doctor';
+            }
+
             this.tratamiento = {
                 ...data,
+                idpaciente: idPaciente,
+                iddoctor: idDoctor,
                 nombreMedicamento: data.nombremedicamento || data.NombreMedicamento || 'Medicamento',
                 fechaInicio: data.fechainicio || data.FechaInicio,
                 fechaFin: data.fechafin || data.FechaFin,
-                nombrePaciente: data.NombrePaciente || data.nombrePaciente || 'Paciente',
-                nombreDoctor: data.NombreDoctor || data.nombreDoctor || 'Doctor'
+                // Guardar el nombre completo en múltiples formatos
+                nombrePaciente: nombreCompleto,
+                NombrePaciente: nombreCompleto,
+                nombreCompleto: nombreCompleto,
+                paciente: nombreCompleto,
+                Paciente: nombreCompleto,
+                nombreDoctor: nombreDoctor,
+                NombreDoctor: nombreDoctor
             };
 
             await this.cargarTomas(id);

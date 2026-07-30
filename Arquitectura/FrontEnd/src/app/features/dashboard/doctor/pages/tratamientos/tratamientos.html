@@ -93,7 +93,8 @@
                         <div class="tratamiento-info">
                             <h3>{{ t.nombreMedicamento || 'Medicamento' }}</h3>
                             <p class="tratamiento-paciente">
-                                <i class="bi bi-person"></i> {{ t.NombrePaciente || t.nombrePaciente || 'Paciente' }}
+                                <i class="bi bi-person"></i>
+                                {{ t.nombrePaciente || t.nombreCompleto || t.NombrePaciente || 'Paciente' }}
                             </p>
                         </div>
                         <span class="badge" [class]="getEstadoClass(t.activo !== false && t.activo !== 0)">
@@ -158,8 +159,12 @@
             </div>
             <div class="detalle-item" *ngIf="tratamientoParaEliminar">
                 <span class="detalle-label">Paciente</span>
-                <span class="detalle-valor">{{ tratamientoParaEliminar.NombrePaciente ||
-                    tratamientoParaEliminar.nombrePaciente || 'Paciente' }}</span>
+                <span class="detalle-valor">
+                    {{ tratamientoParaEliminar.nombrePaciente ||
+                    tratamientoParaEliminar.nombreCompleto ||
+                    tratamientoParaEliminar.NombrePaciente ||
+                    'Paciente' }}
+                </span>
             </div>
         </div>
         <div class="modal-footer">

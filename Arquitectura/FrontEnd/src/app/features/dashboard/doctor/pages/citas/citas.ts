@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, ChangeDetectorRef, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { RouterModule, Router } from '@angular/router'; // ✅ Agregar Router
+import { RouterModule, Router } from '@angular/router';
 import { DoctorMenu } from "../../template/menu/menu";
 import { Users } from '../../../../../core/services/users.service';
 import { firstValueFrom } from 'rxjs';
@@ -14,7 +14,7 @@ import { firstValueFrom } from 'rxjs';
 })
 export class DoctorCitas implements OnInit {
     private usersService = inject(Users);
-    private router = inject(Router); // ✅ Inyectar Router
+    private router = inject(Router);
     private cdr = inject(ChangeDetectorRef);
     private platformId = inject(PLATFORM_ID);
 
@@ -51,9 +51,6 @@ export class DoctorCitas implements OnInit {
                 this.doctorId = userData.idusuario || userData.uid || null;
             }
 
-            console.log('📧 Email del doctor:', this.userEmail);
-            console.log('🆔 ID del doctor:', this.doctorId);
-
             await this.cargarCitas();
         } catch (error) {
             console.error('Error al cargar datos:', error);
@@ -67,24 +64,40 @@ export class DoctorCitas implements OnInit {
         try {
             const todasLasCitas = await firstValueFrom(this.usersService.getAllCitas());
 
-            console.log('📋 Total de citas en backend:', todasLasCitas?.length || 0);
-
             if (Array.isArray(todasLasCitas) && todasLasCitas.length > 0) {
-                // 🔍 Ver la primera cita para ver qué campos tiene
-                console.log('🔍 Primera cita:', todasLasCitas[0]);
-                console.log('🔍 Campos de la primera cita:', Object.keys(todasLasCitas[0]));
+                this.citas = todasLasCitas.map(c => {
+                    // CONSTRUIR NOMBRE COMPLETO DEL PACIENTE
+                    // Los campos vienen del backend: nombrepaciente, appaternopaciente, apmaternopaciente
+                    const nombre = c.nombrepaciente || c.nombrePaciente || c.NombrePaciente || '';
+                    const apPaterno = c.appaternopaciente || c.apPaternoPaciente || c.ApPaternoPaciente || '';
+                    const apMaterno = c.apmaternopaciente || c.apMaternoPaciente || c.ApMaternoPaciente || '';
 
-                // Mostrar TODAS las citas
-                this.citas = todasLasCitas.map(c => ({
-                    ...c,
-                    id: c.idcita || c.id,
-                    fechacita: c.fechacita || c.fecha || c.fechaCita,
-                    horacita: c.horacita || c.hora || c.horaCita,
-                    paciente: c.pacienteNombre || c.nombrePaciente || c.paciente || 'Paciente',
-                    especialidad: c.especialidad || c.Especialidad || 'General'
-                }));
+                    let nombreCompleto = '';
+                    if (nombre || apPaterno || apMaterno) {
+                        nombreCompleto = `${nombre} ${apPaterno} ${apMaterno}`.trim();
+                    } else {
+                        // Fallback: usar el campo paciente si existe
+                        nombreCompleto = c.paciente || c.pacienteNombre || c.nombrePaciente || 'Paciente';
+                    }
 
-                console.log('✅ Total de citas mostradas:', this.citas.length);
+                    // Si está vacío, usar 'Paciente'
+                    if (!nombreCompleto || nombreCompleto.trim() === '') {
+                        nombreCompleto = 'Paciente';
+                    }
+
+                    return {
+                        ...c,
+                        id: c.idcita || c.id,
+                        fechacita: c.fechacita || c.fecha || c.fechaCita,
+                        horacita: c.horacita || c.hora || c.horaCita,
+                        // Guardar el nombre en todos los formatos posibles
+                        paciente: nombreCompleto,
+                        nombrePaciente: nombreCompleto,
+                        NombrePaciente: nombreCompleto,
+                        pacienteNombre: nombreCompleto,
+                        especialidad: c.especialidad || c.Especialidad || 'General'
+                    };
+                });
 
                 this.citas.sort((a: any, b: any) => {
                     const fechaA = new Date(a.fechacita || a.fecha || a.fechaCita);
@@ -95,13 +108,12 @@ export class DoctorCitas implements OnInit {
                 this.calcularEstadisticas();
                 this.aplicarFiltro('todas');
             } else {
-                console.warn('⚠️ No hay citas en el backend');
                 this.citas = [];
                 this.calcularEstadisticas();
                 this.aplicarFiltro('todas');
             }
         } catch (error) {
-            console.error('❌ Error al cargar citas:', error);
+            console.error('Error al cargar citas:', error);
             this.citas = [];
             this.calcularEstadisticas();
             this.aplicarFiltro('todas');

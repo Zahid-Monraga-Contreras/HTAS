@@ -28,6 +28,9 @@ export class DoctorInicio implements OnInit {
     doctorId: number | null = null;
     userEmail: string = '';
 
+    // Mapa de pacientes para obtener nombres completos
+    private pacientesMap: Map<number, any> = new Map();
+
     metrics = {
         totalPacientes: 0,
         citasProgramadas: 0,
@@ -72,14 +75,35 @@ export class DoctorInicio implements OnInit {
 
     private async cargarDatos() {
         try {
-            // Obtener todos los usuarios para contar pacientes
+            // Obtener todos los usuarios para contar pacientes y crear mapa
             let allUsers: any[] = [];
             try {
                 allUsers = await firstValueFrom(this.usersService.getUsuariosBackend());
                 if (Array.isArray(allUsers)) {
+                    // Crear mapa de pacientes por ID para obtener nombres completos
+                    this.pacientesMap.clear();
                     const pacientes = allUsers.filter(u => u.rol?.toLowerCase() === 'paciente');
+
+                    pacientes.forEach(p => {
+                        const id = p.idusuario || p.id;
+                        if (id) {
+                            this.pacientesMap.set(id, p);
+                        }
+                    });
+
                     this.metrics.totalPacientes = pacientes.length;
-                    this.pacientesRecientes = pacientes.slice(0, 4);
+
+                    // Pacientes recientes con nombre completo
+                    this.pacientesRecientes = pacientes.slice(0, 4).map(p => {
+                        const nombre = p.nombre || '';
+                        const apPaterno = p.apPaterno || '';
+                        const apMaterno = p.apMaterno || '';
+                        const nombreCompleto = `${nombre} ${apPaterno} ${apMaterno}`.trim() || p.correo || 'Paciente';
+                        return {
+                            ...p,
+                            nombreCompleto: nombreCompleto
+                        };
+                    });
                 }
             } catch (error) {
                 console.error('Error al obtener usuarios:', error);
@@ -101,13 +125,38 @@ export class DoctorInicio implements OnInit {
                 console.error('Error al obtener tratamientos:', error);
             }
 
-            // Procesar citas - Mostrar TODAS las citas programadas (sin filtrar por doctor)
+            // Procesar citas - Mostrar TODAS las citas programadas con nombre completo
             if (Array.isArray(todasLasCitas) && todasLasCitas.length > 0) {
                 // Citas programadas: todas las que no están canceladas ni completadas
                 this.citasProgramadas = todasLasCitas
                     .filter((c: any) => {
                         const estado = (c.estado || '').toLowerCase();
                         return !['cancelada', 'completada', 'realizada', 'finalizada'].includes(estado);
+                    })
+                    .map((c: any) => {
+                        // Construir nombre completo del paciente de la cita
+                        const nombre = c.nombrepaciente || c.nombrePaciente || c.NombrePaciente || '';
+                        const apPaterno = c.appaternopaciente || c.apPaternoPaciente || c.ApPaternoPaciente || '';
+                        const apMaterno = c.apmaternopaciente || c.apMaternoPaciente || c.ApMaternoPaciente || '';
+
+                        let nombreCompleto = '';
+                        if (nombre || apPaterno || apMaterno) {
+                            nombreCompleto = `${nombre} ${apPaterno} ${apMaterno}`.trim();
+                        } else {
+                            // Fallback: usar el campo paciente si existe
+                            nombreCompleto = c.paciente || c.pacienteNombre || c.nombrePaciente || 'Paciente';
+                        }
+
+                        if (!nombreCompleto || nombreCompleto.trim() === '') {
+                            nombreCompleto = 'Paciente';
+                        }
+
+                        return {
+                            ...c,
+                            id: c.idcita || c.id,
+                            nombrePaciente: nombreCompleto,
+                            paciente: nombreCompleto
+                        };
                     })
                     .slice(0, 5);
 
@@ -116,6 +165,29 @@ export class DoctorInicio implements OnInit {
                     .filter((c: any) => {
                         const estado = (c.estado || '').toLowerCase();
                         return ['pendiente', 'programada', 'confirmada', 'agendada'].includes(estado);
+                    })
+                    .map((c: any) => {
+                        const nombre = c.nombrepaciente || c.nombrePaciente || c.NombrePaciente || '';
+                        const apPaterno = c.appaternopaciente || c.apPaternoPaciente || c.ApPaternoPaciente || '';
+                        const apMaterno = c.apmaternopaciente || c.apMaternoPaciente || c.ApMaternoPaciente || '';
+
+                        let nombreCompleto = '';
+                        if (nombre || apPaterno || apMaterno) {
+                            nombreCompleto = `${nombre} ${apPaterno} ${apMaterno}`.trim();
+                        } else {
+                            nombreCompleto = c.paciente || c.pacienteNombre || c.nombrePaciente || 'Paciente';
+                        }
+
+                        if (!nombreCompleto || nombreCompleto.trim() === '') {
+                            nombreCompleto = 'Paciente';
+                        }
+
+                        return {
+                            ...c,
+                            id: c.idcita || c.id,
+                            nombrePaciente: nombreCompleto,
+                            paciente: nombreCompleto
+                        };
                     });
 
                 this.metrics.citasProgramadas = this.citasProgramadas.length;

@@ -49,10 +49,13 @@
                 <div class="tratamiento-info-principal">
                     <h1>{{ tratamiento.nombreMedicamento || 'Medicamento' }}</h1>
                     <p class="tratamiento-paciente" (click)="irAPaciente()" style="cursor: pointer;">
-                        <i class="bi bi-person"></i> {{ tratamiento.nombrePaciente || 'Paciente' }}
+                        <i class="bi bi-person"></i>
+                        {{ tratamiento.nombrePaciente || tratamiento.NombrePaciente || tratamiento.nombreCompleto ||
+                        tratamiento.paciente || 'Paciente' }}
                     </p>
                     <p class="tratamiento-doctor">
-                        <i class="bi bi-person-badge"></i> {{ tratamiento.nombreDoctor || 'Doctor' }}
+                        <i class="bi bi-person-badge"></i>
+                        {{ tratamiento.nombreDoctor || tratamiento.NombreDoctor || 'Doctor' }}
                     </p>
                 </div>
                 <span class="estado-badge"
@@ -265,7 +268,8 @@
             </div>
             <div class="detalle-item" *ngIf="tratamiento">
                 <span class="detalle-label">Paciente</span>
-                <span class="detalle-valor">{{ tratamiento.nombrePaciente || 'Paciente' }}</span>
+                <span class="detalle-valor">{{ tratamiento.nombrePaciente || tratamiento.NombrePaciente ||
+                    tratamiento.nombreCompleto || tratamiento.paciente || 'Paciente' }}</span>
             </div>
         </div>
         <div class="modal-footer">

@@ -84,9 +84,11 @@
                             <span class="cita-mes">{{ obtenerMes(cita.fechacita || cita.fecha) }}</span>
                         </div>
                         <div class="cita-info-principal">
-                            <h3>{{ cita.motivo || 'Consulta Medica' }}</h3>
+                            <h3>{{ cita.motivo || cita.Motivo || 'Consulta Medica' }}</h3>
                             <p class="cita-paciente">
-                                <i class="bi bi-person"></i> {{ cita.paciente || cita.pacienteNombre || 'Paciente' }}
+                                <i class="bi bi-person"></i>
+                                {{ cita.paciente || cita.nombrePaciente || cita.NombrePaciente || cita.pacienteNombre ||
+                                'Paciente' }}
                             </p>
                             <p class="cita-especialidad" *ngIf="cita.especialidad">
                                 <i class="bi bi-briefcase"></i> {{ cita.especialidad }}

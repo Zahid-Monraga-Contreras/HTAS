@@ -1,0 +1,197 @@
+<app-doctor-menu></app-doctor-menu>
+
+<div class="toast-container" *ngIf="notifications.length > 0">
+    <div *ngFor="let notif of notifications; let i = index" class="toast-notification toast-{{ notif.type }}"
+        [class.toast-exit]="i > 0">
+        <div class="toast-icon">
+            <i class="bi" [class]="
+                notif.type === 'success' ? 'bi-check-circle-fill' :
+                notif.type === 'error' ? 'bi-x-circle-fill' :
+                notif.type === 'warning' ? 'bi-exclamation-triangle-fill' :
+                'bi-info-circle-fill'
+            "></i>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title">{{ notif.title }}</div>
+            <div class="toast-message">{{ notif.message }}</div>
+        </div>
+        <button class="toast-close" (click)="removeToast(notif.id)">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        <div class="toast-progress" [style.animation-duration]="(notif.duration || 5000) + 'ms'"></div>
+    </div>
+</div>
+
+<div class="medicamentos-container">
+    <header class="page-header">
+        <div class="header-top">
+            <div class="header-info">
+                <h1>Medicamentos</h1>
+                <p>Gestiona el catalogo de medicamentos</p>
+            </div>
+            <button class="btn-nuevo" (click)="irANuevoMedicamento()">
+                <i class="bi bi-plus-lg"></i>
+                <span>Nuevo Medicamento</span>
+            </button>
+        </div>
+    </header>
+
+    <div *ngIf="isLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Cargando medicamentos...</p>
+    </div>
+
+    <div *ngIf="!isLoading" class="medicamentos-content">
+        <section class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card" (click)="aplicarFiltroPorTipo('todos')" [class.active]="filterTipo === 'todos'">
+                    <span class="stat-number">{{ estadisticas.total }}</span>
+                    <span class="stat-label">Total</span>
+                </div>
+                <div class="stat-card stat-con-tratamientos" (click)="aplicarFiltroPorTipo('con-uso')"
+                    [class.active]="filterTipo === 'con-uso'">
+                    <span class="stat-number">{{ estadisticas.conTratamientos }}</span>
+                    <span class="stat-label">En Uso</span>
+                </div>
+                <div class="stat-card stat-sin-tratamientos" (click)="aplicarFiltroPorTipo('sin-uso')"
+                    [class.active]="filterTipo === 'sin-uso'">
+                    <span class="stat-number">{{ estadisticas.sinTratamientos }}</span>
+                    <span class="stat-label">Sin Uso</span>
+                </div>
+                <div class="stat-card stat-laboratorios" (click)="aplicarFiltroPorLaboratorio('todos')"
+                    [class.active]="filterLaboratorio === 'todos'">
+                    <span class="stat-number">{{ estadisticas.laboratorios }}</span>
+                    <span class="stat-label">Laboratorios</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="medicamentos-section">
+            <div class="section-header">
+                <h2><i class="bi bi-list-ul"></i> Lista de Medicamentos</h2>
+                <span class="medicamentos-count">{{ medicamentosFiltrados.length }} medicamento{{
+                    medicamentosFiltrados.length !== 1 ? 's' : '' }}</span>
+            </div>
+
+            <div class="search-section">
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" [(ngModel)]="searchTerm" (input)="buscarMedicamentos()"
+                        placeholder="Buscar por nombre, sustancia o laboratorio..." class="search-input" />
+                    <button *ngIf="searchTerm" class="btn-clear" (click)="searchTerm = ''; buscarMedicamentos()">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="filtros-laboratorio" *ngIf="laboratoriosDisponibles.length > 0">
+                <button class="filtro-btn" [class.active]="filterLaboratorio === 'todos'"
+                    (click)="aplicarFiltroPorLaboratorio('todos')">
+                    Todos
+                </button>
+                <button class="filtro-btn" *ngFor="let lab of laboratoriosDisponibles"
+                    [class.active]="filterLaboratorio === lab" (click)="aplicarFiltroPorLaboratorio(lab)">
+                    {{ lab }}
+                </button>
+            </div>
+
+            <div class="medicamentos-list">
+                <div *ngFor="let m of medicamentosFiltrados" class="medicamento-card" (click)="verDetalle(m)">
+                    <div class="medicamento-header">
+                        <div class="medicamento-icon">
+                            <i class="bi bi-capsule"></i>
+                        </div>
+                        <div class="medicamento-info">
+                            <h3>{{ m.nombreComercial || 'Medicamento' }}</h3>
+                            <p class="medicamento-sustancia">
+                                <i class="bi bi-flask"></i> {{ m.sustanciaActiva || 'Sustancia no especificada' }}
+                            </p>
+                        </div>
+                        <span class="badge" [class]="m.totalTratamientos > 0 ? 'badge-success' : 'badge-secondary'">
+                            {{ m.totalTratamientos > 0 ? 'En uso' : 'Sin uso' }}
+                        </span>
+                    </div>
+
+                    <div class="medicamento-body">
+                        <div class="medicamento-detalles">
+                            <div class="detalle">
+                                <i class="bi bi-box"></i>
+                                <span>{{ m.presentacion || 'Presentacion no especificada' }}</span>
+                            </div>
+                            <div class="detalle" *ngIf="m.concentracion">
+                                <i class="bi bi-droplet"></i>
+                                <span>{{ m.concentracion }}</span>
+                            </div>
+                            <div class="detalle" *ngIf="m.laboratorio">
+                                <i class="bi bi-building"></i>
+                                <span>{{ m.laboratorio }}</span>
+                            </div>
+                            <div class="detalle" *ngIf="m.totalTratamientos > 0">
+                                <i class="bi bi-prescription"></i>
+                                <span>{{ m.totalTratamientos }} tratamiento{{ m.totalTratamientos !== 1 ? 's' : ''
+                                    }}</span>
+                            </div>
+                        </div>
+
+                        <div class="medicamento-acciones">
+                            <button class="btn-detalle" (click)="$event.stopPropagation(); verDetalle(m)"
+                                title="Ver detalle">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="!medicamentosFiltrados.length" class="empty-state">
+                    <i class="bi bi-capsule"></i>
+                    <p>No hay medicamentos
+                        {{ filterTipo === 'con-uso' ? 'en uso' : '' }}
+                        {{ filterTipo === 'sin-uso' ? 'sin uso' : '' }}
+                        {{ filterLaboratorio !== 'todos' ? 'del laboratorio ' + filterLaboratorio : '' }}
+                    </p>
+                    <button class="btn-primary" (click)="irANuevoMedicamento()">
+                        Crear Medicamento
+                    </button>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<div class="modal-overlay" *ngIf="mostrarModalConfirmacion" (click)="cerrarModalConfirmacion()">
+    <div class="modal-content modal-confirmacion" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2><i class="bi bi-exclamation-triangle-fill" style="color: var(--warning);"></i> {{
+                modalConfirmacion.titulo }}</h2>
+            <button class="modal-close" (click)="cerrarModalConfirmacion()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p>{{ modalConfirmacion.mensaje }}</p>
+            <div class="detalle-item" *ngIf="medicamentoParaEliminar">
+                <span class="detalle-label">Medicamento</span>
+                <span class="detalle-valor">{{ medicamentoParaEliminar.nombreComercial || 'Medicamento' }}</span>
+            </div>
+            <div class="detalle-item" *ngIf="medicamentoParaEliminar">
+                <span class="detalle-label">Laboratorio</span>
+                <span class="detalle-valor">{{ medicamentoParaEliminar.laboratorio || 'No especificado' }}</span>
+            </div>
+            <div class="detalle-item" *ngIf="medicamentoParaEliminar?.totalTratamientos > 0">
+                <span class="detalle-label">Tratamientos asociados</span>
+                <span class="detalle-valor" style="color: var(--warning);">{{ medicamentoParaEliminar.totalTratamientos
+                    }}</span>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="form-actions">
+                <button class="btn-cancelar" (click)="cerrarModalConfirmacion()">Cancelar</button>
+                <button class="btn-confirmar-eliminar" (click)="ejecutarEliminarMedicamento()"
+                    [disabled]="cargandoEliminar || medicamentoParaEliminar?.totalTratamientos > 0">
+                    <span class="spinner-small" *ngIf="cargandoEliminar"></span>
+                    {{ cargandoEliminar ? 'Eliminando...' : 'Si, Eliminar' }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

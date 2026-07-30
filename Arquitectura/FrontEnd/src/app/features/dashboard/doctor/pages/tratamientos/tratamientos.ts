@@ -38,6 +38,9 @@ export class DoctorTratamientos implements OnInit {
     filterEstado: string = 'todos';
     searchTerm: string = '';
 
+    // Diccionario de pacientes por ID para mapear nombres
+    private pacientesMap: Map<number, any> = new Map();
+
     estadisticas = {
         total: 0,
         activos: 0,
@@ -161,6 +164,9 @@ export class DoctorTratamientos implements OnInit {
     async cargarDatos() {
         this.isLoading = true;
         try {
+            // Cargar pacientes primero para tener el mapa de nombres
+            await this.cargarPacientes();
+            // Luego cargar tratamientos
             await this.cargarTratamientos();
         } catch (error) {
             console.error('Error al cargar datos:', error);
@@ -171,17 +177,82 @@ export class DoctorTratamientos implements OnInit {
         }
     }
 
+    private async cargarPacientes() {
+        try {
+            const usuarios = await firstValueFrom(this.usersService.getUsuariosBackend());
+            if (Array.isArray(usuarios)) {
+                // Filtrar solo pacientes
+                const pacientes = usuarios.filter(u =>
+                    u.rol?.toLowerCase() === 'paciente' && u.activo !== false
+                );
+
+                // Crear mapa de pacientes por ID
+                this.pacientesMap.clear();
+                pacientes.forEach(p => {
+                    const id = p.idusuario || p.id;
+                    if (id) {
+                        this.pacientesMap.set(id, p);
+                    }
+                });
+
+                console.log('Pacientes cargados:', this.pacientesMap.size);
+            }
+        } catch (error) {
+            console.error('Error al cargar pacientes:', error);
+        }
+    }
+
     private async cargarTratamientos() {
         try {
             const data = await firstValueFrom(this.usersService.getTratamientos());
 
             if (Array.isArray(data)) {
-                this.tratamientos = data.map(t => ({
-                    ...t,
-                    nombreMedicamento: t.nombremedicamento || t.NombreMedicamento || 'Medicamento',
-                    fechaInicio: t.fechainicio || t.FechaInicio,
-                    fechaFin: t.fechafin || t.FechaFin
-                }));
+                this.tratamientos = data.map(t => {
+                    // Obtener el ID del paciente del tratamiento
+                    const pacienteId = t.idpaciente || t.IdPaciente || t.idPaciente;
+
+                    // Buscar el paciente en el mapa
+                    let nombreCompleto = 'Paciente';
+                    if (pacienteId && this.pacientesMap.has(pacienteId)) {
+                        const paciente = this.pacientesMap.get(pacienteId);
+                        const nombre = paciente.nombre || '';
+                        const apPaterno = paciente.apPaterno || '';
+                        const apMaterno = paciente.apMaterno || '';
+                        nombreCompleto = `${nombre} ${apPaterno} ${apMaterno}`.trim();
+                        if (!nombreCompleto) {
+                            nombreCompleto = paciente.correo || 'Paciente';
+                        }
+                    } else {
+                        // Fallback: intentar usar los campos que pueda tener el tratamiento
+                        const nombre = t.nombre || t.Nombre || '';
+                        const apPaterno = t.appaterno || t.ApPaterno || t.apPaterno || '';
+                        const apMaterno = t.apmaterno || t.ApMaterno || t.apMaterno || '';
+                        if (nombre || apPaterno || apMaterno) {
+                            nombreCompleto = `${nombre} ${apPaterno} ${apMaterno}`.trim();
+                        } else if (t.nombrepaciente) {
+                            nombreCompleto = t.nombrepaciente;
+                        } else if (t.paciente) {
+                            nombreCompleto = t.paciente;
+                        }
+                    }
+
+                    return {
+                        ...t,
+                        idtratamiento: t.idtratamiento || t.IdTratamiento || t.id,
+                        idpaciente: pacienteId,
+                        nombreMedicamento: t.nombremedicamento || t.NombreMedicamento || 'Medicamento',
+                        nombrePaciente: nombreCompleto,
+                        NombrePaciente: nombreCompleto,
+                        nombreCompleto: nombreCompleto,
+                        paciente: nombreCompleto,
+                        Paciente: nombreCompleto,
+                        fechaInicio: t.fechainicio || t.FechaInicio,
+                        fechaFin: t.fechafin || t.FechaFin,
+                        dosis: t.dosis || t.Dosis,
+                        frecuenciaHoras: t.frecuenciaHoras || t.frecuenciashoras || t.FrecuenciaHoras,
+                        activo: t.activo !== undefined ? t.activo : t.Activo
+                    };
+                });
 
                 this.calcularEstadisticas();
                 this.aplicarFiltro('todos');
