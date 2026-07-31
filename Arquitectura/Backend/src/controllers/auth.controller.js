@@ -15,7 +15,6 @@ const authController = {
       rol,
       telefono,
       genero,
-      // Nuevos campos de USUARIOS
       fechaNacimiento,
       curp,
       domicilio,
@@ -35,30 +34,20 @@ const authController = {
     }
 
     try {
-      // Dentro de register, para el rol 'Doctor'
       if (rol === "Doctor" && datosExtra.cedula) {
         try {
-          // Aseguramos que solo tomamos lo que está después de la coma
           const base64Data =
             datosExtra.cedula.split(",")[1] || datosExtra.cedula;
-
-          // Convertimos a Buffer de forma explícita
           const buffer = Buffer.from(base64Data, "base64");
-
-          // Validamos que el buffer tenga contenido
           if (buffer.length === 0) throw new Error("Buffer vacío");
-
           const data = await pdf(buffer);
           const texto = data.text.toUpperCase();
-
-          console.log("Palabras encontradas:", texto.length, "caracteres.");
 
           const esValido =
             texto.includes("CÉDULA PROFESIONAL") ||
             texto.includes("ESTADOS UNIDOS MEXICANOS");
 
           if (!esValido) {
-            console.log("PDF rechazado por falta de palabras clave.");
             return res
               .status(400)
               .json({ error: "El contenido del PDF no es válido." });
@@ -76,7 +65,6 @@ const authController = {
       const hash = await bcrypt.hash(contrasenia, 10);
       const pin = Math.floor(100000 + Math.random() * 900000).toString();
 
-      // 1. Insertar en USUARIOS con los nuevos campos
       const userRes = await db.query(
         `INSERT INTO USUARIOS (
           Nombre, ApPaterno, ApMaterno, Correo, Contrasenia, 
@@ -107,7 +95,6 @@ const authController = {
 
       const userId = userRes.rows[0].idusuario;
 
-      // 2. Insertar según Rol
       if (rol === "Doctor") {
         await db.query(
           `INSERT INTO DOCTORES (
@@ -141,8 +128,6 @@ const authController = {
           ],
         );
       } else if (rol === "Acompañante") {
-        // La fecha de nacimiento ahora se guarda en USUARIOS, no aquí
-        // Solo necesitamos la fecha de asignación
         const idPaciente = datosExtra.idPacienteAsociado || null;
         await db.query(
           `INSERT INTO ACOMPANANTES (
@@ -225,7 +210,6 @@ const authController = {
 
       const match = await bcrypt.compare(contrasenia, usuario.contrasenia);
       if (!match) {
-        // Incrementar intentos fallidos
         const nuevosIntentos = (usuario.intentosfallidos || 0) + 1;
         if (nuevosIntentos >= 3) {
           const tiempoBloqueo = new Date(Date.now() + 3 * 60000);
@@ -249,7 +233,6 @@ const authController = {
         return res.status(401).json({ error: "Credenciales inválidas" });
       }
 
-      // Resetear intentos fallidos en login exitoso
       await db.query(
         `UPDATE USUARIOS 
          SET IntentosFallidos = 0, BloqueadoHasta = NULL 
@@ -257,7 +240,6 @@ const authController = {
         [usuario.idusuario]
       );
 
-      // Generar Tokens
       const accessToken = jwt.sign(
         { id: usuario.idusuario, rol: usuario.rol },
         process.env.JWT_SECRET,
@@ -269,7 +251,6 @@ const authController = {
         { expiresIn: "7d" },
       );
 
-      // Guardar sesión en DB
       const fechaExp = new Date();
       fechaExp.setDate(fechaExp.getDate() + 7);
 
@@ -280,7 +261,6 @@ const authController = {
         [usuario.idusuario, refreshToken, deviceInfo, req.ip, fechaExp],
       );
 
-      // Responder con todos los datos incluyendo los nuevos campos
       res.json({
         accessToken,
         refreshToken,
@@ -292,8 +272,6 @@ const authController = {
         correo: usuario.correo,
         telefono: usuario.telefono,
         genero: usuario.genero,
-
-        // Nuevos campos
         fechaNacimiento: usuario.fechanacimiento,
         curp: usuario.curp,
         domicilio: usuario.domicilio,
@@ -301,14 +279,11 @@ const authController = {
         localidad: usuario.localidad,
         municipio: usuario.municipio,
         estado: usuario.estado,
-
-        // Datos específicos según rol
         nss: usuario.nss,
         tipoSangre: usuario.tiposangrepaciente,
         cedula: usuario.cedula,
         especialidad: usuario.especialidad,
         fechaAsignacion: usuario.fechaasignacion,
-
         pin: usuario.pinverificacion,
         pinVerificado: usuario.pinverificado,
       });
@@ -333,7 +308,6 @@ const authController = {
       const usuario = result.rows[0];
       const ahora = new Date();
 
-      // Verificar si sigue bloqueado
       if (usuario.bloqueadohasta && new Date(usuario.bloqueadohasta) > ahora) {
         const segundos = Math.ceil(
           (new Date(usuario.bloqueadohasta) - ahora) / 1000,
@@ -346,7 +320,6 @@ const authController = {
       }
 
       if (usuario.pinverificacion === pin) {
-        // ÉXITO: Resetear contadores
         await db.query(
           `UPDATE USUARIOS 
            SET PinVerificado = TRUE, IntentosFallidos = 0, BloqueadoHasta = NULL 
@@ -355,11 +328,10 @@ const authController = {
         );
         return res.json({ message: "¡PIN verificado correctamente!" });
       } else {
-        // FALLO: Incrementar intentos
         const nuevosIntentos = (usuario.intentosfallidos || 0) + 1;
 
         if (nuevosIntentos >= 3) {
-          const tiempoBloqueo = new Date(ahora.getTime() + 3 * 60000); // 3 min
+          const tiempoBloqueo = new Date(ahora.getTime() + 3 * 60000);
           await db.query(
             `UPDATE USUARIOS 
              SET IntentosFallidos = $1, BloqueadoHasta = $2 
@@ -400,7 +372,6 @@ const authController = {
 
       const usuario = result.rows[0];
 
-      // Generar nuevo PIN
       const nuevoPin = Math.floor(100000 + Math.random() * 900000).toString();
       await db.query(
         `UPDATE USUARIOS 
@@ -428,7 +399,6 @@ const authController = {
       correo,
       genero,
       rol,
-      // Nuevos campos opcionales para Google
       fechaNacimiento,
       curp,
       domicilio,
@@ -453,7 +423,6 @@ const authController = {
       let usuario;
 
       if (result.rows.length === 0) {
-        // 2. REGISTRO AUTOMÁTICO (Primer inicio de sesión con Google)
         await db.query("BEGIN");
         try {
           const nuevoPin = Math.floor(
@@ -491,7 +460,6 @@ const authController = {
 
           usuario = nuevoUser.rows[0];
 
-          // 3. INSERCIÓN EN TABLA DE ENTIDAD SEGÚN EL ROL
           const rolNormalizado = rolAsignar.toLowerCase();
 
           switch (rolNormalizado) {
@@ -502,7 +470,6 @@ const authController = {
                 [usuario.idusuario],
               );
               break;
-
             case "medico":
             case "doctor":
               await db.query(
@@ -512,7 +479,6 @@ const authController = {
                 [usuario.idusuario],
               );
               break;
-
             case "acompanante":
             case "acompañante":
               await db.query(
@@ -522,7 +488,6 @@ const authController = {
                 [usuario.idusuario],
               );
               break;
-
             case "admin":
             case "administrador":
               await db.query(
@@ -532,7 +497,6 @@ const authController = {
                 [usuario.idusuario],
               );
               break;
-
             default:
               await db.query(
                 `INSERT INTO PACIENTES (IdUsuario) VALUES ($1) 
@@ -548,11 +512,9 @@ const authController = {
           throw insertError;
         }
       } else {
-        // 4. LOGIN NORMAL (El usuario ya existía)
         usuario = result.rows[0];
       }
 
-      // 5. Generar Token JWT
       let accessToken = null;
       if (usuario.pinverificado) {
         accessToken = jwt.sign(
@@ -569,8 +531,6 @@ const authController = {
         apMaterno: usuario.apmaterno,
         correo: correo,
         genero: usuario.genero,
-
-        // Nuevos campos
         fechaNacimiento: usuario.fechanacimiento,
         curp: usuario.curp,
         domicilio: usuario.domicilio,
@@ -578,7 +538,6 @@ const authController = {
         localidad: usuario.localidad,
         municipio: usuario.municipio,
         estado: usuario.estado,
-
         pin: usuario.pinverificacion,
         pinVerificado: usuario.pinverificado,
         accessToken: accessToken,
@@ -590,7 +549,6 @@ const authController = {
     }
   },
 
-  // Método para obtener perfil completo del usuario
   getPerfilUsuario: async (req, res) => {
     const { uid } = req.params;
 
@@ -625,7 +583,6 @@ const authController = {
     }
   },
 
-  // Método para actualizar perfil
   actualizarPerfil: async (req, res) => {
     const { uid } = req.params;
     const {
@@ -641,7 +598,6 @@ const authController = {
       localidad,
       municipio,
       estado,
-      // Datos específicos según rol
       nss,
       tipoSangre,
       peso,
@@ -654,7 +610,6 @@ const authController = {
     try {
       await db.query("BEGIN");
 
-      // Actualizar USUARIOS
       await db.query(
         `UPDATE USUARIOS 
         SET 
@@ -679,7 +634,6 @@ const authController = {
         ]
       );
 
-      // Obtener rol del usuario
       const rolResult = await db.query(
         `SELECT Rol FROM USUARIOS WHERE IdUsuario = $1`,
         [uid]
@@ -692,7 +646,6 @@ const authController = {
 
       const rol = rolResult.rows[0].rol;
 
-      // Actualizar según rol
       if (rol === "Paciente") {
         await db.query(
           `UPDATE PACIENTES 
@@ -731,7 +684,6 @@ const authController = {
     }
   },
 
-  // Logout
   logout: async (req, res) => {
     const { refreshToken } = req.body;
 
@@ -747,7 +699,6 @@ const authController = {
     }
   },
 
-  // Refresh Token
   refreshToken: async (req, res) => {
     const { refreshToken } = req.body;
 
@@ -756,7 +707,6 @@ const authController = {
     }
 
     try {
-      // Verificar que el refresh token existe en la BD
       const result = await db.query(
         `SELECT IdUsuario, FechaExpiracion FROM SESIONES 
          WHERE RefreshToken = $1 AND FechaExpiracion > NOW()`,
@@ -769,7 +719,6 @@ const authController = {
 
       const { idusuario } = result.rows[0];
 
-      // Obtener usuario para generar nuevo token
       const userResult = await db.query(
         `SELECT IdUsuario, Rol FROM USUARIOS WHERE IdUsuario = $1`,
         [idusuario]
@@ -781,7 +730,6 @@ const authController = {
 
       const usuario = userResult.rows[0];
 
-      // Generar nuevo access token
       const newAccessToken = jwt.sign(
         { id: usuario.idusuario, rol: usuario.rol },
         process.env.JWT_SECRET,

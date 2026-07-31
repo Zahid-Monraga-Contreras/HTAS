@@ -18,6 +18,7 @@ import { MedicamentoDetalle } from './pages/medicamentos/medicamento-detalle/med
 import { Dispositivos } from './pages/dispositivos/dispositivos';
 import { DispositivoDetalle } from './pages/dispositivos/dispositivo-detalle/dispositivo-detalle';
 import { Configuracion } from './pages/configuracion/configuracion';
+import { Solicitudes } from './pages/solicitudes/solicitudes';
 import { authGuard } from '../../../core/guards/auth.guard';
 import { roleGuard } from '../../../core/guards/role.guard';
 
@@ -47,6 +48,7 @@ export const ADMIN_ROUTES: Routes = [
             { path: 'dispositivos/editar/:id', component: DispositivoDetalle },
             { path: 'notificaciones', component: Notificaciones },
             { path: 'configuracion', component: Configuracion },
+            { path: 'solicitudes', component: Solicitudes },
         ]
     }
 ];

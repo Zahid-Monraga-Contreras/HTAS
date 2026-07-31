@@ -16,6 +16,7 @@ const pagosRoutes = require('./routes/pagos.routes');
 const contactoRoutes = require('./routes/contacto.routes');
 const googlefitRoutes = require('./routes/googlefit.routes');
 const algorithmRoutes = require('./routes/algorithm.routes');
+const solicitudesRoutes = require('./routes/solicitudes.routes');
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use('/api/pagos', pagosRoutes);
 app.use('/api/contacto', contactoRoutes);
 app.use('/api/googlefit', googlefitRoutes);
 app.use('/api/algorithm', algorithmRoutes);
+app.use('/api/solicitudes', solicitudesRoutes);
 
 // Ruta de prueba para verificar que el servidor funciona
 app.get('/', (req, res) => {
@@ -61,6 +63,15 @@ app.get('/', (req, res) => {
                 'POST /api/algorithm/analizar': 'Analizar con un PDF (requiere autenticación)',
                 'POST /api/algorithm/analizar-completo': 'Analizar con dos PDFs (requiere autenticación)',
                 'GET /api/algorithm/estado': 'Verificar estado del sistema'
+            },
+            solicitudes: {
+                'POST /api/solicitudes/solicitar/:idAcompanante': 'Solicitar asignación de paciente',
+                'GET /api/solicitudes/mis-solicitudes/:idAcompanante': 'Obtener solicitudes del acompañante',
+                'GET /api/solicitudes/mis-pacientes/:idAcompanante': 'Obtener pacientes asignados',
+                'GET /api/solicitudes/pendientes': 'Obtener solicitudes pendientes (solo admin)',
+                'PUT /api/solicitudes/aprobar/:idSolicitud': 'Aprobar solicitud (solo admin)',
+                'PUT /api/solicitudes/rechazar/:idSolicitud': 'Rechazar solicitud (solo admin)',
+                'DELETE /api/solicitudes/asignacion/:idAsignacion': 'Eliminar asignación (solo admin)'
             }
         }
     });

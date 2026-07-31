@@ -67,11 +67,10 @@ export const routes: Routes = [
     loadChildren: () => import('./features/dashboard/doctor/doctor.routes').then(m => m.DOCTOR_ROUTES)
   },
 
-  /*
   {
     path: 'caregiver',
     loadChildren: () => import('./features/dashboard/caregiver/caregiver.routes').then(m => m.CAREGIVER_ROUTES)
-  },*/
+  },
 
   {
     path: '**',

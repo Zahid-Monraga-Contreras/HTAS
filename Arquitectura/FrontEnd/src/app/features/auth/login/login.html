@@ -30,8 +30,8 @@
             <input [type]="showLoginPassword ? 'text' : 'password'" formControlName="Password" placeholder="Contraseña">
             <i class="bi" [ngClass]="showLoginPassword ? 'bi-eye-slash' : 'bi-eye'" (click)="toggleLoginPassword()"></i>
           </div>
-          <re-captcha formControlName="recaptcha" [formGroup]="loginForm" [siteKey]="recaptchaSiteKey"
-            (resolved)="onCaptchaLoginResolved($event)">
+          <re-captcha #recaptchaLogin mode="invisible" formControlName="recaptcha" [formGroup]="loginForm"
+            [siteKey]="recaptchaSiteKey" (resolved)="onCaptchaLoginResolved($event)">
           </re-captcha>
           <button type="button" class="button google-style" (click)="onLoginWithEmailPassword()"
             [disabled]="loading || loginForm.invalid">
@@ -229,8 +229,8 @@
 
         <!-- reCAPTCHA - Movido ARRIBA de los botones -->
         <div *ngIf="currentStep === 3" class="recaptcha-wrapper">
-          <re-captcha formControlName="recaptcha" [formGroup]="registerForm" [siteKey]="recaptchaSiteKey"
-            (resolved)="onCaptchaRegisterResolved($event)">
+          <re-captcha #recaptchaRegister mode="invisible" formControlName="recaptcha" [formGroup]="registerForm"
+            [siteKey]="recaptchaSiteKey" (resolved)="onCaptchaRegisterResolved($event)">
           </re-captcha>
         </div>
 

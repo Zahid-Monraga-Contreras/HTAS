@@ -775,6 +775,114 @@ CREATE TRIGGER update_dispositivos_updated_at
     BEFORE UPDATE ON DISPOSITIVOS 
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+	-- ============================================
+-- TABLA: SOLICITUDES_ASIGNACION
+-- ============================================
+CREATE TABLE SOLICITUDES_ASIGNACION (
+    IdSolicitud SERIAL PRIMARY KEY,
+    IdAcompanante INT NOT NULL REFERENCES USUARIOS(IdUsuario) ON DELETE CASCADE,
+    IdPaciente INT NOT NULL REFERENCES PACIENTES(IdUsuario) ON DELETE CASCADE,
+    Parentesco VARCHAR(50), -- Ej: Hermano, Tio, Primo, Padre, Madre
+    Notas TEXT,
+    Estado VARCHAR(20) DEFAULT 'pendiente' CHECK (
+        Estado IN ('pendiente', 'aprobada', 'rechazada')
+    ),
+    IdAprobador INT REFERENCES USUARIOS(IdUsuario) ON DELETE SET NULL,
+    FechaSolicitud TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FechaAprobacion TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(IdAcompanante, IdPaciente)
+);
+
+SELECT  *  FROM  SOLICITUDES_ASIGNACION  
+
+-- ============================================
+-- TABLA: ASIGNACIONES_PACIENTES
+-- ============================================
+CREATE TABLE ASIGNACIONES_PACIENTES (
+    IdAsignacion SERIAL PRIMARY KEY,
+    IdAcompanante INT NOT NULL REFERENCES USUARIOS(IdUsuario) ON DELETE CASCADE,
+    IdPaciente INT NOT NULL REFERENCES PACIENTES(IdUsuario) ON DELETE CASCADE,
+    IdAprobador INT REFERENCES USUARIOS(IdUsuario) ON DELETE SET NULL,
+    FechaAsignacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    Activo BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(IdAcompanante, IdPaciente)
+);
+
+-- ============================================
+-- TRIGGERS PARA updated_at
+-- ============================================
+CREATE TRIGGER update_solicitudes_asignacion_updated_at 
+    BEFORE UPDATE ON SOLICITUDES_ASIGNACION 
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_asignaciones_pacientes_updated_at 
+    BEFORE UPDATE ON ASIGNACIONES_PACIENTES 
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- ============================================
+-- VISTA PARA VER SOLICITUDES CON DETALLES
+-- ============================================
+CREATE OR REPLACE VIEW VW_SOLICITUDES_ASIGNACION AS
+SELECT 
+    s.IdSolicitud,
+    s.IdAcompanante,
+    ua.Nombre AS NombreAcompanante,
+    ua.ApPaterno AS ApPaternoAcompanante,
+    ua.ApMaterno AS ApMaternoAcompanante,
+    ua.Correo AS CorreoAcompanante,
+    ua.Telefono AS TelefonoAcompanante,
+    s.IdPaciente,
+    up.Nombre AS NombrePaciente,
+    up.ApPaterno AS ApPaternoPaciente,
+    up.ApMaterno AS ApMaternoPaciente,
+    up.Correo AS CorreoPaciente,
+    s.Parentesco,
+    s.Notas,
+    s.Estado,
+    s.IdAprobador,
+    uap.Nombre AS NombreAprobador,
+    s.FechaSolicitud,
+    s.FechaAprobacion,
+    s.created_at,
+    s.updated_at
+FROM SOLICITUDES_ASIGNACION s
+INNER JOIN USUARIOS ua ON s.IdAcompanante = ua.IdUsuario
+INNER JOIN PACIENTES p ON s.IdPaciente = p.IdUsuario
+INNER JOIN USUARIOS up ON p.IdUsuario = up.IdUsuario
+LEFT JOIN USUARIOS uap ON s.IdAprobador = uap.IdUsuario
+WHERE ua.deleted_at IS NULL AND up.deleted_at IS NULL;
+
+-- ============================================
+-- VISTA PARA VER ASIGNACIONES ACTIVAS
+-- ============================================
+CREATE OR REPLACE VIEW VW_ASIGNACIONES_ACTIVAS AS
+SELECT 
+    a.IdAsignacion,
+    a.IdAcompanante,
+    ua.Nombre AS NombreAcompanante,
+    ua.ApPaterno AS ApPaternoAcompanante,
+    ua.ApMaterno AS ApMaternoAcompanante,
+    ua.Correo AS CorreoAcompanante,
+    a.IdPaciente,
+    up.Nombre AS NombrePaciente,
+    up.ApPaterno AS ApPaternoPaciente,
+    up.ApMaterno AS ApMaternoPaciente,
+    up.Correo AS CorreoPaciente,
+    a.IdAprobador,
+    uap.Nombre AS NombreAprobador,
+    a.FechaAsignacion,
+    a.Activo
+FROM ASIGNACIONES_PACIENTES a
+INNER JOIN USUARIOS ua ON a.IdAcompanante = ua.IdUsuario
+INNER JOIN PACIENTES p ON a.IdPaciente = p.IdUsuario
+INNER JOIN USUARIOS up ON p.IdUsuario = up.IdUsuario
+LEFT JOIN USUARIOS uap ON a.IdAprobador = uap.IdUsuario
+WHERE a.Activo = true AND ua.deleted_at IS NULL AND up.deleted_at IS NULL;
+
 -- ============================================
 -- FIN DEL SCRIPT
 -- ============================================

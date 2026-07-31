@@ -768,4 +768,61 @@ export class Users {
   getNotificacionesAcompanante(idUsuario: string | number): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/auth/notificaciones-acompanante/${idUsuario}`);
   }
+
+  // ==========================================================================
+  // --- GESTIÓN DE SOLICITUDES DE ASIGNACIÓN ---
+  // ==========================================================================
+
+  /**
+   * Solicitar asignación a un paciente (Acompañante)
+   */
+  solicitarAsignacionPaciente(idAcompanante: number, data: {
+    correoPaciente: string;
+    parentesco: string;
+    notas: string;
+  }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/solicitudes/solicitar/${idAcompanante}`, data);
+  }
+
+  /**
+   * Obtener mis solicitudes (Acompañante)
+   */
+  getMisSolicitudes(idAcompanante: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/solicitudes/mis-solicitudes/${idAcompanante}`);
+  }
+
+  /**
+   * Obtener pacientes asignados a un acompañante
+   */
+  getPacientesAsignados(idAcompanante: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/solicitudes/mis-pacientes/${idAcompanante}`);
+  }
+
+  /**
+   * Obtener todas las solicitudes pendientes (Admin)
+   */
+  getSolicitudesPendientes(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/solicitudes/pendientes`);
+  }
+
+  /**
+   * Aprobar solicitud (Admin)
+   */
+  aprobarSolicitud(idSolicitud: number, idAdmin: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/solicitudes/aprobar/${idSolicitud}`, { idAdmin });
+  }
+
+  /**
+   * Rechazar solicitud (Admin)
+   */
+  rechazarSolicitud(idSolicitud: number, idAdmin: number, motivo?: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/solicitudes/rechazar/${idSolicitud}`, { idAdmin, motivo });
+  }
+
+  /**
+   * Eliminar asignación (Admin)
+   */
+  eliminarAsignacion(idAsignacion: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/solicitudes/asignacion/${idAsignacion}`);
+  }
 }

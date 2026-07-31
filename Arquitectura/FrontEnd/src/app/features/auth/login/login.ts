@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectorRef, NgZone, PLATFORM_ID } from '@angular/core';
+import { Component, inject, ChangeDetectorRef, NgZone, PLATFORM_ID, AfterViewInit, ViewChild } from '@angular/core';
 import { Auth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from '@angular/fire/auth';
 import { Firestore, doc, getDoc, setDoc } from '@angular/fire/firestore';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
@@ -9,7 +9,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import flatpickr from 'flatpickr';
 import { Spanish } from 'flatpickr/dist/l10n/es.js';
 import { Users } from '../../../core/services/users.service';
-import { RecaptchaModule, RecaptchaFormsModule } from 'ng-recaptcha';
+import { RecaptchaModule, RecaptchaFormsModule, RecaptchaComponent } from 'ng-recaptcha';
 import { environment } from '../../../../environments/environment';
 
 @Component({
@@ -26,7 +26,7 @@ import { environment } from '../../../../environments/environment';
   styleUrl: './login.css',
 })
 
-export class Login {
+export class Login implements AfterViewInit {
   private googleService = inject(GoogleService);
   private auth = inject(Auth);
   private firestore = inject(Firestore);
@@ -69,6 +69,9 @@ export class Login {
 
   recaptchaSiteKey = environment.recaptchaSiteKey;
 
+  @ViewChild('recaptchaLogin') recaptchaLoginComponent!: RecaptchaComponent;
+  @ViewChild('recaptchaRegister') recaptchaRegisterComponent!: RecaptchaComponent;
+
   constructor(public users: Users, private fb: FormBuilder) {
     this.registerForm = this.fb.group({
       NombreCompleto: ['', [Validators.required, Validators.maxLength(100), soloLetrasValidator()]],
@@ -97,6 +100,42 @@ export class Login {
     });
 
     this.configurarLimitesFecha();
+  }
+
+  ngAfterViewInit() {
+    if (isPlatformBrowser(this.platformId)) {
+      const isMobile = window.innerWidth < 768;
+      if (isMobile) {
+        setTimeout(() => {
+          this.recargarCaptchaLogin();
+          this.recargarCaptchaRegister();
+        }, 500);
+      }
+    }
+  }
+
+  recargarCaptchaLogin() {
+    if (this.recaptchaLoginComponent) {
+      try {
+        this.recaptchaLoginComponent.reset();
+        this.captchaTokenLogin = null;
+        this.loginForm.get('recaptcha')?.setValue(null);
+      } catch (error) {
+        console.warn('Error al recargar reCAPTCHA login:', error);
+      }
+    }
+  }
+
+  recargarCaptchaRegister() {
+    if (this.recaptchaRegisterComponent) {
+      try {
+        this.recaptchaRegisterComponent.reset();
+        this.captchaTokenRegister = null;
+        this.registerForm.get('recaptcha')?.setValue(null);
+      } catch (error) {
+        console.warn('Error al recargar reCAPTCHA register:', error);
+      }
+    }
   }
 
   passwordMatchValidator(group: FormGroup): any {
@@ -283,6 +322,22 @@ export class Login {
     });
   }
 
+  private guardarToken(token: string): void {
+    if (!token) {
+      console.warn('No se proporcionó token para guardar');
+      return;
+    }
+
+    console.log('Guardando token:', token.substring(0, 30) + '...');
+
+    localStorage.setItem('access_token', token);
+    localStorage.setItem('token', token);
+    localStorage.setItem('accessToken', token);
+
+    const verificado = localStorage.getItem('access_token');
+    console.log('Token verificado en localStorage:', verificado ? 'Sí' : 'No');
+  }
+
   async onSubmitSignUp(): Promise<void> {
     if (!this.captchaTokenRegister) {
       this.openModal('Verificacion requerida', 'Por favor completa el reCAPTCHA.', 'modal-error');
@@ -359,8 +414,9 @@ export class Login {
         this.loading = false;
 
         if (res) {
-          if (res.accessToken) {
-            localStorage.setItem('token', res.accessToken);
+          const token = res.accessToken || res.token;
+          if (token) {
+            this.guardarToken(token);
           }
 
           const userData = {
@@ -433,11 +489,13 @@ export class Login {
           this.loading = false;
 
           if (res) {
-            if (res.token || res.accessToken) {
-              localStorage.setItem('token', res.token || res.accessToken);
+            const token = res.token || res.accessToken;
+            if (token) {
+              this.guardarToken(token);
+            } else {
+              console.warn('No se recibió token en la respuesta');
             }
 
-            // IMPORTANTE: El ID viene en el campo 'uid' como número
             const userId = res.uid || res.idusuario || res.id || res.idUsuario || res.userId || null;
 
             const nombre = res.nombre || '';
@@ -510,8 +568,9 @@ export class Login {
         console.log('PIN verification response:', res);
         this.loading = false;
 
-        if (res.accessToken) {
-          localStorage.setItem('token', res.accessToken);
+        const token = res.accessToken || res.token;
+        if (token) {
+          this.guardarToken(token);
         }
 
         const userData = {

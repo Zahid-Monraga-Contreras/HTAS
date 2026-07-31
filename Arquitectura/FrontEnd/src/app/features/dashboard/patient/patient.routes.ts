@@ -6,7 +6,6 @@ import { PatientCitas } from './pages/citas/citas';
 import { PatientTratamientos } from './pages/tratamientos/tratamientos';
 import { PatientMedicamentos } from './pages/medicamentos/medicamentos';
 import { PatientDispositivos } from './pages/dispositivos/dispositivos';
-import { PatientConfiguracion } from './pages/configuracion/configuracion';
 import { PatientPerfil } from './template/perfil/perfil';
 import { PatientNotificaciones } from './template/notificaciones/notificaciones';
 
@@ -35,7 +34,6 @@ export const PATIENT_ROUTES: Routes = [
             { path: 'dispositivos', component: PatientDispositivos },
             { path: 'dispositivos/detalle/:id', component: PatientDispositivos },
 
-            { path: 'configuracion', component: PatientConfiguracion },
         ]
     }
 ];

@@ -1,0 +1,180 @@
+<app-caregiver-menu></app-caregiver-menu>
+
+<div class="pacientes-container">
+    <header class="page-header">
+        <div class="header-content">
+            <div class="header-text">
+                <h1>Mis Pacientes</h1>
+                <p>Pacientes asignados a tu cuidado</p>
+            </div>
+            <button class="btn-solicitar" (click)="abrirModalSolicitud()" [disabled]="solicitudPendiente">
+                <i class="bi bi-person-plus"></i>
+                <span>Solicitar Acceso</span>
+            </button>
+        </div>
+    </header>
+
+    <div *ngIf="solicitudPendiente" class="solicitud-pendiente-banner">
+        <i class="bi bi-clock-history"></i>
+        <span class="banner-text">{{ mensajeSolicitud }}</span>
+        <span class="badge-pendiente">Pendiente</span>
+    </div>
+
+    <div class="search-section">
+        <div class="search-box">
+            <i class="bi bi-search"></i>
+            <input type="text" [(ngModel)]="searchTerm" (input)="buscarPacientes()"
+                placeholder="Buscar por nombre, correo o NSS..." class="search-input" />
+            <button *ngIf="searchTerm" class="btn-clear" (click)="limpiarFiltros()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="filter-section">
+            <select class="filter-select" [(ngModel)]="filterGenero" (change)="buscarPacientes()">
+                <option value="">Todos los generos</option>
+                <option value="Masculino">Masculino</option>
+                <option value="Femenino">Femenino</option>
+                <option value="Otro">Otro</option>
+            </select>
+
+            <select class="filter-select" [(ngModel)]="filterEstado" (change)="buscarPacientes()">
+                <option value="">Todos los estados</option>
+                <option value="activo">Activos</option>
+                <option value="inactivo">Inactivos</option>
+            </select>
+        </div>
+    </div>
+
+    <div *ngIf="isLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Cargando pacientes...</p>
+    </div>
+
+    <div *ngIf="!isLoading" class="pacientes-content">
+        <div class="results-count" *ngIf="filteredPacientes.length > 0">
+            <span>{{ filteredPacientes.length }} pacientes encontrados</span>
+        </div>
+
+        <div class="pacientes-list">
+            <div *ngFor="let paciente of filteredPacientes" class="paciente-card" (click)="verDetalle(paciente)">
+                <div class="paciente-avatar">
+                    <img [src]="getAvatarUrl(paciente.nombre, paciente.apPaterno)" alt="Avatar">
+                    <span class="estado-indicador" [class.activo]="paciente.activo !== false"
+                        [class.inactivo]="paciente.activo === false"></span>
+                </div>
+                <div class="paciente-info">
+                    <h3>{{ paciente.nombre }} {{ paciente.apPaterno }} {{ paciente.apMaterno }}</h3>
+                    <p class="paciente-email">
+                        <i class="bi bi-envelope"></i> {{ paciente.correo }}
+                    </p>
+                    <div class="paciente-detalles">
+                        <span *ngIf="paciente.telefono" class="detalle">
+                            <i class="bi bi-phone"></i> {{ paciente.telefono }}
+                        </span>
+                        <span *ngIf="paciente.nss" class="detalle">
+                            <i class="bi bi-card-text"></i> NSS: {{ paciente.nss }}
+                        </span>
+                        <span *ngIf="paciente.genero" class="detalle">
+                            <i class="bi bi-gender-ambiguous"></i> {{ paciente.genero }}
+                        </span>
+                    </div>
+                </div>
+                <div class="paciente-actions">
+                    <span class="badge" [class]="getEstadoClass(paciente.activo !== false)">
+                        {{ getEstadoTexto(paciente.activo !== false) }}
+                    </span>
+                    <i class="bi bi-chevron-right arrow-icon"></i>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="filteredPacientes.length === 0 && pacientes.length > 0" class="empty-state">
+            <div class="empty-icon">
+                <i class="bi bi-search"></i>
+            </div>
+            <h3>No se encontraron pacientes</h3>
+            <p>Intenta con otros filtros o busca por otro termino</p>
+            <button class="btn-primary" (click)="limpiarFiltros()">
+                <i class="bi bi-arrow-counterclockwise"></i>
+                <span>Limpiar filtros</span>
+            </button>
+        </div>
+
+        <div *ngIf="pacientes.length === 0" class="empty-state">
+            <div class="empty-icon">
+                <i class="bi bi-people"></i>
+            </div>
+            <h3>No tienes pacientes asignados</h3>
+            <p>Solicita acceso a un paciente para comenzar a dar seguimiento</p>
+            <button class="btn-primary" (click)="abrirModalSolicitud()" [disabled]="solicitudPendiente">
+                <i class="bi bi-person-plus"></i>
+                <span>Solicitar Acceso</span>
+            </button>
+            <p *ngIf="solicitudPendiente" class="solicitud-texto">
+                <i class="bi bi-clock-history"></i> Tienes una solicitud pendiente
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" *ngIf="mostrarModalSolicitud">
+    <div class="modal-content modal-solicitud">
+        <div class="modal-header">
+            <h2><i class="bi bi-person-plus"></i> Solicitar Acceso a Paciente</h2>
+            <button class="btn-close-modal" (click)="cerrarModalSolicitud()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <p class="modal-subtitle">Ingresa los datos del paciente al que deseas tener acceso</p>
+
+            <div class="form-group">
+                <label>Correo electronico del paciente *</label>
+                <input type="email" [(ngModel)]="correoPaciente" placeholder="ejemplo@correo.com" class="form-control">
+                <small>Ingresa el correo con el que el paciente se registro</small>
+            </div>
+
+            <div class="form-group">
+                <label>Parentesco o relacion</label>
+                <select [(ngModel)]="parentesco" class="form-control">
+                    <option value="">Selecciona...</option>
+                    <option *ngFor="let p of parentescos" [value]="p">{{ p }}</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Notas adicionales</label>
+                <textarea [(ngModel)]="notas" rows="3"
+                    placeholder="Describe tu relacion con el paciente, motivo de la solicitud..."
+                    class="form-control"></textarea>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-cancelar" (click)="cerrarModalSolicitud()">Cancelar</button>
+            <button class="btn-enviar" (click)="enviarSolicitud()" [disabled]="enviandoSolicitud">
+                <i class="bi bi-send"></i>
+                {{ enviandoSolicitud ? 'Enviando...' : 'Enviar Solicitud' }}
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container">
+    <div *ngFor="let toast of toastNotifications" class="toast-notification toast-{{ toast.type }}"
+        [class.toast-exit]="toast.duration === 0">
+        <div class="toast-icon">
+            <i class="bi" [class]="getToastIcon(toast.type)"></i>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title">{{ toast.title }}</div>
+            <div class="toast-message">{{ toast.message }}</div>
+        </div>
+        <button class="toast-close" (click)="cerrarToast(toast.id)">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        <div class="toast-progress" [style.animation-duration]="(toast.duration || 4000) + 'ms'"></div>
+    </div>
+</div>

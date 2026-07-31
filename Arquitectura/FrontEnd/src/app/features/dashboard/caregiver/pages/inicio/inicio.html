@@ -1,0 +1,155 @@
+<app-caregiver-menu></app-caregiver-menu>
+
+<div class="caregiver-dashboard">
+    <header class="dashboard-header">
+        <div class="header-top">
+            <div class="greeting-section">
+                <p class="greeting-label">Hola</p>
+                <h1 class="greeting-name">{{ caregiverFullName || caregiverName || 'Acompanante' }}</h1>
+                <p class="greeting-sub">Bienvenido a tu panel de acompanante</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn-fab" routerLink="/caregiver/perfil" aria-label="Ver perfil">
+                    <i class="bi bi-person-fill"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div *ngIf="isLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Cargando tu informacion...</p>
+    </div>
+
+    <div *ngIf="!isLoading" class="dashboard-content">
+
+        <section class="welcome-card">
+            <div class="welcome-bg"></div>
+            <div class="welcome-content">
+                <div class="welcome-text">
+                    <span class="welcome-badge">Acompanante</span>
+                    <h2>Resumen de Acompanamiento</h2>
+                    <p>Aqui tienes un resumen de tu actividad</p>
+                </div>
+                <div class="welcome-stats">
+                    <div class="stat-item" routerLink="/caregiver/pacientes" style="cursor: pointer;">
+                        <span class="stat-number">{{ metrics.totalPacientes }}</span>
+                        <span class="stat-label">Pacientes</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item" routerLink="/caregiver/citas" style="cursor: pointer;">
+                        <span class="stat-number">{{ metrics.citasProgramadas }}</span>
+                        <span class="stat-label">Citas</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item" routerLink="/caregiver/tratamientos" style="cursor: pointer;">
+                        <span class="stat-number">{{ metrics.tratamientosActivos }}</span>
+                        <span class="stat-label">Tratamientos</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="quick-metrics">
+            <div class="metric-item" routerLink="/caregiver/pacientes">
+                <div class="metric-icon" style="background: #b0001e15; color: #b0001e;">
+                    <i class="bi bi-people"></i>
+                </div>
+                <div class="metric-info">
+                    <span class="metric-value">{{ metrics.totalPacientes }}</span>
+                    <span class="metric-label">Total Pacientes</span>
+                </div>
+                <i class="bi bi-chevron-right metric-arrow"></i>
+            </div>
+
+            <div class="metric-item" routerLink="/caregiver/citas">
+                <div class="metric-icon" style="background: #f59e0b15; color: #f59e0b;">
+                    <i class="bi bi-calendar-check"></i>
+                </div>
+                <div class="metric-info">
+                    <span class="metric-value">{{ metrics.citasProgramadas }}</span>
+                    <span class="metric-label">Citas Programadas</span>
+                </div>
+                <i class="bi bi-chevron-right metric-arrow"></i>
+            </div>
+
+            <div class="metric-item" routerLink="/caregiver/citas">
+                <div class="metric-icon" style="background: #ef444415; color: #ef4444;">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+                <div class="metric-info">
+                    <span class="metric-value">{{ metrics.citasPendientes }}</span>
+                    <span class="metric-label">Pendientes</span>
+                </div>
+                <i class="bi bi-chevron-right metric-arrow"></i>
+            </div>
+
+            <div class="metric-item" routerLink="/caregiver/tratamientos">
+                <div class="metric-icon" style="background: #10b98115; color: #10b981;">
+                    <i class="bi bi-heart-pulse"></i>
+                </div>
+                <div class="metric-info">
+                    <span class="metric-value">{{ metrics.tratamientosActivos }}</span>
+                    <span class="metric-label">Tratamientos Activos</span>
+                </div>
+                <i class="bi bi-chevron-right metric-arrow"></i>
+            </div>
+        </section>
+
+        <section class="section-card">
+            <div class="section-header">
+                <h2><i class="bi bi-calendar-event"></i> Citas Programadas</h2>
+                <a routerLink="/caregiver/citas" class="view-all">Ver todas</a>
+            </div>
+            <div class="citas-list">
+                <div *ngFor="let cita of citasProgramadas" class="cita-item" (click)="verDetalleCita(cita)">
+                    <div class="cita-date-badge">
+                        <span class="cita-day">{{ obtenerDia(cita.fechacita || cita.fecha) }}</span>
+                        <span class="cita-month">{{ obtenerMes(cita.fechacita || cita.fecha) }}</span>
+                    </div>
+                    <div class="cita-info">
+                        <h4>{{ cita.motivo || 'Consulta Medica' }}</h4>
+                        <p>
+                            <i class="bi bi-person"></i> {{ cita.paciente || cita.pacienteNombre || cita.nombrePaciente
+                            || 'Paciente' }}
+                            <span class="dot">•</span>
+                            <i class="bi bi-clock"></i> {{ cita.horacita || cita.hora || 'S/H' }}
+                        </p>
+                        <span class="badge" [class]="getEstadoClass(cita.estado)">
+                            {{ cita.estado || 'Programada' }}
+                        </span>
+                    </div>
+                </div>
+                <div *ngIf="!citasProgramadas.length" class="empty-state">
+                    <i class="bi bi-calendar-x"></i>
+                    <p>No hay citas programadas</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section-card">
+            <div class="section-header">
+                <h2><i class="bi bi-people"></i> Mis Pacientes</h2>
+                <a routerLink="/caregiver/pacientes" class="view-all">Ver todos</a>
+            </div>
+            <div class="pacientes-list">
+                <div *ngFor="let paciente of pacientesAsignados" class="paciente-item"
+                    (click)="verDetallePaciente(paciente)">
+                    <div class="paciente-avatar">
+                        <img [src]="getAvatarUrl(paciente.nombre, paciente.apPaterno)" alt="Avatar">
+                    </div>
+                    <div class="paciente-info">
+                        <h4>{{ paciente.nombre }} {{ paciente.apPaterno }} {{ paciente.apMaterno }}</h4>
+                        <p><i class="bi bi-envelope"></i> {{ paciente.correo }}</p>
+                    </div>
+                    <i class="bi bi-chevron-right paciente-arrow"></i>
+                </div>
+                <div *ngIf="!pacientesAsignados.length" class="empty-state">
+                    <i class="bi bi-people"></i>
+                    <p>No tienes pacientes asignados</p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>

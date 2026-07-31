@@ -32,7 +32,6 @@ export class Menu implements OnInit, OnDestroy {
   userRol: string = '';
   searchTerm: string = '';
 
-  // ESTRUCTURA CON RUTAS /admin/ Y PERMISOS POR DEFECTO PARA ADMIN
   private allNavItems = [
     {
       category: 'General',
@@ -69,7 +68,7 @@ export class Menu implements OnInit, OnDestroy {
         {
           route: '/admin/acompanantes',
           icon: 'bi-person-fill-add',
-          label: 'Acompanantes',
+          label: 'Acompañantes',
           queryParams: { canAdd: true, canEdit: true, canDelete: true }
         }
       ]
@@ -104,12 +103,23 @@ export class Menu implements OnInit, OnDestroy {
       ]
     },
     {
+      category: 'Solicitudes y Asignaciones',
+      items: [
+        {
+          route: '/admin/solicitudes',
+          icon: 'bi-list-check',
+          label: 'Solicitudes',
+          queryParams: { canAdd: false, canEdit: true, canDelete: true }
+        }
+      ]
+    },
+    {
       category: 'Cuenta',
       items: [
         {
           route: '/admin/configuracion',
           icon: 'bi-gear',
-          label: 'Configuracion',
+          label: 'Configuración',
           queryParams: { canAdd: false, canEdit: true, canDelete: false }
         }
       ]
@@ -181,119 +191,31 @@ export class Menu implements OnInit, OnDestroy {
 
     this.menuFiltrado = mapeoOriginal.filter((section: any) => {
 
-      // REGLAS PARA ROL: INVITADO
-      if (rol === 'invitado') {
-        if (section.category === 'Administración') return false;
-        if (section.category === 'Seguimiento') {
-          section.items.forEach((item: any) => {
-            item.queryParams = { canAdd: false, canEdit: false, canDelete: false };
-          });
-        }
-        if (section.category === 'Cuenta') {
-          section.items.forEach((item: any) => {
-            item.queryParams = { canAdd: false, canEdit: false, canDelete: false };
-          });
-        }
-      }
-
-      // REGLAS PARA ROL: PACIENTE
-      if (rol === 'paciente') {
-        if (section.category === 'Administración') {
-          section.items = section.items.filter((i: any) => i.route === '/admin/usuarios');
-          section.items.forEach((item: any) => {
-            item.queryParams = { canAdd: false, canEdit: false, canDelete: false };
-          });
-        }
-        if (section.category === 'Seguimiento') {
-          section.items.forEach((item: any) => {
-            if (item.route === '/admin/citas') {
-              item.queryParams = { canAdd: true, canEdit: false, canDelete: false };
-            }
-            if (item.route === '/admin/tratamientos' || item.route === '/admin/medicamentos') {
-              item.queryParams = { canAdd: false, canEdit: false, canDelete: false };
-            }
-            if (item.route === '/admin/dispositivos') {
-              item.queryParams = { canAdd: true, canEdit: false, canDelete: false };
-            }
-          });
-        }
-        if (section.category === 'Cuenta') {
-          section.items.forEach((item: any) => {
-            item.queryParams = { canAdd: false, canEdit: true, canDelete: false };
-          });
-        }
-      }
-
-      // REGLAS PARA ROL: ACOMPAÑANTE
-      if (rol === 'acompañante' || rol === 'acompanante') {
-        if (section.category === 'Administración') {
-          section.items = section.items.filter((i: any) => i.route === '/admin/usuarios');
-          section.items.forEach((item: any) => {
-            item.queryParams = { canAdd: false, canEdit: false, canDelete: false };
-          });
-        }
-        if (section.category === 'Seguimiento') {
-          section.items.forEach((item: any) => {
-            if (item.route === '/admin/citas') {
-              item.queryParams = { canAdd: false, canEdit: false, canDelete: false };
-            }
-            if (item.route === '/admin/tratamientos' || item.route === '/admin/medicamentos') {
-              item.queryParams = { canAdd: false, canEdit: false, canDelete: false };
-            }
-            if (item.route === '/admin/dispositivos') {
-              item.queryParams = { canAdd: false, canEdit: true, canDelete: false };
-            }
-          });
-        }
-        if (section.category === 'Cuenta') {
-          section.items.forEach((item: any) => {
-            item.queryParams = { canAdd: false, canEdit: true, canDelete: false };
-          });
-        }
-      }
-
-      // REGLAS PARA ROL: MÉDICO / DOCTOR
-      if (rol === 'doctor' || rol === 'medico') {
-        if (section.category === 'Administración') {
-          section.items = section.items.filter((i: any) => i.route !== '/admin/medicos');
-          section.items.forEach((item: any) => {
-            if (item.route === '/admin/pacientes' || item.route === '/admin/acompanantes') {
-              item.queryParams = { canAdd: true, canEdit: true, canDelete: true };
-            }
-            if (item.route === '/admin/usuarios') {
-              item.queryParams = { canAdd: false, canEdit: false, canDelete: false };
-            }
-          });
-        }
-        if (section.category === 'Seguimiento') {
-          section.items.forEach((item: any) => {
-            if (item.route === '/admin/tratamientos' || item.route === '/admin/medicamentos' || item.route === '/admin/dispositivos') {
-              item.queryParams = { canAdd: true, canEdit: true, canDelete: true };
-            }
-            if (item.route === '/admin/citas') {
-              item.queryParams = { canAdd: true, canEdit: true, canDelete: true };
-            }
-          });
-        }
-        if (section.category === 'Cuenta') {
-          section.items.forEach((item: any) => {
-            item.queryParams = { canAdd: false, canEdit: true, canDelete: false };
-          });
-        }
-      }
-
-      // REGLAS PARA ROL: ADMIN (todos los permisos)
+      // ADMIN - todos los permisos
       if (rol === 'admin' || rol === 'administrador') {
-        // Mantener todos los permisos por defecto (ya están en allNavItems)
-        // Solo aseguramos que Cuenta tenga editar
+        // Mantener todos los permisos por defecto
         if (section.category === 'Cuenta') {
           section.items.forEach((item: any) => {
             item.queryParams = { canAdd: false, canEdit: true, canDelete: false };
           });
         }
+        if (section.category === 'Solicitudes y Asignaciones') {
+          section.items.forEach((item: any) => {
+            if (item.route === '/admin/solicitudes') {
+              item.queryParams = { canAdd: false, canEdit: true, canDelete: true };
+            }
+          });
+        }
+        return true;
       }
 
-      return section.items.length > 0;
+      // OTROS ROLES - solo ven lo que les corresponde
+      // Si no es admin, solo mostrar general y cuenta
+      if (section.category === 'General' || section.category === 'Cuenta') {
+        return true;
+      }
+
+      return false;
     });
   }
 

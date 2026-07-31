@@ -10,6 +10,7 @@ export const environment = {
     tomasApi: 'http://localhost:3000/api/tomas',
     dispositivosApi: 'http://localhost:3000/api/dispositivos',
     medicionesApi: 'http://localhost:3000/api/mediciones',
+    solicitudesApi: 'http://localhost:3000/api/solicitudes',
 
     algorithmApi: 'http://localhost:3000/api/algorithm',
     algorithmAnalizar: 'http://localhost:3000/api/algorithm/analizar',

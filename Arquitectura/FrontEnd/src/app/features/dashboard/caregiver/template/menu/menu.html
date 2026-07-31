@@ -1,0 +1,16 @@
+<div class="caregiver-menu-container">
+
+    <!-- Barra de navegación inferior (Bottom Navigation) -->
+    <nav class="bottom-nav">
+        <div class="bottom-nav-items">
+            <a *ngFor="let item of menuItems" class="bottom-nav-item" [routerLink]="item.path" routerLinkActive="active"
+                #rla="routerLinkActive" (click)="cerrarMenu()">
+                <div class="nav-icon-wrapper">
+                    <i [class]="item.icon"></i>
+                    <span class="nav-label" *ngIf="rla.isActive">{{ item.label }}</span>
+                    <span class="badge-number" *ngIf="item.label === 'Notificaciones'">3</span>
+                </div>
+            </a>
+        </div>
+    </nav>
+</div>

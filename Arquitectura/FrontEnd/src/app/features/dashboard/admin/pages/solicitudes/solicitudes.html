@@ -1,0 +1,409 @@
+<app-menu #sidebar></app-menu>
+
+@if (mostrarToast) {
+<div class="toast-premium-container" [ngClass]="tipoToast">
+    <div class="toast-content">
+        @if (tipoToast === 'success') { <i class="bi bi-check-circle-fill icon-toast"></i> }
+        @if (tipoToast === 'error') { <i class="bi bi-exclamation-triangle-fill icon-toast"></i> }
+        @if (tipoToast === 'warning') { <i class="bi bi-exclamation-circle-fill icon-toast"></i> }
+        <span class="toast-message">{{ mensajeToast }}</span>
+    </div>
+</div>
+}
+
+<main class="main-content" [class.menu-collapsed]="sidebar.isCollapsed">
+    <div class="container-fluid">
+
+        <div class="header-section">
+            <div class="title-group">
+                <h2 class="title-page">Solicitudes y Asignaciones</h2>
+                <p class="subtitle-page">Gestiona las solicitudes de acceso de los acompañantes</p>
+            </div>
+            <div class="header-controls">
+                <button class="btn-cancel-premium" routerLink="/admin/acompanantes">
+                    <i class="bi bi-arrow-left"></i>
+                    <span>Volver</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- TABS -->
+        <div class="tabs-nav-wrapper">
+            <nav class="tabs-nav">
+                <button type="button" class="tab-btn" [class.active]="activeTab === 'pendientes'"
+                    (click)="cambiarTab('pendientes')">
+                    <i class="bi bi-clock-history"></i>
+                    <span>Pendientes</span>
+                    <span class="tab-badge" *ngIf="getTabCount('pendientes') > 0">
+                        {{ getTabCount('pendientes') }}
+                    </span>
+                </button>
+                <button type="button" class="tab-btn" [class.active]="activeTab === 'aprobadas'"
+                    (click)="cambiarTab('aprobadas')">
+                    <i class="bi bi-check-circle"></i>
+                    <span>Aprobadas</span>
+                    <span class="tab-badge" *ngIf="getTabCount('aprobadas') > 0">
+                        {{ getTabCount('aprobadas') }}
+                    </span>
+                </button>
+                <button type="button" class="tab-btn" [class.active]="activeTab === 'asignaciones'"
+                    (click)="cambiarTab('asignaciones')">
+                    <i class="bi bi-person-check"></i>
+                    <span>Asignaciones</span>
+                    <span class="tab-badge" *ngIf="getTabCount('asignaciones') > 0">
+                        {{ getTabCount('asignaciones') }}
+                    </span>
+                </button>
+            </nav>
+        </div>
+
+        @if (isLoading) {
+        <div class="loading-container">
+            <div class="spinner"></div>
+            <p>Cargando datos...</p>
+        </div>
+        }
+
+        @if (!isLoading) {
+        <!-- TAB: PENDIENTES -->
+        <div class="tab-content" *ngIf="activeTab === 'pendientes'">
+            <div class="solicitudes-list">
+                @if (solicitudesPendientes.length === 0) {
+                <div class="empty-state">
+                    <i class="bi bi-inbox"></i>
+                    <h3>No hay solicitudes pendientes</h3>
+                    <p>Todas las solicitudes han sido procesadas</p>
+                </div>
+                }
+
+                @for (solicitud of solicitudesPendientes; track solicitud.idsolicitud) {
+                <div class="solicitud-card">
+                    <div class="card-header">
+                        <div class="header-left">
+                            <span class="badge-estado" [class]="getEstadoClass(solicitud.estado)">
+                                <i class="bi" [class]="getEstadoIcon(solicitud.estado)"></i>
+                                {{ getEstadoTexto(solicitud.estado) }}
+                            </span>
+                            <span class="fecha-solicitud">
+                                <i class="bi bi-calendar3"></i>
+                                {{ formatearFecha(solicitud.fechasolicitud) }}
+                            </span>
+                        </div>
+                        <div class="header-right">
+                            <span class="id-solicitud">#{{ solicitud.idsolicitud }}</span>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <!-- ACOMPAÑANTE -->
+                        <div class="info-block acompanante-block">
+                            <div class="block-header">
+                                <i class="bi bi-person-fill-add block-icon"></i>
+                                <span class="block-title">Acompañante solicitante</span>
+                            </div>
+                            <div class="block-content">
+                                <div class="info-row">
+                                    <span class="info-label">Nombre completo:</span>
+                                    <span class="info-value strong">
+                                        {{ solicitud.nombreacompanante }} {{ solicitud.appaternoacompanante }} {{
+                                        solicitud.apmaternoacompanante || '' }}
+                                    </span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Correo electrónico:</span>
+                                    <span class="info-value">
+                                        <i class="bi bi-envelope"></i>
+                                        {{ solicitud.correoacompanante }}
+                                    </span>
+                                </div>
+                                <div class="info-row" *ngIf="solicitud.telefonoacompanante">
+                                    <span class="info-label">Teléfono:</span>
+                                    <span class="info-value">
+                                        <i class="bi bi-telephone"></i>
+                                        {{ solicitud.telefonoacompanante }}
+                                    </span>
+                                </div>
+                                <div class="info-row" *ngIf="solicitud.parentesco">
+                                    <span class="info-label">Parentesco:</span>
+                                    <span class="info-value parentesco-tag">
+                                        <i class="bi bi-person-lines-fill"></i>
+                                        {{ solicitud.parentesco }}
+                                    </span>
+                                </div>
+                            </div>
+                            <button class="btn-ver-perfil" (click)="verDetalleAcompanante(solicitud.idacompanante)">
+                                <i class="bi bi-box-arrow-up-right"></i>
+                                Ver perfil completo
+                            </button>
+                        </div>
+
+                        <!-- PACIENTE -->
+                        <div class="info-block paciente-block">
+                            <div class="block-header">
+                                <i class="bi bi-person-heart block-icon"></i>
+                                <span class="block-title">Paciente solicitado</span>
+                            </div>
+                            <div class="block-content">
+                                <div class="info-row">
+                                    <span class="info-label">Nombre completo:</span>
+                                    <span class="info-value strong">
+                                        {{ solicitud.nombrepaciente }} {{ solicitud.appaterrnopaciente }} {{
+                                        solicitud.apmaternopaciente || '' }}
+                                    </span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Correo electrónico:</span>
+                                    <span class="info-value">
+                                        <i class="bi bi-envelope"></i>
+                                        {{ solicitud.correopaciente }}
+                                    </span>
+                                </div>
+                            </div>
+                            <button class="btn-ver-perfil" (click)="verDetallePaciente(solicitud.idpaciente)">
+                                <i class="bi bi-box-arrow-up-right"></i>
+                                Ver perfil completo
+                            </button>
+                        </div>
+
+                        <!-- NOTAS -->
+                        @if (solicitud.notas) {
+                        <div class="notas-block">
+                            <div class="block-header">
+                                <i class="bi bi-chat-left-text block-icon"></i>
+                                <span class="block-title">Notas adicionales</span>
+                            </div>
+                            <div class="notas-content">
+                                {{ solicitud.notas }}
+                            </div>
+                        </div>
+                        }
+                    </div>
+
+                    <div class="card-footer">
+                        <div class="footer-actions">
+                            <button class="btn-aprobar" (click)="aprobarSolicitud(solicitud.idsolicitud)">
+                                <i class="bi bi-check-lg"></i>
+                                Aprobar solicitud
+                            </button>
+                            <button class="btn-rechazar" (click)="rechazarSolicitud(solicitud.idsolicitud)">
+                                <i class="bi bi-x-lg"></i>
+                                Rechazar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+
+        <!-- TAB: APROBADAS -->
+        <div class="tab-content" *ngIf="activeTab === 'aprobadas'">
+            <div class="solicitudes-list">
+                @if (solicitudesAprobadas.length === 0) {
+                <div class="empty-state">
+                    <i class="bi bi-check-circle"></i>
+                    <h3>No hay solicitudes aprobadas</h3>
+                    <p>Aún no se han aprobado solicitudes</p>
+                </div>
+                }
+
+                @for (solicitud of solicitudesAprobadas; track solicitud.idsolicitud) {
+                <div class="solicitud-card">
+                    <div class="card-header">
+                        <div class="header-left">
+                            <span class="badge-estado estado-aprobada">
+                                <i class="bi bi-check-circle-fill"></i>
+                                Aprobada
+                            </span>
+                            <span class="fecha-solicitud">
+                                <i class="bi bi-calendar3"></i>
+                                {{ formatearFecha(solicitud.fechasolicitud) }}
+                            </span>
+                        </div>
+                        <div class="header-right">
+                            <span class="id-solicitud">#{{ solicitud.idsolicitud }}</span>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="info-block acompanante-block">
+                            <div class="block-header">
+                                <i class="bi bi-person-fill-add block-icon"></i>
+                                <span class="block-title">Acompañante</span>
+                            </div>
+                            <div class="block-content">
+                                <div class="info-row">
+                                    <span class="info-label">Nombre completo:</span>
+                                    <span class="info-value strong">
+                                        {{ solicitud.nombreacompanante }} {{ solicitud.appaternoacompanante }} {{
+                                        solicitud.apmaternoacompanante || '' }}
+                                    </span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Correo:</span>
+                                    <span class="info-value">
+                                        <i class="bi bi-envelope"></i>
+                                        {{ solicitud.correoacompanante }}
+                                    </span>
+                                </div>
+                                @if (solicitud.parentesco) {
+                                <div class="info-row">
+                                    <span class="info-label">Parentesco:</span>
+                                    <span class="info-value parentesco-tag">
+                                        <i class="bi bi-person-lines-fill"></i>
+                                        {{ solicitud.parentesco }}
+                                    </span>
+                                </div>
+                                }
+                            </div>
+                            <button class="btn-ver-perfil" (click)="verDetalleAcompanante(solicitud.idacompanante)">
+                                <i class="bi bi-box-arrow-up-right"></i>
+                                Ver perfil
+                            </button>
+                        </div>
+
+                        <div class="info-block paciente-block">
+                            <div class="block-header">
+                                <i class="bi bi-person-heart block-icon"></i>
+                                <span class="block-title">Paciente</span>
+                            </div>
+                            <div class="block-content">
+                                <div class="info-row">
+                                    <span class="info-label">Nombre completo:</span>
+                                    <span class="info-value strong">
+                                        {{ solicitud.nombrepaciente }} {{ solicitud.appaterrnopaciente }} {{
+                                        solicitud.apmaternopaciente || '' }}
+                                    </span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Correo:</span>
+                                    <span class="info-value">
+                                        <i class="bi bi-envelope"></i>
+                                        {{ solicitud.correopaciente }}
+                                    </span>
+                                </div>
+                            </div>
+                            <button class="btn-ver-perfil" (click)="verDetallePaciente(solicitud.idpaciente)">
+                                <i class="bi bi-box-arrow-up-right"></i>
+                                Ver perfil
+                            </button>
+                        </div>
+
+                        @if (solicitud.fechaaprobacion) {
+                        <div class="fecha-aprobacion-block">
+                            <i class="bi bi-calendar-check"></i>
+                            <span>Aprobada el: {{ formatearFecha(solicitud.fechaaprobacion) }}</span>
+                        </div>
+                        }
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+
+        <!-- TAB: ASIGNACIONES -->
+        <div class="tab-content" *ngIf="activeTab === 'asignaciones'">
+            <div class="solicitudes-list">
+                @if (asignacionesActivas.length === 0) {
+                <div class="empty-state">
+                    <i class="bi bi-person-check"></i>
+                    <h3>No hay asignaciones activas</h3>
+                    <p>No hay acompañantes asignados a pacientes</p>
+                </div>
+                }
+
+                @for (asignacion of asignacionesActivas; track asignacion.idsolicitud) {
+                <div class="solicitud-card">
+                    <div class="card-header">
+                        <div class="header-left">
+                            <span class="badge-estado estado-aprobada">
+                                <i class="bi bi-check-circle-fill"></i>
+                                Activo
+                            </span>
+                            <span class="fecha-solicitud">
+                                <i class="bi bi-calendar3"></i>
+                                {{ formatearFecha(asignacion.fechasolicitud) }}
+                            </span>
+                        </div>
+                        <div class="header-right">
+                            <span class="id-solicitud">#{{ asignacion.idsolicitud }}</span>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="info-block acompanante-block">
+                            <div class="block-header">
+                                <i class="bi bi-person-fill-add block-icon"></i>
+                                <span class="block-title">Acompañante asignado</span>
+                            </div>
+                            <div class="block-content">
+                                <div class="info-row">
+                                    <span class="info-label">Nombre:</span>
+                                    <span class="info-value strong">
+                                        {{ asignacion.nombreacompanante }} {{ asignacion.appaternoacompanante }}
+                                    </span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Correo:</span>
+                                    <span class="info-value">
+                                        <i class="bi bi-envelope"></i>
+                                        {{ asignacion.correoacompanante }}
+                                    </span>
+                                </div>
+                                @if (asignacion.parentesco) {
+                                <div class="info-row">
+                                    <span class="info-label">Parentesco:</span>
+                                    <span class="info-value parentesco-tag">
+                                        <i class="bi bi-person-lines-fill"></i>
+                                        {{ asignacion.parentesco }}
+                                    </span>
+                                </div>
+                                }
+                            </div>
+                            <button class="btn-ver-perfil" (click)="verDetalleAcompanante(asignacion.idacompanante)">
+                                <i class="bi bi-box-arrow-up-right"></i>
+                                Ver perfil
+                            </button>
+                        </div>
+
+                        <div class="info-block paciente-block">
+                            <div class="block-header">
+                                <i class="bi bi-person-heart block-icon"></i>
+                                <span class="block-title">Paciente asignado</span>
+                            </div>
+                            <div class="block-content">
+                                <div class="info-row">
+                                    <span class="info-label">Nombre:</span>
+                                    <span class="info-value strong">
+                                        {{ asignacion.nombrepaciente }} {{ asignacion.appaterrnopaciente }}
+                                    </span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Correo:</span>
+                                    <span class="info-value">
+                                        <i class="bi bi-envelope"></i>
+                                        {{ asignacion.correopaciente }}
+                                    </span>
+                                </div>
+                            </div>
+                            <button class="btn-ver-perfil" (click)="verDetallePaciente(asignacion.idpaciente)">
+                                <i class="bi bi-box-arrow-up-right"></i>
+                                Ver perfil
+                            </button>
+                        </div>
+
+                        @if (asignacion.fechaasignacion) {
+                        <div class="fecha-aprobacion-block">
+                            <i class="bi bi-calendar-check"></i>
+                            <span>Asignado el: {{ formatearFecha(asignacion.fechaasignacion) }}</span>
+                        </div>
+                        }
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+        }
+
+    </div>
+</main>

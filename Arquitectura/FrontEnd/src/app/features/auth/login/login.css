@@ -2577,3 +2577,91 @@ input[type="date"] {
     font-size: 12px !important;
   }
 }
+
+/* ============================================================
+   RECAPTCHA - CORRECCIÓN PARA MÓVILES
+   ============================================================ */
+
+/* Ajustar el contenedor del reCAPTCHA */
+.recaptcha-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 360px;
+  margin: 12px 0;
+  min-height: 80px;
+  overflow: hidden;
+}
+
+/* Ajustar el iframe del reCAPTCHA */
+.recaptcha-wrapper re-captcha {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  transform: scale(1);
+  transform-origin: center center;
+}
+
+/* Ajustes específicos para móviles */
+@media screen and (max-width: 768px) {
+  .recaptcha-wrapper {
+    min-height: 90px;
+    padding: 4px 0;
+    max-width: 100%;
+  }
+
+  .recaptcha-wrapper re-captcha {
+    transform: scale(0.95);
+    transform-origin: center center;
+  }
+
+  .recaptcha-wrapper iframe {
+    pointer-events: auto !important;
+    touch-action: auto !important;
+    min-height: 78px;
+    width: 100% !important;
+    max-width: 302px !important;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .recaptcha-wrapper {
+    min-height: 100px;
+    padding: 8px 0;
+  }
+
+  .recaptcha-wrapper re-captcha {
+    transform: scale(0.85);
+    transform-origin: center center;
+  }
+
+  .recaptcha-wrapper iframe {
+    min-height: 78px;
+    width: 100% !important;
+    max-width: 280px !important;
+  }
+}
+
+@media screen and (max-width: 360px) {
+  .recaptcha-wrapper re-captcha {
+    transform: scale(0.75);
+    transform-origin: center center;
+  }
+
+  .recaptcha-wrapper iframe {
+    max-width: 240px !important;
+  }
+}
+
+/* Forzar que el reCAPTCHA sea clickeable en móviles */
+.recaptcha-wrapper iframe {
+  border-radius: 8px !important;
+  pointer-events: auto !important;
+  touch-action: auto !important;
+}
+
+/* Ajuste adicional para el reCAPTCHA en el paso 3 */
+.recaptcha-wrapper iframe {
+  border-radius: 8px !important;
+}
