@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, ChangeDetectorRef, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { PatientMenu } from "../../template/menu/menu";
 import { firstValueFrom } from 'rxjs';
 import { Users } from '../../../../../core/services/users.service';
@@ -22,6 +22,7 @@ export class PatientInicio implements OnInit {
   private auth = inject(Auth);
   private cdr = inject(ChangeDetectorRef);
   private platformId = inject(PLATFORM_ID);
+  private router = inject(Router);
 
   isLoading = true;
   patientName = '';
@@ -313,6 +314,11 @@ export class PatientInicio implements OnInit {
   }
 
   verDetalleCita(cita: any) {
-    // Navegar a detalle de cita
+    const idCita = cita.idcita || cita.id || cita.IdCita;
+    if (idCita) {
+      this.router.navigate(['/patient/citas']);
+    } else {
+      this.router.navigate(['/patient/citas']);
+    }
   }
 }

@@ -1,10 +1,12 @@
-import { Component, OnInit, inject, ChangeDetectorRef, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef, PLATFORM_ID, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PatientMenu } from "../../template/menu/menu";
 import { Users } from '../../../../../core/services/users.service';
 import { Auth } from '@angular/fire/auth';
 import { firstValueFrom } from 'rxjs';
+import flatpickr from 'flatpickr';
+import { Spanish } from 'flatpickr/dist/l10n/es';
 
 interface Tratamiento {
     idtratamiento: number;
@@ -44,7 +46,7 @@ interface RegistroToma {
     templateUrl: './tratamientos.html',
     styleUrls: ['./tratamientos.css']
 })
-export class PatientTratamientos implements OnInit {
+export class PatientTratamientos implements OnInit, OnDestroy {
     private usersService = inject(Users);
     private auth = inject(Auth);
     private cdr = inject(ChangeDetectorRef);
@@ -88,6 +90,50 @@ export class PatientTratamientos implements OnInit {
     generandoTomas = false;
     eliminandoTomas = false;
     mostrarModalTomas = false;
+
+    // Filtro de fecha (flatpickr)
+    filtroFecha: string = '';
+    private flatpickrInstance: any = null;
+
+    @ViewChild('filtroFechaInput', { static: false }) set filtroFechaInput(element: ElementRef) {
+        if (element && !this.flatpickrInstance) {
+            setTimeout(() => {
+                let minDate: Date | string | undefined = undefined;
+                let maxDate: Date | string | undefined = undefined;
+
+                if (this.tratamientoSeleccionado) {
+                    const inicio = this.tratamientoSeleccionado.fechainicio;
+                    const fin = this.tratamientoSeleccionado.fechafin;
+
+                    if (inicio) {
+                        const d = new Date(inicio);
+                        if (!isNaN(d.getTime())) {
+                            minDate = d;
+                        }
+                    }
+                    if (fin) {
+                        const d = new Date(fin);
+                        if (!isNaN(d.getTime())) {
+                            maxDate = d;
+                        }
+                    }
+                }
+
+                this.flatpickrInstance = flatpickr(element.nativeElement, {
+                    locale: Spanish,
+                    dateFormat: 'Y-m-d',
+                    allowInput: false,
+                    disableMobile: true,
+                    minDate: minDate,
+                    maxDate: maxDate,
+                    onChange: (selectedDates: Date[], dateStr: string) => {
+                        this.filtroFecha = dateStr;
+                        this.cdr.markForCheck();
+                    }
+                });
+            }, 0);
+        }
+    }
 
     // Notificaciones Toast
     mostrarToast = false;
@@ -151,6 +197,7 @@ export class PatientTratamientos implements OnInit {
 
     ngOnDestroy() {
         if (this.toastTimeout) clearTimeout(this.toastTimeout);
+        this.destruirFlatpickr();
     }
 
     private async cargarTratamientos() {
@@ -263,6 +310,7 @@ export class PatientTratamientos implements OnInit {
     verDetalle(tratamiento: Tratamiento) {
         this.tratamientoSeleccionado = tratamiento;
         this.mostrarModalDetalle = true;
+        this.filtroFecha = '';
         document.body.style.overflow = 'hidden';
         this.cargarTomas(tratamiento.idtratamiento);
     }
@@ -272,7 +320,52 @@ export class PatientTratamientos implements OnInit {
         this.tratamientoSeleccionado = null;
         this.registrosTomas = [];
         this.estadisticasTomas = null;
+        this.filtroFecha = '';
+        this.destruirFlatpickr();
         document.body.style.overflow = '';
+        this.cdr.markForCheck();
+    }
+
+    private destruirFlatpickr() {
+        if (this.flatpickrInstance) {
+            this.flatpickrInstance.destroy();
+            this.flatpickrInstance = null;
+        }
+    }
+
+    // ==========================================
+    // FILTRO DE FECHA (TOMAS)
+    // ==========================================
+
+    get registrosTomasFiltrados(): RegistroToma[] {
+        if (!this.filtroFecha || this.filtroFecha.trim() === '') {
+            return this.registrosTomas;
+        }
+
+        const partes = this.filtroFecha.split('-').map(Number);
+        const filtroAnio = partes[0];
+        const filtroMes = partes[1] - 1;
+        const filtroDia = partes[2];
+
+        return this.registrosTomas.filter(toma => {
+            try {
+                const fechaToma = new Date(toma.fechaProgramada);
+                const tomaAnio = fechaToma.getFullYear();
+                const tomaMes = fechaToma.getMonth();
+                const tomaDia = fechaToma.getDate();
+
+                return tomaAnio === filtroAnio && tomaMes === filtroMes && tomaDia === filtroDia;
+            } catch {
+                return false;
+            }
+        });
+    }
+
+    limpiarFiltroFecha() {
+        this.filtroFecha = '';
+        if (this.flatpickrInstance) {
+            this.flatpickrInstance.clear();
+        }
         this.cdr.markForCheck();
     }
 

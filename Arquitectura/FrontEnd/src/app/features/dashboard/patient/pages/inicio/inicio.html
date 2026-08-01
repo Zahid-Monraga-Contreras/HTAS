@@ -121,6 +121,7 @@
                 <a routerLink="/patient/citas" class="view-all">Ver todas</a>
             </div>
             <div class="citas-list">
+                <!-- Cada cita al hacer clic redirige al detalle -->
                 <div *ngFor="let cita of citasRecientes" class="cita-item" (click)="verDetalleCita(cita)">
                     <div class="cita-date-badge">
                         <span class="cita-day">{{ obtenerDia(cita.fechacita || cita.fecha) }}</span>
@@ -129,7 +130,7 @@
                     <div class="cita-info">
                         <h4>{{ cita.motivo || 'Consulta Medica' }}</h4>
                         <p>
-                            <i class="bi bi-person"></i> {{ cita.medico || 'Medico' }}
+                            <i class="bi bi-person"></i> {{ cita.medico || cita.nombreMedico || 'Medico' }}
                             <span class="dot">•</span>
                             <i class="bi bi-clock"></i> {{ cita.horacita || cita.hora || 'S/H' }}
                         </p>

@@ -1999,3 +1999,159 @@
         font-size: 0.7rem;
     }
 }
+
+/* ==========================================================================
+   BUSCADOR DE TOMAS CON FLATPICKR
+   ========================================================================== */
+.buscador-tomas {
+    margin: 12px 0;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.buscador-tomas label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--gray-600);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.buscador-tomas input.flatpickr-input {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--gray-300);
+    font-size: 0.8rem;
+    background: white;
+    flex: 1;
+    min-width: 150px;
+    max-width: 220px;
+    transition: var(--transition);
+    outline: none;
+    color: var(--gray-800);
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.buscador-tomas input.flatpickr-input:focus {
+    border-color: var(--info);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.buscador-tomas input.flatpickr-input::placeholder {
+    color: var(--gray-400);
+}
+
+.buscador-tomas .btn-limpiar-filtro {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--gray-300);
+    background: var(--gray-50);
+    color: var(--gray-600);
+    cursor: pointer;
+    font-size: 0.75rem;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.buscador-tomas .btn-limpiar-filtro:hover {
+    background: var(--gray-200);
+    border-color: var(--gray-400);
+}
+
+.buscador-tomas .contador-filtro {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    white-space: nowrap;
+}
+
+/* ==========================================================================
+   FLATPICKR - CALENDARIO
+   ========================================================================== */
+.flatpickr-calendar {
+    box-shadow: var(--shadow-lg) !important;
+    border-radius: var(--border-radius-sm) !important;
+    border: 1px solid var(--gray-200) !important;
+    font-family: inherit !important;
+    background: white !important;
+    z-index: 9999 !important;
+}
+
+.flatpickr-calendar .flatpickr-current-month {
+    font-size: 0.95rem !important;
+    padding-top: 10px !important;
+}
+
+.flatpickr-calendar .flatpickr-day.selected,
+.flatpickr-calendar .flatpickr-day.startRange,
+.flatpickr-calendar .flatpickr-day.endRange,
+.flatpickr-calendar .flatpickr-day.selected.inRange,
+.flatpickr-calendar .flatpickr-day.startRange.inRange,
+.flatpickr-calendar .flatpickr-day.endRange.inRange {
+    background: var(--primary) !important;
+    border-color: var(--primary) !important;
+    box-shadow: none !important;
+}
+
+.flatpickr-calendar .flatpickr-day.selected:hover,
+.flatpickr-calendar .flatpickr-day.startRange:hover,
+.flatpickr-calendar .flatpickr-day.endRange:hover {
+    background: var(--primary-dark) !important;
+    border-color: var(--primary-dark) !important;
+}
+
+.flatpickr-calendar .flatpickr-day.today {
+    border-color: var(--info) !important;
+}
+
+.flatpickr-calendar .flatpickr-day.today:hover {
+    background: var(--info) !important;
+    color: white !important;
+}
+
+/* ==========================================================================
+   RESPONSIVE - BUSCADOR DE FECHA
+   ========================================================================== */
+@media screen and (max-width: 768px) {
+    .buscador-tomas {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+    }
+
+    .buscador-tomas label {
+        white-space: normal;
+        font-size: 0.75rem;
+    }
+
+    .buscador-tomas input.flatpickr-input {
+        max-width: 100%;
+        min-width: unset;
+    }
+
+    .buscador-tomas .btn-limpiar-filtro {
+        justify-content: center;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .buscador-tomas input.flatpickr-input {
+        padding: 8px 12px;
+        font-size: 0.75rem;
+    }
+
+    .buscador-tomas .contador-filtro {
+        font-size: 0.65rem;
+    }
+
+    .flatpickr-calendar {
+        width: 94vw !important;
+        max-width: 320px !important;
+    }
+}

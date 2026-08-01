@@ -240,6 +240,20 @@
                     </button>
                 </div>
 
+                <!-- BUSCADOR POR FECHA CON FLATPICKR -->
+                <div class="buscador-tomas" *ngIf="registrosTomas.length > 0">
+                    <label for="filtroFecha">
+                        <i class="bi bi-calendar3"></i> Filtrar por fecha:
+                    </label>
+                    <input type="text" id="filtroFecha" #filtroFechaInput placeholder="Selecciona una fecha" readonly>
+                    <button *ngIf="filtroFecha" class="btn-limpiar-filtro" (click)="limpiarFiltroFecha()">
+                        <i class="bi bi-x-circle"></i> Limpiar
+                    </button>
+                    <span *ngIf="filtroFecha" class="contador-filtro">
+                        Mostrando {{ registrosTomasFiltrados.length }} de {{ registrosTomas.length }} tomas
+                    </span>
+                </div>
+
                 <!-- Lista de Tomas -->
                 <div class="tomas-lista">
                     <div *ngIf="cargandoTomas" class="tomas-loading">
@@ -247,7 +261,7 @@
                         <p>Cargando tomas...</p>
                     </div>
 
-                    <div *ngFor="let t of registrosTomas" class="toma-item" [class]="{
+                    <div *ngFor="let t of registrosTomasFiltrados" class="toma-item" [class]="{
                         'toma-completada': t.estado === 'Tomada',
                         'toma-pendiente': t.estado === 'Pendiente',
                         'toma-omitida': t.estado === 'Omitida',
@@ -298,6 +312,13 @@
                         <i class="bi bi-inbox"></i>
                         <p>No hay tomas registradas</p>
                         <span>Genera tomas programadas para este tratamiento</span>
+                    </div>
+
+                    <div *ngIf="!cargandoTomas && registrosTomas.length > 0 && registrosTomasFiltrados.length === 0"
+                        class="tomas-vacio">
+                        <i class="bi bi-calendar-x"></i>
+                        <p>No hay tomas en la fecha seleccionada</p>
+                        <span>Prueba con otra fecha o limpia el filtro</span>
                     </div>
                 </div>
             </div>
