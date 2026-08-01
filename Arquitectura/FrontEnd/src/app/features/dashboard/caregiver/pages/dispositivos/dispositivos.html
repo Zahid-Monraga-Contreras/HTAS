@@ -1,0 +1,141 @@
+<app-caregiver-menu></app-caregiver-menu>
+
+<div class="toast-container" *ngIf="notifications.length > 0">
+    <div *ngFor="let notif of notifications; let i = index" class="toast-notification toast-{{ notif.type }}"
+        [class.toast-exit]="i > 0">
+        <div class="toast-icon">
+            <i class="bi" [class]="
+                notif.type === 'success' ? 'bi-check-circle-fill' :
+                notif.type === 'error' ? 'bi-x-circle-fill' :
+                notif.type === 'warning' ? 'bi-exclamation-triangle-fill' :
+                'bi-info-circle-fill'
+            "></i>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title">{{ notif.title }}</div>
+            <div class="toast-message">{{ notif.message }}</div>
+        </div>
+        <button class="toast-close" (click)="removeToast(notif.id)">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        <div class="toast-progress" [style.animation-duration]="(notif.duration || 5000) + 'ms'"></div>
+    </div>
+</div>
+
+<div *ngIf="solicitudPendiente" class="solicitud-pendiente-banner">
+    <i class="bi bi-clock-history"></i>
+    <span class="banner-text">{{ mensajeSolicitud }}</span>
+    <span class="badge-pendiente">Pendiente</span>
+</div>
+
+<div class="dispositivos-container">
+    <header class="page-header">
+        <div class="header-top">
+            <div class="header-info">
+                <h1>Dispositivos</h1>
+                <p>Visualiza los dispositivos de tus pacientes</p>
+            </div>
+        </div>
+    </header>
+
+    <div *ngIf="isLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Cargando dispositivos...</p>
+    </div>
+
+    <div *ngIf="!isLoading" class="dispositivos-content">
+        <section class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card" (click)="aplicarFiltro('todos')" [class.active]="filterEstado === 'todos'">
+                    <span class="stat-number">{{ estadisticas.total }}</span>
+                    <span class="stat-label">Total</span>
+                </div>
+                <div class="stat-card stat-activos" (click)="aplicarFiltro('activos')"
+                    [class.active]="filterEstado === 'activos'">
+                    <span class="stat-number">{{ estadisticas.activos }}</span>
+                    <span class="stat-label">Activos</span>
+                </div>
+                <div class="stat-card stat-inactivos" (click)="aplicarFiltro('inactivos')"
+                    [class.active]="filterEstado === 'inactivos'">
+                    <span class="stat-number">{{ estadisticas.inactivos }}</span>
+                    <span class="stat-label">Inactivos</span>
+                </div>
+                <div class="stat-card stat-sin-asignar" (click)="aplicarFiltro('sin-asignar')"
+                    [class.active]="filterEstado === 'sin-asignar'">
+                    <span class="stat-number">{{ estadisticas.sinAsignar }}</span>
+                    <span class="stat-label">Sin Asignar</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="dispositivos-section">
+            <div class="section-header">
+                <h2><i class="bi bi-list-ul"></i> Lista de Dispositivos</h2>
+                <span class="dispositivos-count">{{ dispositivosFiltrados.length }} dispositivo{{
+                    dispositivosFiltrados.length !== 1 ? 's' : '' }}</span>
+            </div>
+
+            <div class="search-section">
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" [(ngModel)]="searchTerm" (input)="buscarDispositivos()"
+                        placeholder="Buscar por nombre, MAC o paciente..." class="search-input" />
+                    <button *ngIf="searchTerm" class="btn-clear" (click)="searchTerm = ''; buscarDispositivos()">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="dispositivos-list">
+                <div *ngFor="let d of dispositivosFiltrados" class="dispositivo-card" (click)="verDetalle(d)">
+                    <div class="dispositivo-header">
+                        <div class="dispositivo-icon">
+                            <i class="bi bi-device-hdd"></i>
+                        </div>
+                        <div class="dispositivo-info">
+                            <h3>{{ d.nombre || 'Dispositivo' }}</h3>
+                            <p class="dispositivo-mac">
+                                <i class="bi bi-wifi"></i> {{ d.direccionmac }}
+                            </p>
+                            <p class="dispositivo-paciente" *ngIf="d.nombrepaciente">
+                                <i class="bi bi-person"></i> {{ d.nombrepaciente }}
+                            </p>
+                            <p class="dispositivo-paciente" *ngIf="!d.nombrepaciente">
+                                <i class="bi bi-person"></i> <span class="text-muted">Sin asignar</span>
+                            </p>
+                        </div>
+                        <span class="estado-badge" [class]="getEstadoClass(d.activo)">
+                            <i class="bi" [class]="getEstadoIcon(d.activo)"></i>
+                            {{ getEstadoTexto(d.activo) }}
+                        </span>
+                    </div>
+
+                    <div class="dispositivo-body">
+                        <div class="dispositivo-detalles">
+                            <div class="detalle" *ngIf="d.ultimasincronizacion">
+                                <i class="bi bi-clock"></i>
+                                <span>Ultima sincronizacion: {{ formatearFecha(d.ultimasincronizacion) }}</span>
+                            </div>
+                            <div class="detalle" *ngIf="!d.ultimasincronizacion">
+                                <i class="bi bi-clock"></i>
+                                <span>No sincronizado</span>
+                            </div>
+                        </div>
+
+                        <div class="dispositivo-acciones">
+                            <button class="btn-detalle" (click)="$event.stopPropagation(); verDetalle(d)"
+                                title="Ver detalle">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="!dispositivosFiltrados.length" class="empty-state">
+                    <i class="bi bi-device-hdd"></i>
+                    <p>No hay dispositivos asociados a tus pacientes</p>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>

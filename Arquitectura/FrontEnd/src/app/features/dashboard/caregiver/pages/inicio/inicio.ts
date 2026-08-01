@@ -47,6 +47,9 @@ export class CaregiverInicio implements OnInit {
 
     private pacientesAsignadosMap: Map<number, any> = new Map();
 
+    // Control para saber si hay datos reales
+    tieneDatos: boolean = false;
+
     async ngOnInit() {
         if (!isPlatformBrowser(this.platformId)) return;
 
@@ -62,10 +65,6 @@ export class CaregiverInicio implements OnInit {
                     this.caregiverFullName = userData.nombreCompleto || userData.nombre || 'Acompanante';
                     this.caregiverCorreo = userData.correo || '';
                     this.userEmail = userData.correo || '';
-
-                    console.log('Acompanante ID:', this.caregiverId);
-                    console.log('Acompanante Correo:', this.caregiverCorreo);
-                    console.log('Acompanante Nombre:', this.caregiverFullName);
                 } catch (e) {
                     console.error('Error al parsear localStorage:', e);
                 }
@@ -87,27 +86,15 @@ export class CaregiverInicio implements OnInit {
 
     private async cargarDatos() {
         try {
-            console.log('Cargando datos del acompanante...');
-
-            let allUsers: any[] = [];
+            // 1. OBTENER PACIENTES ASIGNADOS REALES
+            let pacientesAsignadosReal: any[] = [];
             try {
-                console.log('Obteniendo todos los usuarios...');
-                allUsers = await firstValueFrom(this.usersService.getUsuariosBackend());
+                pacientesAsignadosReal = await firstValueFrom(
+                    this.usersService.getPacientesAsignados(this.caregiverId!)
+                );
 
-                if (Array.isArray(allUsers)) {
-                    console.log(allUsers.length + ' usuarios encontrados en total');
-
-                    const todosLosPacientes = allUsers.filter(u =>
-                        u.rol?.toLowerCase() === 'paciente' && u.deleted_at === null
-                    );
-
-                    console.log(todosLosPacientes.length + ' pacientes encontrados');
-
-                    this.pacientesAsignados = todosLosPacientes.filter(paciente => {
-                        const pacienteId = paciente.idusuario || paciente.id;
-
-                        return true;
-                    });
+                if (Array.isArray(pacientesAsignadosReal) && pacientesAsignadosReal.length > 0) {
+                    this.pacientesAsignados = pacientesAsignadosReal;
 
                     this.pacientesAsignadosMap.clear();
                     this.pacientesAsignados.forEach(p => {
@@ -117,30 +104,61 @@ export class CaregiverInicio implements OnInit {
                         }
                     });
 
-                    console.log(this.pacientesAsignados.length + ' pacientes asignados a este acompanante');
-
                     this.metrics.totalPacientes = this.pacientesAsignados.length;
+                } else {
+                    this.pacientesAsignados = [];
+                    this.metrics.totalPacientes = 0;
                 }
             } catch (error) {
-                console.error('Error al obtener usuarios:', error);
+                console.error('Error al obtener pacientes asignados:', error);
                 this.pacientesAsignados = [];
                 this.metrics.totalPacientes = 0;
             }
 
+            // VERIFICAR SI TIENE PACIENTES ASIGNADOS
+            if (this.pacientesAsignados.length === 0) {
+                this.tieneDatos = false;
+                return;
+            }
+
+            this.tieneDatos = true;
+
+            // 2. OBTENER CITAS DE PACIENTES ASIGNADOS
             let todasLasCitas: any[] = [];
             try {
-                console.log('Obteniendo todas las citas...');
                 todasLasCitas = await firstValueFrom(this.usersService.getAllCitas());
 
                 if (Array.isArray(todasLasCitas) && todasLasCitas.length > 0) {
-                    console.log(todasLasCitas.length + ' citas encontradas en total');
-
+                    // Buscar citas de pacientes asignados por ID o por nombre
                     const citasFiltradas = todasLasCitas.filter((c: any) => {
-                        const idPaciente = c.idpaciente || c.idPaciente || c.pacienteId;
-                        return this.pacientesAsignadosMap.has(idPaciente);
-                    });
+                        // Buscar ID del paciente en múltiples campos
+                        const idPaciente = c.idpaciente || c.IdPaciente || c.idPaciente || c.pacienteId || c.IdPaciente || c.id_usuario;
 
-                    console.log(citasFiltradas.length + ' citas de pacientes asignados');
+                        // Verificar si el ID está en el mapa
+                        if (idPaciente && this.pacientesAsignadosMap.has(idPaciente)) {
+                            return true;
+                        }
+
+                        // Si no tiene ID o no está en el mapa, buscar por nombre
+                        const nombrePaciente = (c.nombrepaciente || c.NombrePaciente || c.nombrePaciente || '').toLowerCase().trim();
+                        const apPaterno = (c.appaternopaciente || c.ApPaternoPaciente || c.apPaternoPaciente || '').toLowerCase().trim();
+                        const nombreCompleto = `${nombrePaciente} ${apPaterno}`.trim();
+
+                        // Buscar en pacientes asignados por nombre
+                        for (const [id, paciente] of this.pacientesAsignadosMap) {
+                            const pNombre = (paciente.nombre || '').toLowerCase().trim();
+                            const pApPaterno = (paciente.apPaterno || '').toLowerCase().trim();
+                            const pNombreCompleto = `${pNombre} ${pApPaterno}`.trim();
+
+                            if (pNombreCompleto === nombreCompleto || pNombre === nombrePaciente) {
+                                // Asignar el ID encontrado
+                                c.idpaciente = id;
+                                return true;
+                            }
+                        }
+
+                        return false;
+                    });
 
                     this.citasProgramadas = citasFiltradas
                         .filter((c: any) => {
@@ -148,14 +166,34 @@ export class CaregiverInicio implements OnInit {
                             return !['cancelada', 'completada', 'realizada', 'finalizada'].includes(estado);
                         })
                         .map((c: any) => {
-                            const nombre = c.nombrepaciente || '';
-                            const apPaterno = c.appaternopaciente || '';
-                            const apMaterno = c.apmaternopaciente || '';
-                            const nombreCompleto = nombre + ' ' + apPaterno + ' ' + apMaterno;
+                            const idPaciente = c.idpaciente || c.IdPaciente || c.idPaciente || c.pacienteId;
+                            let nombreCompleto = 'Paciente';
+
+                            // Intentar obtener nombre del mapa
+                            if (idPaciente && this.pacientesAsignadosMap.has(idPaciente)) {
+                                const paciente = this.pacientesAsignadosMap.get(idPaciente);
+                                const nombre = paciente.nombre || '';
+                                const apPaterno = paciente.apPaterno || '';
+                                const apMaterno = paciente.apMaterno || '';
+                                nombreCompleto = `${nombre} ${apPaterno} ${apMaterno}`.trim();
+                                if (!nombreCompleto) {
+                                    nombreCompleto = paciente.correo || 'Paciente';
+                                }
+                            } else {
+                                // Usar el nombre de la cita
+                                const nombre = c.nombrepaciente || c.NombrePaciente || c.nombrePaciente || '';
+                                const apPaterno = c.appaternopaciente || c.ApPaternoPaciente || c.apPaternoPaciente || '';
+                                const apMaterno = c.apmaternopaciente || c.ApMaternoPaciente || c.apMaternoPaciente || '';
+                                nombreCompleto = `${nombre} ${apPaterno} ${apMaterno}`.trim();
+                                if (!nombreCompleto) {
+                                    nombreCompleto = 'Paciente';
+                                }
+                            }
+
                             return {
                                 ...c,
-                                nombrePaciente: nombreCompleto.trim() || 'Paciente',
-                                paciente: nombreCompleto.trim() || 'Paciente'
+                                nombrePaciente: nombreCompleto,
+                                paciente: nombreCompleto
                             };
                         })
                         .slice(0, 5);
@@ -166,14 +204,32 @@ export class CaregiverInicio implements OnInit {
                             return ['pendiente', 'programada', 'confirmada', 'agendada'].includes(estado);
                         })
                         .map((c: any) => {
-                            const nombre = c.nombrepaciente || '';
-                            const apPaterno = c.appaternopaciente || '';
-                            const apMaterno = c.apmaternopaciente || '';
-                            const nombreCompleto = nombre + ' ' + apPaterno + ' ' + apMaterno;
+                            const idPaciente = c.idpaciente || c.IdPaciente || c.idPaciente || c.pacienteId;
+                            let nombreCompleto = 'Paciente';
+
+                            if (idPaciente && this.pacientesAsignadosMap.has(idPaciente)) {
+                                const paciente = this.pacientesAsignadosMap.get(idPaciente);
+                                const nombre = paciente.nombre || '';
+                                const apPaterno = paciente.apPaterno || '';
+                                const apMaterno = paciente.apMaterno || '';
+                                nombreCompleto = `${nombre} ${apPaterno} ${apMaterno}`.trim();
+                                if (!nombreCompleto) {
+                                    nombreCompleto = paciente.correo || 'Paciente';
+                                }
+                            } else {
+                                const nombre = c.nombrepaciente || c.NombrePaciente || c.nombrePaciente || '';
+                                const apPaterno = c.appaternopaciente || c.ApPaternoPaciente || c.apPaternoPaciente || '';
+                                const apMaterno = c.apmaternopaciente || c.ApMaternoPaciente || c.apMaternoPaciente || '';
+                                nombreCompleto = `${nombre} ${apPaterno} ${apMaterno}`.trim();
+                                if (!nombreCompleto) {
+                                    nombreCompleto = 'Paciente';
+                                }
+                            }
+
                             return {
                                 ...c,
-                                nombrePaciente: nombreCompleto.trim() || 'Paciente',
-                                paciente: nombreCompleto.trim() || 'Paciente'
+                                nombrePaciente: nombreCompleto,
+                                paciente: nombreCompleto
                             };
                         });
 
@@ -188,20 +244,16 @@ export class CaregiverInicio implements OnInit {
                 this.metrics.citasPendientes = 0;
             }
 
+            // 3. OBTENER TRATAMIENTOS DE PACIENTES ASIGNADOS
             let tratamientos: any[] = [];
             try {
-                console.log('Obteniendo todos los tratamientos...');
                 tratamientos = await firstValueFrom(this.usersService.getTratamientos());
 
                 if (Array.isArray(tratamientos) && tratamientos.length > 0) {
-                    console.log(tratamientos.length + ' tratamientos encontrados en total');
-
                     const tratamientosFiltrados = tratamientos.filter((t: any) => {
-                        const idPaciente = t.idpaciente || t.pacienteId;
+                        const idPaciente = t.idpaciente || t.IdPaciente || t.idPaciente || t.pacienteId;
                         return this.pacientesAsignadosMap.has(idPaciente);
                     });
-
-                    console.log(tratamientosFiltrados.length + ' tratamientos de pacientes asignados');
 
                     const activos = tratamientosFiltrados.filter((t: any) => t.activo !== false && t.activo !== 0);
                     this.metrics.tratamientosActivos = activos.length;
@@ -213,20 +265,16 @@ export class CaregiverInicio implements OnInit {
                 this.tratamientosActivosList = [];
             }
 
+            // 4. OBTENER MEDICAMENTOS
             let medicamentos: any[] = [];
             try {
-                console.log('Obteniendo todos los medicamentos...');
                 medicamentos = await firstValueFrom(this.usersService.getMedicamentos());
 
                 if (Array.isArray(medicamentos) && medicamentos.length > 0) {
-                    console.log(medicamentos.length + ' medicamentos encontrados en total');
-
                     const medicamentosFiltrados = medicamentos.filter((m: any) => {
                         const idPaciente = m.idpaciente || m.pacienteId;
                         return this.pacientesAsignadosMap.has(idPaciente);
                     });
-
-                    console.log(medicamentosFiltrados.length + ' medicamentos de pacientes asignados');
 
                     this.medicamentosList = medicamentosFiltrados.slice(0, 3);
                     this.metrics.medicamentosActivos = medicamentosFiltrados.length;
@@ -237,20 +285,16 @@ export class CaregiverInicio implements OnInit {
                 this.metrics.medicamentosActivos = 0;
             }
 
+            // 5. OBTENER DISPOSITIVOS
             let dispositivos: any[] = [];
             try {
-                console.log('Obteniendo todos los dispositivos...');
                 dispositivos = await firstValueFrom(this.usersService.getDispositivos());
 
                 if (Array.isArray(dispositivos) && dispositivos.length > 0) {
-                    console.log(dispositivos.length + ' dispositivos encontrados en total');
-
                     const dispositivosFiltrados = dispositivos.filter((d: any) => {
                         const idPaciente = d.idpacienteasociado || d.idPacienteAsociado || d.pacienteId || d.idusuario;
                         return this.pacientesAsignadosMap.has(idPaciente);
                     });
-
-                    console.log(dispositivosFiltrados.length + ' dispositivos de pacientes asignados');
 
                     this.dispositivosList = dispositivosFiltrados.slice(0, 3);
                     this.metrics.dispositivosActivos = dispositivosFiltrados.length;
@@ -261,10 +305,9 @@ export class CaregiverInicio implements OnInit {
                 this.metrics.dispositivosActivos = 0;
             }
 
-            console.log('Datos cargados exitosamente:', this.metrics);
-
         } catch (error) {
             console.error('Error al cargar datos:', error);
+            this.tieneDatos = false;
         }
     }
 

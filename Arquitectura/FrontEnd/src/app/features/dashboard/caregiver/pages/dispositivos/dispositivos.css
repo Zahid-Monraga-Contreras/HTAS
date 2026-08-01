@@ -1,0 +1,1181 @@
+:host {
+    --primary: #b0001e;
+    --primary-dark: #8a0017;
+    --primary-light: #d42a4a;
+    --primary-gradient: linear-gradient(135deg, #b0001e 0%, #d42a4a 100%);
+    --success: #10b981;
+    --success-dark: #059669;
+    --warning: #f59e0b;
+    --warning-dark: #d97706;
+    --danger: #ef4444;
+    --danger-dark: #dc2626;
+    --info: #3b82f6;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-400: #94a3b8;
+    --gray-500: #64748b;
+    --gray-600: #475569;
+    --gray-700: #334155;
+    --gray-800: #1e293b;
+    --gray-900: #0f172a;
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+    --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.15);
+    --border-radius: 16px;
+    --border-radius-sm: 10px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:host {
+    display: block;
+    width: 100%;
+    min-height: 100vh;
+    background: var(--gray-50);
+}
+
+.dispositivos-container {
+    min-height: 100vh;
+    background: var(--gray-50);
+    padding: 16px 16px 100px;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 100%;
+}
+
+.page-header {
+    padding: 0 0 16px;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-info h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin: 0;
+}
+
+.header-info p {
+    font-size: 0.85rem;
+    color: var(--gray-500);
+    margin: 2px 0 0;
+}
+
+.solicitud-pendiente-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: #fef3c7;
+    border: 1px solid #f59e0b;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    color: #92400e;
+    font-size: 0.85rem;
+    flex-wrap: wrap;
+}
+
+.solicitud-pendiente-banner i {
+    font-size: 1.2rem;
+    color: #f59e0b;
+    flex-shrink: 0;
+}
+
+.solicitud-pendiente-banner .banner-text {
+    flex: 1;
+    min-width: 0;
+    word-break: break-word;
+}
+
+.solicitud-pendiente-banner .badge-pendiente {
+    background: #f59e0b;
+    color: white;
+    padding: 2px 12px;
+    border-radius: 20px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--gray-200);
+    border-top: 4px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-container p {
+    margin-top: 16px;
+    color: var(--gray-500);
+    font-size: 0.9rem;
+}
+
+.stats-section {
+    margin-bottom: 20px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.stat-card {
+    background: white;
+    padding: 14px 8px;
+    border-radius: var(--border-radius-sm);
+    text-align: center;
+    box-shadow: var(--shadow-md);
+    cursor: pointer;
+    transition: var(--transition);
+    border: 2px solid transparent;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.stat-card.active {
+    border-color: var(--primary);
+    background: #b0001e08;
+}
+
+.stat-number {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    line-height: 1.2;
+}
+
+.stat-label {
+    font-size: 0.6rem;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.stat-activos .stat-number {
+    color: var(--success);
+}
+
+.stat-inactivos .stat-number {
+    color: var(--gray-500);
+}
+
+.stat-sin-asignar .stat-number {
+    color: var(--warning);
+}
+
+.dispositivos-section {
+    background: white;
+    padding: 16px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-md);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.section-header h2 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.section-header h2 i {
+    color: var(--primary);
+}
+
+.dispositivos-count {
+    font-size: 0.8rem;
+    color: var(--gray-500);
+    background: var(--gray-100);
+    padding: 2px 14px;
+    border-radius: 20px;
+}
+
+.search-section {
+    margin-bottom: 12px;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    background: var(--gray-50);
+    border: 1.5px solid var(--gray-200);
+    border-radius: 10px;
+    padding: 0 14px;
+    transition: var(--transition);
+}
+
+.search-box:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(176, 0, 30, 0.1);
+}
+
+.search-box i {
+    color: var(--gray-400);
+    font-size: 0.95rem;
+}
+
+.search-input {
+    flex: 1;
+    padding: 10px 12px;
+    border: none;
+    outline: none;
+    font-size: 0.9rem;
+    color: var(--gray-800);
+    background: transparent;
+}
+
+.btn-clear {
+    background: none;
+    border: none;
+    color: var(--gray-400);
+    cursor: pointer;
+    padding: 4px;
+    transition: var(--transition);
+}
+
+.btn-clear:hover {
+    color: var(--gray-600);
+}
+
+.dispositivos-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.dispositivo-card {
+    background: var(--gray-50);
+    border-radius: var(--border-radius-sm);
+    padding: 14px;
+    transition: var(--transition);
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.dispositivo-card:hover {
+    border-color: var(--gray-200);
+    box-shadow: var(--shadow-md);
+}
+
+.dispositivo-card:active {
+    transform: scale(0.98);
+}
+
+.dispositivo-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.dispositivo-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.dispositivo-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.dispositivo-info h3 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin: 0;
+}
+
+.dispositivo-mac {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    margin: 2px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.dispositivo-mac i {
+    font-size: 0.7rem;
+    color: var(--gray-400);
+}
+
+.dispositivo-paciente {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    margin: 2px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.dispositivo-paciente i {
+    font-size: 0.7rem;
+    color: var(--gray-400);
+}
+
+.text-muted {
+    color: var(--gray-400);
+}
+
+.estado-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 0.6rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.estado-activo {
+    background: #10b98115;
+    color: #10b981;
+}
+
+.estado-inactivo {
+    background: #94a3b815;
+    color: var(--gray-500);
+}
+
+.dispositivo-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.dispositivo-detalles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+}
+
+.detalle {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.7rem;
+    color: var(--gray-600);
+}
+
+.detalle i {
+    font-size: 0.7rem;
+    color: var(--gray-400);
+}
+
+.dispositivo-acciones {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-detalle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: white;
+    color: var(--gray-400);
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow);
+}
+
+.btn-detalle:hover {
+    background: var(--primary);
+    color: white;
+    transform: scale(1.05);
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 12px;
+    color: var(--gray-400);
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 12px;
+    opacity: 0.5;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 400px;
+    width: 100%;
+    pointer-events: none;
+}
+
+.toast-notification {
+    background: white;
+    border-radius: 12px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow-xl);
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    pointer-events: all;
+    animation: slideInRight 0.4s ease;
+    position: relative;
+    overflow: hidden;
+    border-left: 4px solid var(--gray-400);
+    transition: all 0.3s ease;
+}
+
+.toast-notification:hover {
+    transform: translateX(-4px);
+}
+
+.toast-notification.toast-exit {
+    animation: slideOutRight 0.3s ease forwards;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+}
+
+.toast-success {
+    border-left-color: var(--success);
+}
+
+.toast-success .toast-icon i {
+    color: var(--success);
+}
+
+.toast-success .toast-progress {
+    background: var(--success);
+}
+
+.toast-error {
+    border-left-color: var(--danger);
+}
+
+.toast-error .toast-icon i {
+    color: var(--danger);
+}
+
+.toast-error .toast-progress {
+    background: var(--danger);
+}
+
+.toast-warning {
+    border-left-color: var(--warning);
+}
+
+.toast-warning .toast-icon i {
+    color: var(--warning);
+}
+
+.toast-warning .toast-progress {
+    background: var(--warning);
+}
+
+.toast-info {
+    border-left-color: var(--info);
+}
+
+.toast-info .toast-icon i {
+    color: var(--info);
+}
+
+.toast-info .toast-progress {
+    background: var(--info);
+}
+
+.toast-icon {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+}
+
+.toast-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.toast-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--gray-800);
+    margin-bottom: 2px;
+}
+
+.toast-message {
+    font-size: 0.85rem;
+    color: var(--gray-600);
+    line-height: 1.4;
+}
+
+.toast-close {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: var(--gray-400);
+    cursor: pointer;
+    padding: 4px;
+    font-size: 0.9rem;
+    transition: var(--transition);
+}
+
+.toast-close:hover {
+    color: var(--gray-600);
+    transform: rotate(90deg);
+}
+
+.toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: var(--gray-400);
+    animation: progressBar linear forwards;
+}
+
+@keyframes progressBar {
+    from {
+        width: 100%;
+    }
+
+    to {
+        width: 0%;
+    }
+}
+
+@media screen and (min-width: 1025px) {
+    .dispositivos-container {
+        padding: 24px 32px 100px;
+    }
+
+    .header-info h1 {
+        font-size: 1.8rem;
+    }
+
+    .header-info p {
+        font-size: 0.95rem;
+    }
+
+    .stat-card {
+        padding: 20px 16px;
+    }
+
+    .stat-number {
+        font-size: 1.8rem;
+    }
+
+    .stat-label {
+        font-size: 0.7rem;
+    }
+
+    .dispositivos-section {
+        padding: 24px 28px;
+    }
+
+    .section-header h2 {
+        font-size: 1.1rem;
+    }
+
+    .dispositivos-count {
+        font-size: 0.9rem;
+        padding: 4px 18px;
+    }
+
+    .search-box {
+        padding: 0 16px;
+        border-width: 2px;
+    }
+
+    .search-box i {
+        font-size: 1.1rem;
+    }
+
+    .search-input {
+        padding: 12px 14px;
+        font-size: 1rem;
+    }
+
+    .dispositivos-list {
+        gap: 14px;
+    }
+
+    .dispositivo-card {
+        padding: 18px 20px;
+    }
+
+    .dispositivo-header {
+        gap: 16px;
+        margin-bottom: 12px;
+    }
+
+    .dispositivo-icon {
+        width: 46px;
+        height: 46px;
+        font-size: 1.15rem;
+    }
+
+    .dispositivo-info h3 {
+        font-size: 0.95rem;
+    }
+
+    .dispositivo-mac {
+        font-size: 0.8rem;
+    }
+
+    .dispositivo-paciente {
+        font-size: 0.8rem;
+    }
+
+    .estado-badge {
+        font-size: 0.65rem;
+        padding: 3px 12px;
+    }
+
+    .detalle {
+        font-size: 0.75rem;
+    }
+
+    .detalle i {
+        font-size: 0.75rem;
+    }
+
+    .btn-detalle {
+        width: 32px;
+        height: 32px;
+        font-size: 0.95rem;
+    }
+
+    .toast-container {
+        max-width: 480px;
+        top: 24px;
+        right: 24px;
+        gap: 14px;
+    }
+
+    .toast-notification {
+        padding: 18px 22px;
+        border-radius: 14px;
+        border-left-width: 5px;
+    }
+
+    .toast-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 1.6rem;
+    }
+
+    .toast-title {
+        font-size: 0.95rem;
+    }
+
+    .toast-message {
+        font-size: 0.9rem;
+    }
+
+    .toast-close {
+        font-size: 1rem;
+        padding: 6px;
+    }
+
+    .toast-progress {
+        height: 4px;
+    }
+}
+
+@media screen and (max-width: 1024px) and (min-width: 769px) {
+    .dispositivos-container {
+        padding: 20px 24px 90px;
+    }
+
+    .stats-grid {
+        gap: 10px;
+    }
+
+    .stat-card {
+        padding: 16px 12px;
+    }
+
+    .stat-number {
+        font-size: 1.6rem;
+    }
+
+    .dispositivos-section {
+        padding: 20px 24px;
+    }
+
+    .dispositivo-card {
+        padding: 16px 18px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .dispositivos-container {
+        padding: 16px 16px 85px;
+    }
+
+    .header-info h1 {
+        font-size: 1.3rem;
+    }
+
+    .header-info p {
+        font-size: 0.8rem;
+    }
+
+    .stats-grid {
+        gap: 6px;
+    }
+
+    .stat-card {
+        padding: 10px 4px;
+    }
+
+    .stat-number {
+        font-size: 1.15rem;
+    }
+
+    .dispositivos-section {
+        padding: 14px;
+        border-radius: var(--border-radius-sm);
+    }
+
+    .dispositivo-card {
+        padding: 12px;
+    }
+
+    .dispositivo-header {
+        gap: 10px;
+    }
+
+    .dispositivo-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 0.9rem;
+    }
+
+    .dispositivo-info h3 {
+        font-size: 0.8rem;
+    }
+
+    .dispositivo-body {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .dispositivo-acciones {
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .dispositivo-header {
+        flex-wrap: wrap;
+    }
+
+    .toast-container {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        top: 10px;
+    }
+
+    .toast-notification {
+        padding: 12px 14px;
+        border-radius: 10px;
+    }
+
+    .toast-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 1.2rem;
+    }
+
+    .toast-title {
+        font-size: 0.8rem;
+    }
+
+    .toast-message {
+        font-size: 0.75rem;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .dispositivos-container {
+        padding: 12px 12px 80px;
+    }
+
+    .header-info h1 {
+        font-size: 1.1rem;
+    }
+
+    .header-info p {
+        font-size: 0.7rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 4px;
+    }
+
+    .stat-card {
+        padding: 8px 2px;
+        border-radius: 8px;
+        border-width: 1.5px;
+    }
+
+    .stat-number {
+        font-size: 1rem;
+    }
+
+    .stat-label {
+        font-size: 0.5rem;
+    }
+
+    .dispositivos-section {
+        padding: 12px;
+    }
+
+    .section-header h2 {
+        font-size: 0.8rem;
+    }
+
+    .dispositivos-count {
+        font-size: 0.65rem;
+        padding: 1px 10px;
+    }
+
+    .search-box {
+        border-radius: 8px;
+        padding: 0 10px;
+    }
+
+    .search-input {
+        padding: 8px 10px;
+        font-size: 0.85rem;
+    }
+
+    .dispositivos-list {
+        gap: 10px;
+    }
+
+    .dispositivo-card {
+        padding: 10px;
+        border-radius: 8px;
+    }
+
+    .dispositivo-header {
+        gap: 8px;
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+    }
+
+    .dispositivo-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 0.8rem;
+    }
+
+    .dispositivo-info h3 {
+        font-size: 0.75rem;
+    }
+
+    .dispositivo-mac {
+        font-size: 0.65rem;
+    }
+
+    .dispositivo-paciente {
+        font-size: 0.65rem;
+    }
+
+    .estado-badge {
+        font-size: 0.5rem;
+        padding: 1px 8px;
+    }
+
+    .dispositivo-body {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+    }
+
+    .dispositivo-detalles {
+        gap: 4px 10px;
+    }
+
+    .detalle {
+        font-size: 0.6rem;
+    }
+
+    .detalle i {
+        font-size: 0.6rem;
+    }
+
+    .dispositivo-acciones {
+        justify-content: space-between;
+        width: 100%;
+        gap: 6px;
+    }
+
+    .btn-detalle {
+        width: 24px;
+        height: 24px;
+        font-size: 0.75rem;
+    }
+
+    .toast-container {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        top: 10px;
+    }
+
+    .toast-notification {
+        padding: 10px 12px;
+        border-radius: 8px;
+        gap: 10px;
+    }
+
+    .toast-icon {
+        width: 24px;
+        height: 24px;
+        font-size: 1rem;
+    }
+
+    .toast-title {
+        font-size: 0.75rem;
+    }
+
+    .toast-message {
+        font-size: 0.7rem;
+    }
+
+    .toast-close {
+        font-size: 0.8rem;
+        padding: 2px;
+    }
+
+    .empty-state {
+        padding: 30px 12px;
+    }
+
+    .empty-state i {
+        font-size: 2.5rem;
+    }
+
+    .empty-state p {
+        font-size: 0.8rem;
+    }
+}
+
+@media screen and (max-width: 360px) {
+    .dispositivos-container {
+        padding: 10px 10px 75px;
+    }
+
+    .header-info h1 {
+        font-size: 0.95rem;
+    }
+
+    .header-info p {
+        font-size: 0.65rem;
+    }
+
+    .stats-grid {
+        gap: 3px;
+    }
+
+    .stat-card {
+        padding: 6px 2px;
+        border-radius: 6px;
+    }
+
+    .stat-number {
+        font-size: 0.9rem;
+    }
+
+    .stat-label {
+        font-size: 0.45rem;
+    }
+
+    .dispositivos-section {
+        padding: 10px;
+    }
+
+    .section-header h2 {
+        font-size: 0.7rem;
+    }
+
+    .dispositivos-count {
+        font-size: 0.55rem;
+        padding: 1px 8px;
+    }
+
+    .search-box {
+        padding: 0 8px;
+    }
+
+    .search-input {
+        padding: 6px 8px;
+        font-size: 0.8rem;
+    }
+
+    .dispositivo-card {
+        padding: 8px;
+    }
+
+    .dispositivo-header {
+        gap: 6px;
+    }
+
+    .dispositivo-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 0.7rem;
+    }
+
+    .dispositivo-info h3 {
+        font-size: 0.7rem;
+    }
+
+    .dispositivo-mac {
+        font-size: 0.6rem;
+    }
+
+    .dispositivo-paciente {
+        font-size: 0.6rem;
+    }
+
+    .estado-badge {
+        font-size: 0.45rem;
+        padding: 1px 6px;
+    }
+
+    .detalle {
+        font-size: 0.55rem;
+    }
+
+    .detalle i {
+        font-size: 0.55rem;
+    }
+
+    .btn-detalle {
+        width: 20px;
+        height: 20px;
+        font-size: 0.65rem;
+    }
+
+    .toast-notification {
+        padding: 8px 10px;
+    }
+
+    .toast-title {
+        font-size: 0.7rem;
+    }
+
+    .toast-message {
+        font-size: 0.65rem;
+    }
+
+    .empty-state i {
+        font-size: 2rem;
+    }
+
+    .empty-state p {
+        font-size: 0.7rem;
+    }
+}

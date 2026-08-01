@@ -1,0 +1,185 @@
+<app-caregiver-menu></app-caregiver-menu>
+
+<div class="toast-container" *ngIf="notifications.length > 0">
+    <div *ngFor="let notif of notifications; let i = index" class="toast-notification toast-{{ notif.type }}"
+        [class.toast-exit]="i > 0">
+        <div class="toast-icon">
+            <i class="bi" [class]="
+                notif.type === 'success' ? 'bi-check-circle-fill' :
+                notif.type === 'error' ? 'bi-x-circle-fill' :
+                notif.type === 'warning' ? 'bi-exclamation-triangle-fill' :
+                'bi-info-circle-fill'
+            "></i>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title">{{ notif.title }}</div>
+            <div class="toast-message">{{ notif.message }}</div>
+        </div>
+        <button class="toast-close" (click)="removeToast(notif.id)">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        <div class="toast-progress" [style.animation-duration]="(notif.duration || 5000) + 'ms'"></div>
+    </div>
+</div>
+
+<div class="detalle-container">
+    <div class="back-section">
+        <button class="btn-back" (click)="volver()">
+            <i class="bi bi-arrow-left"></i>
+            <span>Volver a dispositivos</span>
+        </button>
+    </div>
+
+    <div *ngIf="isLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Cargando informacion del dispositivo...</p>
+    </div>
+
+    <div *ngIf="!isLoading && dispositivo" class="detalle-content">
+        <div class="detalle-card">
+            <div class="detalle-header">
+                <div class="dispositivo-icon">
+                    <i class="bi bi-device-hdd"></i>
+                </div>
+                <div class="dispositivo-info-principal">
+                    <h1>{{ dispositivo.nombre || 'Dispositivo' }}</h1>
+                    <p class="dispositivo-mac">
+                        <i class="bi bi-wifi"></i> {{ dispositivo.direccionmac }}
+                    </p>
+                    <p class="dispositivo-paciente"
+                        *ngIf="dispositivo.nombrepaciente && dispositivo.nombrepaciente !== 'Sin asignar'">
+                        <i class="bi bi-person"></i> {{ dispositivo.nombrepaciente }}
+                    </p>
+                    <p class="dispositivo-paciente"
+                        *ngIf="!dispositivo.nombrepaciente || dispositivo.nombrepaciente === 'Sin asignar'">
+                        <i class="bi bi-person"></i> <span class="text-muted">Sin asignar</span>
+                    </p>
+                </div>
+                <span class="estado-badge" [class]="getEstadoClass(dispositivo.activo)">
+                    <i class="bi" [class]="getEstadoIcon(dispositivo.activo)"></i>
+                    {{ getEstadoTexto(dispositivo.activo) }}
+                </span>
+            </div>
+
+            <div class="detalle-body">
+                <div class="detalle-grid">
+                    <div class="detalle-item">
+                        <span class="detalle-label">Nombre</span>
+                        <span class="detalle-valor">{{ dispositivo.nombre }}</span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-label">Direccion MAC</span>
+                        <span class="detalle-valor">{{ dispositivo.direccionmac }}</span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-label">Estado</span>
+                        <span class="detalle-valor">
+                            <span class="estado-badge" [class]="getEstadoClass(dispositivo.activo)">
+                                <i class="bi" [class]="getEstadoIcon(dispositivo.activo)"></i>
+                                {{ getEstadoTexto(dispositivo.activo) }}
+                            </span>
+                        </span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-label">Paciente</span>
+                        <span class="detalle-valor">{{ dispositivo.nombrepaciente || 'Sin asignar' }}</span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-label">Ultima Sincronizacion</span>
+                        <span class="detalle-valor">{{ dispositivo.ultimasincronizacion ?
+                            formatearFechaUltimaSincronizacion(dispositivo.ultimasincronizacion) : 'No sincronizado'
+                            }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="acceso-section" *ngIf="!tieneAcceso && dispositivo.idpacienteasociado">
+                <div class="acceso-mensaje">
+                    <i class="bi bi-shield-lock"></i>
+                    <span>No tienes acceso a este paciente</span>
+                </div>
+                <span *ngIf="solicitudEnviada" class="solicitud-enviada-text">
+                    <i class="bi bi-clock-history"></i>
+                    Solicitud enviada, esperando aprobacion
+                </span>
+                <div *ngIf="!solicitudEnviada" class="acceso-actions">
+                    <button class="btn-solicitar" (click)="solicitarAcceso()">
+                        <i class="bi bi-person-plus"></i>
+                        Solicitar Acceso
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCION DE HISTORIAL DE MEDICIONES -->
+        <div class="historial-section" *ngIf="tieneAcceso && dispositivo.idpacienteasociado">
+            <div class="historial-header">
+                <h2><i class="bi bi-clock-history"></i> Historial de Mediciones</h2>
+                <span class="historial-count">{{ mediciones.length }} medicion{{
+                    mediciones.length !== 1 ? 'es' : '' }}</span>
+            </div>
+
+            <div *ngIf="cargandoMediciones" class="loading-mediciones">
+                <div class="spinner-small"></div>
+                <span>Cargando historial...</span>
+            </div>
+
+            <div *ngIf="!cargandoMediciones && mediciones.length > 0" class="mediciones-list">
+                <div *ngFor="let m of mediciones" class="medicion-item">
+                    <div class="medicion-fecha">
+                        <span class="medicion-dia">{{ formatearFecha(m.fechahoralectura) }}</span>
+                        <span class="medicion-hora" *ngIf="formatearHoraHistorial(m.fechahoralectura)">
+                            {{ formatearHoraHistorial(m.fechahoralectura) }}
+                        </span>
+                    </div>
+                    <div class="medicion-valores">
+                        <div class="medicion-valor">
+                            <span class="valor">{{ m.sistolica }}</span>
+                            <span class="unidad">mmHg</span>
+                            <span class="label">Sistolica</span>
+                        </div>
+                        <div class="medicion-separador">/</div>
+                        <div class="medicion-valor">
+                            <span class="valor">{{ m.diastolica }}</span>
+                            <span class="unidad">mmHg</span>
+                            <span class="label">Diastolica</span>
+                        </div>
+                        <div class="medicion-valor pulso">
+                            <span class="valor">{{ m.pulso }}</span>
+                            <span class="unidad">bpm</span>
+                            <span class="label">Pulso</span>
+                        </div>
+                    </div>
+                    <span class="clasificacion-badge" [class]="getClasificacionColor(m.clasificacionpresion)">
+                        {{ m.clasificacionpresion || 'Sin clasificar' }}
+                    </span>
+                </div>
+            </div>
+
+            <div *ngIf="!cargandoMediciones && mediciones.length === 0" class="empty-mediciones">
+                <i class="bi bi-heart-pulse"></i>
+                <p>No hay mediciones registradas para este paciente</p>
+            </div>
+        </div>
+
+        <div *ngIf="!tieneAcceso && dispositivo.idpacienteasociado" class="sin-acceso-section">
+            <div class="sin-acceso-mensaje">
+                <i class="bi bi-shield-lock"></i>
+                <p>Solicita acceso al paciente para ver el historial de mediciones</p>
+            </div>
+        </div>
+
+        <div class="detalle-acciones">
+            <button class="btn-volver" (click)="volver()">
+                <i class="bi bi-arrow-left"></i> Volver
+            </button>
+        </div>
+    </div>
+
+    <div *ngIf="!isLoading && !dispositivo" class="error-state">
+        <i class="bi bi-device-hdd"></i>
+        <h3>Dispositivo no encontrado</h3>
+        <p>El dispositivo que buscas no existe o ha sido eliminado</p>
+        <button class="btn-primary" (click)="volver()">Volver a dispositivos</button>
+    </div>
+</div>

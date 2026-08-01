@@ -1,0 +1,213 @@
+<app-caregiver-menu></app-caregiver-menu>
+
+<div class="citas-page">
+    <header class="citas-header">
+        <div class="header-top">
+            <div class="header-info">
+                <h1>Mis Citas</h1>
+                <p>Visualiza las citas de tus pacientes</p>
+            </div>
+        </div>
+    </header>
+
+    <div *ngIf="isLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Cargando tus citas...</p>
+    </div>
+
+    <div *ngIf="!isLoading" class="citas-content">
+        <section class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card" (click)="aplicarFiltro('todas')" [class.active]="filterEstado === 'todas'">
+                    <span class="stat-number">{{ citasEstadisticas.total }}</span>
+                    <span class="stat-label">Total</span>
+                </div>
+                <div class="stat-card stat-programada" (click)="aplicarFiltro('programada')"
+                    [class.active]="filterEstado === 'programada'">
+                    <span class="stat-number">{{ citasEstadisticas.programadas }}</span>
+                    <span class="stat-label">Programadas</span>
+                </div>
+                <div class="stat-card stat-completada" (click)="aplicarFiltro('completada')"
+                    [class.active]="filterEstado === 'completada'">
+                    <span class="stat-number">{{ citasEstadisticas.completadas }}</span>
+                    <span class="stat-label">Completadas</span>
+                </div>
+                <div class="stat-card stat-cancelada" (click)="aplicarFiltro('cancelada')"
+                    [class.active]="filterEstado === 'cancelada'">
+                    <span class="stat-number">{{ citasEstadisticas.canceladas }}</span>
+                    <span class="stat-label">Canceladas</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="citas-section">
+            <div class="section-header">
+                <h2><i class="bi bi-list-ul"></i> Lista de Citas</h2>
+                <span class="citas-count">{{ citasFiltradas.length }} cita{{ citasFiltradas.length !== 1 ? 's' : ''
+                    }}</span>
+            </div>
+
+            <div class="filtros-rapidos">
+                <button class="filtro-btn" [class.active]="filterEstado === 'todas'" (click)="aplicarFiltro('todas')">
+                    <i class="bi bi-grid-3x3-gap-fill"></i> Todas
+                </button>
+                <button class="filtro-btn" [class.active]="filterEstado === 'programada'"
+                    (click)="aplicarFiltro('programada')">
+                    <i class="bi bi-calendar-plus"></i> Programadas
+                </button>
+                <button class="filtro-btn" [class.active]="filterEstado === 'completada'"
+                    (click)="aplicarFiltro('completada')">
+                    <i class="bi bi-check2-circle"></i> Completadas
+                </button>
+                <button class="filtro-btn" [class.active]="filterEstado === 'cancelada'"
+                    (click)="aplicarFiltro('cancelada')">
+                    <i class="bi bi-x-circle"></i> Canceladas
+                </button>
+            </div>
+
+            <div class="citas-list">
+                <!-- CARD COMPLETA CLICKEABLE -->
+                <div *ngFor="let cita of citasFiltradas" class="cita-card" (click)="verDetalleCita(cita)">
+                    <div class="cita-card-header">
+                        <div class="cita-fecha-badge">
+                            <span class="cita-dia">{{ obtenerDia(cita.fechacita || cita.fecha) }}</span>
+                            <span class="cita-mes">{{ obtenerMes(cita.fechacita || cita.fecha) }}</span>
+                        </div>
+                        <div class="cita-info-principal">
+                            <h3>{{ cita.motivo || cita.Motivo || 'Consulta Medica' }}</h3>
+                            <p class="cita-paciente">
+                                <i class="bi bi-person"></i>
+                                {{ cita.paciente || cita.nombrePaciente || 'Paciente' }}
+                            </p>
+                            <p class="cita-especialidad" *ngIf="cita.especialidad">
+                                <i class="bi bi-briefcase"></i> {{ cita.especialidad }}
+                            </p>
+                        </div>
+                        <div class="header-actions">
+                            <span class="badge-tiempo" [class]="getBadgeTiempoClass(cita.fechacita || cita.fecha)">
+                                {{ obtenerBadgeTiempo(cita.fechacita || cita.fecha) }}
+                            </span>
+                            <span class="acceso-badge" [class]="getAccesoStatus(cita).clase"
+                                title="{{ getAccesoStatus(cita).texto }}">
+                                <i class="bi" [class]="getAccesoStatus(cita).icono"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="cita-card-body">
+                        <div class="cita-detalles">
+                            <div class="cita-detalle">
+                                <i class="bi bi-clock"></i>
+                                <span>{{ formatearHora(cita.horacita || cita.hora) }}</span>
+                            </div>
+                            <div class="cita-detalle">
+                                <i class="bi bi-calendar3"></i>
+                                <span>{{ formatearFecha(cita.fechacita || cita.fecha) }}</span>
+                            </div>
+                            <div class="cita-detalle">
+                                <i class="bi" [class]="cita.modalidad === 'Virtual' ? 'bi-laptop' : 'bi-building'"></i>
+                                <span class="modalidad-badge"
+                                    [class]="cita.modalidad === 'Virtual' ? 'modalidad-virtual' : 'modalidad-presencial'">
+                                    {{ cita.modalidad || 'Presencial' }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="cita-acciones">
+                            <span class="estado-badge" [class]="getEstadoClass(cita.estado)">
+                                <i class="bi" [class]="getEstadoIcon(cita.estado)"></i>
+                                {{ cita.estado || 'Programada' }}
+                            </span>
+                            <div class="acciones-group">
+                                <!-- Botón Detalle - CON stopPropagation -->
+                                <button class="btn-detalle" (click)="$event.stopPropagation(); verDetalleCita(cita)"
+                                    title="Ver detalle">
+                                    <i class="bi bi-chevron-right"></i>
+                                </button>
+                                <!-- Botón Solicitar Acceso - CON stopPropagation -->
+                                <button *ngIf="!cita.tieneAcceso && !cita.solicitudEnviada" class="btn-solicitar-acceso"
+                                    (click)="$event.stopPropagation(); abrirModalSolicitud(cita)"
+                                    title="Solicitar acceso al paciente">
+                                    <i class="bi bi-person-plus"></i>
+                                </button>
+                                <span *ngIf="cita.solicitudEnviada" class="solicitud-enviada-badge"
+                                    title="Solicitud enviada">
+                                    <i class="bi bi-clock-history"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="!citasFiltradas.length" class="empty-state">
+                    <i class="bi bi-calendar-x"></i>
+                    <p>No tienes citas {{ filterEstado !== 'todas' ? filterEstado : '' }}</p>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<!-- Modal de Solicitud de Acceso -->
+<div class="modal-overlay" *ngIf="mostrarModalSolicitud">
+    <div class="modal-content modal-solicitud">
+        <div class="modal-header">
+            <h2><i class="bi bi-person-plus"></i> Solicitar Acceso a Paciente</h2>
+            <button class="btn-close-modal" (click)="cerrarModalSolicitud()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <p class="modal-subtitle">
+                Solicita acceso al paciente <strong>{{ pacienteSolicitado?.paciente || '' }}</strong>
+            </p>
+
+            <div class="form-group">
+                <label>Parentesco o relacion *</label>
+                <select [(ngModel)]="parentesco" class="form-control">
+                    <option value="">Selecciona...</option>
+                    <option *ngFor="let p of parentescos" [value]="p">{{ p }}</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Notas adicionales</label>
+                <textarea [(ngModel)]="notas" rows="3"
+                    placeholder="Describe tu relacion con el paciente, motivo de la solicitud..."
+                    class="form-control"></textarea>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-cancelar" (click)="cerrarModalSolicitud()">Cancelar</button>
+            <button class="btn-enviar" (click)="enviarSolicitud()" [disabled]="enviandoSolicitud">
+                <i class="bi bi-send"></i>
+                {{ enviandoSolicitud ? 'Enviando...' : 'Enviar Solicitud' }}
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notifications -->
+<div class="toast-container">
+    <div *ngFor="let toast of notifications" class="toast-notification toast-{{ toast.type }}"
+        [class.toast-exit]="toast.duration === 0">
+        <div class="toast-icon">
+            <i class="bi" [class]="
+                toast.type === 'success' ? 'bi-check-circle-fill' :
+                toast.type === 'error' ? 'bi-x-circle-fill' :
+                toast.type === 'warning' ? 'bi-exclamation-triangle-fill' :
+                'bi-info-circle-fill'
+            "></i>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title">{{ toast.title }}</div>
+            <div class="toast-message">{{ toast.message }}</div>
+        </div>
+        <button class="toast-close" (click)="removerToast(toast.id)">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        <div class="toast-progress" [style.animation-duration]="(toast.duration || 4000) + 'ms'"></div>
+    </div>
+</div>

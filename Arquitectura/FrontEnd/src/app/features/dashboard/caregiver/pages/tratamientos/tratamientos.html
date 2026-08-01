@@ -1,0 +1,196 @@
+<app-caregiver-menu></app-caregiver-menu>
+
+<div class="toast-container" *ngIf="notifications.length > 0">
+    <div *ngFor="let notif of notifications; let i = index" class="toast-notification toast-{{ notif.type }}"
+        [class.toast-exit]="i > 0">
+        <div class="toast-icon">
+            <i class="bi" [class]="
+                notif.type === 'success' ? 'bi-check-circle-fill' :
+                notif.type === 'error' ? 'bi-x-circle-fill' :
+                notif.type === 'warning' ? 'bi-exclamation-triangle-fill' :
+                'bi-info-circle-fill'
+            "></i>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title">{{ notif.title }}</div>
+            <div class="toast-message">{{ notif.message }}</div>
+        </div>
+        <button class="toast-close" (click)="removeToast(notif.id)">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        <div class="toast-progress" [style.animation-duration]="(notif.duration || 5000) + 'ms'"></div>
+    </div>
+</div>
+
+<div class="tratamientos-container">
+    <header class="page-header">
+        <div class="header-top">
+            <div class="header-info">
+                <h1>Tratamientos</h1>
+                <p>Visualiza los tratamientos de tus pacientes</p>
+            </div>
+        </div>
+    </header>
+
+    <div *ngIf="isLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Cargando tratamientos...</p>
+    </div>
+
+    <div *ngIf="!isLoading" class="tratamientos-content">
+        <section class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card" (click)="aplicarFiltro('todos')" [class.active]="filterEstado === 'todos'">
+                    <span class="stat-number">{{ estadisticas.total }}</span>
+                    <span class="stat-label">Total</span>
+                </div>
+                <div class="stat-card stat-activos" (click)="aplicarFiltro('activos')"
+                    [class.active]="filterEstado === 'activos'">
+                    <span class="stat-number">{{ estadisticas.activos }}</span>
+                    <span class="stat-label">Activos</span>
+                </div>
+                <div class="stat-card stat-inactivos" (click)="aplicarFiltro('inactivos')"
+                    [class.active]="filterEstado === 'inactivos'">
+                    <span class="stat-number">{{ estadisticas.inactivos }}</span>
+                    <span class="stat-label">Inactivos</span>
+                </div>
+                <div class="stat-card stat-vencidos" (click)="aplicarFiltro('vencidos')"
+                    [class.active]="filterEstado === 'vencidos'">
+                    <span class="stat-number">{{ estadisticas.vencidos }}</span>
+                    <span class="stat-label">Vencidos</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="tratamientos-section">
+            <div class="section-header">
+                <h2><i class="bi bi-list-ul"></i> Lista de Tratamientos</h2>
+                <span class="tratamientos-count">{{ tratamientosFiltrados.length }} tratamiento{{
+                    tratamientosFiltrados.length !== 1 ? 's' : '' }}</span>
+            </div>
+
+            <div class="search-section">
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" [(ngModel)]="searchTerm" (input)="buscarTratamientos()"
+                        placeholder="Buscar por medicamento, paciente o dosis..." class="search-input" />
+                    <button *ngIf="searchTerm" class="btn-clear" (click)="searchTerm = ''; buscarTratamientos()">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="tratamientos-list">
+                <!-- CARD COMPLETA CLICKEABLE -->
+                <div *ngFor="let t of tratamientosFiltrados" class="tratamiento-card" (click)="verDetalle(t)">
+                    <div class="tratamiento-header">
+                        <div class="tratamiento-icon">
+                            <i class="bi bi-prescription"></i>
+                        </div>
+                        <div class="tratamiento-info">
+                            <h3>{{ t.nombreMedicamento || 'Medicamento' }}</h3>
+                            <p class="tratamiento-paciente">
+                                <i class="bi bi-person"></i>
+                                {{ t.nombrePaciente || 'Paciente' }}
+                            </p>
+                        </div>
+                        <div class="header-actions">
+                            <span class="badge" [class]="getEstadoClass(t.activo !== false && t.activo !== 0)">
+                                {{ getEstadoTexto(t.activo !== false && t.activo !== 0) }}
+                            </span>
+                            <span class="acceso-badge" [class]="getAccesoStatus(t).clase"
+                                title="{{ getAccesoStatus(t).texto }}">
+                                <i class="bi" [class]="getAccesoStatus(t).icono"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="tratamiento-body">
+                        <div class="tratamiento-detalles">
+                            <div class="detalle">
+                                <i class="bi bi-droplet"></i>
+                                <span>{{ t.dosis || 'Dosis no especificada' }}</span>
+                            </div>
+                            <div class="detalle" *ngIf="t.frecuenciaHoras || t.frecuenciashoras">
+                                <i class="bi bi-clock"></i>
+                                <span>Cada {{ t.frecuenciaHoras || t.frecuenciashoras }}h</span>
+                            </div>
+                            <div class="detalle">
+                                <i class="bi bi-calendar3"></i>
+                                <span>{{ formatearFecha(t.fechaInicio || t.fechainicio) }} - {{
+                                    formatearFecha(t.fechaFin || t.fechafin) }}</span>
+                            </div>
+                            <div class="detalle" *ngIf="esTratamientoVencido(t.fechaFin || t.fechafin)">
+                                <span class="badge-vencido">Vencido</span>
+                            </div>
+                        </div>
+
+                        <div class="tratamiento-acciones">
+                            <!-- Botón Solicitar Acceso - CON stopPropagation para no redirigir -->
+                            <button *ngIf="!t.tieneAcceso && !t.solicitudEnviada" class="btn-solicitar-acceso"
+                                (click)="$event.stopPropagation(); abrirModalSolicitud(t)"
+                                title="Solicitar acceso al paciente">
+                                <i class="bi bi-person-plus"></i>
+                            </button>
+                            <!-- Badge Solicitud Enviada -->
+                            <span *ngIf="t.solicitudEnviada" class="solicitud-enviada-badge" title="Solicitud enviada">
+                                <i class="bi bi-clock-history"></i>
+                            </span>
+                            <!-- Botón Detalle - CON stopPropagation -->
+                            <button class="btn-detalle" (click)="$event.stopPropagation(); verDetalle(t)"
+                                title="Ver detalle">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="!tratamientosFiltrados.length" class="empty-state">
+                    <i class="bi bi-prescription"></i>
+                    <p>No hay tratamientos {{ filterEstado !== 'todos' ? filterEstado : '' }}</p>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<!-- Modal de Solicitud de Acceso -->
+<div class="modal-overlay" *ngIf="mostrarModalSolicitud">
+    <div class="modal-content modal-solicitud">
+        <div class="modal-header">
+            <h2><i class="bi bi-person-plus"></i> Solicitar Acceso a Paciente</h2>
+            <button class="btn-close-modal" (click)="cerrarModalSolicitud()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <p class="modal-subtitle">
+                Solicita acceso al paciente <strong>{{ pacienteSolicitado?.nombrePaciente || '' }}</strong>
+            </p>
+
+            <div class="form-group">
+                <label>Parentesco o relacion *</label>
+                <select [(ngModel)]="parentesco" class="form-control">
+                    <option value="">Selecciona...</option>
+                    <option *ngFor="let p of parentescos" [value]="p">{{ p }}</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Notas adicionales</label>
+                <textarea [(ngModel)]="notas" rows="3"
+                    placeholder="Describe tu relacion con el paciente, motivo de la solicitud..."
+                    class="form-control"></textarea>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-cancelar" (click)="cerrarModalSolicitud()">Cancelar</button>
+            <button class="btn-enviar" (click)="enviarSolicitud()" [disabled]="enviandoSolicitud">
+                <i class="bi bi-send"></i>
+                {{ enviandoSolicitud ? 'Enviando...' : 'Enviar Solicitud' }}
+            </button>
+        </div>
+    </div>
+</div>

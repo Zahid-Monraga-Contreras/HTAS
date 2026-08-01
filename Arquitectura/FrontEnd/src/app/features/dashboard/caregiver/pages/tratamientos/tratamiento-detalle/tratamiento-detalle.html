@@ -1,0 +1,288 @@
+<app-caregiver-menu></app-caregiver-menu>
+
+<div class="toast-container" *ngIf="notifications.length > 0">
+    <div *ngFor="let notif of notifications; let i = index" class="toast-notification toast-{{ notif.type }}"
+        [class.toast-exit]="i > 0">
+        <div class="toast-icon">
+            <i class="bi" [class]="
+                notif.type === 'success' ? 'bi-check-circle-fill' :
+                notif.type === 'error' ? 'bi-x-circle-fill' :
+                notif.type === 'warning' ? 'bi-exclamation-triangle-fill' :
+                'bi-info-circle-fill'
+            "></i>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title">{{ notif.title }}</div>
+            <div class="toast-message">{{ notif.message }}</div>
+        </div>
+        <button class="toast-close" (click)="removeToast(notif.id)">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        <div class="toast-progress" [style.animation-duration]="(notif.duration || 5000) + 'ms'"></div>
+    </div>
+</div>
+
+<div class="detalle-container">
+    <!-- BOTON VOLVER -->
+    <div class="back-section">
+        <button class="btn-back" (click)="volver()">
+            <i class="bi bi-arrow-left"></i>
+            <span>Volver a tratamientos</span>
+        </button>
+    </div>
+
+    <!-- LOADING -->
+    <div *ngIf="isLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Cargando informacion del tratamiento...</p>
+    </div>
+
+    <!-- CONTENIDO -->
+    <div *ngIf="!isLoading && tratamiento" class="detalle-content">
+
+        <div class="detalle-card">
+            <!-- Header del tratamiento -->
+            <div class="detalle-header">
+                <div class="tratamiento-icon">
+                    <i class="bi bi-prescription"></i>
+                </div>
+                <div class="tratamiento-info-principal">
+                    <h1>{{ tratamiento.nombreMedicamento || 'Medicamento' }}</h1>
+                    <p class="tratamiento-paciente">
+                        <i class="bi bi-person"></i>
+                        {{ tratamiento.nombrePaciente || tratamiento.paciente || 'Paciente' }}
+                    </p>
+                </div>
+                <span class="estado-badge"
+                    [class]="getEstadoClass(tratamiento.activo !== false && tratamiento.activo !== 0)">
+                    {{ getEstadoTexto(tratamiento.activo !== false && tratamiento.activo !== 0) }}
+                </span>
+            </div>
+
+            <!-- Detalles del tratamiento -->
+            <div class="detalle-body">
+                <div class="detalle-grid">
+                    <div class="detalle-item">
+                        <span class="detalle-label">Medicamento</span>
+                        <span class="detalle-valor">{{ tratamiento.nombreMedicamento || 'Medicamento' }}</span>
+                    </div>
+                    <div class="detalle-item" *ngIf="tratamiento.sustanciaActiva || tratamiento.SustanciaActiva">
+                        <span class="detalle-label">Sustancia Activa</span>
+                        <span class="detalle-valor">{{ tratamiento.sustanciaActiva || tratamiento.SustanciaActiva
+                            }}</span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-label">Dosis</span>
+                        <span class="detalle-valor">{{ tratamiento.dosis || 'No especificada' }}</span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-label">Frecuencia</span>
+                        <span class="detalle-valor">{{ tratamiento.frecuenciaHoras || tratamiento.frecuenciashoras ?
+                            'Cada ' + (tratamiento.frecuenciaHoras || tratamiento.frecuenciashoras) + ' horas' : 'No
+                            especificada' }}</span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-label">Fecha de Inicio</span>
+                        <span class="detalle-valor">{{ formatearFechaCompleta(tratamiento.fechaInicio ||
+                            tratamiento.fechainicio) }}</span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-label">Fecha de Fin</span>
+                        <span class="detalle-valor">{{ formatearFechaCompleta(tratamiento.fechaFin ||
+                            tratamiento.fechafin) }}</span>
+                    </div>
+                    <div class="detalle-item"
+                        *ngIf="esTratamientoVencido(tratamiento.fechaFin || tratamiento.fechafin)">
+                        <span class="detalle-label">Estado</span>
+                        <span class="detalle-valor" style="color: var(--warning); font-weight: 600;">Vencido</span>
+                    </div>
+                    <div class="detalle-item" *ngIf="tratamiento.notasInstrucciones || tratamiento.notasinstrucciones">
+                        <span class="detalle-label">Instrucciones</span>
+                        <span class="detalle-valor" style="text-align: left; max-width: 70%;">{{
+                            tratamiento.notasInstrucciones || tratamiento.notasinstrucciones }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acceso al paciente -->
+            <div class="acceso-section" *ngIf="!tieneAcceso">
+                <div class="acceso-mensaje">
+                    <i class="bi bi-shield-lock"></i>
+                    <span>No tienes acceso a este paciente</span>
+                </div>
+                <button *ngIf="!solicitudEnviada" class="btn-solicitar-acceso" (click)="abrirModalSolicitud()">
+                    <i class="bi bi-person-plus"></i>
+                    Solicitar Acceso
+                </button>
+                <span *ngIf="solicitudEnviada" class="solicitud-enviada-text">
+                    <i class="bi bi-clock-history"></i>
+                    Solicitud enviada, esperando aprobacion
+                </span>
+            </div>
+        </div>
+
+        <!-- SECCION DE TOMAS -->
+        <div class="tomas-section">
+            <div class="tomas-header">
+                <h2><i class="bi bi-check2-square"></i> Registro de Tomas</h2>
+                <span class="tomas-acceso-label" *ngIf="!tieneAcceso">
+                    <i class="bi bi-lock"></i> Visualización restringida
+                </span>
+            </div>
+
+            <!-- BUSCADOR POR FECHA CON FLATPICKR -->
+            <div class="buscador-tomas" *ngIf="registrosTomas.length > 0 && tieneAcceso">
+                <label for="filtroFecha">
+                    <i class="bi bi-calendar3"></i> Filtrar por fecha:
+                </label>
+                <input type="text" id="filtroFecha" #filtroFechaInput placeholder="Selecciona una fecha" readonly>
+                <button *ngIf="filtroFecha" class="btn-limpiar-filtro" (click)="filtroFecha = ''">
+                    <i class="bi bi-x-circle"></i> Limpiar filtro
+                </button>
+                <span *ngIf="filtroFecha" class="contador-filtro">
+                    (Mostrando {{ registrosTomasFiltrados.length }} de {{ registrosTomas.length }} tomas)
+                </span>
+            </div>
+
+            <div *ngIf="cargandoTomas" class="loading-tomas">
+                <div class="spinner-small"></div>
+                <span>Cargando tomas...</span>
+            </div>
+
+            <!-- Estadisticas de Tomas -->
+            <div *ngIf="!cargandoTomas && estadisticasTomas && tieneAcceso" class="tomas-estadisticas">
+                <div class="toma-stat">
+                    <span class="stat-numero">{{ estadisticasTomas.totalTomas || 0 }}</span>
+                    <span class="stat-label">Total</span>
+                </div>
+                <div class="toma-stat stat-completada">
+                    <span class="stat-numero">{{ estadisticasTomas.tomasCompletadas || 0 }}</span>
+                    <span class="stat-label">Completadas</span>
+                </div>
+                <div class="toma-stat stat-pendiente">
+                    <span class="stat-numero">{{ estadisticasTomas.tomasPendientes || 0 }}</span>
+                    <span class="stat-label">Pendientes</span>
+                </div>
+                <div class="toma-stat stat-omitida">
+                    <span class="stat-numero">{{ estadisticasTomas.tomasOmitidas || 0 }}</span>
+                    <span class="stat-label">Omitidas</span>
+                </div>
+                <div class="toma-stat stat-retrasada">
+                    <span class="stat-numero">{{ estadisticasTomas.tomasRetrasadas || 0 }}</span>
+                    <span class="stat-label">Retrasadas</span>
+                </div>
+                <div class="toma-stat stat-cumplimiento">
+                    <span class="stat-numero">{{ estadisticasTomas.porcentajeCumplimiento || 0 }}%</span>
+                    <span class="stat-label">Cumplimiento</span>
+                </div>
+            </div>
+
+            <!-- Mensaje sin acceso -->
+            <div *ngIf="!tieneAcceso" class="sin-acceso-tomas">
+                <i class="bi bi-shield-lock"></i>
+                <p>Solicita acceso al paciente para ver el registro de tomas</p>
+            </div>
+
+            <!-- Lista de Tomas -->
+            <div *ngIf="!cargandoTomas && tieneAcceso && registrosTomasFiltrados.length > 0" class="tomas-list">
+                <div *ngFor="let toma of registrosTomasFiltrados" class="toma-item"
+                    [class.toma-eliminada]="toma.estado === 'Eliminada'">
+                    <div class="toma-izquierda">
+                        <div class="toma-fecha">
+                            <span class="toma-dia">{{ obtenerDia(toma.fechaProgramada) }}</span>
+                            <span class="toma-mes">{{ obtenerMes(toma.fechaProgramada) }}</span>
+                        </div>
+                        <div class="toma-info">
+                            <span class="toma-hora">{{ formatearHora(toma.fechaProgramada) }}</span>
+                            <span class="toma-estado" [style.color]="getEstadoColor(toma.estado)">
+                                <i class="bi" [class]="getEstadoIcono(toma.estado)"></i>
+                                {{ toma.estado }}
+                            </span>
+                            <span *ngIf="toma.fechaRealizada" class="toma-realizada">
+                                <i class="bi bi-check2"></i>
+                                {{ formatearFechaCompleta(toma.fechaRealizada) }}
+                            </span>
+                            <span *ngIf="toma.nombreAcompanante" class="toma-acompanante">
+                                <i class="bi bi-person-badge"></i>
+                                {{ toma.nombreAcompanante }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="toma-derecha">
+                        <span *ngIf="toma.estado === 'Eliminada'" class="eliminada-label">Eliminada</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mensajes cuando no hay resultados -->
+            <div *ngIf="!cargandoTomas && tieneAcceso && registrosTomas.length === 0" class="sin-tomas">
+                <i class="bi bi-clock-history"></i>
+                <p>No hay tomas registradas para este tratamiento.</p>
+            </div>
+
+            <div *ngIf="!cargandoTomas && tieneAcceso && registrosTomas.length > 0 && registrosTomasFiltrados.length === 0"
+                class="sin-tomas">
+                <i class="bi bi-search"></i>
+                <p>No hay tomas para la fecha seleccionada.</p>
+                <p class="sin-tomas-sub">Intenta con otra fecha o limpia el filtro.</p>
+            </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="detalle-acciones">
+            <button class="btn-volver" (click)="volver()">
+                <i class="bi bi-arrow-left"></i> Volver
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Tratamiento no encontrado -->
+    <div *ngIf="!isLoading && !tratamiento" class="error-state">
+        <i class="bi bi-prescription"></i>
+        <h3>Tratamiento no encontrado</h3>
+        <p>El tratamiento que buscas no existe o ha sido eliminado</p>
+        <button class="btn-primary" (click)="volver()">Volver a tratamientos</button>
+    </div>
+</div>
+
+<!-- Modal de Solicitud de Acceso -->
+<div class="modal-overlay" *ngIf="mostrarModalSolicitud">
+    <div class="modal-content modal-solicitud">
+        <div class="modal-header">
+            <h2><i class="bi bi-person-plus"></i> Solicitar Acceso a Paciente</h2>
+            <button class="btn-close-modal" (click)="cerrarModalSolicitud()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <p class="modal-subtitle">
+                Solicita acceso al paciente <strong>{{ tratamiento?.nombrePaciente || '' }}</strong>
+            </p>
+
+            <div class="form-group">
+                <label>Parentesco o relacion *</label>
+                <select [(ngModel)]="parentesco" class="form-control">
+                    <option value="">Selecciona...</option>
+                    <option *ngFor="let p of parentescos" [value]="p">{{ p }}</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Notas adicionales</label>
+                <textarea [(ngModel)]="notas" rows="3"
+                    placeholder="Describe tu relacion con el paciente, motivo de la solicitud..."
+                    class="form-control"></textarea>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-cancelar" (click)="cerrarModalSolicitud()">Cancelar</button>
+            <button class="btn-enviar" (click)="enviarSolicitud()" [disabled]="enviandoSolicitud">
+                <i class="bi bi-send"></i>
+                {{ enviandoSolicitud ? 'Enviando...' : 'Enviar Solicitud' }}
+            </button>
+        </div>
+    </div>
+</div>

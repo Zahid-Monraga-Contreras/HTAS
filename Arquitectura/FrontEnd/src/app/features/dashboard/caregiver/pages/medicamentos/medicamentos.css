@@ -1,0 +1,1657 @@
+:host {
+    --primary: #b0001e;
+    --primary-dark: #8a0017;
+    --primary-light: #d42a4a;
+    --primary-gradient: linear-gradient(135deg, #b0001e 0%, #d42a4a 100%);
+    --success: #10b981;
+    --success-dark: #059669;
+    --warning: #f59e0b;
+    --warning-dark: #d97706;
+    --danger: #ef4444;
+    --danger-dark: #dc2626;
+    --info: #3b82f6;
+    --info-dark: #2563eb;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-400: #94a3b8;
+    --gray-500: #64748b;
+    --gray-600: #475569;
+    --gray-700: #334155;
+    --gray-800: #1e293b;
+    --gray-900: #0f172a;
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+    --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.15);
+    --border-radius: 16px;
+    --border-radius-sm: 10px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:host {
+    display: block;
+    width: 100%;
+    min-height: 100vh;
+    background: var(--gray-50);
+}
+
+.medicamentos-container {
+    min-height: 100vh;
+    background: var(--gray-50);
+    padding: 16px 16px 100px;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 100%;
+}
+
+.page-header {
+    padding: 0 0 16px;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-info h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin: 0;
+}
+
+.header-info p {
+    font-size: 0.85rem;
+    color: var(--gray-500);
+    margin: 2px 0 0;
+}
+
+.solicitud-pendiente-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: #fef3c7;
+    border: 1px solid #f59e0b;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    color: #92400e;
+    font-size: 0.85rem;
+    flex-wrap: wrap;
+}
+
+.solicitud-pendiente-banner i {
+    font-size: 1.2rem;
+    color: #f59e0b;
+    flex-shrink: 0;
+}
+
+.solicitud-pendiente-banner .banner-text {
+    flex: 1;
+    min-width: 0;
+    word-break: break-word;
+}
+
+.solicitud-pendiente-banner .badge-pendiente {
+    background: #f59e0b;
+    color: white;
+    padding: 2px 12px;
+    border-radius: 20px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--gray-200);
+    border-top: 4px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-container p {
+    margin-top: 16px;
+    color: var(--gray-500);
+    font-size: 0.9rem;
+}
+
+.stats-section {
+    margin-bottom: 20px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.stat-card {
+    background: white;
+    padding: 14px 8px;
+    border-radius: var(--border-radius-sm);
+    text-align: center;
+    box-shadow: var(--shadow-md);
+    cursor: pointer;
+    transition: var(--transition);
+    border: 2px solid transparent;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.stat-card.active {
+    border-color: var(--primary);
+    background: #b0001e08;
+}
+
+.stat-number {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    line-height: 1.2;
+}
+
+.stat-label {
+    font-size: 0.6rem;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.stat-con-tratamientos .stat-number {
+    color: var(--success);
+}
+
+.stat-sin-tratamientos .stat-number {
+    color: var(--gray-400);
+}
+
+.stat-laboratorios .stat-number {
+    color: var(--info);
+}
+
+.medicamentos-section {
+    background: white;
+    padding: 16px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-md);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.section-header h2 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.section-header h2 i {
+    color: var(--primary);
+}
+
+.medicamentos-count {
+    font-size: 0.8rem;
+    color: var(--gray-500);
+    background: var(--gray-100);
+    padding: 2px 14px;
+    border-radius: 20px;
+}
+
+.search-section {
+    margin-bottom: 12px;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    background: var(--gray-50);
+    border: 1.5px solid var(--gray-200);
+    border-radius: 10px;
+    padding: 0 14px;
+    transition: var(--transition);
+}
+
+.search-box:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(176, 0, 30, 0.1);
+}
+
+.search-box i {
+    color: var(--gray-400);
+    font-size: 0.95rem;
+}
+
+.search-input {
+    flex: 1;
+    padding: 10px 12px;
+    border: none;
+    outline: none;
+    font-size: 0.9rem;
+    color: var(--gray-800);
+    background: transparent;
+}
+
+.btn-clear {
+    background: none;
+    border: none;
+    color: var(--gray-400);
+    cursor: pointer;
+    padding: 4px;
+    transition: var(--transition);
+}
+
+.btn-clear:hover {
+    color: var(--gray-600);
+}
+
+.filtros-laboratorio {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 14px;
+    padding: 4px 0;
+}
+
+.filtro-btn {
+    padding: 4px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--gray-200);
+    background: transparent;
+    color: var(--gray-600);
+    font-size: 0.7rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.filtro-btn:hover {
+    border-color: var(--gray-400);
+    background: var(--gray-50);
+}
+
+.filtro-btn.active {
+    border-color: var(--primary);
+    background: #b0001e08;
+    color: var(--primary);
+}
+
+.medicamentos-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.medicamento-card {
+    background: var(--gray-50);
+    border-radius: var(--border-radius-sm);
+    padding: 14px;
+    transition: var(--transition);
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.medicamento-card:hover {
+    border-color: var(--gray-200);
+    box-shadow: var(--shadow-md);
+}
+
+.medicamento-card:active {
+    transform: scale(0.98);
+}
+
+.medicamento-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.medicamento-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.medicamento-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.medicamento-info h3 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin: 0;
+}
+
+.medicamento-sustancia {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    margin: 2px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.medicamento-paciente {
+    font-size: 0.7rem;
+    color: var(--gray-400);
+    margin: 2px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 0.6rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    flex-shrink: 0;
+}
+
+.badge-success {
+    background: #10b98115;
+    color: #10b981;
+}
+
+.badge-secondary {
+    background: var(--gray-200);
+    color: var(--gray-500);
+}
+
+.acceso-badge {
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.acceso-si {
+    color: #10b981;
+    background: #10b98115;
+}
+
+.acceso-pendiente {
+    color: #f59e0b;
+    background: #f59e0b15;
+}
+
+.acceso-no {
+    color: #ef4444;
+    background: #ef444415;
+}
+
+.medicamento-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.medicamento-detalles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+}
+
+.detalle {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.7rem;
+    color: var(--gray-600);
+}
+
+.detalle i {
+    font-size: 0.7rem;
+    color: var(--gray-400);
+}
+
+.medicamento-acciones {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-solicitar-acceso {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: #f59e0b;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+}
+
+.btn-solicitar-acceso:hover {
+    background: #d97706;
+    transform: scale(1.05);
+}
+
+.solicitud-enviada-badge {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #f59e0b15;
+    color: #f59e0b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+}
+
+.btn-detalle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: white;
+    color: var(--gray-400);
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow);
+}
+
+.btn-detalle:hover {
+    background: var(--primary);
+    color: white;
+    transform: scale(1.05);
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 12px;
+    color: var(--gray-400);
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 12px;
+    opacity: 0.5;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 400px;
+    width: 100%;
+    pointer-events: none;
+}
+
+.toast-notification {
+    background: white;
+    border-radius: 12px;
+    padding: 16px 18px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    pointer-events: all;
+    animation: slideInRight 0.4s ease;
+    position: relative;
+    overflow: hidden;
+    border-left: 4px solid var(--gray-400);
+    transition: all 0.3s ease;
+}
+
+.toast-notification:hover {
+    transform: translateX(-4px);
+}
+
+.toast-notification.toast-exit {
+    animation: slideOutRight 0.3s ease forwards;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+}
+
+.toast-success {
+    border-left-color: var(--success);
+}
+
+.toast-success .toast-icon i {
+    color: var(--success);
+}
+
+.toast-success .toast-progress {
+    background: var(--success);
+}
+
+.toast-error {
+    border-left-color: var(--danger);
+}
+
+.toast-error .toast-icon i {
+    color: var(--danger);
+}
+
+.toast-error .toast-progress {
+    background: var(--danger);
+}
+
+.toast-warning {
+    border-left-color: var(--warning);
+}
+
+.toast-warning .toast-icon i {
+    color: var(--warning);
+}
+
+.toast-warning .toast-progress {
+    background: var(--warning);
+}
+
+.toast-info {
+    border-left-color: var(--info);
+}
+
+.toast-info .toast-icon i {
+    color: var(--info);
+}
+
+.toast-info .toast-progress {
+    background: var(--info);
+}
+
+.toast-icon {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+}
+
+.toast-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.toast-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--gray-800);
+    margin-bottom: 2px;
+}
+
+.toast-message {
+    font-size: 0.85rem;
+    color: var(--gray-600);
+    line-height: 1.4;
+}
+
+.toast-close {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: var(--gray-400);
+    cursor: pointer;
+    padding: 4px;
+    font-size: 0.9rem;
+    transition: var(--transition);
+}
+
+.toast-close:hover {
+    color: var(--gray-600);
+    transform: rotate(90deg);
+}
+
+.toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: var(--gray-400);
+    animation: progressBar linear forwards;
+}
+
+@keyframes progressBar {
+    from {
+        width: 100%;
+    }
+
+    to {
+        width: 0%;
+    }
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 16px;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.modal-content {
+    background: white;
+    border-radius: 16px;
+    max-width: 520px;
+    width: 100%;
+    max-height: 90vh;
+    overflow: hidden;
+    animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(40px) scale(0.96);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.modal-header h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-header h2 i {
+    color: #b0001e;
+}
+
+.btn-close-modal {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 4px;
+    transition: all 0.3s ease;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-close-modal:hover {
+    background: #f1f5f9;
+    color: #475569;
+    transform: rotate(90deg);
+}
+
+.modal-body {
+    padding: 20px 24px;
+    max-height: 50vh;
+    overflow-y: auto;
+}
+
+.modal-subtitle {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin: 0 0 20px;
+}
+
+.modal-subtitle strong {
+    color: #1e293b;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #334155;
+    margin-bottom: 6px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    background: #f8fafc;
+    color: #1e293b;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #b0001e;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(176, 0, 30, 0.1);
+}
+
+select.form-control {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 40px;
+    cursor: pointer;
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 12px;
+    padding: 16px 24px 20px;
+    border-top: 1px solid #f1f5f9;
+    background: #f8fafc;
+}
+
+.btn-cancelar {
+    flex: 1;
+    padding: 10px;
+    background: #f1f5f9;
+    color: #64748b;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-cancelar:hover {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+.btn-enviar {
+    flex: 2;
+    padding: 10px;
+    background: #b0001e;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-enviar:hover:not(:disabled) {
+    background: #8a0017;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(176, 0, 30, 0.3);
+}
+
+.btn-enviar:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+@media screen and (min-width: 1025px) {
+    .medicamentos-container {
+        padding: 24px 32px 100px;
+    }
+
+    .header-info h1 {
+        font-size: 1.8rem;
+    }
+
+    .header-info p {
+        font-size: 0.95rem;
+    }
+
+    .stat-card {
+        padding: 20px 16px;
+    }
+
+    .stat-number {
+        font-size: 1.8rem;
+    }
+
+    .stat-label {
+        font-size: 0.7rem;
+    }
+
+    .medicamentos-section {
+        padding: 24px 28px;
+    }
+
+    .section-header h2 {
+        font-size: 1.1rem;
+    }
+
+    .medicamentos-count {
+        font-size: 0.9rem;
+        padding: 4px 18px;
+    }
+
+    .search-box {
+        padding: 0 16px;
+        border-width: 2px;
+    }
+
+    .search-box i {
+        font-size: 1.1rem;
+    }
+
+    .search-input {
+        padding: 12px 14px;
+        font-size: 1rem;
+    }
+
+    .filtros-laboratorio {
+        gap: 10px;
+        margin-bottom: 18px;
+    }
+
+    .filtro-btn {
+        padding: 6px 18px;
+        font-size: 0.8rem;
+    }
+
+    .medicamentos-list {
+        gap: 14px;
+    }
+
+    .medicamento-card {
+        padding: 18px 20px;
+    }
+
+    .medicamento-header {
+        gap: 16px;
+        margin-bottom: 12px;
+    }
+
+    .medicamento-icon {
+        width: 46px;
+        height: 46px;
+        font-size: 1.15rem;
+    }
+
+    .medicamento-info h3 {
+        font-size: 0.95rem;
+    }
+
+    .medicamento-sustancia {
+        font-size: 0.8rem;
+    }
+
+    .medicamento-paciente {
+        font-size: 0.75rem;
+    }
+
+    .badge {
+        font-size: 0.65rem;
+        padding: 3px 12px;
+    }
+
+    .acceso-badge {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+    }
+
+    .detalle {
+        font-size: 0.75rem;
+    }
+
+    .detalle i {
+        font-size: 0.75rem;
+    }
+
+    .btn-detalle {
+        width: 32px;
+        height: 32px;
+        font-size: 0.95rem;
+    }
+
+    .btn-solicitar-acceso {
+        width: 32px;
+        height: 32px;
+        font-size: 0.95rem;
+    }
+
+    .solicitud-enviada-badge {
+        width: 32px;
+        height: 32px;
+        font-size: 0.95rem;
+    }
+
+    .modal-content {
+        max-width: 560px;
+    }
+
+    .toast-container {
+        max-width: 480px;
+        top: 24px;
+        right: 24px;
+        gap: 14px;
+    }
+
+    .toast-notification {
+        padding: 18px 22px;
+        border-radius: 14px;
+        border-left-width: 5px;
+    }
+
+    .toast-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 1.6rem;
+    }
+
+    .toast-title {
+        font-size: 0.95rem;
+    }
+
+    .toast-message {
+        font-size: 0.9rem;
+    }
+
+    .toast-close {
+        font-size: 1rem;
+        padding: 6px;
+    }
+
+    .toast-progress {
+        height: 4px;
+    }
+}
+
+@media screen and (max-width: 1024px) and (min-width: 769px) {
+    .medicamentos-container {
+        padding: 20px 24px 90px;
+    }
+
+    .stats-grid {
+        gap: 10px;
+    }
+
+    .stat-card {
+        padding: 16px 12px;
+    }
+
+    .stat-number {
+        font-size: 1.6rem;
+    }
+
+    .medicamentos-section {
+        padding: 20px 24px;
+    }
+
+    .medicamento-card {
+        padding: 16px 18px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .medicamentos-container {
+        padding: 16px 16px 85px;
+    }
+
+    .header-info h1 {
+        font-size: 1.3rem;
+    }
+
+    .header-info p {
+        font-size: 0.8rem;
+    }
+
+    .stats-grid {
+        gap: 6px;
+    }
+
+    .stat-card {
+        padding: 10px 4px;
+    }
+
+    .stat-number {
+        font-size: 1.15rem;
+    }
+
+    .medicamentos-section {
+        padding: 14px;
+        border-radius: var(--border-radius-sm);
+    }
+
+    .medicamento-card {
+        padding: 12px;
+    }
+
+    .medicamento-header {
+        gap: 10px;
+    }
+
+    .medicamento-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 0.9rem;
+    }
+
+    .medicamento-info h3 {
+        font-size: 0.8rem;
+    }
+
+    .medicamento-body {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .medicamento-acciones {
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .filtros-laboratorio {
+        gap: 4px;
+    }
+
+    .filtro-btn {
+        font-size: 0.65rem;
+        padding: 3px 10px;
+    }
+
+    .modal-content {
+        max-width: 95%;
+        margin: 10px;
+        border-radius: 12px;
+    }
+
+    .modal-footer {
+        flex-direction: column;
+    }
+
+    .btn-cancelar,
+    .btn-enviar {
+        flex: 1;
+    }
+
+    .toast-container {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        top: 10px;
+    }
+
+    .toast-notification {
+        padding: 12px 14px;
+        border-radius: 10px;
+    }
+
+    .toast-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 1.2rem;
+    }
+
+    .toast-title {
+        font-size: 0.8rem;
+    }
+
+    .toast-message {
+        font-size: 0.75rem;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .medicamentos-container {
+        padding: 12px 12px 80px;
+    }
+
+    .header-info h1 {
+        font-size: 1.1rem;
+    }
+
+    .header-info p {
+        font-size: 0.7rem;
+    }
+
+    .stats-grid {
+        gap: 4px;
+    }
+
+    .stat-card {
+        padding: 8px 2px;
+        border-radius: 8px;
+        border-width: 1.5px;
+    }
+
+    .stat-number {
+        font-size: 1rem;
+    }
+
+    .stat-label {
+        font-size: 0.5rem;
+    }
+
+    .medicamentos-section {
+        padding: 12px;
+    }
+
+    .section-header h2 {
+        font-size: 0.8rem;
+    }
+
+    .medicamentos-count {
+        font-size: 0.65rem;
+        padding: 1px 10px;
+    }
+
+    .search-box {
+        border-radius: 8px;
+        padding: 0 10px;
+    }
+
+    .search-input {
+        padding: 8px 10px;
+        font-size: 0.85rem;
+    }
+
+    .filtro-btn {
+        font-size: 0.6rem;
+        padding: 3px 8px;
+        border-width: 1.5px;
+    }
+
+    .medicamentos-list {
+        gap: 10px;
+    }
+
+    .medicamento-card {
+        padding: 10px;
+        border-radius: 8px;
+    }
+
+    .medicamento-header {
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+
+    .medicamento-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 0.8rem;
+    }
+
+    .medicamento-info h3 {
+        font-size: 0.75rem;
+    }
+
+    .medicamento-sustancia {
+        font-size: 0.65rem;
+    }
+
+    .medicamento-paciente {
+        font-size: 0.6rem;
+    }
+
+    .badge {
+        font-size: 0.5rem;
+        padding: 1px 8px;
+    }
+
+    .acceso-badge {
+        width: 22px;
+        height: 22px;
+        font-size: 0.65rem;
+    }
+
+    .medicamento-body {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+    }
+
+    .medicamento-detalles {
+        gap: 4px 10px;
+    }
+
+    .detalle {
+        font-size: 0.6rem;
+    }
+
+    .detalle i {
+        font-size: 0.6rem;
+    }
+
+    .medicamento-acciones {
+        justify-content: space-between;
+        width: 100%;
+        gap: 6px;
+    }
+
+    .btn-detalle {
+        width: 24px;
+        height: 24px;
+        font-size: 0.75rem;
+    }
+
+    .btn-solicitar-acceso {
+        width: 24px;
+        height: 24px;
+        font-size: 0.65rem;
+    }
+
+    .solicitud-enviada-badge {
+        width: 24px;
+        height: 24px;
+        font-size: 0.65rem;
+    }
+
+    .modal-content {
+        border-radius: 12px;
+        width: 100%;
+        margin: 0;
+        max-height: 95vh;
+    }
+
+    .modal-header {
+        padding: 16px 16px 12px;
+    }
+
+    .modal-header h2 {
+        font-size: 0.95rem;
+    }
+
+    .btn-close-modal {
+        width: 32px;
+        height: 32px;
+        font-size: 0.95rem;
+    }
+
+    .modal-body {
+        padding: 16px;
+    }
+
+    .modal-subtitle {
+        font-size: 0.8rem;
+    }
+
+    .form-group {
+        margin-bottom: 14px;
+    }
+
+    .form-group label {
+        font-size: 0.8rem;
+    }
+
+    .form-control {
+        font-size: 0.85rem;
+        padding: 9px 14px;
+    }
+
+    .modal-footer {
+        padding: 12px 16px 16px;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .btn-cancelar,
+    .btn-enviar {
+        padding: 10px;
+        font-size: 0.85rem;
+    }
+
+    .toast-container {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        top: 10px;
+    }
+
+    .toast-notification {
+        padding: 10px 12px;
+        border-radius: 8px;
+        gap: 10px;
+    }
+
+    .toast-icon {
+        width: 24px;
+        height: 24px;
+        font-size: 1rem;
+    }
+
+    .toast-title {
+        font-size: 0.75rem;
+    }
+
+    .toast-message {
+        font-size: 0.7rem;
+    }
+
+    .toast-close {
+        font-size: 0.8rem;
+        padding: 2px;
+    }
+
+    .empty-state {
+        padding: 30px 12px;
+    }
+
+    .empty-state i {
+        font-size: 2.5rem;
+    }
+
+    .empty-state p {
+        font-size: 0.8rem;
+    }
+}
+
+@media screen and (max-width: 360px) {
+    .medicamentos-container {
+        padding: 10px 10px 75px;
+    }
+
+    .header-info h1 {
+        font-size: 0.95rem;
+    }
+
+    .header-info p {
+        font-size: 0.65rem;
+    }
+
+    .stats-grid {
+        gap: 3px;
+    }
+
+    .stat-card {
+        padding: 6px 2px;
+        border-radius: 6px;
+    }
+
+    .stat-number {
+        font-size: 0.9rem;
+    }
+
+    .stat-label {
+        font-size: 0.45rem;
+    }
+
+    .medicamentos-section {
+        padding: 10px;
+    }
+
+    .section-header h2 {
+        font-size: 0.7rem;
+    }
+
+    .medicamentos-count {
+        font-size: 0.55rem;
+        padding: 1px 8px;
+    }
+
+    .search-box {
+        padding: 0 8px;
+    }
+
+    .search-input {
+        padding: 6px 8px;
+        font-size: 0.8rem;
+    }
+
+    .filtro-btn {
+        font-size: 0.55rem;
+        padding: 2px 6px;
+    }
+
+    .medicamento-card {
+        padding: 8px;
+    }
+
+    .medicamento-header {
+        gap: 6px;
+    }
+
+    .medicamento-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 0.7rem;
+    }
+
+    .medicamento-info h3 {
+        font-size: 0.7rem;
+    }
+
+    .medicamento-sustancia {
+        font-size: 0.6rem;
+    }
+
+    .medicamento-paciente {
+        font-size: 0.55rem;
+    }
+
+    .badge {
+        font-size: 0.45rem;
+        padding: 1px 6px;
+    }
+
+    .acceso-badge {
+        width: 20px;
+        height: 20px;
+        font-size: 0.55rem;
+    }
+
+    .detalle {
+        font-size: 0.55rem;
+    }
+
+    .detalle i {
+        font-size: 0.55rem;
+    }
+
+    .btn-detalle {
+        width: 20px;
+        height: 20px;
+        font-size: 0.65rem;
+    }
+
+    .btn-solicitar-acceso {
+        width: 20px;
+        height: 20px;
+        font-size: 0.55rem;
+    }
+
+    .solicitud-enviada-badge {
+        width: 20px;
+        height: 20px;
+        font-size: 0.55rem;
+    }
+
+    .modal-header h2 {
+        font-size: 0.85rem;
+    }
+
+    .btn-close-modal {
+        width: 28px;
+        height: 28px;
+        font-size: 0.85rem;
+    }
+
+    .modal-body {
+        padding: 12px;
+    }
+
+    .modal-subtitle {
+        font-size: 0.7rem;
+    }
+
+    .form-group label {
+        font-size: 0.7rem;
+    }
+
+    .form-control {
+        font-size: 0.75rem;
+        padding: 8px 12px;
+    }
+
+    .btn-cancelar,
+    .btn-enviar {
+        padding: 8px;
+        font-size: 0.75rem;
+    }
+
+    .toast-notification {
+        padding: 8px 10px;
+    }
+
+    .toast-title {
+        font-size: 0.7rem;
+    }
+
+    .toast-message {
+        font-size: 0.65rem;
+    }
+
+    .empty-state i {
+        font-size: 2rem;
+    }
+
+    .empty-state p {
+        font-size: 0.7rem;
+    }
+}

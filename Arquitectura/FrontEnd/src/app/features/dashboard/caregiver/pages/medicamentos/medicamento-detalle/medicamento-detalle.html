@@ -1,0 +1,189 @@
+<app-caregiver-menu></app-caregiver-menu>
+
+<div class="toast-container" *ngIf="notifications.length > 0">
+    <div *ngFor="let notif of notifications; let i = index" class="toast-notification toast-{{ notif.type }}"
+        [class.toast-exit]="i > 0">
+        <div class="toast-icon">
+            <i class="bi" [class]="
+                notif.type === 'success' ? 'bi-check-circle-fill' :
+                notif.type === 'error' ? 'bi-x-circle-fill' :
+                notif.type === 'warning' ? 'bi-exclamation-triangle-fill' :
+                'bi-info-circle-fill'
+            "></i>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title">{{ notif.title }}</div>
+            <div class="toast-message">{{ notif.message }}</div>
+        </div>
+        <button class="toast-close" (click)="removeToast(notif.id)">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        <div class="toast-progress" [style.animation-duration]="(notif.duration || 5000) + 'ms'"></div>
+    </div>
+</div>
+
+<div class="detalle-container">
+    <div class="back-section">
+        <button class="btn-back" (click)="volver()">
+            <i class="bi bi-arrow-left"></i>
+            <span>Volver a medicamentos</span>
+        </button>
+    </div>
+
+    <div *ngIf="isLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Cargando informacion del medicamento...</p>
+    </div>
+
+    <div *ngIf="!isLoading && medicamento" class="detalle-content">
+
+        <div class="detalle-card">
+            <div class="detalle-header">
+                <div class="medicamento-icon">
+                    <i class="bi bi-capsule"></i>
+                </div>
+                <div class="medicamento-info-principal">
+                    <h1>{{ medicamento.nombreComercial || 'Medicamento' }}</h1>
+                    <p class="medicamento-sustancia">
+                        <i class="bi bi-flask"></i> {{ medicamento.sustanciaActiva || 'Sustancia no especificada' }}
+                    </p>
+                    <p class="medicamento-laboratorio" *ngIf="medicamento.laboratorio">
+                        <i class="bi bi-building"></i> {{ medicamento.laboratorio }}
+                    </p>
+                </div>
+                <span class="uso-badge" [class]="getUsoClass(medicamento.totalTratamientos)">
+                    {{ getUsoTexto(medicamento.totalTratamientos) }}
+                </span>
+            </div>
+
+            <div class="detalle-body">
+                <div class="detalle-grid">
+                    <div class="detalle-item">
+                        <span class="detalle-label">Nombre Comercial</span>
+                        <span class="detalle-valor">{{ medicamento.nombreComercial }}</span>
+                    </div>
+                    <div class="detalle-item" *ngIf="medicamento.sustanciaActiva">
+                        <span class="detalle-label">Sustancia Activa</span>
+                        <span class="detalle-valor">{{ medicamento.sustanciaActiva }}</span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-label">Presentacion</span>
+                        <span class="detalle-valor">{{ medicamento.presentacion }}</span>
+                    </div>
+                    <div class="detalle-item" *ngIf="medicamento.concentracion">
+                        <span class="detalle-label">Concentracion</span>
+                        <span class="detalle-valor">{{ medicamento.concentracion }}</span>
+                    </div>
+                    <div class="detalle-item" *ngIf="medicamento.laboratorio">
+                        <span class="detalle-label">Laboratorio</span>
+                        <span class="detalle-valor">{{ medicamento.laboratorio }}</span>
+                    </div>
+                    <div class="detalle-item" *ngIf="medicamento.indicacionesGenerales">
+                        <span class="detalle-label">Indicaciones</span>
+                        <span class="detalle-valor" style="text-align: left; max-width: 70%;">{{
+                            medicamento.indicacionesGenerales }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tratamientos-section" *ngIf="tratamientosRelacionados && tratamientosRelacionados.length > 0">
+            <div class="tratamientos-header">
+                <h2><i class="bi bi-prescription"></i> Tratamientos Asociados</h2>
+                <span class="tratamientos-count">{{ tratamientosRelacionados.length }}</span>
+            </div>
+            <div class="tratamientos-list">
+                <div *ngFor="let t of tratamientosRelacionados" class="tratamiento-item"
+                    (click)="verTratamiento(t.idtratamiento)">
+                    <div class="tratamiento-info">
+                        <h4>{{ t.paciente || t.nombrePaciente || 'Paciente sin nombre' }}</h4>
+                        <p>
+                            <i class="bi bi-calendar3"></i>
+                            <span *ngIf="t.fechainicio || t.FechaInicio || t.fechaInicio">
+                                {{ formatearFecha(t.fechainicio || t.FechaInicio || t.fechaInicio) }}
+                            </span>
+                            <span
+                                *ngIf="(t.fechainicio || t.FechaInicio || t.fechaInicio) && (t.fechafin || t.FechaFin || t.fechaFin)">
+                                -
+                            </span>
+                            <span *ngIf="t.fechafin || t.FechaFin || t.fechaFin">
+                                {{ formatearFecha(t.fechafin || t.FechaFin || t.fechaFin) }}
+                            </span>
+                            <span
+                                *ngIf="!t.fechainicio && !t.FechaInicio && !t.fechaInicio && !t.fechafin && !t.FechaFin && !t.fechaFin">
+                                Sin fechas definidas
+                            </span>
+                        </p>
+                    </div>
+                    <span class="badge" [class]="getEstadoClass(t.activo)">
+                        {{ getEstadoTexto(t.activo) }}
+                    </span>
+                    <i class="bi bi-chevron-right tratamiento-arrow"></i>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="!tieneAcceso && tratamientosRelacionados.length === 0" class="sin-acceso-section">
+            <div class="sin-acceso-mensaje">
+                <i class="bi bi-shield-lock"></i>
+                <p>No tienes acceso a este medicamento</p>
+                <p class="sin-acceso-sub">No hay tratamientos asociados a tus pacientes con este medicamento</p>
+            </div>
+        </div>
+
+        <div class="detalle-acciones">
+            <button class="btn-volver" (click)="volver()">
+                <i class="bi bi-arrow-left"></i> Volver
+            </button>
+        </div>
+
+    </div>
+
+    <div *ngIf="!isLoading && !medicamento" class="error-state">
+        <i class="bi bi-capsule"></i>
+        <h3>Medicamento no encontrado</h3>
+        <p>El medicamento que buscas no existe o ha sido eliminado</p>
+        <button class="btn-primary" (click)="volver()">Volver a medicamentos</button>
+    </div>
+</div>
+
+<div class="modal-overlay" *ngIf="mostrarModalSolicitud">
+    <div class="modal-content modal-solicitud">
+        <div class="modal-header">
+            <h2><i class="bi bi-person-plus"></i> Solicitar Acceso a Paciente</h2>
+            <button class="btn-close-modal" (click)="cerrarModalSolicitud()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <p class="modal-subtitle">
+                Solicita acceso al paciente <strong>{{ pacienteSolicitado?.nombrePaciente || '' }}</strong>
+                para ver su tratamiento
+            </p>
+
+            <div class="form-group">
+                <label>Parentesco o relacion *</label>
+                <select [(ngModel)]="parentesco" class="form-control">
+                    <option value="">Selecciona...</option>
+                    <option *ngFor="let p of parentescos" [value]="p">{{ p }}</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Notas adicionales</label>
+                <textarea [(ngModel)]="notasSolicitud" rows="3"
+                    placeholder="Describe tu relacion con el paciente, motivo de la solicitud..."
+                    class="form-control"></textarea>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-cancelar" (click)="cerrarModalSolicitud()">Cancelar</button>
+            <button class="btn-enviar" (click)="enviarSolicitud()" [disabled]="enviandoSolicitud">
+                <i class="bi bi-send"></i>
+                {{ enviandoSolicitud ? 'Enviando...' : 'Enviar Solicitud' }}
+            </button>
+        </div>
+    </div>
+</div>

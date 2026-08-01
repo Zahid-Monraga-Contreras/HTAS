@@ -1,0 +1,1727 @@
+/* ==========================================================================
+   PAGINA DE CITAS DEL ACOMPAÑANTE - COMPLETA
+   ========================================================================== */
+
+:host {
+    --primary: #b0001e;
+    --primary-dark: #8a0017;
+    --primary-light: #d42a4a;
+    --primary-gradient: linear-gradient(135deg, #b0001e 0%, #d42a4a 100%);
+    --success: #10b981;
+    --success-dark: #059669;
+    --warning: #f59e0b;
+    --warning-dark: #d97706;
+    --danger: #ef4444;
+    --danger-dark: #dc2626;
+    --info: #3b82f6;
+    --info-dark: #2563eb;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-400: #94a3b8;
+    --gray-500: #64748b;
+    --gray-600: #475569;
+    --gray-700: #334155;
+    --gray-800: #1e293b;
+    --gray-900: #0f172a;
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+    --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.15);
+    --border-radius: 16px;
+    --border-radius-sm: 10px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:host {
+    display: block;
+    width: 100%;
+    min-height: 100vh;
+    background: var(--gray-50);
+}
+
+/* ==========================================================================
+   CITAS PAGE
+   ========================================================================== */
+.citas-page {
+    min-height: 100vh;
+    background: var(--gray-50);
+    padding: 16px 16px 100px;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 100%;
+}
+
+/* ==========================================================================
+   HEADER
+   ========================================================================== */
+.citas-header {
+    padding: 0 0 16px;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-info h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin: 0;
+}
+
+.header-info p {
+    font-size: 0.85rem;
+    color: var(--gray-500);
+    margin: 2px 0 0;
+}
+
+/* ==========================================================================
+   LOADING
+   ========================================================================== */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--gray-200);
+    border-top: 4px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-container p {
+    margin-top: 16px;
+    color: var(--gray-500);
+    font-size: 0.9rem;
+}
+
+/* ==========================================================================
+   ESTADISTICAS
+   ========================================================================== */
+.stats-section {
+    margin-bottom: 20px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.stat-card {
+    background: white;
+    padding: 14px 8px;
+    border-radius: var(--border-radius-sm);
+    text-align: center;
+    box-shadow: var(--shadow-md);
+    cursor: pointer;
+    transition: var(--transition);
+    border: 2px solid transparent;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.stat-card:active {
+    transform: scale(0.95);
+}
+
+.stat-card.active {
+    border-color: var(--primary);
+    background: #b0001e08;
+}
+
+.stat-number {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    line-height: 1.2;
+}
+
+.stat-label {
+    font-size: 0.6rem;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.stat-programada .stat-number {
+    color: var(--warning);
+}
+
+.stat-completada .stat-number {
+    color: var(--info);
+}
+
+.stat-cancelada .stat-number {
+    color: var(--danger);
+}
+
+/* ==========================================================================
+   SECCION DE CITAS
+   ========================================================================== */
+.citas-section {
+    background: white;
+    padding: 16px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-md);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.section-header h2 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.section-header h2 i {
+    color: var(--primary);
+}
+
+.citas-count {
+    font-size: 0.8rem;
+    color: var(--gray-500);
+    background: var(--gray-100);
+    padding: 2px 14px;
+    border-radius: 20px;
+}
+
+/* ==========================================================================
+   FILTROS RAPIDOS
+   ========================================================================== */
+.filtros-rapidos {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-bottom: 16px;
+}
+
+.filtro-btn {
+    padding: 8px 8px;
+    border-radius: 10px;
+    border: 1.5px solid var(--gray-200);
+    background: transparent;
+    font-size: 0.6rem;
+    font-weight: 500;
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.filtro-btn i {
+    font-size: 0.7rem;
+}
+
+.filtro-btn:hover {
+    background: var(--gray-50);
+    border-color: var(--gray-300);
+}
+
+.filtro-btn:active {
+    transform: scale(0.95);
+}
+
+.filtro-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.filtro-btn.active i {
+    color: white;
+}
+
+/* ==========================================================================
+   LISTA DE CITAS - CARDS CLICKEABLES
+   ========================================================================== */
+.citas-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.cita-card {
+    background: var(--gray-50);
+    border-radius: var(--border-radius-sm);
+    padding: 14px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1.5px solid transparent;
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+}
+
+.cita-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 4px 16px rgba(176, 0, 30, 0.12);
+    transform: translateY(-3px);
+    background: white;
+}
+
+.cita-card:active {
+    transform: scale(0.98);
+}
+
+/* Los elementos internos no deben capturar el click a menos que sean botones */
+.cita-card .cita-card-header {
+    pointer-events: none;
+}
+
+.cita-card .cita-card-body {
+    pointer-events: none;
+}
+
+.cita-card .cita-acciones {
+    pointer-events: all;
+}
+
+.cita-card .cita-acciones button,
+.cita-card .cita-acciones span {
+    pointer-events: all;
+}
+
+/* ==========================================================================
+   CITA CARD HEADER
+   ========================================================================== */
+.cita-card-header {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.cita-fecha-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    background: white;
+    padding: 4px 8px;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    flex-shrink: 0;
+}
+
+.cita-dia {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--gray-800);
+    line-height: 1.2;
+}
+
+.cita-mes {
+    font-size: 0.6rem;
+    color: var(--gray-500);
+    text-transform: uppercase;
+}
+
+.cita-info-principal {
+    flex: 1;
+    min-width: 0;
+}
+
+.cita-info-principal h3 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin: 0 0 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cita-paciente {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.cita-paciente i {
+    font-size: 0.7rem;
+}
+
+.cita-especialidad {
+    font-size: 0.7rem;
+    color: var(--gray-400);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* ==========================================================================
+   BADGES
+   ========================================================================== */
+.badge-tiempo {
+    font-size: 0.6rem;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 12px;
+    white-space: nowrap;
+    height: fit-content;
+    flex-shrink: 0;
+}
+
+.badge-hoy {
+    background: #b0001e15;
+    color: var(--primary);
+}
+
+.badge-proxima {
+    background: #10b98115;
+    color: var(--success);
+}
+
+.badge-pasada {
+    background: #94a3b815;
+    color: var(--gray-500);
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.acceso-badge {
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.acceso-si {
+    color: #10b981;
+    background: #10b98115;
+}
+
+.acceso-pendiente {
+    color: #f59e0b;
+    background: #f59e0b15;
+}
+
+.acceso-no {
+    color: #ef4444;
+    background: #ef444415;
+}
+
+/* ==========================================================================
+   CITA CARD BODY
+   ========================================================================== */
+.cita-card-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.cita-detalles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+}
+
+.cita-detalle {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.7rem;
+    color: var(--gray-600);
+}
+
+.cita-detalle i {
+    font-size: 0.7rem;
+    color: var(--gray-400);
+}
+
+.modalidad-badge {
+    font-size: 0.65rem;
+    font-weight: 500;
+    padding: 1px 8px;
+    border-radius: 10px;
+}
+
+.modalidad-presencial {
+    background: #0369a115;
+    color: var(--info);
+}
+
+.modalidad-virtual {
+    background: #7c3aed15;
+    color: #7c3aed;
+}
+
+/* ==========================================================================
+   CITAS ACCIONES (BOTONES)
+   ========================================================================== */
+.cita-acciones {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.acciones-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-solicitar-acceso {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: #f59e0b;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+}
+
+.btn-solicitar-acceso:hover {
+    background: #d97706;
+    transform: scale(1.05);
+}
+
+.solicitud-enviada-badge {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #f59e0b15;
+    color: #f59e0b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+}
+
+.estado-badge {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 3px 12px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.estado-badge i {
+    font-size: 0.55rem;
+}
+
+.estado-programada {
+    background: #f59e0b15;
+    color: #f59e0b;
+}
+
+.estado-completada {
+    background: #3b82f615;
+    color: #3b82f6;
+}
+
+.estado-cancelada {
+    background: #ef444415;
+    color: var(--danger);
+}
+
+.estado-info {
+    background: #94a3b815;
+    color: var(--gray-500);
+}
+
+.btn-detalle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: white;
+    color: var(--gray-400);
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow);
+}
+
+.btn-detalle:hover {
+    background: var(--primary);
+    color: white;
+    transform: scale(1.05);
+}
+
+.btn-detalle:active {
+    transform: scale(0.9);
+}
+
+/* ==========================================================================
+   EMPTY STATE
+   ========================================================================== */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 12px;
+    color: var(--gray-400);
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 12px;
+    opacity: 0.5;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+/* ==========================================================================
+   MODAL
+   ========================================================================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 16px;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.modal-content {
+    background: white;
+    border-radius: var(--border-radius);
+    max-width: 520px;
+    width: 100%;
+    max-height: 90vh;
+    overflow: hidden;
+    animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: var(--shadow-xl);
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(40px) scale(0.96);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.modal-header h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--gray-800);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-header h2 i {
+    color: var(--primary);
+}
+
+.btn-close-modal {
+    background: var(--gray-100);
+    border: none;
+    color: var(--gray-500);
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 1.1rem;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-close-modal:hover {
+    background: var(--gray-200);
+    color: var(--gray-700);
+    transform: rotate(90deg);
+}
+
+.modal-body {
+    padding: 20px 24px;
+    max-height: 55vh;
+    overflow-y: auto;
+}
+
+.modal-body::-webkit-scrollbar {
+    width: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: var(--gray-300);
+    border-radius: 10px;
+}
+
+.modal-subtitle {
+    color: var(--gray-500);
+    font-size: 0.9rem;
+    margin: 0 0 20px;
+    line-height: 1.5;
+}
+
+.modal-subtitle strong {
+    color: var(--gray-800);
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--gray-700);
+    margin-bottom: 6px;
+}
+
+.form-group small {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--gray-400);
+    margin-top: 6px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid var(--gray-200);
+    border-radius: 10px;
+    font-size: 0.9rem;
+    transition: var(--transition);
+    background: var(--gray-50);
+    color: var(--gray-800);
+    font-weight: 400;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: white;
+    box-shadow: 0 0 0 4px rgba(176, 0, 30, 0.08);
+}
+
+.form-control::placeholder {
+    color: var(--gray-400);
+}
+
+select.form-control {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 40px;
+    cursor: pointer;
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 12px;
+    padding: 16px 24px 20px;
+    border-top: 1px solid var(--gray-100);
+    background: var(--gray-50);
+}
+
+.btn-cancelar {
+    flex: 1;
+    padding: 10px;
+    background: var(--gray-100);
+    color: var(--gray-600);
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-cancelar:hover {
+    background: var(--gray-200);
+    color: var(--gray-700);
+}
+
+.btn-enviar {
+    flex: 2;
+    padding: 10px;
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 16px rgba(176, 0, 30, 0.2);
+}
+
+.btn-enviar:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(176, 0, 30, 0.3);
+}
+
+.btn-enviar:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* ==========================================================================
+   TOAST NOTIFICATIONS
+   ========================================================================== */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 400px;
+    width: 100%;
+    pointer-events: none;
+}
+
+.toast-notification {
+    background: white;
+    border-radius: 12px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow-xl);
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    pointer-events: all;
+    animation: slideInRight 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+    border-left: 4px solid var(--gray-400);
+    transition: all 0.3s ease;
+}
+
+.toast-notification:hover {
+    transform: translateX(-4px);
+}
+
+.toast-notification.toast-exit {
+    animation: slideOutRight 0.3s ease forwards;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(120%) scale(0.9);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateX(120%) scale(0.9);
+        opacity: 0;
+    }
+}
+
+.toast-success {
+    border-left-color: var(--success);
+}
+
+.toast-success .toast-icon i {
+    color: var(--success);
+}
+
+.toast-success .toast-progress {
+    background: var(--success);
+}
+
+.toast-error {
+    border-left-color: var(--danger);
+}
+
+.toast-error .toast-icon i {
+    color: var(--danger);
+}
+
+.toast-error .toast-progress {
+    background: var(--danger);
+}
+
+.toast-warning {
+    border-left-color: var(--warning);
+}
+
+.toast-warning .toast-icon i {
+    color: var(--warning);
+}
+
+.toast-warning .toast-progress {
+    background: var(--warning);
+}
+
+.toast-info {
+    border-left-color: var(--info);
+}
+
+.toast-info .toast-icon i {
+    color: var(--info);
+}
+
+.toast-info .toast-progress {
+    background: var(--info);
+}
+
+.toast-icon {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+}
+
+.toast-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.toast-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--gray-800);
+    margin-bottom: 2px;
+}
+
+.toast-message {
+    font-size: 0.85rem;
+    color: var(--gray-600);
+    line-height: 1.4;
+}
+
+.toast-close {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: var(--gray-400);
+    cursor: pointer;
+    padding: 4px;
+    font-size: 0.9rem;
+    transition: var(--transition);
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toast-close:hover {
+    color: var(--gray-600);
+    background: var(--gray-100);
+    transform: rotate(90deg);
+}
+
+.toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: var(--gray-400);
+    animation: progressBar linear forwards;
+}
+
+@keyframes progressBar {
+    from {
+        width: 100%;
+    }
+
+    to {
+        width: 0%;
+    }
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+@media screen and (min-width: 1025px) {
+    .citas-page {
+        padding: 24px 32px 100px;
+    }
+
+    .header-info h1 {
+        font-size: 1.8rem;
+    }
+
+    .header-info p {
+        font-size: 0.95rem;
+    }
+
+    .stat-card {
+        padding: 20px 16px;
+        border-radius: var(--border-radius-sm);
+    }
+
+    .stat-number {
+        font-size: 1.8rem;
+    }
+
+    .stat-label {
+        font-size: 0.7rem;
+    }
+
+    .citas-section {
+        padding: 24px 28px;
+        border-radius: var(--border-radius);
+    }
+
+    .cita-card {
+        padding: 18px 20px;
+        border-radius: var(--border-radius-sm);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .cita-card:hover {
+        border-color: var(--primary);
+        box-shadow: 0 6px 24px rgba(176, 0, 30, 0.15);
+        transform: translateY(-3px);
+        background: white;
+    }
+
+    .cita-fecha-badge {
+        min-width: 52px;
+        padding: 6px 10px;
+    }
+
+    .cita-dia {
+        font-size: 1.3rem;
+    }
+
+    .cita-info-principal h3 {
+        font-size: 0.95rem;
+    }
+
+    .btn-detalle {
+        width: 32px;
+        height: 32px;
+        font-size: 0.95rem;
+    }
+
+    .btn-solicitar-acceso {
+        width: 32px;
+        height: 32px;
+        font-size: 0.95rem;
+    }
+
+    .modal-content {
+        max-width: 560px;
+    }
+
+    .toast-container {
+        max-width: 480px;
+        top: 24px;
+        right: 24px;
+        gap: 14px;
+    }
+
+    .toast-notification {
+        padding: 18px 22px;
+        border-radius: 14px;
+        border-left-width: 5px;
+    }
+}
+
+@media screen and (max-width: 1024px) and (min-width: 769px) {
+    .citas-page {
+        padding: 20px 24px 90px;
+    }
+
+    .stats-grid {
+        gap: 10px;
+    }
+
+    .stat-card {
+        padding: 16px 12px;
+    }
+
+    .stat-number {
+        font-size: 1.6rem;
+    }
+
+    .citas-section {
+        padding: 20px 24px;
+    }
+
+    .cita-card {
+        padding: 16px 18px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .citas-page {
+        padding: 16px 16px 85px;
+    }
+
+    .header-info h1 {
+        font-size: 1.3rem;
+    }
+
+    .header-info p {
+        font-size: 0.8rem;
+    }
+
+    .stats-grid {
+        gap: 6px;
+    }
+
+    .stat-card {
+        padding: 10px 4px;
+    }
+
+    .stat-number {
+        font-size: 1.15rem;
+    }
+
+    .citas-section {
+        padding: 14px;
+        border-radius: var(--border-radius-sm);
+    }
+
+    .filtro-btn {
+        padding: 6px 6px;
+        font-size: 0.55rem;
+    }
+
+    .cita-card {
+        padding: 12px;
+        border-radius: var(--border-radius-sm);
+    }
+
+    .cita-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .cita-fecha-badge {
+        min-width: 38px;
+        padding: 3px 6px;
+    }
+
+    .cita-dia {
+        font-size: 0.95rem;
+    }
+
+    .cita-info-principal h3 {
+        font-size: 0.8rem;
+    }
+
+    .cita-paciente {
+        font-size: 0.7rem;
+    }
+
+    .badge-tiempo {
+        font-size: 0.55rem;
+        padding: 2px 8px;
+    }
+
+    .acceso-badge {
+        width: 24px;
+        height: 24px;
+        font-size: 0.7rem;
+    }
+
+    .cita-card-body {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .cita-acciones {
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .btn-detalle {
+        width: 26px;
+        height: 26px;
+        font-size: 0.8rem;
+    }
+
+    .btn-solicitar-acceso {
+        width: 26px;
+        height: 26px;
+        font-size: 0.7rem;
+    }
+
+    .solicitud-enviada-badge {
+        width: 26px;
+        height: 26px;
+        font-size: 0.7rem;
+    }
+
+    .estado-badge {
+        font-size: 0.6rem;
+        padding: 2px 10px;
+    }
+
+    .modal-content {
+        width: 95%;
+        margin: 10px;
+        border-radius: var(--border-radius);
+    }
+
+    .modal-footer {
+        flex-direction: column;
+    }
+
+    .btn-cancelar,
+    .btn-enviar {
+        flex: 1;
+    }
+
+    .toast-container {
+        top: 16px;
+        right: 16px;
+        max-width: calc(100vw - 32px);
+    }
+
+    .toast-notification {
+        padding: 14px 16px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .citas-page {
+        padding: 12px 12px 80px;
+    }
+
+    .header-info h1 {
+        font-size: 1.1rem;
+    }
+
+    .header-info p {
+        font-size: 0.7rem;
+    }
+
+    .stats-grid {
+        gap: 4px;
+    }
+
+    .stat-card {
+        padding: 8px 2px;
+        border-radius: 8px;
+        border-width: 1.5px;
+    }
+
+    .stat-number {
+        font-size: 1rem;
+    }
+
+    .stat-label {
+        font-size: 0.5rem;
+    }
+
+    .citas-section {
+        padding: 12px;
+        border-radius: var(--border-radius-sm);
+    }
+
+    .section-header h2 {
+        font-size: 0.8rem;
+    }
+
+    .citas-count {
+        font-size: 0.65rem;
+        padding: 1px 10px;
+    }
+
+    .filtros-rapidos {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 4px;
+    }
+
+    .filtro-btn {
+        font-size: 0.5rem;
+        padding: 5px 4px;
+        border-radius: 8px;
+    }
+
+    .cita-card {
+        padding: 10px;
+        border-radius: 8px;
+        border-width: 1.5px;
+    }
+
+    .cita-card:hover {
+        transform: translateY(-1px);
+    }
+
+    .cita-fecha-badge {
+        min-width: 32px;
+        padding: 2px 4px;
+        border-radius: 6px;
+    }
+
+    .cita-dia {
+        font-size: 0.85rem;
+    }
+
+    .cita-mes {
+        font-size: 0.5rem;
+    }
+
+    .cita-info-principal h3 {
+        font-size: 0.7rem;
+    }
+
+    .cita-paciente {
+        font-size: 0.6rem;
+    }
+
+    .cita-especialidad {
+        font-size: 0.6rem;
+    }
+
+    .badge-tiempo {
+        font-size: 0.5rem;
+        padding: 1px 6px;
+    }
+
+    .acceso-badge {
+        width: 20px;
+        height: 20px;
+        font-size: 0.6rem;
+    }
+
+    .cita-detalle {
+        font-size: 0.6rem;
+    }
+
+    .cita-detalle i {
+        font-size: 0.6rem;
+    }
+
+    .modalidad-badge {
+        font-size: 0.55rem;
+        padding: 1px 6px;
+    }
+
+    .estado-badge {
+        font-size: 0.55rem;
+        padding: 2px 8px;
+    }
+
+    .estado-badge i {
+        font-size: 0.5rem;
+    }
+
+    .btn-detalle {
+        width: 22px;
+        height: 22px;
+        font-size: 0.7rem;
+    }
+
+    .btn-solicitar-acceso {
+        width: 22px;
+        height: 22px;
+        font-size: 0.6rem;
+    }
+
+    .solicitud-enviada-badge {
+        width: 22px;
+        height: 22px;
+        font-size: 0.6rem;
+    }
+
+    .empty-state {
+        padding: 30px 12px;
+    }
+
+    .empty-state i {
+        font-size: 2.5rem;
+    }
+
+    .empty-state p {
+        font-size: 0.8rem;
+    }
+
+    .modal-content {
+        border-radius: 12px;
+        width: 100%;
+        margin: 0;
+        max-height: 95vh;
+    }
+
+    .modal-header {
+        padding: 12px 14px 10px;
+    }
+
+    .modal-header h2 {
+        font-size: 0.85rem;
+    }
+
+    .btn-close-modal {
+        width: 28px;
+        height: 28px;
+        font-size: 0.9rem;
+    }
+
+    .modal-body {
+        padding: 12px 14px;
+        max-height: 45vh;
+    }
+
+    .modal-subtitle {
+        font-size: 0.8rem;
+        margin-bottom: 14px;
+    }
+
+    .form-group {
+        margin-bottom: 12px;
+    }
+
+    .form-group label {
+        font-size: 0.8rem;
+    }
+
+    .form-control {
+        font-size: 0.85rem;
+        padding: 8px 12px;
+        border-radius: 8px;
+    }
+
+    .modal-footer {
+        padding: 10px 14px 14px;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .btn-cancelar,
+    .btn-enviar {
+        padding: 8px;
+        font-size: 0.85rem;
+        border-radius: 8px;
+    }
+
+    .toast-container {
+        top: 12px;
+        right: 12px;
+        left: 12px;
+        max-width: none;
+    }
+
+    .toast-notification {
+        padding: 12px 14px;
+        border-radius: 10px;
+        gap: 10px;
+    }
+
+    .toast-title {
+        font-size: 0.8rem;
+    }
+
+    .toast-message {
+        font-size: 0.75rem;
+    }
+
+    .toast-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 1.1rem;
+    }
+
+    .toast-close {
+        width: 24px;
+        height: 24px;
+        font-size: 0.8rem;
+    }
+}
+
+@media screen and (max-width: 360px) {
+    .citas-page {
+        padding: 10px 10px 75px;
+    }
+
+    .header-info h1 {
+        font-size: 0.95rem;
+    }
+
+    .header-info p {
+        font-size: 0.65rem;
+    }
+
+    .stats-grid {
+        gap: 3px;
+    }
+
+    .stat-card {
+        padding: 6px 2px;
+        border-radius: 6px;
+    }
+
+    .stat-number {
+        font-size: 0.85rem;
+    }
+
+    .stat-label {
+        font-size: 0.45rem;
+    }
+
+    .citas-section {
+        padding: 10px;
+    }
+
+    .section-header h2 {
+        font-size: 0.7rem;
+    }
+
+    .citas-count {
+        font-size: 0.55rem;
+        padding: 1px 8px;
+    }
+
+    .filtro-btn {
+        font-size: 0.45rem;
+        padding: 4px 2px;
+        border-radius: 6px;
+    }
+
+    .cita-card {
+        padding: 8px;
+        border-radius: 6px;
+    }
+
+    .cita-card-header {
+        gap: 8px;
+        margin-bottom: 6px;
+    }
+
+    .cita-fecha-badge {
+        min-width: 28px;
+        padding: 2px 3px;
+    }
+
+    .cita-dia {
+        font-size: 0.7rem;
+    }
+
+    .cita-mes {
+        font-size: 0.4rem;
+    }
+
+    .cita-info-principal h3 {
+        font-size: 0.6rem;
+    }
+
+    .cita-paciente {
+        font-size: 0.55rem;
+    }
+
+    .cita-especialidad {
+        font-size: 0.5rem;
+    }
+
+    .badge-tiempo {
+        font-size: 0.4rem;
+        padding: 1px 4px;
+    }
+
+    .acceso-badge {
+        width: 18px;
+        height: 18px;
+        font-size: 0.5rem;
+    }
+
+    .cita-detalle {
+        font-size: 0.55rem;
+    }
+
+    .cita-detalle i {
+        font-size: 0.55rem;
+    }
+
+    .modalidad-badge {
+        font-size: 0.5rem;
+        padding: 1px 4px;
+    }
+
+    .estado-badge {
+        font-size: 0.5rem;
+        padding: 1px 6px;
+    }
+
+    .btn-detalle {
+        width: 20px;
+        height: 20px;
+        font-size: 0.6rem;
+    }
+
+    .btn-solicitar-acceso {
+        width: 20px;
+        height: 20px;
+        font-size: 0.5rem;
+    }
+
+    .solicitud-enviada-badge {
+        width: 20px;
+        height: 20px;
+        font-size: 0.5rem;
+    }
+
+    .modal-header h2 {
+        font-size: 0.8rem;
+    }
+
+    .btn-close-modal {
+        width: 24px;
+        height: 24px;
+        font-size: 0.8rem;
+    }
+
+    .modal-body {
+        padding: 10px 12px;
+    }
+
+    .modal-subtitle {
+        font-size: 0.7rem;
+    }
+
+    .form-group label {
+        font-size: 0.7rem;
+    }
+
+    .form-control {
+        font-size: 0.75rem;
+        padding: 6px 10px;
+    }
+
+    .btn-cancelar,
+    .btn-enviar {
+        font-size: 0.75rem;
+        padding: 6px;
+    }
+
+    .toast-notification {
+        padding: 10px 12px;
+        gap: 8px;
+    }
+
+    .toast-title {
+        font-size: 0.7rem;
+    }
+
+    .toast-message {
+        font-size: 0.65rem;
+    }
+
+    .toast-icon {
+        width: 24px;
+        height: 24px;
+        font-size: 0.9rem;
+    }
+}
