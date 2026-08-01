@@ -19,9 +19,6 @@ const solicitudesController = {
                 [idAcompanante]
             );
 
-            console.log('ACOMPANANTE existe?', acompananteResult.rows.length > 0);
-            console.log('ACOMPANANTE resultado:', acompananteResult.rows);
-
             if (acompananteResult.rows.length === 0) {
                 return res.status(404).json({
                     error: 'Acompanante no encontrado. Contacta al administrador.'
@@ -34,9 +31,6 @@ const solicitudesController = {
                 WHERE Correo = $1 AND Rol = 'Paciente' AND deleted_at IS NULL`,
                 [correoPaciente]
             );
-
-            console.log('PACIENTE existe?', pacienteResult.rows.length > 0);
-            console.log('PACIENTE resultado:', pacienteResult.rows);
 
             if (pacienteResult.rows.length === 0) {
                 return res.status(404).json({
@@ -54,9 +48,6 @@ const solicitudesController = {
                 [idAcompanante, idPaciente]
             );
 
-            console.log('Solicitud pendiente existe?', solicitudExistente.rows.length > 0);
-            console.log('Solicitud pendiente resultado:', solicitudExistente.rows);
-
             if (solicitudExistente.rows.length > 0) {
                 return res.status(400).json({
                     error: 'Ya tienes una solicitud pendiente para este paciente'
@@ -68,9 +59,6 @@ const solicitudesController = {
                 WHERE IdAcompanante = $1 AND IdPaciente = $2 AND Activo = true`,
                 [idAcompanante, idPaciente]
             );
-
-            console.log('Asignacion existe?', asignacionExistente.rows.length > 0);
-            console.log('Asignacion resultado:', asignacionExistente.rows);
 
             if (asignacionExistente.rows.length > 0) {
                 return res.status(400).json({
@@ -104,19 +92,27 @@ const solicitudesController = {
         try {
             const result = await db.query(
                 `SELECT 
-                    s.IdSolicitud,
-                    s.IdPaciente,
-                    u.Nombre AS NombrePaciente,
-                    u.ApPaterno AS ApPaternoPaciente,
-                    u.ApMaterno AS ApMaternoPaciente,
-                    u.Correo AS CorreoPaciente,
-                    s.Parentesco,
-                    s.Notas,
-                    s.Estado,
-                    s.FechaSolicitud,
-                    s.FechaAprobacion
+                    s.IdSolicitud AS "idsolicitud",
+                    s.IdPaciente AS "idpaciente",
+                    s.Parentesco AS "parentesco",
+                    s.Notas AS "notas",
+                    s.Estado AS "estado",
+                    s.FechaSolicitud AS "fechasolicitud",
+                    s.FechaAprobacion AS "fechaaprobacion",
+                    -- Datos del ACOMPAÑANTE
+                    ua.Nombre AS "nombreacompanante",
+                    ua.ApPaterno AS "appaternoacompanante",
+                    ua.ApMaterno AS "apmaternoacompanante",
+                    ua.Correo AS "correoacompanante",
+                    ua.Telefono AS "telefonoacompanante",
+                    -- Datos del PACIENTE
+                    up.Nombre AS "nombrepaciente",
+                    up.ApPaterno AS "appaterrnopaciente",
+                    up.ApMaterno AS "apmaternopaciente",
+                    up.Correo AS "correopaciente"
                 FROM SOLICITUDES_ASIGNACION s
-                INNER JOIN USUARIOS u ON s.IdPaciente = u.IdUsuario
+                INNER JOIN USUARIOS ua ON s.IdAcompanante = ua.IdUsuario
+                INNER JOIN USUARIOS up ON s.IdPaciente = up.IdUsuario
                 WHERE s.IdAcompanante = $1
                 ORDER BY s.FechaSolicitud DESC`,
                 [idAcompanante]
@@ -132,17 +128,22 @@ const solicitudesController = {
         try {
             const result = await db.query(
                 `SELECT 
-                    s.IdSolicitud,
-                    s.FechaSolicitud,
-                    ua.Nombre AS NombreAcompanante,
-                    ua.ApPaterno AS ApPaternoAcompanante,
-                    ua.Correo AS CorreoAcompanante,
-                    up.Nombre AS NombrePaciente,
-                    up.ApPaterno AS ApPaternoPaciente,
-                    up.Correo AS CorreoPaciente,
-                    s.Parentesco,
-                    s.Notas,
-                    s.Estado
+                    s.IdSolicitud AS "idsolicitud",
+                    s.IdAcompanante AS "idacompanante",
+                    s.IdPaciente AS "idpaciente",
+                    s.Parentesco AS "parentesco",
+                    s.Notas AS "notas",
+                    s.Estado AS "estado",
+                    s.FechaSolicitud AS "fechasolicitud",
+                    s.FechaAprobacion AS "fechaaprobacion",
+                    ua.Nombre AS "nombreacompanante",
+                    ua.ApPaterno AS "appaternoacompanante",
+                    ua.ApMaterno AS "apmaternoacompanante",
+                    ua.Correo AS "correoacompanante",
+                    up.Nombre AS "nombrepaciente",
+                    up.ApPaterno AS "appaterrnopaciente",
+                    up.ApMaterno AS "apmaternopaciente",
+                    up.Correo AS "correopaciente"
                 FROM SOLICITUDES_ASIGNACION s
                 INNER JOIN USUARIOS ua ON s.IdAcompanante = ua.IdUsuario
                 INNER JOIN USUARIOS up ON s.IdPaciente = up.IdUsuario
@@ -152,6 +153,39 @@ const solicitudesController = {
             res.json(result.rows);
         } catch (error) {
             console.error('Error al obtener solicitudes pendientes:', error);
+            res.status(500).json({ error: 'Error al obtener las solicitudes' });
+        }
+    },
+
+    getTodasLasSolicitudes: async (req, res) => {
+        try {
+            const result = await db.query(
+                `SELECT 
+                    s.IdSolicitud AS "idsolicitud",
+                    s.IdAcompanante AS "idacompanante",
+                    s.IdPaciente AS "idpaciente",
+                    s.Parentesco AS "parentesco",
+                    s.Notas AS "notas",
+                    s.Estado AS "estado",
+                    s.FechaSolicitud AS "fechasolicitud",
+                    s.FechaAprobacion AS "fechaaprobacion",
+                    ua.Nombre AS "nombreacompanante",
+                    ua.ApPaterno AS "appaternoacompanante",
+                    ua.ApMaterno AS "apmaternoacompanante",
+                    ua.Correo AS "correoacompanante",
+                    ua.Telefono AS "telefonoacompanante",
+                    up.Nombre AS "nombrepaciente",
+                    up.ApPaterno AS "appaterrnopaciente",
+                    up.ApMaterno AS "apmaternopaciente",
+                    up.Correo AS "correopaciente"
+                FROM SOLICITUDES_ASIGNACION s
+                INNER JOIN USUARIOS ua ON s.IdAcompanante = ua.IdUsuario
+                INNER JOIN USUARIOS up ON s.IdPaciente = up.IdUsuario
+                ORDER BY s.FechaSolicitud DESC`
+            );
+            res.json(result.rows);
+        } catch (error) {
+            console.error('Error al obtener todas las solicitudes:', error);
             res.status(500).json({ error: 'Error al obtener las solicitudes' });
         }
     },

@@ -41,6 +41,7 @@ export class Solicitudes implements OnInit, OnDestroy {
         if (storedUser) {
             const userData = JSON.parse(storedUser);
             this.adminId = userData.idusuario || userData.uid || null;
+            console.log('Admin ID:', this.adminId);
         }
 
         this.cargarTodosLosDatos();
@@ -60,15 +61,23 @@ export class Solicitudes implements OnInit, OnDestroy {
         this.isLoading = true;
         try {
             const todasLasSolicitudes = await firstValueFrom(
-                this.usersService.getMisSolicitudes(1)
+                this.usersService.getTodasLasSolicitudes()
             );
+
+            console.log('Todas las solicitudes:', todasLasSolicitudes);
 
             if (Array.isArray(todasLasSolicitudes)) {
                 this.solicitudesPendientes = todasLasSolicitudes.filter(s => s.estado === 'pendiente');
                 this.solicitudesAprobadas = todasLasSolicitudes.filter(s => s.estado === 'aprobada');
                 this.asignacionesActivas = todasLasSolicitudes.filter(s => s.estado === 'aprobada');
             }
+
+            console.log('Pendientes:', this.solicitudesPendientes.length);
+            console.log('Aprobadas:', this.solicitudesAprobadas.length);
+            console.log('Asignaciones:', this.asignacionesActivas.length);
+
         } catch (error) {
+            console.error('Error al cargar datos:', error);
             this.lanzarNotificacion('No se pudieron cargar los datos', 'error');
         } finally {
             this.isLoading = false;
@@ -104,7 +113,7 @@ export class Solicitudes implements OnInit, OnDestroy {
     async rechazarSolicitud(idSolicitud: number) {
         if (!this.adminId) return;
 
-        if (!confirm('¿Estás seguro de rechazar esta solicitud?')) return;
+        if (!confirm('Estas seguro de rechazar esta solicitud?')) return;
 
         try {
             await firstValueFrom(
@@ -124,12 +133,72 @@ export class Solicitudes implements OnInit, OnDestroy {
         }
     }
 
-    verDetalleAcompanante(idAcompanante: number) {
-        this.router.navigate(['/admin/acompanantes/editar', idAcompanante]);
+    verDetalleAcompanante(idAcompanante: any) {
+        console.log('ID Acompañante recibido:', idAcompanante);
+
+        if (!idAcompanante) {
+            this.lanzarNotificacion('No se encontró el ID del acompañante', 'warning');
+            return;
+        }
+
+        const id = Number(idAcompanante);
+        if (!isNaN(id) && id > 0) {
+            // Buscar el acompañante en los datos para pasar por state
+            const acompanante = this.solicitudesAprobadas.find(s => s.idacompanante === id) ||
+                this.solicitudesPendientes.find(s => s.idacompanante === id);
+
+            if (acompanante) {
+                const usuario = {
+                    idusuario: id,
+                    nombre: acompanante.nombreacompanante || acompanante.NombreAcompanante || '',
+                    apPaterno: acompanante.appaternoacompanante || acompanante.ApPaternoAcompanante || '',
+                    apMaterno: acompanante.apmaternoacompanante || acompanante.ApMaternoAcompanante || '',
+                    correo: acompanante.correoacompanante || acompanante.CorreoAcompanante || ''
+                };
+                this.router.navigate(['/admin/acompanantes/editar', id], {
+                    state: { usuario: usuario }
+                });
+            } else {
+                this.router.navigate(['/admin/acompanantes/editar', id]);
+            }
+        } else {
+            this.lanzarNotificacion('ID de acompañante no válido', 'warning');
+        }
     }
 
-    verDetallePaciente(idPaciente: number) {
-        this.router.navigate(['/admin/pacientes/editar', idPaciente]);
+    verDetallePaciente(idPaciente: any) {
+        console.log('ID Paciente recibido:', idPaciente);
+
+        if (!idPaciente) {
+            this.lanzarNotificacion('No se encontró el ID del paciente', 'warning');
+            return;
+        }
+
+        const id = Number(idPaciente);
+        if (!isNaN(id) && id > 0) {
+            // Buscar el paciente en los datos para pasar por state
+            const paciente = this.solicitudesAprobadas.find(s => s.idpaciente === id) ||
+                this.solicitudesPendientes.find(s => s.idpaciente === id);
+
+            if (paciente) {
+                const usuario = {
+                    idusuario: id,
+                    nombre: paciente.nombrepaciente || paciente.NombrePaciente || '',
+                    apPaterno: paciente.appaterrnopaciente || paciente.ApPaternoPaciente || '',
+                    apMaterno: paciente.apmaternopaciente || paciente.ApMaternoPaciente || '',
+                    correo: paciente.correopaciente || paciente.CorreoPaciente || ''
+                };
+                console.log('Navegando con usuario:', usuario);
+                this.router.navigate(['/admin/pacientes/editar', id], {
+                    state: { usuario: usuario }
+                });
+            } else {
+                console.log('Navegando sin usuario, solo ID:', id);
+                this.router.navigate(['/admin/pacientes/editar', id]);
+            }
+        } else {
+            this.lanzarNotificacion('ID de paciente no válido', 'warning');
+        }
     }
 
     obtenerNombreCompleto(persona: any): string {

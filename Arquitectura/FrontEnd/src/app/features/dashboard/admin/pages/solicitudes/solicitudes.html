@@ -105,22 +105,26 @@
                                 <div class="info-row">
                                     <span class="info-label">Nombre completo:</span>
                                     <span class="info-value strong">
-                                        {{ solicitud.nombreacompanante }} {{ solicitud.appaternoacompanante }} {{
-                                        solicitud.apmaternoacompanante || '' }}
+                                        {{ solicitud.nombreacompanante || solicitud.NombreAcompanante || 'No disponible'
+                                        }}
+                                        {{ solicitud.appaternoacompanante || solicitud.ApPaternoAcompanante || '' }}
+                                        {{ solicitud.apmaternoacompanante || solicitud.ApMaternoAcompanante || '' }}
                                     </span>
                                 </div>
                                 <div class="info-row">
                                     <span class="info-label">Correo electrónico:</span>
                                     <span class="info-value">
                                         <i class="bi bi-envelope"></i>
-                                        {{ solicitud.correoacompanante }}
+                                        {{ solicitud.correoacompanante || solicitud.CorreoAcompanante || 'No disponible'
+                                        }}
                                     </span>
                                 </div>
-                                <div class="info-row" *ngIf="solicitud.telefonoacompanante">
+                                <div class="info-row"
+                                    *ngIf="solicitud.telefonoacompanante || solicitud.TelefonoAcompanante">
                                     <span class="info-label">Teléfono:</span>
                                     <span class="info-value">
                                         <i class="bi bi-telephone"></i>
-                                        {{ solicitud.telefonoacompanante }}
+                                        {{ solicitud.telefonoacompanante || solicitud.TelefonoAcompanante }}
                                     </span>
                                 </div>
                                 <div class="info-row" *ngIf="solicitud.parentesco">
@@ -131,7 +135,8 @@
                                     </span>
                                 </div>
                             </div>
-                            <button class="btn-ver-perfil" (click)="verDetalleAcompanante(solicitud.idacompanante)">
+                            <button class="btn-ver-perfil"
+                                (click)="verDetalleAcompanante(solicitud.idacompanante || solicitud.IdAcompanante)">
                                 <i class="bi bi-box-arrow-up-right"></i>
                                 Ver perfil completo
                             </button>
@@ -147,19 +152,21 @@
                                 <div class="info-row">
                                     <span class="info-label">Nombre completo:</span>
                                     <span class="info-value strong">
-                                        {{ solicitud.nombrepaciente }} {{ solicitud.appaterrnopaciente }} {{
-                                        solicitud.apmaternopaciente || '' }}
+                                        {{ solicitud.nombrepaciente || solicitud.NombrePaciente || 'No disponible' }}
+                                        {{ solicitud.appaterrnopaciente || solicitud.ApPaternoPaciente || '' }}
+                                        {{ solicitud.apmaternopaciente || solicitud.ApMaternoPaciente || '' }}
                                     </span>
                                 </div>
                                 <div class="info-row">
                                     <span class="info-label">Correo electrónico:</span>
                                     <span class="info-value">
                                         <i class="bi bi-envelope"></i>
-                                        {{ solicitud.correopaciente }}
+                                        {{ solicitud.correopaciente || solicitud.CorreoPaciente || 'No disponible' }}
                                     </span>
                                 </div>
                             </div>
-                            <button class="btn-ver-perfil" (click)="verDetallePaciente(solicitud.idpaciente)">
+                            <button class="btn-ver-perfil"
+                                (click)="verDetallePaciente(solicitud.idpaciente || solicitud.IdPaciente)">
                                 <i class="bi bi-box-arrow-up-right"></i>
                                 Ver perfil completo
                             </button>
@@ -235,15 +242,18 @@
                                 <div class="info-row">
                                     <span class="info-label">Nombre completo:</span>
                                     <span class="info-value strong">
-                                        {{ solicitud.nombreacompanante }} {{ solicitud.appaternoacompanante }} {{
-                                        solicitud.apmaternoacompanante || '' }}
+                                        {{ solicitud.nombreacompanante || solicitud.NombreAcompanante || 'No disponible'
+                                        }}
+                                        {{ solicitud.appaternoacompanante || solicitud.ApPaternoAcompanante || '' }}
+                                        {{ solicitud.apmaternoacompanante || solicitud.ApMaternoAcompanante || '' }}
                                     </span>
                                 </div>
                                 <div class="info-row">
                                     <span class="info-label">Correo:</span>
                                     <span class="info-value">
                                         <i class="bi bi-envelope"></i>
-                                        {{ solicitud.correoacompanante }}
+                                        {{ solicitud.correoacompanante || solicitud.CorreoAcompanante || 'No disponible'
+                                        }}
                                     </span>
                                 </div>
                                 @if (solicitud.parentesco) {
@@ -256,7 +266,8 @@
                                 </div>
                                 }
                             </div>
-                            <button class="btn-ver-perfil" (click)="verDetalleAcompanante(solicitud.idacompanante)">
+                            <button class="btn-ver-perfil"
+                                (click)="verDetalleAcompanante(solicitud.idacompanante || solicitud.IdAcompanante)">
                                 <i class="bi bi-box-arrow-up-right"></i>
                                 Ver perfil
                             </button>
@@ -271,19 +282,21 @@
                                 <div class="info-row">
                                     <span class="info-label">Nombre completo:</span>
                                     <span class="info-value strong">
-                                        {{ solicitud.nombrepaciente }} {{ solicitud.appaterrnopaciente }} {{
-                                        solicitud.apmaternopaciente || '' }}
+                                        {{ solicitud.nombrepaciente || solicitud.NombrePaciente || 'No disponible' }}
+                                        {{ solicitud.appaterrnopaciente || solicitud.ApPaternoPaciente || '' }}
+                                        {{ solicitud.apmaternopaciente || solicitud.ApMaternoPaciente || '' }}
                                     </span>
                                 </div>
                                 <div class="info-row">
                                     <span class="info-label">Correo:</span>
                                     <span class="info-value">
                                         <i class="bi bi-envelope"></i>
-                                        {{ solicitud.correopaciente }}
+                                        {{ solicitud.correopaciente || solicitud.CorreoPaciente || 'No disponible' }}
                                     </span>
                                 </div>
                             </div>
-                            <button class="btn-ver-perfil" (click)="verDetallePaciente(solicitud.idpaciente)">
+                            <button class="btn-ver-perfil"
+                                (click)="verDetallePaciente(solicitud.idpaciente || solicitud.IdPaciente)">
                                 <i class="bi bi-box-arrow-up-right"></i>
                                 Ver perfil
                             </button>
@@ -340,14 +353,18 @@
                                 <div class="info-row">
                                     <span class="info-label">Nombre:</span>
                                     <span class="info-value strong">
-                                        {{ asignacion.nombreacompanante }} {{ asignacion.appaternoacompanante }}
+                                        {{ asignacion.nombreacompanante || asignacion.NombreAcompanante || 'No
+                                        disponible' }}
+                                        {{ asignacion.appaternoacompanante || asignacion.ApPaternoAcompanante || '' }}
+                                        {{ asignacion.apmaternoacompanante || asignacion.ApMaternoAcompanante || '' }}
                                     </span>
                                 </div>
                                 <div class="info-row">
                                     <span class="info-label">Correo:</span>
                                     <span class="info-value">
                                         <i class="bi bi-envelope"></i>
-                                        {{ asignacion.correoacompanante }}
+                                        {{ asignacion.correoacompanante || asignacion.CorreoAcompanante || 'No
+                                        disponible' }}
                                     </span>
                                 </div>
                                 @if (asignacion.parentesco) {
@@ -360,7 +377,8 @@
                                 </div>
                                 }
                             </div>
-                            <button class="btn-ver-perfil" (click)="verDetalleAcompanante(asignacion.idacompanante)">
+                            <button class="btn-ver-perfil"
+                                (click)="verDetalleAcompanante(asignacion.idacompanante || asignacion.IdAcompanante)">
                                 <i class="bi bi-box-arrow-up-right"></i>
                                 Ver perfil
                             </button>
@@ -375,18 +393,21 @@
                                 <div class="info-row">
                                     <span class="info-label">Nombre:</span>
                                     <span class="info-value strong">
-                                        {{ asignacion.nombrepaciente }} {{ asignacion.appaterrnopaciente }}
+                                        {{ asignacion.nombrepaciente || asignacion.NombrePaciente || 'No disponible' }}
+                                        {{ asignacion.appaterrnopaciente || asignacion.ApPaternoPaciente || '' }}
+                                        {{ asignacion.apmaternopaciente || asignacion.ApMaternoPaciente || '' }}
                                     </span>
                                 </div>
                                 <div class="info-row">
                                     <span class="info-label">Correo:</span>
                                     <span class="info-value">
                                         <i class="bi bi-envelope"></i>
-                                        {{ asignacion.correopaciente }}
+                                        {{ asignacion.correopaciente || asignacion.CorreoPaciente || 'No disponible' }}
                                     </span>
                                 </div>
                             </div>
-                            <button class="btn-ver-perfil" (click)="verDetallePaciente(asignacion.idpaciente)">
+                            <button class="btn-ver-perfil"
+                                (click)="verDetallePaciente(asignacion.idpaciente || asignacion.IdPaciente)">
                                 <i class="bi bi-box-arrow-up-right"></i>
                                 Ver perfil
                             </button>

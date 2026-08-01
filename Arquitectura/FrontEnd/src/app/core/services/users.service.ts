@@ -799,6 +799,13 @@ export class Users {
   }
 
   /**
+   * Obtener TODAS las solicitudes (Admin)
+   */
+  getTodasLasSolicitudes(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/solicitudes/todas`);
+  }
+
+  /**
    * Obtener todas las solicitudes pendientes (Admin)
    */
   getSolicitudesPendientes(): Observable<any[]> {

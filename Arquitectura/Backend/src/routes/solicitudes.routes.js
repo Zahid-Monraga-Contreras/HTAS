@@ -118,6 +118,17 @@ router.get(
 // ============================================
 
 /**
+ * GET /api/solicitudes/todas
+ * Admin obtiene TODAS las solicitudes (pendientes, aprobadas, rechazadas)
+ */
+router.get(
+    '/todas',
+    verificarAutenticacion,
+    verificarAdmin,
+    solicitudesController.getTodasLasSolicitudes
+);
+
+/**
  * GET /api/solicitudes/pendientes
  * Admin obtiene todas las solicitudes pendientes
  */

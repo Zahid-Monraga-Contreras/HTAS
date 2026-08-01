@@ -68,6 +68,7 @@ app.get('/', (req, res) => {
                 'POST /api/solicitudes/solicitar/:idAcompanante': 'Solicitar asignación de paciente',
                 'GET /api/solicitudes/mis-solicitudes/:idAcompanante': 'Obtener solicitudes del acompañante',
                 'GET /api/solicitudes/mis-pacientes/:idAcompanante': 'Obtener pacientes asignados',
+                'GET /api/solicitudes/todas': 'Obtener TODAS las solicitudes (solo admin)',
                 'GET /api/solicitudes/pendientes': 'Obtener solicitudes pendientes (solo admin)',
                 'PUT /api/solicitudes/aprobar/:idSolicitud': 'Aprobar solicitud (solo admin)',
                 'PUT /api/solicitudes/rechazar/:idSolicitud': 'Rechazar solicitud (solo admin)',

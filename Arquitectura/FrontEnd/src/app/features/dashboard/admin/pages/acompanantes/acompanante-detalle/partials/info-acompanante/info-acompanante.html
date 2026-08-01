@@ -1,7 +1,7 @@
-<!-- TAB 1: INFORMACIÓN DEL ACOMPAÑANTE -->
+<!-- TAB 1: INFORMACION DEL ACOMPANANTE -->
 <div class="tab-panel">
 
-    <!-- RESUMEN DEL ACOMPAÑANTE -->
+    <!-- RESUMEN DEL ACOMPANANTE -->
     <div class="resumen-acompanante">
         <div class="resumen-item">
             <i class="bi bi-person-fill"></i>
@@ -22,7 +22,7 @@
         <div class="resumen-item">
             <i class="bi bi-telephone-fill"></i>
             <div>
-                <small>Teléfono</small>
+                <small>Telefono</small>
                 <strong>{{ usuarioSeleccionado.telefono || 'No registrado' }}</strong>
             </div>
         </div>
@@ -62,20 +62,20 @@
             </div>
 
             <div class="form-group">
-                <label>Correo Electrónico</label>
+                <label>Correo Electronico</label>
                 <input type="email" maxlength="60" [(ngModel)]="usuarioSeleccionado.correo"
                     class="form-control-premium">
             </div>
 
             <div class="form-group">
-                <label>Teléfono</label>
+                <label>Telefono</label>
                 <input type="text" required maxlength="10" pattern="[0-9]*"
                     oninput="this.value = this.value.replace(/[^0-9]/g, '')" [(ngModel)]="usuarioSeleccionado.telefono"
                     placeholder="Ej: 2711234567" class="form-control-premium">
             </div>
 
             <div class="form-group">
-                <label>Género</label>
+                <label>Genero</label>
                 <select [(ngModel)]="usuarioSeleccionado.genero" class="form-control-premium">
                     <option value="Masculino">Masculino</option>
                     <option value="Femenino">Femenino</option>
@@ -87,18 +87,19 @@
             <div class="form-group">
                 <label>Fecha de Nacimiento</label>
                 <div class="input-picker-wrapper">
-                    <input type="text" id="fechaNacimientoInput" [(ngModel)]="usuarioSeleccionado.fechaNacimiento"
-                        placeholder="Seleccione fecha de nacimiento" class="form-control-premium picker-custom"
-                        readonly>
+                    <input type="text" id="fechaNacimientoInput" [value]="fechaNacimientoFormateada"
+                        (change)="onFechaNacimientoChange($event)" placeholder="Seleccione fecha de nacimiento"
+                        class="form-control-premium picker-custom" readonly>
                     <i class="bi bi-calendar3 icon-embed"></i>
                 </div>
             </div>
 
             <div class="form-group">
-                <label>Fecha de Asignación</label>
+                <label>Fecha de Asignacion</label>
                 <div class="input-picker-wrapper">
-                    <input type="text" id="fechaInput" [(ngModel)]="usuarioSeleccionado.fechaAsignacion"
-                        placeholder="Seleccione fecha" class="form-control-premium picker-custom" readonly>
+                    <input type="text" id="fechaInput" [value]="fechaAsignacionFormateada"
+                        (change)="onFechaAsignacionChange($event)" placeholder="Seleccione fecha"
+                        class="form-control-premium picker-custom" readonly>
                     <i class="bi bi-calendar3 icon-embed"></i>
                 </div>
             </div>
@@ -107,43 +108,43 @@
                 <label>CURP</label>
                 <input type="text" maxlength="18" [(ngModel)]="usuarioSeleccionado.curp" (input)="formatearCURP()"
                     placeholder="Ej: GAML850315HVZRRL01" class="form-control-premium">
-                <small class="form-text text-muted">18 caracteres alfanuméricos</small>
+                <small class="form-text text-muted">18 caracteres alfanumericos</small>
             </div>
         </div>
 
-        <!-- UBICACIÓN - ESTILO MEJORADO -->
+        <!-- UBICACION - ESTILO MEJORADO -->
         <div class="ubicacion-section">
             <div class="ubicacion-header">
                 <i class="bi bi-geo-alt-fill"></i>
-                <span>Datos de Ubicación</span>
+                <span>Datos de Ubicacion</span>
             </div>
 
             <div class="ubicacion-grid">
                 <div class="ubicacion-item full-width">
                     <label>Domicilio</label>
                     <input type="text" [(ngModel)]="usuarioSeleccionado.domicilio"
-                        (blur)="formatearCampoTexto('domicilio')" placeholder="Ej: Calle Benito Juárez #123 Col. Centro"
+                        (blur)="formatearCampoTexto('domicilio')" placeholder="Ej: Calle Benito Juarez #123 Col. Centro"
                         class="form-control-premium">
                 </div>
 
                 <div class="ubicacion-item">
-                    <label>Código Postal</label>
+                    <label>Codigo Postal</label>
                     <input type="text" maxlength="5" [(ngModel)]="usuarioSeleccionado.codigoPostal"
                         (input)="formatearCodigoPostal()" placeholder="Ej: 94500" class="form-control-premium">
-                    <small class="form-text text-muted">5 dígitos numéricos</small>
+                    <small class="form-text text-muted">5 digitos numericos</small>
                 </div>
 
                 <div class="ubicacion-item">
                     <label>Localidad</label>
                     <input type="text" [(ngModel)]="usuarioSeleccionado.localidad"
-                        (blur)="formatearCampoTexto('localidad')" placeholder="Ej: Córdoba"
+                        (blur)="formatearCampoTexto('localidad')" placeholder="Ej: Cordoba"
                         class="form-control-premium">
                 </div>
 
                 <div class="ubicacion-item">
                     <label>Municipio</label>
                     <input type="text" [(ngModel)]="usuarioSeleccionado.municipio"
-                        (blur)="formatearCampoTexto('municipio')" placeholder="Ej: Córdoba"
+                        (blur)="formatearCampoTexto('municipio')" placeholder="Ej: Cordoba"
                         class="form-control-premium">
                 </div>
 

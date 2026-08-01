@@ -37,6 +37,10 @@ export class InfoAcompanante implements OnDestroy {
 
     visitasAcompanante: any[] = [];
 
+    // Variables para almacenar las fechas formateadas
+    fechaNacimientoDisplay: string = '';
+    fechaAsignacionDisplay: string = '';
+
     ngOnDestroy() {
         if (this.fpNacimientoInstance) {
             try { this.fpNacimientoInstance.destroy(); } catch (e) { }
@@ -50,8 +54,107 @@ export class InfoAcompanante implements OnDestroy {
 
     ngAfterViewInit() {
         setTimeout(() => {
+            this.actualizarFechasDisplay();
             this.inicializarCalendarios();
         }, 500);
+    }
+
+    actualizarFechasDisplay() {
+        if (this.usuarioSeleccionado) {
+            this.fechaNacimientoDisplay = this.formatearFechaParaMostrar(this.usuarioSeleccionado.fechaNacimiento);
+            this.fechaAsignacionDisplay = this.formatearFechaParaMostrar(this.usuarioSeleccionado.fechaAsignacion);
+            this.cdr.detectChanges();
+        }
+    }
+
+    formatearFechaParaInput(fecha: string): string {
+        if (!fecha) return '';
+        if (fecha === 'null' || fecha === 'undefined') return '';
+
+        try {
+            if (fecha.includes('T')) {
+                const d = new Date(fecha);
+                if (!isNaN(d.getTime())) {
+                    const year = d.getFullYear();
+                    const month = String(d.getMonth() + 1).padStart(2, '0');
+                    const day = String(d.getDate()).padStart(2, '0');
+                    return `${year}-${month}-${day}`;
+                }
+            }
+
+            if (/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
+                return fecha;
+            }
+
+            if (/^\d{2}\/\d{2}\/\d{4}$/.test(fecha)) {
+                const partes = fecha.split('/');
+                return `${partes[2]}-${partes[1]}-${partes[0]}`;
+            }
+
+            const d = new Date(fecha);
+            if (!isNaN(d.getTime())) {
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+
+            return fecha;
+        } catch (error) {
+            console.warn('Error al formatear fecha:', fecha, error);
+            return fecha;
+        }
+    }
+
+    formatearFechaParaMostrar(fecha: string): string {
+        if (!fecha) return 'No registrada';
+
+        try {
+            const d = new Date(fecha);
+            if (!isNaN(d.getTime())) {
+                const dia = String(d.getDate()).padStart(2, '0');
+                const mes = String(d.getMonth() + 1).padStart(2, '0');
+                const anio = d.getFullYear();
+                return `${dia}/${mes}/${anio}`;
+            }
+            return fecha;
+        } catch (error) {
+            return fecha;
+        }
+    }
+
+    get fechaAsignacionFormateada(): string {
+        if (!this.usuarioSeleccionado?.fechaAsignacion) return 'No registrada';
+        return this.formatearFechaParaMostrar(this.usuarioSeleccionado.fechaAsignacion);
+    }
+
+    get fechaNacimientoFormateada(): string {
+        if (!this.usuarioSeleccionado?.fechaNacimiento) return 'No registrada';
+        return this.formatearFechaParaMostrar(this.usuarioSeleccionado.fechaNacimiento);
+    }
+
+    onFechaNacimientoChange(event: any) {
+        const value = event.target.value;
+        if (this.usuarioSeleccionado) {
+            const fechaFormateada = this.formatearFechaParaInput(value);
+            if (fechaFormateada) {
+                this.usuarioSeleccionado.fechaNacimiento = fechaFormateada;
+                this.fechaNacimientoDisplay = this.formatearFechaParaMostrar(fechaFormateada);
+                this.cdr.detectChanges();
+            }
+        }
+    }
+
+    onFechaAsignacionChange(event: any) {
+        const value = event.target.value;
+        if (this.usuarioSeleccionado) {
+            const fechaFormateada = this.formatearFechaParaInput(value);
+            if (fechaFormateada) {
+                this.usuarioSeleccionado.fechaAsignacion = fechaFormateada;
+                this.fechaAsignacionDisplay = this.formatearFechaParaMostrar(fechaFormateada);
+                this.cdr.detectChanges();
+            }
+        }
     }
 
     inicializarCalendarios() {
@@ -68,10 +171,14 @@ export class InfoAcompanante implements OnDestroy {
 
         const nacimientoEl = document.querySelector('#fechaNacimientoInput') as HTMLInputElement;
         if (nacimientoEl) {
+            const fechaNacimiento = this.usuarioSeleccionado?.fechaNacimiento
+                ? this.formatearFechaParaInput(this.usuarioSeleccionado.fechaNacimiento)
+                : null;
+
             const configNacimiento: any = {
                 locale: Spanish,
                 dateFormat: "Y-m-d",
-                defaultDate: this.usuarioSeleccionado?.fechaNacimiento || null,
+                defaultDate: fechaNacimiento,
                 maxDate: "today",
                 appendTo: document.body,
                 static: false,
@@ -79,6 +186,7 @@ export class InfoAcompanante implements OnDestroy {
                 onChange: (selectedDates: any, dateStr: string) => {
                     if (this.usuarioSeleccionado) {
                         this.usuarioSeleccionado.fechaNacimiento = dateStr;
+                        this.fechaNacimientoDisplay = this.formatearFechaParaMostrar(dateStr);
                         this.cdr.detectChanges();
                     }
                 }
@@ -88,13 +196,21 @@ export class InfoAcompanante implements OnDestroy {
 
         const asignacionEl = document.querySelector('#fechaInput') as HTMLInputElement;
         if (asignacionEl) {
+            let fechaAsignacion = 'today';
+            if (this.usuarioSeleccionado?.fechaAsignacion) {
+                const fechaFormateada = this.formatearFechaParaInput(this.usuarioSeleccionado.fechaAsignacion);
+                if (fechaFormateada) {
+                    fechaAsignacion = fechaFormateada;
+                }
+            }
+
             const hoy = new Date();
             const fechaMaximaAsignacion = new Date(hoy.getFullYear(), hoy.getMonth() + 2, hoy.getDate());
 
             const configAsignacion: any = {
                 locale: Spanish,
                 dateFormat: "Y-m-d",
-                defaultDate: this.usuarioSeleccionado?.fechaAsignacion || "today",
+                defaultDate: fechaAsignacion,
                 minDate: "today",
                 maxDate: fechaMaximaAsignacion,
                 appendTo: document.body,
@@ -103,6 +219,7 @@ export class InfoAcompanante implements OnDestroy {
                 onChange: (selectedDates: any, dateStr: string) => {
                     if (this.usuarioSeleccionado) {
                         this.usuarioSeleccionado.fechaAsignacion = dateStr;
+                        this.fechaAsignacionDisplay = this.formatearFechaParaMostrar(dateStr);
                         this.cdr.detectChanges();
                     }
                 }
@@ -111,7 +228,6 @@ export class InfoAcompanante implements OnDestroy {
         }
     }
 
-    // --- ESTADO DEL ACOMPAÑANTE ---
     getEstadoAcompanante(): { texto: string; clase: string; icono: string } {
         if (!this.usuarioSeleccionado) {
             return { texto: 'Sin datos', clase: 'estado-sin-datos', icono: 'bi-question-circle' };
@@ -132,7 +248,6 @@ export class InfoAcompanante implements OnDestroy {
         return { texto: 'Activo', clase: 'estado-activo', icono: 'bi-check-circle-fill' };
     }
 
-    // --- UBICACIÓN ---
     tieneUbicacionCompleta(): boolean {
         const u = this.usuarioSeleccionado;
         if (!u) return false;
@@ -149,10 +264,9 @@ export class InfoAcompanante implements OnDestroy {
             u.estado,
             u.codigoPostal ? `CP ${u.codigoPostal}` : ''
         ].filter(Boolean);
-        return partes.length ? partes.join(', ') : 'Sin ubicación registrada';
+        return partes.length ? partes.join(', ') : 'Sin ubicacion registrada';
     }
 
-    // --- FORMATEO DE CAMPOS ---
     formatearCURP() {
         if (this.usuarioSeleccionado && this.usuarioSeleccionado.curp) {
             this.usuarioSeleccionado.curp = this.usuarioSeleccionado.curp.toUpperCase().trim();
