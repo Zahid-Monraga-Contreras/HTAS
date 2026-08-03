@@ -1,8 +1,11 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, inject, ChangeDetectorRef, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { Users } from '../../../../../../../../core/services/users.service';
+import { PatientMenu } from "../../template/menu/menu";
+import { Users } from '../../../../../core/services/users.service';
+import { Auth } from '@angular/fire/auth';
+import { firstValueFrom } from 'rxjs';
 import jsPDF from 'jspdf';
 
 interface AnalisisHistorial {
@@ -23,26 +26,32 @@ interface ToastMessage {
 }
 
 @Component({
-    selector: 'app-analisis-paciente',
+    selector: 'app-patient-analisis',
     standalone: true,
-    imports: [CommonModule, FormsModule],
-    templateUrl: './analisis-paciente.html',
-    styleUrls: ['./analisis-paciente.css']
+    imports: [CommonModule, FormsModule, PatientMenu],
+    templateUrl: './analisis.html',
+    styleUrls: ['./analisis.css']
 })
-export class AnalisisPacienteComponent implements OnInit, OnDestroy {
-    @Input() usuarioSeleccionado: any = null;
-    @Input() pacienteId: number | null = null;
-    @Output() lanzarNotificacion = new EventEmitter<{ mensaje: string; tipo: 'success' | 'error' | 'warning' }>();
-
+export class PatientAnalisis implements OnInit {
     private usersService = inject(Users);
     private sanitizer = inject(DomSanitizer);
     private cdr = inject(ChangeDetectorRef);
     private platformId = inject(PLATFORM_ID);
+    private auth = inject(Auth);
 
     // Estado del sistema
     sistemaActivo = false;
     isAnalizando = false;
     isCargandoArchivos = false;
+    isLoading = true;
+
+    // Datos del paciente
+    patientId: number | null = null;
+    patientName: string = '';
+    patientFullName: string = '';
+    patientEmail: string = '';
+    patientFechaNacimiento: string | null = null;
+    pacienteEdad: number | null = null;
 
     // Archivo PDF
     analisisArchivo: File | null = null;
@@ -79,15 +88,81 @@ export class AnalisisPacienteComponent implements OnInit, OnDestroy {
     vistaPreviaTitulo = '';
     vistaPreviaCargando = false;
 
-    ngOnInit() {
-        this.verificarEstadoSistema();
-        if (this.pacienteId) {
-            this.cargarExpedienteExistente();
+    // Estadisticas
+    metrics = {
+        totalAnalisis: 0,
+        ultimoRiesgo: '',
+        ultimaFecha: ''
+    };
+
+    async ngOnInit() {
+        if (!isPlatformBrowser(this.platformId)) return;
+
+        try {
+            this.isLoading = true;
+
+            const storedUser = localStorage.getItem('user_htas');
+            if (storedUser) {
+                try {
+                    const userData = JSON.parse(storedUser);
+                    this.patientId = userData.idusuario || userData.uid || null;
+                    this.patientName = userData.nombre || 'Paciente';
+                    this.patientFullName = userData.nombreCompleto || userData.nombre || 'Paciente';
+                    this.patientEmail = userData.correo || '';
+                    this.patientFechaNacimiento = userData.fechaNacimiento || null;
+                    this.pacienteEdad = userData.edad || userData.Edad || null;
+                } catch (e) {
+                    console.error('[HTAS] Error parseando localStorage:', e);
+                }
+            }
+
+            if (!this.patientId) {
+                const user = this.auth.currentUser;
+                if (user) {
+                    this.patientEmail = user.email || '';
+                    this.patientName = user.displayName || 'Paciente';
+                }
+            }
+
+            if (this.patientId && !this.pacienteEdad && !this.patientFechaNacimiento) {
+                await this.obtenerEdadDesdeBackend();
+            }
+
+            await this.verificarEstadoSistema();
+
+            if (this.patientId) {
+                await this.cargarExpedienteExistente();
+            }
+
+        } catch (error) {
+            console.error('[HTAS] Error inicializando:', error);
+        } finally {
+            this.isLoading = false;
+            this.cdr.detectChanges();
         }
     }
 
-    ngOnDestroy() {
-        // Cleanup
+    // ============================================================
+    // OBTENER EDAD DESDE EL BACKEND
+    // ============================================================
+    async obtenerEdadDesdeBackend() {
+        try {
+            if (!this.patientId) return;
+
+            const usuario = await firstValueFrom(this.usersService.getUsuarioById(this.patientId));
+            if (usuario && usuario.fechaNacimiento) {
+                this.patientFechaNacimiento = usuario.fechaNacimiento;
+                const storedUser = localStorage.getItem('user_htas');
+                if (storedUser) {
+                    const userData = JSON.parse(storedUser);
+                    userData.fechaNacimiento = usuario.fechaNacimiento;
+                    localStorage.setItem('user_htas', JSON.stringify(userData));
+                }
+                console.log('[HTAS] Edad obtenida del backend:', this.calcularEdad());
+            }
+        } catch (error) {
+            console.error('[HTAS] Error obteniendo edad del backend:', error);
+        }
     }
 
     // ============================================================
@@ -118,8 +193,22 @@ export class AnalisisPacienteComponent implements OnInit, OnDestroy {
         }
     }
 
+    getToastTitle(tipo: string): string {
+        switch (tipo) {
+            case 'success': return 'Éxito';
+            case 'error': return 'Error';
+            case 'warning': return 'Advertencia';
+            default: return 'Información';
+        }
+    }
+
     getToastClass(tipo: string): string {
-        return tipo;
+        switch (tipo) {
+            case 'success': return 'toast-success';
+            case 'error': return 'toast-error';
+            case 'warning': return 'toast-warning';
+            default: return 'toast-info';
+        }
     }
 
     // ============================================================
@@ -202,95 +291,82 @@ export class AnalisisPacienteComponent implements OnInit, OnDestroy {
     // ============================================================
     // METODOS PRINCIPALES
     // ============================================================
-    verificarEstadoSistema() {
-        this.usersService.verificarEstadoAlgoritmo().subscribe({
-            next: (response) => {
-                this.sistemaActivo = true;
-                this.mostrarToast('Sistema de analisis activo', 'success', 3000);
-            },
-            error: (error) => {
-                this.sistemaActivo = false;
-                this.mostrarToast('El sistema de analisis no esta disponible', 'warning', 5000);
-            }
-        });
+    async verificarEstadoSistema() {
+        try {
+            const response = await firstValueFrom(this.usersService.verificarEstadoAlgoritmo());
+            this.sistemaActivo = true;
+            this.mostrarToast('Sistema de analisis activo', 'success', 3000);
+        } catch (error) {
+            this.sistemaActivo = false;
+            this.mostrarToast('El sistema de analisis no esta disponible', 'warning', 5000);
+        }
     }
 
-    cargarExpedienteExistente() {
-        if (!this.pacienteId) return;
+    async cargarExpedienteExistente() {
+        if (!this.patientId) return;
 
         this.isCargandoArchivos = true;
-        this.usersService.obtenerUltimoExpediente(this.pacienteId).subscribe({
-            next: (response) => {
-                this.isCargandoArchivos = false;
-                if (response.success && response.data) {
-                    this.expedienteExistente = response.data;
-                    this.tieneArchivosExistentes = true;
+        try {
+            const response = await firstValueFrom(this.usersService.obtenerUltimoExpediente(this.patientId));
 
-                    console.log('[HTAS] Expediente cargado:', response.data);
+            if (response.success && response.data) {
+                this.expedienteExistente = response.data;
+                this.tieneArchivosExistentes = true;
+                this.folioExpediente = response.data.folio || null;
 
-                    // El campo correcto es 'folio' según la interfaz
-                    const folio = response.data.folio || null;
+                console.log('[HTAS] Expediente cargado:', response.data);
 
-                    if (folio) {
-                        this.folioExpediente = folio;
-                        console.log('[HTAS] Folio encontrado:', this.folioExpediente);
-                    } else {
-                        console.warn('[HTAS] No se encontró folio en la respuesta:', response.data);
+                const pdfBase64 = response.data.pdf_diagnostico_base64 || null;
+
+                if (pdfBase64) {
+                    this.pdfExistenteBase64 = pdfBase64;
+                    this.archivoExistenteNombre = `Expediente Folio #${this.folioExpediente || 'sin folio'}`;
+                    this.mostrarToast(`Expediente encontrado (Folio #${this.folioExpediente || 'sin folio'})`, 'info', 3000);
+                } else {
+                    this.archivoExistenteNombre = `Expediente Folio #${this.folioExpediente || 'sin folio'}`;
+                    if (this.folioExpediente) {
+                        this.mostrarToast(`Expediente encontrado (Folio #${this.folioExpediente}). Haz clic en "Ver PDF" para cargarlo.`, 'info', 5000);
                     }
-
-                    // El campo correcto es 'pdf_diagnostico_base64' según la interfaz
-                    const pdfBase64 = response.data.pdf_diagnostico_base64 || null;
-
-                    if (pdfBase64) {
-                        this.pdfExistenteBase64 = pdfBase64;
-                        this.archivoExistenteNombre = `Expediente Folio #${this.folioExpediente || 'sin folio'}`;
-                        console.log('[HTAS] PDF cargado correctamente, longitud:', pdfBase64.length);
-                        this.mostrarToast(`Expediente encontrado (Folio #${this.folioExpediente || 'sin folio'})`, 'info', 3000);
-                    } else {
-                        console.warn('[HTAS] No se encontró PDF en el expediente. Se descargará del servidor al hacer clic en "Ver PDF".');
-                        this.archivoExistenteNombre = `Expediente Folio #${this.folioExpediente || 'sin folio'}`;
-                        if (this.folioExpediente) {
-                            this.mostrarToast(`Expediente encontrado (Folio #${this.folioExpediente}). Haz clic en "Ver PDF" para cargarlo.`, 'info', 5000);
-                        } else {
-                            this.mostrarToast('Expediente encontrado pero sin folio. El PDF no se podrá cargar.', 'warning', 5000);
-                        }
-                    }
-
-                    if (response.data.nivel_riesgo) {
-                        this.resultadoAnalisis = {
-                            folio_expediente_db: this.folioExpediente || 0,
-                            cedula_pdf_valida: response.data.tiene_pdf_cedula || false,
-                            diagnostico_pdf_valido: response.data.tiene_pdf_diagnostico || false,
-                            prediccion_crisis: response.data.prediccion_crisis || 0,
-                            probabilidad_porcentual: response.data.probabilidad_porcentual || 0,
-                            nivel_riesgo_clinico: response.data.nivel_riesgo || 'No disponible',
-                            protocolo_sugerido: this.obtenerProtocoloPorNivel(response.data.nivel_riesgo),
-                            motor_inferencia_usado: response.data.motor_utilizado || 'No disponible',
-                            sistolica_usada: response.data.presion_pdf_sistolica || response.data.sistolica || 0,
-                            diastolica_usada: response.data.presion_pdf_diastolica || response.data.diastolica || 0,
-                            valores_usados: response.data.presion_pdf_sistolica ? 'pdf' : 'payload'
-                        };
-
-                        const historialItem: AnalisisHistorial = {
-                            folio_expediente_db: this.folioExpediente || 0,
-                            fecha_analisis: response.data.fecha_consulta || new Date().toISOString(),
-                            nivel_riesgo_clinico: response.data.nivel_riesgo || 'No disponible',
-                            sistolica_usada: response.data.presion_pdf_sistolica || response.data.sistolica || 0,
-                            diastolica_usada: response.data.presion_pdf_diastolica || response.data.diastolica || 0,
-                            probabilidad_porcentual: response.data.probabilidad_porcentual || 0,
-                            prediccion_crisis: response.data.prediccion_crisis || 0,
-                            motor_inferencia_usado: response.data.motor_utilizado || 'No disponible'
-                        };
-                        this.historialAnalisis.unshift(historialItem);
-                    }
-                    this.cdr.detectChanges();
                 }
-            },
-            error: (error) => {
-                this.isCargandoArchivos = false;
-                console.error('[HTAS] Error cargando expediente:', error);
+
+                if (response.data.nivel_riesgo) {
+                    this.resultadoAnalisis = {
+                        folio_expediente_db: this.folioExpediente || 0,
+                        cedula_pdf_valida: response.data.tiene_pdf_cedula || false,
+                        diagnostico_pdf_valido: response.data.tiene_pdf_diagnostico || false,
+                        prediccion_crisis: response.data.prediccion_crisis || 0,
+                        probabilidad_porcentual: response.data.probabilidad_porcentual || 0,
+                        nivel_riesgo_clinico: response.data.nivel_riesgo || 'No disponible',
+                        protocolo_sugerido: this.obtenerProtocoloPorNivel(response.data.nivel_riesgo),
+                        motor_inferencia_usado: response.data.motor_utilizado || 'No disponible',
+                        sistolica_usada: response.data.presion_pdf_sistolica || response.data.sistolica || 0,
+                        diastolica_usada: response.data.presion_pdf_diastolica || response.data.diastolica || 0,
+                        valores_usados: response.data.presion_pdf_sistolica ? 'pdf' : 'payload'
+                    };
+
+                    this.metrics.ultimoRiesgo = response.data.nivel_riesgo;
+                    this.metrics.ultimaFecha = response.data.fecha_consulta || new Date().toISOString();
+
+                    const historialItem: AnalisisHistorial = {
+                        folio_expediente_db: this.folioExpediente || 0,
+                        fecha_analisis: response.data.fecha_consulta || new Date().toISOString(),
+                        nivel_riesgo_clinico: response.data.nivel_riesgo || 'No disponible',
+                        sistolica_usada: response.data.presion_pdf_sistolica || response.data.sistolica || 0,
+                        diastolica_usada: response.data.presion_pdf_diastolica || response.data.diastolica || 0,
+                        probabilidad_porcentual: response.data.probabilidad_porcentual || 0,
+                        prediccion_crisis: response.data.prediccion_crisis || 0,
+                        motor_inferencia_usado: response.data.motor_utilizado || 'No disponible'
+                    };
+                    this.historialAnalisis.unshift(historialItem);
+                    this.metrics.totalAnalisis = this.historialAnalisis.length;
+                }
+                this.cdr.detectChanges();
             }
-        });
+        } catch (error) {
+            console.error('[HTAS] Error cargando expediente:', error);
+        } finally {
+            this.isCargandoArchivos = false;
+        }
     }
 
     obtenerProtocoloPorNivel(nivel: string): string {
@@ -305,11 +381,34 @@ export class AnalisisPacienteComponent implements OnInit, OnDestroy {
     }
 
     calcularEdad(): number | null {
-        const fechaNacimiento = this.usuarioSeleccionado?.fechaNacimiento;
-        if (!fechaNacimiento) return null;
+        if (this.pacienteEdad !== null && this.pacienteEdad > 0) {
+            return this.pacienteEdad;
+        }
+
+        let fechaNacimiento = this.patientFechaNacimiento;
+
+        if (!fechaNacimiento) {
+            const storedUser = localStorage.getItem('user_htas');
+            if (storedUser) {
+                try {
+                    const userData = JSON.parse(storedUser);
+                    fechaNacimiento = userData.fechaNacimiento || null;
+                } catch (e) {
+                    console.error('[HTAS] Error obteniendo fecha de nacimiento:', e);
+                }
+            }
+        }
+
+        if (!fechaNacimiento) {
+            console.warn('[HTAS] No se encontró fecha de nacimiento para el paciente');
+            return null;
+        }
 
         const nacimiento = new Date(fechaNacimiento);
-        if (isNaN(nacimiento.getTime())) return null;
+        if (isNaN(nacimiento.getTime())) {
+            console.warn('[HTAS] Fecha de nacimiento inválida:', fechaNacimiento);
+            return null;
+        }
 
         const hoy = new Date();
         let edad = hoy.getUTCFullYear() - nacimiento.getUTCFullYear();
@@ -317,7 +416,15 @@ export class AnalisisPacienteComponent implements OnInit, OnDestroy {
         if (mes < 0 || (mes === 0 && hoy.getUTCDate() < nacimiento.getUTCDate())) {
             edad--;
         }
-        return edad >= 0 ? edad : null;
+        this.pacienteEdad = edad >= 0 ? edad : null;
+        return this.pacienteEdad;
+    }
+
+    abrirSelectorArchivo() {
+        const fileInput = document.getElementById('pdfFile') as HTMLInputElement;
+        if (fileInput) {
+            fileInput.click();
+        }
     }
 
     onAnalisisFileSelected(event: any) {
@@ -384,7 +491,7 @@ export class AnalisisPacienteComponent implements OnInit, OnDestroy {
             document.body.removeChild(link);
             this.mostrarToast('Descargando PDF...', 'success', 2000);
         } else if (this.folioExpediente) {
-            this.mostrarToast('Cargando PDF desde el servidor para descargar...', 'info', 2000);
+            this.mostrarToast('Cargando PDF desde el servidor...', 'info', 2000);
             this.descargarPDFDesdeServidor(this.folioExpediente);
         } else {
             this.mostrarToast('No hay PDF para descargar.', 'warning', 3000);
@@ -392,10 +499,6 @@ export class AnalisisPacienteComponent implements OnInit, OnDestroy {
     }
 
     verPdfExistente() {
-        console.log('[HTAS] Ver PDF - pdfExistenteBase64:', this.pdfExistenteBase64 ? 'Existe' : 'No existe');
-        console.log('[HTAS] folioExpediente:', this.folioExpediente);
-        console.log('[HTAS] archivoExistenteNombre:', this.archivoExistenteNombre);
-
         if (this.pdfExistenteBase64) {
             this.abrirVistaPrevia(
                 this.pdfExistenteBase64,
@@ -434,7 +537,6 @@ export class AnalisisPacienteComponent implements OnInit, OnDestroy {
                 this.vistaPreviaCargando = false;
                 this.mostrarVistaPrevia = false;
                 console.error('[HTAS] Error descargando PDF:', error);
-
                 let mensajeError = 'Error al cargar el PDF desde el servidor.';
                 if (error.status === 404) {
                     mensajeError = 'El PDF no se encontró en el servidor.';
@@ -458,8 +560,8 @@ export class AnalisisPacienteComponent implements OnInit, OnDestroy {
             return;
         }
 
-        if (!this.pacienteId) {
-            this.mostrarToast('No se ha seleccionado un paciente.', 'error', 3000);
+        if (!this.patientId) {
+            this.mostrarToast('No se ha identificado al paciente.', 'error', 3000);
             return;
         }
 
@@ -488,10 +590,25 @@ export class AnalisisPacienteComponent implements OnInit, OnDestroy {
         this.resultadoAnalisis = null;
 
         const edad = this.calcularEdad();
-        if (edad === null) {
-            this.isAnalizando = false;
-            this.mostrarToast('No se pudo calcular la edad del paciente.', 'error', 3000);
-            return;
+        let edadFinal = edad;
+
+        if (edadFinal === null) {
+            const storedUser = localStorage.getItem('user_htas');
+            if (storedUser) {
+                try {
+                    const userData = JSON.parse(storedUser);
+                    if (userData.edad) {
+                        edadFinal = userData.edad;
+                    }
+                } catch (e) {
+                    console.error('[HTAS] Error obteniendo edad:', e);
+                }
+            }
+        }
+
+        if (edadFinal === null) {
+            edadFinal = 30;
+            this.mostrarToast('No se encontró fecha de nacimiento. Usando edad predeterminada (30 años) para el análisis. Por favor, actualiza tu perfil.', 'warning', 5000);
         }
 
         if (!this.analisisArchivo) {
@@ -500,16 +617,22 @@ export class AnalisisPacienteComponent implements OnInit, OnDestroy {
             return;
         }
 
+        if (!this.patientId) {
+            this.mostrarToast('No se ha identificado al paciente.', 'error', 3000);
+            this.isAnalizando = false;
+            return;
+        }
+
         const archivoActual = this.analisisArchivo;
 
         const request = {
-            idPaciente: this.pacienteId!,
-            idDoctor: this.usuarioSeleccionado?.idusuario || null,
-            edad: edad,
+            idPaciente: this.patientId,
+            idDoctor: undefined,
+            edad: edadFinal,
             sistolica: 120,
             diastolica: 80,
             tomaMedicamento: 0,
-            cedulaMedico: this.usuarioSeleccionado?.cedulaMedico || '',
+            cedulaMedico: '',
             pdf: archivoActual
         };
 
@@ -519,16 +642,8 @@ export class AnalisisPacienteComponent implements OnInit, OnDestroy {
                 if (response.success && response.data) {
                     this.resultadoAnalisis = response.data;
                     this.tieneArchivosExistentes = true;
+                    this.folioExpediente = response.data.folio_expediente_db || null;
 
-                    // El campo correcto es 'folio_expediente_db' según la interfaz
-                    const folio = response.data.folio_expediente_db || null;
-
-                    if (folio) {
-                        this.folioExpediente = folio;
-                        console.log('[HTAS] Folio del nuevo expediente:', this.folioExpediente);
-                    }
-
-                    // Guardar el PDF en Base64 para vista previa
                     const reader = new FileReader();
                     reader.onload = (e) => {
                         const base64 = (e.target?.result as string).split(',')[1];
@@ -553,6 +668,9 @@ export class AnalisisPacienteComponent implements OnInit, OnDestroy {
                         motor_inferencia_usado: response.data.motor_inferencia_usado
                     };
                     this.historialAnalisis.unshift(historialItem);
+                    this.metrics.totalAnalisis = this.historialAnalisis.length;
+                    this.metrics.ultimoRiesgo = response.data.nivel_riesgo_clinico;
+                    this.metrics.ultimaFecha = new Date().toISOString();
 
                     this.mostrarToast(`Analisis completado exitosamente. Folio #${this.folioExpediente || 'sin folio'}`, 'success', 5000);
                     this.cdr.detectChanges();
@@ -618,11 +736,7 @@ export class AnalisisPacienteComponent implements OnInit, OnDestroy {
 
         const r = this.resultadoAnalisis;
 
-        const nombreCompleto = [
-            this.usuarioSeleccionado?.nombre || '',
-            this.usuarioSeleccionado?.tempApellidoPaterno || this.usuarioSeleccionado?.apPaterno || '',
-            this.usuarioSeleccionado?.tempApellidoMaterno || this.usuarioSeleccionado?.apMaterno || ''
-        ].filter(Boolean).join(' ').trim() || 'Paciente no especificado';
+        const nombreCompleto = this.patientFullName || this.patientName || 'Paciente';
 
         const colorPrimary: [number, number, number] = [176, 0, 30];
         const colorDark: [number, number, number] = [10, 22, 40];
@@ -696,11 +810,11 @@ export class AnalisisPacienteComponent implements OnInit, OnDestroy {
         doc.setTextColor(colorDark[0], colorDark[1], colorDark[2]);
         doc.text(nombreCompleto, marginX + 24, y + 8);
 
-        if (this.usuarioSeleccionado?.correo) {
+        if (this.patientEmail) {
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(8);
             doc.setTextColor(colorGray[0], colorGray[1], colorGray[2]);
-            doc.text(this.usuarioSeleccionado.correo, marginX + 24, y + 15);
+            doc.text(this.patientEmail, marginX + 24, y + 15);
         }
 
         doc.setFillColor(59, 130, 246);

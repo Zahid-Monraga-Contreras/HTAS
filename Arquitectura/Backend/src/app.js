@@ -60,8 +60,10 @@ app.get('/', (req, res) => {
             contacto: '/api/contacto',
             googlefit: '/api/googlefit',
             algoritmo: {
-                'POST /api/algorithm/analizar': 'Analizar con un PDF (requiere autenticación)',
-                'POST /api/algorithm/analizar-completo': 'Analizar con dos PDFs (requiere autenticación)',
+                'POST /api/algorithm/analizar': 'Analizar con un PDF (requiere autenticacion)',
+                'POST /api/algorithm/analizar-completo': 'Analizar con dos PDFs (cedula + diagnostico)',
+                'GET /api/algorithm/ultimo-expediente/:idPaciente': 'Obtener ultimo expediente de un paciente',
+                'GET /api/algorithm/pdf/:folio': 'Descargar PDF de un expediente por folio',
                 'GET /api/algorithm/estado': 'Verificar estado del sistema'
             },
             solicitudes: {

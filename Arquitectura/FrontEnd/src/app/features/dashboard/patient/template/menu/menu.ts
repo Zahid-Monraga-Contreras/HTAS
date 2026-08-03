@@ -23,6 +23,7 @@ export class PatientMenu {
     { path: '/patient/tratamientos', icon: 'bi-heart-pulse', label: 'Tratamientos' },
     { path: '/patient/medicamentos', icon: 'bi-capsule', label: 'Medicamentos' },
     { path: '/patient/dispositivos', icon: 'bi-device-hdd', label: 'Dispositivos' },
+    { path: '/patient/analisis', icon: 'bi-clipboard2-pulse', label: 'Analisis' },
     { path: '/patient/perfil', icon: 'bi-person', label: 'Perfil' }
   ];
 

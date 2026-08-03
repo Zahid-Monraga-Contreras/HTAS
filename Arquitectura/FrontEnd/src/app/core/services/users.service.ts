@@ -19,9 +19,8 @@ export interface Usuario {
   contrasenia: string;
   telefono?: string;
   genero?: 'Masculino' | 'Femenino' | 'Otro' | 'No especificado';
-  rol: 'Paciente' | 'Doctor' | 'Acompañante' | 'Admin';
+  rol: 'Paciente' | 'Doctor' | 'Acompanante' | 'Admin';
 
-  // NUEVOS CAMPOS
   fechaNacimiento?: string;
   curp?: string;
   domicilio?: string;
@@ -78,7 +77,6 @@ export interface DispositivoData {
   activo?: boolean;
 }
 
-// ✅ CORREGIDO: Agregar 'Eliminada' al tipo de estado
 export interface RegistroToma {
   id?: number;
   idTratamiento: number;
@@ -88,6 +86,105 @@ export interface RegistroToma {
   notas?: string;
   idAcompanante?: number;
   nombreAcompanante?: string;
+}
+
+// ==========================================================================
+// INTERFACES PARA EL ALGORITMO
+// ==========================================================================
+export interface AnalisisRequest {
+  edad: number;
+  sistolica: number;
+  diastolica: number;
+  tomaMedicamento: number;
+  cedulaMedico?: string;
+  idPaciente: number;
+  idDoctor?: number;
+  pdf: File;
+}
+
+export interface AnalisisCompletoRequest {
+  edad: number;
+  sistolica: number;
+  diastolica: number;
+  tomaMedicamento: number;
+  cedulaMedico?: string;
+  idPaciente: number;
+  idDoctor?: number;
+  cedula: File;
+  diagnostico: File;
+}
+
+export interface AnalisisResponse {
+  success: boolean;
+  data: {
+    exitoso: boolean;
+    folio_expediente_db: number;
+    cedula_pdf_valida: boolean;
+    diagnostico_pdf_valido: boolean;
+    prediccion_crisis: number;
+    probabilidad_porcentual: number;
+    nivel_riesgo_clinico: string;
+    protocolo_sugerido: string;
+    motor_inferencia_usado: string;
+    valores_pdf: any[];
+    sistolica_usada: number;
+    diastolica_usada: number;
+    valores_usados: string;
+    ruta_pdf_cedula?: string;
+    ruta_pdf_diagnostico?: string;
+    doctorId?: number;
+    doctorNombre?: string;
+  };
+  mensaje: string;
+}
+
+export interface EstadoResponse {
+  success: boolean;
+  data: {
+    scriptExist: boolean;
+    scriptPath: string;
+    pythonPath: string;
+  };
+  servidor: string;
+}
+
+export interface UltimoExpedienteResponse {
+  success: boolean;
+  data: {
+    folio: number;
+    fecha_consulta: string;
+    id_paciente: number;
+    nombre_paciente: string;
+    ap_paterno_paciente: string;
+    ap_materno_paciente: string;
+    edad: number;
+    sistolica: number;
+    diastolica: number;
+    presion_pdf_sistolica: number;
+    presion_pdf_diastolica: number;
+    prediccion_crisis: number;
+    probabilidad_porcentual: number;
+    nivel_riesgo: string;
+    motor_utilizado: string;
+    tiene_pdf_cedula: boolean;
+    tiene_pdf_diagnostico: boolean;
+    pdf_cedula_base64: string | null;
+    pdf_diagnostico_base64: string | null;
+  };
+}
+
+export interface PdfResponse {
+  folio: number;
+  fecha_consulta: string;
+  cedula_medico: string;
+  edad: number;
+  sistolica: number;
+  diastolica: number;
+  nivel_riesgo: string;
+  tiene_pdf_cedula: boolean;
+  tiene_pdf_diagnostico: boolean;
+  pdf_cedula_base64: string | null;
+  pdf_diagnostico_base64: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -110,7 +207,7 @@ export class Users {
   }
 
   // ==========================================================================
-  // --- AUTENTICACIÓN ---
+  // --- AUTENTICACION ---
   // ==========================================================================
   registrar(datos: RegistroData) {
     return this.http.post(`${this.apiUrl}/auth/register`, datos).pipe(
@@ -158,7 +255,6 @@ export class Users {
   establecerSesion(res: any) {
     console.log('ESTABLECIENDO SESION - Datos recibidos:', res);
 
-    // ✅ CONSTRUIR NOMBRE COMPLETO
     const nombre = res.nombre || '';
     const apPaterno = res.apPaterno || '';
     const apMaterno = res.apMaterno || '';
@@ -171,7 +267,7 @@ export class Users {
       uid: res.uid || '',
       idusuario: userId,
       nombre: res.nombre || 'Usuario',
-      nombreCompleto: nombreCompleto,  // ✅ AGREGADO
+      nombreCompleto: nombreCompleto,
       rol: res.rol || 'Paciente',
       correo: res.correo || res.Email || res.email || '',
       apPaterno: apPaterno,
@@ -182,7 +278,7 @@ export class Users {
 
     console.log('USUARIO PROCESADO (guardado en localStorage):', usuarioProcesado);
     console.log('ID de usuario guardado:', usuarioProcesado.idusuario);
-    console.log('Nombre completo guardado:', usuarioProcesado.nombreCompleto);  // ✅ VERIFICAR
+    console.log('Nombre completo guardado:', usuarioProcesado.nombreCompleto);
 
     this.currentUserSubject.next(usuarioProcesado);
     localStorage.setItem('user_htas', JSON.stringify(usuarioProcesado));
@@ -271,7 +367,7 @@ export class Users {
   }
 
   // ==========================================================================
-  // --- GESTIÓN DE CITAS ---
+  // --- GESTION DE CITAS ---
   // ==========================================================================
   crearCita(datosCita: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/citas/agendar-cita`, datosCita);
@@ -331,7 +427,7 @@ export class Users {
   }
 
   // ==========================================================================
-  // --- GESTIÓN DE USUARIOS ---
+  // --- GESTION DE USUARIOS ---
   // ==========================================================================
   getUsuariosBackend(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/usuarios/all-users`);
@@ -358,7 +454,7 @@ export class Users {
   }
 
   // ==========================================================================
-  // --- GESTIÓN DE MEDICAMENTOS ---
+  // --- GESTION DE MEDICAMENTOS ---
   // ==========================================================================
   getMedicamentos(params?: { busqueda?: string; laboratorio?: string }): Observable<any[]> {
     let url = `${this.apiUrl}/medicamentos/medicamentos`;
@@ -417,7 +513,7 @@ export class Users {
   }
 
   // ==========================================================================
-  // --- GESTIÓN DE TRATAMIENTOS ---
+  // --- GESTION DE TRATAMIENTOS ---
   // ==========================================================================
   getTratamientos(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/tratamientos/tratamientos`);
@@ -466,23 +562,13 @@ export class Users {
   }
 
   // ==========================================================================
-  // --- ✅ GESTIÓN DE TOMAS ---
+  // --- GESTION DE TOMAS ---
   // ==========================================================================
 
-  /**
-   * Obtiene todas las tomas de un tratamiento específico
-   * @param idTratamiento ID del tratamiento
-   * @returns Observable con el listado de tomas
-   */
   getTomasByTratamiento(idTratamiento: number | string): Observable<RegistroToma[]> {
     return this.http.get<RegistroToma[]>(`${this.apiUrl}/tomas/tratamiento/${idTratamiento}`);
   }
 
-  /**
-   * Obtiene estadísticas de tomas de un tratamiento
-   * @param idTratamiento ID del tratamiento
-   * @returns Observable con las estadísticas
-   */
   getEstadisticasTomas(idTratamiento: number | string): Observable<{
     totalTomas: number;
     tomasCompletadas: number;
@@ -494,11 +580,6 @@ export class Users {
     return this.http.get<any>(`${this.apiUrl}/tomas/tratamiento/${idTratamiento}/estadisticas`);
   }
 
-  /**
-   * Registra una nueva toma para un tratamiento
-   * @param data Datos de la toma
-   * @returns Observable con la toma registrada
-   */
   registrarToma(data: {
     idTratamiento: number;
     fechaHoraProgramada: string;
@@ -508,11 +589,6 @@ export class Users {
     return this.http.post<any>(`${this.apiUrl}/tomas`, data);
   }
 
-  /**
-   * Genera tomas programadas automáticamente para un tratamiento
-   * @param data Datos para generar las tomas
-   * @returns Observable con las tomas generadas
-   */
   generarTomasProgramadas(data: {
     idTratamiento: number;
     fechaInicio: string;
@@ -526,14 +602,6 @@ export class Users {
     return this.http.post<any>(`${this.apiUrl}/tomas/generar`, data);
   }
 
-  /**
-   * Actualiza el estado de una toma específica
-   * @param id ID de la toma
-   * @param estado Nuevo estado ('Pendiente' | 'Tomada' | 'Omitida' | 'Retrasada' | 'Eliminada')
-   * @param fechaHoraRealizada Fecha y hora en que se realizó la toma (opcional)
-   * @param notasTomas Notas adicionales (opcional)
-   * @returns Observable con la toma actualizada
-   */
   actualizarEstadoToma(
     id: number,
     estado: string,
@@ -547,58 +615,30 @@ export class Users {
     });
   }
 
-  /**
-   * Marca una toma como completada (Tomada)
-   * @param id ID de la toma
-   * @param notas Notas opcionales
-   * @returns Observable con la toma actualizada
-   */
   marcarTomaComoTomada(id: number, notas?: string): Observable<any> {
     const fechaRealizada = new Date().toISOString();
     return this.actualizarEstadoToma(id, 'Tomada', fechaRealizada, notas);
   }
 
-  /**
-   * Marca una toma como omitida
-   * @param id ID de la toma
-   * @param notas Notas opcionales
-   * @returns Observable con la toma actualizada
-   */
   marcarTomaComoOmitida(id: number, notas?: string): Observable<any> {
     return this.actualizarEstadoToma(id, 'Omitida', undefined, notas);
   }
 
-  /**
-   * Marca una toma como retrasada
-   * @param id ID de la toma
-   * @param notas Notas opcionales
-   * @returns Observable con la toma actualizada
-   */
   marcarTomaComoRetrasada(id: number, notas?: string): Observable<any> {
     return this.actualizarEstadoToma(id, 'Retrasada', undefined, notas);
   }
 
-  /**
-   * Elimina una toma específica
-   * @param id ID de la toma
-   * @returns Observable con la toma eliminada
-   */
   eliminarToma(id: number): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/tomas/${id}`);
   }
 
-  /**
-   * ✅ ELIMINA TODAS LAS TOMAS DE UN TRATAMIENTO
-   * @param idTratamiento ID del tratamiento
-   * @returns Observable con el resultado de la operación
-   */
   eliminarTodasTomas(idTratamiento: number): Observable<any> {
     console.log(`[Service] Eliminando todas las tomas del tratamiento ID: ${idTratamiento}`);
     return this.http.delete<any>(`${this.apiUrl}/tomas/tratamiento/${idTratamiento}/todas`);
   }
 
   // ==========================================================================
-  // --- GESTIÓN DE DISPOSITIVOS ---
+  // --- GESTION DE DISPOSITIVOS ---
   // ==========================================================================
   getDispositivos(params?: {
     paciente?: number;
@@ -619,10 +659,8 @@ export class Users {
   }
 
   getDispositivosByPaciente(idPaciente: number | string): Observable<any[]> {
-    // Usar el endpoint que devuelve todos los dispositivos y filtrar en el frontend
     return this.http.get<any[]>(`${this.apiUrl}/dispositivos/dispositivos`).pipe(
       map((dispositivos: any[]) => {
-        // Filtrar dispositivos del paciente
         return dispositivos.filter((d: any) => {
           const pacienteId = d.idpacienteasociado || d.idPacienteAsociado || d.pacienteId || d.idusuario;
           return pacienteId === idPaciente;
@@ -660,12 +698,9 @@ export class Users {
   }
 
   // ==========================================================================
-  // --- GESTIÓN DE MEDICIONES ---
+  // --- GESTION DE MEDICIONES ---
   // ==========================================================================
 
-  /**
-   * Registrar una nueva medición manualmente
-   */
   registrarMedicion(datos: MedicionData): Observable<any> {
     const payload = {
       idPaciente: datos.idPaciente,
@@ -677,9 +712,6 @@ export class Users {
     return this.http.post(`${this.apiUrl}/mediciones`, payload);
   }
 
-  /**
-   * Obtener todas las mediciones de un paciente
-   */
   getMedicionesPaciente(
     idPaciente: number | string,
     limite?: number
@@ -691,16 +723,10 @@ export class Users {
     return this.http.get<any>(url);
   }
 
-  /**
-   * Obtener la última medición de un paciente
-   */
   getUltimaMedicionPaciente(idPaciente: number | string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/mediciones/paciente/${idPaciente}/ultima`);
   }
 
-  /**
-   * Obtener mediciones por rango de fechas
-   */
   getMedicionesPorRango(
     idPaciente: number | string,
     fechaInicio: string,
@@ -711,9 +737,6 @@ export class Users {
     );
   }
 
-  /**
-   * Obtener estadísticas de mediciones por período
-   */
   getEstadisticasMediciones(
     idPaciente: number | string,
     periodo?: 'dia' | 'semana' | 'mes' | 'trimestre'
@@ -725,16 +748,10 @@ export class Users {
     return this.http.get(url);
   }
 
-  /**
-   * Eliminar una medición específica
-   */
   eliminarMedicion(idMedicion: number | string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/mediciones/medicion/${idMedicion}`);
   }
 
-  /**
-   * Registrar múltiples mediciones en lote
-   */
   registrarMultiplesMediciones(mediciones: any[]): Observable<any> {
     const medicionesFormateadas = mediciones.map(m => ({
       idPaciente: m.idPaciente,
@@ -746,11 +763,8 @@ export class Users {
     return this.http.post(`${this.apiUrl}/mediciones/registrar-multiples`, { mediciones: medicionesFormateadas });
   }
 
-  /**
-   * OBTENER MEDICIÓN DESDE TENSIÓMETRO VÍA BLUETOOTH
-   */
   obtenerMedicionTensiometro(idPaciente: number | string): Observable<any> {
-    console.log(`[Service] Solicitando medición para paciente ID: ${idPaciente}`);
+    console.log(`[Service] Solicitando medicion para paciente ID: ${idPaciente}`);
     return this.http.get(`${this.apiUrl}/mediciones/tensiometro/${idPaciente}`);
   }
 
@@ -770,12 +784,9 @@ export class Users {
   }
 
   // ==========================================================================
-  // --- GESTIÓN DE SOLICITUDES DE ASIGNACIÓN ---
+  // --- GESTION DE SOLICITUDES DE ASIGNACION ---
   // ==========================================================================
 
-  /**
-   * Solicitar asignación a un paciente (Acompañante)
-   */
   solicitarAsignacionPaciente(idAcompanante: number, data: {
     correoPaciente: string;
     parentesco: string;
@@ -784,52 +795,118 @@ export class Users {
     return this.http.post(`${this.apiUrl}/solicitudes/solicitar/${idAcompanante}`, data);
   }
 
-  /**
-   * Obtener mis solicitudes (Acompañante)
-   */
   getMisSolicitudes(idAcompanante: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/solicitudes/mis-solicitudes/${idAcompanante}`);
   }
 
-  /**
-   * Obtener pacientes asignados a un acompañante
-   */
   getPacientesAsignados(idAcompanante: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/solicitudes/mis-pacientes/${idAcompanante}`);
   }
 
-  /**
-   * Obtener TODAS las solicitudes (Admin)
-   */
   getTodasLasSolicitudes(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/solicitudes/todas`);
   }
 
-  /**
-   * Obtener todas las solicitudes pendientes (Admin)
-   */
   getSolicitudesPendientes(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/solicitudes/pendientes`);
   }
 
-  /**
-   * Aprobar solicitud (Admin)
-   */
   aprobarSolicitud(idSolicitud: number, idAdmin: number): Observable<any> {
     return this.http.put(`${this.apiUrl}/solicitudes/aprobar/${idSolicitud}`, { idAdmin });
   }
 
-  /**
-   * Rechazar solicitud (Admin)
-   */
   rechazarSolicitud(idSolicitud: number, idAdmin: number, motivo?: string): Observable<any> {
     return this.http.put(`${this.apiUrl}/solicitudes/rechazar/${idSolicitud}`, { idAdmin, motivo });
   }
 
-  /**
-   * Eliminar asignación (Admin)
-   */
   eliminarAsignacion(idAsignacion: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/solicitudes/asignacion/${idAsignacion}`);
+  }
+
+  // ==========================================================================
+  // --- ALGORITMO - ANALISIS DE HIPERTENSION ---
+  // ==========================================================================
+
+  /**
+   * Verifica el estado del sistema de analisis
+   */
+  verificarEstadoAlgoritmo(): Observable<EstadoResponse> {
+    return this.http.get<EstadoResponse>(`${this.apiUrl}/algorithm/estado`);
+  }
+
+  /**
+   * Analiza un paciente con un solo PDF (diagnostico)
+   */
+  analizarConPDF(request: AnalisisRequest): Observable<AnalisisResponse> {
+    const formData = new FormData();
+
+    formData.append('edad', request.edad.toString());
+    formData.append('sistolica', request.sistolica.toString());
+    formData.append('diastolica', request.diastolica.toString());
+    formData.append('tomaMedicamento', request.tomaMedicamento.toString());
+    formData.append('idPaciente', request.idPaciente.toString());
+
+    if (request.idDoctor) {
+      formData.append('idDoctor', request.idDoctor.toString());
+    }
+
+    if (request.cedulaMedico) {
+      formData.append('cedulaMedico', request.cedulaMedico);
+    }
+
+    formData.append('pdf', request.pdf, request.pdf.name);
+
+    return this.http.post<AnalisisResponse>(
+      `${this.apiUrl}/algorithm/analizar`,
+      formData
+    );
+  }
+
+  /**
+   * Analiza un paciente con dos PDFs (cedula + diagnostico)
+   */
+  analizarConMultiplesPDFs(request: AnalisisCompletoRequest): Observable<AnalisisResponse> {
+    const formData = new FormData();
+
+    formData.append('edad', request.edad.toString());
+    formData.append('sistolica', request.sistolica.toString());
+    formData.append('diastolica', request.diastolica.toString());
+    formData.append('tomaMedicamento', request.tomaMedicamento.toString());
+    formData.append('idPaciente', request.idPaciente.toString());
+
+    if (request.idDoctor) {
+      formData.append('idDoctor', request.idDoctor.toString());
+    }
+
+    if (request.cedulaMedico) {
+      formData.append('cedulaMedico', request.cedulaMedico);
+    }
+
+    formData.append('cedula', request.cedula, request.cedula.name);
+    formData.append('diagnostico', request.diagnostico, request.diagnostico.name);
+
+    return this.http.post<AnalisisResponse>(
+      `${this.apiUrl}/algorithm/analizar-completo`,
+      formData
+    );
+  }
+
+  /**
+   * Obtiene el ultimo expediente de un paciente
+   */
+  obtenerUltimoExpediente(idPaciente: number): Observable<UltimoExpedienteResponse> {
+    return this.http.get<UltimoExpedienteResponse>(
+      `${this.apiUrl}/algorithm/ultimo-expediente/${idPaciente}`
+    );
+  }
+
+  /**
+   * Obtiene el PDF de un expediente por su folio
+   */
+  obtenerPDFExpediente(folio: number): Observable<Blob> {
+    return this.http.get(
+      `${this.apiUrl}/algorithm/pdf/${folio}`,
+      { responseType: 'blob' }
+    );
   }
 }

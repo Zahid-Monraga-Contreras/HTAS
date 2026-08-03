@@ -1,0 +1,350 @@
+<app-patient-menu></app-patient-menu>
+
+<div class="analisis-page">
+    <!-- ============================================ -->
+    <!-- HEADER -->
+    <!-- ============================================ -->
+    <header class="analisis-header">
+        <div class="header-top">
+            <div class="header-info">
+                <h1><i class="bi bi-heart-pulse-fill"></i> Analisis de Hipertension</h1>
+                <p>Gestiona tus analisis de presion arterial</p>
+            </div>
+            <div class="header-actions">
+                <span class="estado-indicador" [ngClass]="{'activo': sistemaActivo, 'inactivo': !sistemaActivo}">
+                    <i class="bi bi-circle-fill"></i>
+                    {{ sistemaActivo ? 'Sistema activo' : 'Sistema desconectado' }}
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- ============================================ -->
+    <!-- LOADING -->
+    <!-- ============================================ -->
+    <div *ngIf="isLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Cargando tu informacion...</p>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- CONTENIDO -->
+    <!-- ============================================ -->
+    <div *ngIf="!isLoading" class="analisis-content">
+
+        <!-- ========================================== -->
+        <!-- TARJETA DE RESUMEN -->
+        <!-- ========================================== -->
+        <section class="resumen-card" *ngIf="tieneArchivosExistentes && resultadoAnalisis">
+            <div class="resumen-bg"></div>
+            <div class="resumen-content">
+                <div class="resumen-texto">
+                    <span class="resumen-badge">Ultimo Analisis</span>
+                    <h2>Resultado: {{ resultadoAnalisis.nivel_riesgo_clinico }}</h2>
+                    <p>Presion: {{ resultadoAnalisis.sistolica_usada }}/{{ resultadoAnalisis.diastolica_usada }} mmHg
+                    </p>
+                    <small>Folio #{{ resultadoAnalisis.folio_expediente_db }}</small>
+                </div>
+                <div class="resumen-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">{{ resultadoAnalisis.probabilidad_porcentual }}%</span>
+                        <span class="stat-label">Probabilidad</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <span class="stat-number">{{ historialAnalisis.length }}</span>
+                        <span class="stat-label">Analisis</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- SUBIR ARCHIVO -->
+        <!-- ========================================== -->
+        <section class="upload-section">
+            <div class="section-header">
+                <h2><i class="bi bi-cloud-upload"></i> Subir Expediente Medico</h2>
+                <span class="section-sub">PDF - Maximo 10MB</span>
+            </div>
+
+            <div class="upload-container">
+                @if (tieneArchivosExistentes) {
+                <div class="archivo-existente-alert">
+                    <div class="archivo-existente-header">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span class="fw-bold">Expediente existente</span>
+                        <span class="archivo-nombre">{{ archivoExistenteNombre }}</span>
+                    </div>
+                    <div class="archivo-existente-actions">
+                        <button class="btn-ver-pdf" (click)="verPdfExistente()">
+                            <i class="bi bi-eye"></i> Ver PDF
+                        </button>
+                        <button class="btn-descargar-pdf" (click)="descargarPdfExistente()">
+                            <i class="bi bi-download"></i> Descargar
+                        </button>
+                    </div>
+                </div>
+                <div class="archivo-existente-divider">
+                    <span>O sube un nuevo archivo para actualizar</span>
+                </div>
+                }
+
+                <div class="file-upload-wrapper" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)"
+                    (drop)="onDrop($event)">
+                    <input type="file" id="pdfFile" accept=".pdf" (change)="onAnalisisFileSelected($event)" hidden>
+                    <label for="pdfFile" class="file-upload-label">
+                        <i class="bi bi-cloud-upload"></i>
+                        <span>{{ analisisArchivoNombre || (tieneArchivosExistentes ? 'Actualizar expediente' :
+                            'Selecciona o arrastra un PDF') }}</span>
+                        <small>Maximo 10MB</small>
+                    </label>
+                </div>
+
+                <button type="button" class="btn-analizar" (click)="ejecutarAnalisis()"
+                    [disabled]="!analisisArchivo || isAnalizando">
+                    @if (isAnalizando) {
+                    <span class="spinner-save"></span>
+                    <span>Analizando...</span>
+                    } @else {
+                    <i class="bi bi-search-heart"></i>
+                    <span>{{ tieneArchivosExistentes ? 'Actualizar Analisis' : 'Analizar Paciente' }}</span>
+                    }
+                </button>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- RESULTADOS -->
+        <!-- ========================================== -->
+        @if (resultadoAnalisis) {
+        <section class="resultados-section">
+            <div class="section-header">
+                <h2><i class="bi bi-clipboard2-data"></i> Resultados del Analisis</h2>
+                <span class="folio-badge">Folio #{{ resultadoAnalisis.folio_expediente_db }}</span>
+            </div>
+
+            <div class="resultado-banner" [ngClass]="getRiesgoClase(resultadoAnalisis.nivel_riesgo_clinico)">
+                <div class="banner-bloque banner-riesgo">
+                    <div class="banner-icono">
+                        <i class="bi" [ngClass]="getRiesgoIcono(resultadoAnalisis.nivel_riesgo_clinico)"></i>
+                    </div>
+                    <div class="banner-texto">
+                        <span class="banner-label">Nivel de Riesgo Clinico</span>
+                        <strong class="banner-valor">{{ resultadoAnalisis.nivel_riesgo_clinico }}</strong>
+                    </div>
+                </div>
+                <div class="banner-divisor"></div>
+                <div class="banner-bloque banner-presion">
+                    <span class="banner-label">Presion Arterial</span>
+                    <strong class="banner-valor-simple">{{ resultadoAnalisis.sistolica_usada }}/{{
+                        resultadoAnalisis.diastolica_usada }} <small>mmHg</small></strong>
+                </div>
+            </div>
+
+            <div class="resultados-grid">
+                <div class="resultado-card prediccion-card"
+                    [ngClass]="resultadoAnalisis.prediccion_crisis ? 'crisis' : 'normal'">
+                    <div class="card-icono">
+                        <i class="bi"
+                            [ngClass]="resultadoAnalisis.prediccion_crisis ? 'bi-exclamation-triangle-fill' : 'bi-check-circle-fill'"></i>
+                    </div>
+                    <div class="card-contenido">
+                        <span class="card-label">Prediccion de Crisis</span>
+                        <strong class="card-valor">{{ resultadoAnalisis.prediccion_crisis ? 'Positiva' : 'Negativa'
+                            }}</strong>
+                    </div>
+                </div>
+
+                <div class="resultado-card probabilidad-card">
+                    <div class="card-icono">
+                        <i class="bi bi-percent"></i>
+                    </div>
+                    <div class="card-contenido">
+                        <span class="card-label">Probabilidad</span>
+                        <strong class="card-valor">{{ resultadoAnalisis.probabilidad_porcentual }}%</strong>
+                        <div class="barra-probabilidad">
+                            <div class="barra-progreso" [style.width.%]="resultadoAnalisis.probabilidad_porcentual"
+                                [ngClass]="{
+                                'baja': resultadoAnalisis.probabilidad_porcentual < 30,
+                                'media': resultadoAnalisis.probabilidad_porcentual >= 30 && resultadoAnalisis.probabilidad_porcentual < 70,
+                                'alta': resultadoAnalisis.probabilidad_porcentual >= 70
+                                }">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resultado-card motor-card">
+                    <div class="card-icono">
+                        <i class="bi bi-cpu"></i>
+                    </div>
+                    <div class="card-contenido">
+                        <span class="card-label">Motor IA</span>
+                        <strong class="card-valor">{{ resultadoAnalisis.motor_inferencia_usado }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="protocolo-container">
+                <h5><i class="bi bi-file-medical"></i> Protocolo Sugerido</h5>
+                <p>{{ resultadoAnalisis.protocolo_sugerido }}</p>
+            </div>
+
+            <div class="detalles-analisis">
+                <div class="detalle-item">
+                    <span class="detalle-label">Presion usada</span>
+                    <span class="detalle-valor">{{ resultadoAnalisis.sistolica_usada }}/{{
+                        resultadoAnalisis.diastolica_usada }} mmHg</span>
+                    <span class="detalle-fuente badge bg-secondary">Fuente: {{ resultadoAnalisis.valores_usados
+                        }}</span>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-label">PDF Cedula</span>
+                    <span class="detalle-valor">
+                        <i class="bi"
+                            [ngClass]="resultadoAnalisis.cedula_pdf_valida ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger'"></i>
+                        {{ resultadoAnalisis.cedula_pdf_valida ? 'Valida' : 'Invalida' }}
+                    </span>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-label">PDF Diagnostico</span>
+                    <span class="detalle-valor">
+                        <i class="bi"
+                            [ngClass]="resultadoAnalisis.diagnostico_pdf_valido ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger'"></i>
+                        {{ resultadoAnalisis.diagnostico_pdf_valido ? 'Valido' : 'Invalido' }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="analisis-actions">
+                <button type="button" class="btn-nuevo-analisis" (click)="limpiarAnalisis()">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                    Nuevo Analisis
+                </button>
+                <button type="button" class="btn-print-analisis" (click)="descargarResultadosPDF()">
+                    <i class="bi bi-file-earmark-arrow-down"></i>
+                    Descargar PDF
+                </button>
+            </div>
+        </section>
+        }
+
+        <!-- ========================================== -->
+        <!-- EMPTY STATE -->
+        <!-- ========================================== -->
+        @if (!tieneArchivosExistentes && !isLoading) {
+        <section class="empty-section">
+            <div class="empty-state">
+                <i class="bi bi-file-earmark-pdf"></i>
+                <h3>No tienes analisis registrados</h3>
+                <p>Sube tu expediente medico en PDF para realizar un analisis de hipertension</p>
+                <button class="btn-primary" (click)="abrirSelectorArchivo()">
+                    <i class="bi bi-cloud-upload"></i> Subir Expediente
+                </button>
+            </div>
+        </section>
+        }
+
+    </div>
+</div>
+
+<!-- TOAST NOTIFICATIONS -->
+<div class="toast-container">
+    @for (toast of toastMessages; track toast.id) {
+    <div class="toast-notification" [class]="getToastClass(toast.tipo)">
+        <div class="toast-icon">
+            <i class="bi" [class]="getToastIcon(toast.tipo)"></i>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title">{{ getToastTitle(toast.tipo) }}</div>
+            <div class="toast-message">{{ toast.mensaje }}</div>
+        </div>
+        <button class="toast-close" (click)="cerrarToast(toast.id)">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        <div class="toast-progress"></div>
+    </div>
+    }
+</div>
+
+<!-- MODAL -->
+@if (modalVisible) {
+<div class="modal-overlay" (click)="cerrarModal()">
+    <div class="modal-container" [class]="modalTipo">
+        <div class="modal-header">
+            <div class="modal-header-icon">
+                @if (modalTipo === 'success') {
+                <i class="bi bi-check-circle-fill"></i>
+                } @else if (modalTipo === 'error') {
+                <i class="bi bi-x-circle-fill"></i>
+                } @else if (modalTipo === 'warning') {
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                } @else if (modalTipo === 'confirm') {
+                <i class="bi bi-question-circle-fill"></i>
+                } @else {
+                <i class="bi bi-info-circle-fill"></i>
+                }
+            </div>
+            <h3 class="modal-titulo">{{ modalTitulo }}</h3>
+            <button class="modal-close" (click)="cerrarModal()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p>{{ modalContenido }}</p>
+        </div>
+        <div class="modal-footer">
+            @if (modalTipo === 'confirm' || modalBotonCancelar) {
+            <button class="btn-modal btn-modal-cancel" (click)="cancelarModal()">
+                {{ modalBotonCancelar }}
+            </button>
+            }
+            <button class="btn-modal btn-modal-confirm" (click)="confirmarModal()">
+                {{ modalBotonConfirmar }}
+            </button>
+        </div>
+    </div>
+</div>
+}
+
+<!-- VISTA PREVIA PDF -->
+@if (mostrarVistaPrevia) {
+<div class="pdf-preview-overlay" (click)="cerrarVistaPrevia()">
+    <div class="pdf-preview-container" (click)="$event.stopPropagation()">
+        <div class="pdf-preview-header">
+            <h4 class="pdf-preview-titulo">
+                <i class="bi bi-file-earmark-pdf-fill"></i>
+                {{ vistaPreviaTitulo }}
+            </h4>
+            <button class="pdf-preview-close" (click)="cerrarVistaPrevia()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="pdf-preview-body">
+            @if (vistaPreviaCargando) {
+            <div class="pdf-preview-loading">
+                <div class="spinner"></div>
+                <span>Cargando documento...</span>
+            </div>
+            } @else if (vistaPreviaUrl) {
+            <iframe [src]="vistaPreviaUrl" class="pdf-preview-iframe" frameborder="0"></iframe>
+            } @else {
+            <div class="pdf-preview-error">
+                <i class="bi bi-file-earmark-pdf"></i>
+                <p>No se pudo cargar el documento</p>
+            </div>
+            }
+        </div>
+        <div class="pdf-preview-footer">
+            <button class="btn-pdf-download" (click)="descargarDesdeVistaPrevia()">
+                <i class="bi bi-download"></i>
+                Descargar PDF
+            </button>
+            <button class="btn-pdf-close" (click)="cerrarVistaPrevia()">
+                Cerrar
+            </button>
+        </div>
+    </div>
+</div>
+}

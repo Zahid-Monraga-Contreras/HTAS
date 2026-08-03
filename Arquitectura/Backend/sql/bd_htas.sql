@@ -775,7 +775,7 @@ CREATE TRIGGER update_dispositivos_updated_at
     BEFORE UPDATE ON DISPOSITIVOS 
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-	-- ============================================
+-- ============================================
 -- TABLA: SOLICITUDES_ASIGNACION
 -- ============================================
 CREATE TABLE SOLICITUDES_ASIGNACION (
@@ -882,6 +882,109 @@ INNER JOIN PACIENTES p ON a.IdPaciente = p.IdUsuario
 INNER JOIN USUARIOS up ON p.IdUsuario = up.IdUsuario
 LEFT JOIN USUARIOS uap ON a.IdAprobador = uap.IdUsuario
 WHERE a.Activo = true AND ua.deleted_at IS NULL AND up.deleted_at IS NULL;
+
+-- ============================================
+-- 13. TABLA: EXPEDIENTES_HTAS (Análisis de Hipertensión)
+-- ============================================
+CREATE TABLE EXPEDIENTES_HTAS (
+    IdExpediente SERIAL PRIMARY KEY,
+    IdPaciente INT NOT NULL REFERENCES PACIENTES(IdUsuario) ON DELETE CASCADE,
+    IdDoctor INT REFERENCES DOCTORES(IdUsuario) ON DELETE SET NULL,
+    
+    -- Datos del análisis
+    Edad INT NOT NULL,
+    Sistolica INT NOT NULL,
+    Diastolica INT NOT NULL,
+    PresionPDFSistolica INT,
+    PresionPDFDiastolica INT,
+    TomaMedicamento INT NOT NULL DEFAULT 0,
+    PrediccionCrisis INT NOT NULL,
+    ProbabilidadPorcentual DECIMAL(5,2) NOT NULL,
+    NivelRiesgo TEXT NOT NULL,
+    MotorInferenciaUsado TEXT NOT NULL,
+    
+    -- Validación de PDFs
+    PDFCedulaValido BOOLEAN DEFAULT FALSE,
+    PDFDiagnosticoValido BOOLEAN DEFAULT FALSE,
+    ValoresExtraidosPDF TEXT,
+    
+    -- Rutas de almacenamiento de PDFs
+    RutaPDFCedula TEXT,
+    RutaPDFDiagnostico TEXT,
+    
+    -- Auditoría
+    FechaConsulta TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Índices para mejorar rendimiento
+CREATE INDEX idx_expedientes_paciente ON EXPEDIENTES_HTAS(IdPaciente);
+CREATE INDEX idx_expedientes_doctor ON EXPEDIENTES_HTAS(IdDoctor);
+CREATE INDEX idx_expedientes_fecha ON EXPEDIENTES_HTAS(FechaConsulta);
+
+-- Trigger para updated_at
+CREATE TRIGGER update_expedientes_htas_updated_at 
+    BEFORE UPDATE ON EXPEDIENTES_HTAS 
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- ============================================
+-- VISTA PARA EXPEDIENTES HTAS CON DETALLES
+-- ============================================
+CREATE OR REPLACE VIEW VW_EXPEDIENTES_HTAS AS
+SELECT 
+    e.IdExpediente,
+    e.IdPaciente,
+    u.Nombre AS NombrePaciente,
+    u.ApPaterno AS ApPaternoPaciente,
+    u.ApMaterno AS ApMaternoPaciente,
+    u.Correo AS CorreoPaciente,
+    e.IdDoctor,
+    d.Cedula AS CedulaDoctor,
+    ud.Nombre AS NombreDoctor,
+    ud.ApPaterno AS ApPaternoDoctor,
+    e.Edad,
+    e.Sistolica,
+    e.Diastolica,
+    e.PresionPDFSistolica,
+    e.PresionPDFDiastolica,
+    e.TomaMedicamento,
+    e.PrediccionCrisis,
+    e.ProbabilidadPorcentual,
+    e.NivelRiesgo,
+    e.MotorInferenciaUsado,
+    e.PDFCedulaValido,
+    e.PDFDiagnosticoValido,
+    e.ValoresExtraidosPDF,
+    e.RutaPDFCedula,
+    e.RutaPDFDiagnostico,
+    e.FechaConsulta
+FROM EXPEDIENTES_HTAS e
+INNER JOIN USUARIOS u ON e.IdPaciente = u.IdUsuario
+LEFT JOIN DOCTORES d ON e.IdDoctor = d.IdUsuario
+LEFT JOIN USUARIOS ud ON d.IdUsuario = ud.IdUsuario
+WHERE u.deleted_at IS NULL;
+
+-- ============================================
+-- FUNCIÓN PARA OBTENER ÚLTIMO EXPEDIENTE
+-- ============================================
+CREATE OR REPLACE FUNCTION obtener_ultimo_expediente_paciente(p_paciente_id INT)
+RETURNS TABLE (
+    IdExpediente INT,
+    FechaConsulta TIMESTAMP,
+    NivelRiesgo TEXT,
+    ProbabilidadPorcentual DECIMAL,
+    RutaPDFDiagnostico TEXT
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT e.IdExpediente, e.FechaConsulta, e.NivelRiesgo, e.ProbabilidadPorcentual, e.RutaPDFDiagnostico
+    FROM EXPEDIENTES_HTAS e
+    WHERE e.IdPaciente = p_paciente_id
+    ORDER BY e.FechaConsulta DESC
+    LIMIT 1;
+END;
+$$ LANGUAGE plpgsql;
 
 -- ============================================
 -- FIN DEL SCRIPT

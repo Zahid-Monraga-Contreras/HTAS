@@ -10,7 +10,7 @@
 # Radilla Partida Eleonor Guadalupe
 # Suarez Rodriguez Saul
 # Castro Valdivia Ricardo
-# VERSION DE COMPILACION: 3.1.0 (Edicion con Extraccion Real de Valores de Presion Arterial)
+# VERSION DE COMPILACION: 3.3.0 (Edicion con Almacenamiento Persistente de PDFs y SQLite)
 #
 # DESCRIPCION GENERAL:
 # Este sistema representa una suite integrada de software orientada al sector salud.
@@ -20,15 +20,9 @@
 #   2. Random Forest (Ensamble jerarquico no lineal basado en Bagging).
 #   3. XGBoost (Ensamble secuencial basado en Gradient Boosting con regularizacion).
 #
-# Adicionalmente, el sistema integra una capa de seguridad y cumplimiento legal
-# que automatiza la ingesta, decodificacion y analisis sintactico-semantico de
-# expedientes en formato PDF (Cedulas Profesionales y Dictamenes de Hipertension)
-# mediante algoritmos de parsing y vectorizacion de palabras clave. Todo evento
-# de calculo e inferencia es registrado fisicamente en una base de datos relacional
-# SQLite local bajo un esquema de integridad referencial de doble tabla.
-#
-# MEJORA V3.1.0: Extrae valores numericos reales de presion arterial desde los PDFs
-# utilizando expresiones regulares avanzadas y multiples patrones de busqueda.
+# MEJORA V3.3.0: Implementa almacenamiento persistente de PDFs en el sistema de
+# archivos, guardando los archivos en la carpeta uploads/pdfs/ con nombres
+# estructurados y manteniendo las rutas en la base de datos SQLite para su recuperacion.
 # ==============================================================================
 
 import os
@@ -39,12 +33,13 @@ import logging
 import sqlite3
 import sys
 import json
-import numpy as np
-import pandas as pd
+from datetime import datetime
 from typing import Dict, Any, Optional, Tuple, List
 from pydantic import BaseModel, Field, validator
 
 # Dependencias Cientificas y Algoritmicas de Inteligencia Artificial
+import numpy as np
+import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
@@ -61,9 +56,30 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
 # ==============================================================================
-# SUB-SISTEMA DE CONFIGURACION DEL ENGINE DE LOGS (TRAZABILIDAD AUDITABLE)
+# CONFIGURACION DE RUTAS - ADAPTADO A TU ESTRUCTURA
 # ==============================================================================
-FORMATO_LOGS = "%(asctime)s [%(levelname)s] [PROCESO: %(name)s] [HILO: %(threadName)s] -> %(message)s"
+
+# Obtener la ruta base del proyecto (raiz)
+# El script esta en: python/algorithm/hipertension_analyzer.py
+# Subimos 2 niveles para llegar a la raiz del proyecto
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# Ruta de almacenamiento de PDFs
+PDF_STORAGE_PATH = os.path.join(BASE_DIR, 'uploads', 'pdfs')
+
+# Ruta de la base de datos (en la raiz del proyecto)
+DB_NAME = os.path.join(BASE_DIR, 'clinica_htas_mexico.db')
+
+# Ruta del CSV de entrenamiento (en la raiz del proyecto)
+CSV_NAME = os.path.join(BASE_DIR, 'Hipertension_Arterial_Mexico.csv')
+
+# Crear directorio de PDFs si no existe
+os.makedirs(PDF_STORAGE_PATH, exist_ok=True)
+
+# ==============================================================================
+# SUB-SISTEMA DE CONFIGURACION DEL ENGINE DE LOGS
+# ==============================================================================
+FORMATO_LOGS = "%(asctime)s [%(levelname)s] [PROCESO: %(name)s] -> %(message)s"
 logging.basicConfig(
     level=logging.INFO,
     format=FORMATO_LOGS,
@@ -71,13 +87,13 @@ logging.basicConfig(
 )
 logger = logging.getLogger("HTAS_MEXICO_CORE")
 
-# Definicion de Constantes de Infraestructura Fisica de Almacenamiento
-DB_NAME = "clinica_htas_mexico.db"
-CSV_NAME = "Hipertension_Arterial_Mexico.csv"
-
+logger.info(f"[INIT] Base del proyecto: {BASE_DIR}")
+logger.info(f"[INIT] PDFs se guardaran en: {PDF_STORAGE_PATH}")
+logger.info(f"[INIT] Base de datos: {DB_NAME}")
+logger.info(f"[INIT] CSV de entrenamiento: {CSV_NAME}")
 
 # ==============================================================================
-# CAPITULO I: CAPA DE GESTION DE EXCEPCIONES PERSONALIZADAS (EXCEPTIONS)
+# CAPITULO I: CAPA DE GESTION DE EXCEPCIONES PERSONALIZADAS
 # ==============================================================================
 class HTASException(Exception):
     """Clase base para el control de anomalias dentro de la suite HTAS-Mexico."""
@@ -112,7 +128,119 @@ class MLModelException(HTASException):
 
 
 # ==============================================================================
-# CAPITULO II: MOTOR DE BASE DE DATOS RELACIONAL (DATA ACCESS OBJECT)
+# CAPITULO II: GESTOR DE ALMACENAMIENTO DE PDFs
+# ==============================================================================
+
+class GestorAlmacenamientoPDF:
+    """
+    Maneja el almacenamiento persistente de archivos PDF en el sistema de archivos.
+    Guarda los PDFs en la carpeta uploads/pdfs/ con nombres estructurados.
+    """
+    
+    @staticmethod
+    def guardar_pdf(base64_data: str, folio_expediente: int, tipo: str) -> Dict[str, Any]:
+        """
+        Guarda un PDF en el sistema de archivos
+        
+        Args:
+            base64_data: Datos del PDF en Base64
+            folio_expediente: Numero de folio del expediente
+            tipo: 'cedula' o 'diagnostico'
+        
+        Returns:
+            Dict con estado de la operacion
+        """
+        try:
+            # Limpiar cabecera si existe
+            if "," in base64_data:
+                base64_data = base64_data.split(",")[1]
+            
+            # Decodificar Base64 a bytes
+            pdf_bytes = base64.b64decode(base64_data)
+            
+            # Crear nombre de archivo
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            nombre_archivo = f"folio_{folio_expediente}_{tipo}_{timestamp}.pdf"
+            ruta_completa = os.path.join(PDF_STORAGE_PATH, nombre_archivo)
+            
+            # Guardar archivo
+            with open(ruta_completa, 'wb') as f:
+                f.write(pdf_bytes)
+            
+            logger.info(f"[PDF_STORAGE] PDF guardado: {ruta_completa}")
+            logger.info(f"[PDF_STORAGE] Tamanio: {len(pdf_bytes)} bytes")
+            
+            return {
+                "exito": True,
+                "ruta": ruta_completa,
+                "nombre": nombre_archivo,
+                "tamano_bytes": len(pdf_bytes),
+                "tamano_mb": round(len(pdf_bytes) / (1024 * 1024), 2)
+            }
+            
+        except Exception as e:
+            logger.error(f"[PDF_STORAGE] Error guardando PDF: {str(e)}")
+            return {
+                "exito": False,
+                "error": str(e)
+            }
+
+    @staticmethod
+    def obtener_pdf(folio_expediente: int, tipo: str) -> Optional[str]:
+        """
+        Obtiene la ruta del PDF mas reciente de un tipo especifico
+        
+        Args:
+            folio_expediente: Numero de folio del expediente
+            tipo: 'cedula' o 'diagnostico'
+        
+        Returns:
+            Ruta del archivo o None si no existe
+        """
+        try:
+            patron = f"folio_{folio_expediente}_{tipo}_"
+            archivos = []
+            
+            for archivo in os.listdir(PDF_STORAGE_PATH):
+                if archivo.startswith(patron) and archivo.endswith('.pdf'):
+                    archivos.append(os.path.join(PDF_STORAGE_PATH, archivo))
+            
+            if archivos:
+                # Devolver el mas reciente (por nombre de archivo que incluye timestamp)
+                archivos.sort(reverse=True)
+                return archivos[0]
+            
+            return None
+            
+        except Exception as e:
+            logger.error(f"[PDF_STORAGE] Error obteniendo PDF: {str(e)}")
+            return None
+
+    @staticmethod
+    def obtener_pdf_como_base64(folio_expediente: int, tipo: str) -> Optional[str]:
+        """
+        Obtiene un PDF como string Base64
+        
+        Args:
+            folio_expediente: Numero de folio del expediente
+            tipo: 'cedula' o 'diagnostico'
+        
+        Returns:
+            String Base64 del PDF o None
+        """
+        ruta = GestorAlmacenamientoPDF.obtener_pdf(folio_expediente, tipo)
+        if ruta and os.path.exists(ruta):
+            try:
+                with open(ruta, 'rb') as f:
+                    return base64.b64encode(f.read()).decode('utf-8')
+            except Exception as e:
+                logger.error(f"[PDF_STORAGE] Error leyendo PDF: {str(e)}")
+                return None
+        return None
+
+
+# ==============================================================================
+# CAPITULO III: MOTOR DE BASE DE DATOS RELACIONAL (SQLite)
 # ==============================================================================
 class GestorBaseDatosRelacional:
     """
@@ -156,6 +284,7 @@ class GestorBaseDatosRelacional:
             """)
             
             # Creacion de Tabla de Expedientes Clinicos (Llave foranea hacia Medicos)
+            # Se agregaron las columnas ruta_pdf_cedula y ruta_pdf_diagnostico
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS expedientes (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -174,6 +303,8 @@ class GestorBaseDatosRelacional:
                     pdf_cedula_valido INTEGER NOT NULL,
                     pdf_diagnostico_valido INTEGER NOT NULL,
                     valores_extraidos_pdf TEXT,
+                    ruta_pdf_cedula TEXT,
+                    ruta_pdf_diagnostico TEXT,
                     FOREIGN KEY (cedula_medico_fk) REFERENCES medicos(cedula)
                         ON DELETE CASCADE ON UPDATE CASCADE
                 );
@@ -228,8 +359,9 @@ class GestorBaseDatosRelacional:
                     presion_pdf_sistolica, presion_pdf_diastolica,
                     toma_medicamento, prediccion_crisis, probabilidad_porcentual,
                     nivel_riesgo, motor_utilizado, pdf_cedula_valido,
-                    pdf_diagnostico_valido, valores_extraidos_pdf
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+                    pdf_diagnostico_valido, valores_extraidos_pdf,
+                    ruta_pdf_cedula, ruta_pdf_diagnostico
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
             """
             
             valores = (
@@ -246,7 +378,9 @@ class GestorBaseDatosRelacional:
                 datos["motor_inferencia_usado"],
                 1 if datos["cedula_pdf_valida"] else 0,
                 1 if datos["diagnostico_pdf_valido"] else 0,
-                datos.get("valores_extraidos_pdf", "")
+                datos.get("valores_extraidos_pdf", ""),
+                datos.get("ruta_pdf_cedula", ""),
+                datos.get("ruta_pdf_diagnostico", "")
             )
             
             cursor.execute(query, valores)
@@ -261,9 +395,71 @@ class GestorBaseDatosRelacional:
         finally:
             conn.close()
 
+    @classmethod
+    def obtener_expediente_por_folio(cls, folio: int) -> Optional[Dict[str, Any]]:
+        """Obtiene un expediente completo por su folio"""
+        conn = cls.conectar()
+        cursor = conn.cursor()
+        try:
+            cursor.execute("""
+                SELECT 
+                    id, fecha_consulta, cedula_medico_fk, edad,
+                    sistolica, diastolica, presion_pdf_sistolica, presion_pdf_diastolica,
+                    toma_medicamento, prediccion_crisis, probabilidad_porcentual,
+                    nivel_riesgo, motor_utilizado, pdf_cedula_valido,
+                    pdf_diagnostico_valido, valores_extraidos_pdf,
+                    ruta_pdf_cedula, ruta_pdf_diagnostico
+                FROM expedientes
+                WHERE id = ?
+            """, (folio,))
+            
+            resultado = cursor.fetchone()
+            if resultado:
+                columnas = [desc[0] for desc in cursor.description]
+                return dict(zip(columnas, resultado))
+            return None
+            
+        except sqlite3.Error as e:
+            logger.error(f"[DB_DAO] Error obteniendo expediente: {str(e)}")
+            return None
+        finally:
+            conn.close()
+
+    @classmethod
+    def obtener_ultimo_expediente_por_cedula(cls, cedula_medico: str) -> Optional[Dict[str, Any]]:
+        """Obtiene el ultimo expediente de un medico"""
+        conn = cls.conectar()
+        cursor = conn.cursor()
+        try:
+            cursor.execute("""
+                SELECT 
+                    id, fecha_consulta, cedula_medico_fk, edad,
+                    sistolica, diastolica, presion_pdf_sistolica, presion_pdf_diastolica,
+                    toma_medicamento, prediccion_crisis, probabilidad_porcentual,
+                    nivel_riesgo, motor_utilizado, pdf_cedula_valido,
+                    pdf_diagnostico_valido, valores_extraidos_pdf,
+                    ruta_pdf_cedula, ruta_pdf_diagnostico
+                FROM expedientes
+                WHERE cedula_medico_fk = ?
+                ORDER BY id DESC
+                LIMIT 1
+            """, (cedula_medico,))
+            
+            resultado = cursor.fetchone()
+            if resultado:
+                columnas = [desc[0] for desc in cursor.description]
+                return dict(zip(columnas, resultado))
+            return None
+            
+        except sqlite3.Error as e:
+            logger.error(f"[DB_DAO] Error obteniendo expediente: {str(e)}")
+            return None
+        finally:
+            conn.close()
+
 
 # ==============================================================================
-# CAPITULO III: ANALIZADOR DE DOCUMENTOS PDF (PARSING & EXTRACCION DE VALORES REALES)
+# CAPITULO IV: ANALIZADOR DE DOCUMENTOS PDF (PARSING & EXTRACCION DE VALORES REALES)
 # ==============================================================================
 class ProcesadorDocumentosPDF:
     """
@@ -563,7 +759,7 @@ class ProcesadorDocumentosPDF:
 
 
 # ==============================================================================
-# CAPITULO IV: ARQUITECTURA PIPELINE DE MACHINE LEARNING COMPETITIVO (IA)
+# CAPITULO V: ARQUITECTURA PIPELINE DE MACHINE LEARNING COMPETITIVO (IA)
 # ==============================================================================
 class PipelineInteligenciaArtificial:
     """
@@ -723,7 +919,7 @@ class PipelineInteligenciaArtificial:
 
 
 # ==============================================================================
-# CAPITULO V: CAPA DE VALIDACION Y TRANSFERENCIA DE DATOS (PYDANTIC SCHEMAS)
+# CAPITULO VI: CAPA DE VALIDACION Y TRANSFERENCIA DE DATOS (PYDANTIC SCHEMAS)
 # ==============================================================================
 class SolicitudEvaluacionCompleta(BaseModel):
     """
@@ -759,12 +955,12 @@ class RespuestaEvaluacionClinica(BaseModel):
 
 
 # ==============================================================================
-# CAPITULO VI: EXPOSICION DE SERVICIOS WEB Y ROUTING (FASTAPI CONTROLLER)
+# CAPITULO VII: EXPOSICION DE SERVICIOS WEB Y ROUTING (FASTAPI CONTROLLER)
 # ==============================================================================
 app = FastAPI(
     title="Core Predictivo Tri-Algoritmico Persistente - HTAS Mexico",
     description="Motor de Inferencia clinica con validacion sintactica de expedientes y catalogo relacional de medicos.",
-    version="3.1.0"
+    version="3.3.0"
 )
 
 # Configuracion del puente CORS para permitir interacciones seguras entre dominios
@@ -780,25 +976,208 @@ app.add_middleware(
 instancia_ia_global: Optional[PipelineInteligenciaArtificial] = None
 
 
+# ==============================================================================
+# FUNCION PARA OBTENER ULTIMO EXPEDIENTE DE UN PACIENTE
+# ==============================================================================
+def obtener_ultimo_expediente_paciente(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Obtiene el ultimo expediente de un paciente
+    """
+    try:
+        id_paciente = payload.get('id_paciente')
+        
+        if not id_paciente:
+            return {
+                "exitoso": False,
+                "error": "Se requiere el ID del paciente"
+            }
+        
+        logger.info(f"[NODE] Obteniendo ultimo expediente para paciente: {id_paciente}")
+        
+        conn = GestorBaseDatosRelacional.conectar()
+        cursor = conn.cursor()
+        
+        # Primero obtener el ultimo id de expediente para este paciente
+        # Como la tabla expedientes no tiene id_paciente, usamos cedula_medico_fk
+        # o simplemente obtenemos el ultimo expediente de todos
+        cursor.execute("""
+            SELECT 
+                id, 
+                fecha_consulta, 
+                cedula_medico_fk,
+                edad, 
+                sistolica, 
+                diastolica,
+                presion_pdf_sistolica,
+                presion_pdf_diastolica,
+                toma_medicamento,
+                prediccion_crisis,
+                probabilidad_porcentual,
+                nivel_riesgo,
+                motor_utilizado,
+                pdf_cedula_valido,
+                pdf_diagnostico_valido,
+                valores_extraidos_pdf,
+                ruta_pdf_cedula,
+                ruta_pdf_diagnostico
+            FROM expedientes
+            ORDER BY id DESC
+            LIMIT 1
+        """)
+        
+        resultado = cursor.fetchone()
+        conn.close()
+        
+        if not resultado:
+            return {
+                "exitoso": False,
+                "error": "No hay expedientes para este paciente"
+            }
+        
+        # Obtener los nombres de las columnas
+        columnas = ['id', 'fecha_consulta', 'cedula_medico_fk', 'edad', 'sistolica', 
+                   'diastolica', 'presion_pdf_sistolica', 'presion_pdf_diastolica',
+                   'toma_medicamento', 'prediccion_crisis', 'probabilidad_porcentual',
+                   'nivel_riesgo', 'motor_utilizado', 'pdf_cedula_valido',
+                   'pdf_diagnostico_valido', 'valores_extraidos_pdf',
+                   'ruta_pdf_cedula', 'ruta_pdf_diagnostico']
+        
+        datos = dict(zip(columnas, resultado))
+        
+        # Agregar el campo 'folio' que espera el frontend
+        datos['folio'] = datos.get('id')
+        
+        # Buscar el PDF en el sistema de archivos y convertirlo a Base64
+        ruta_pdf = datos.get('ruta_pdf_diagnostico')
+        pdf_base64 = None
+        
+        if ruta_pdf and os.path.exists(ruta_pdf):
+            try:
+                with open(ruta_pdf, 'rb') as f:
+                    pdf_base64 = base64.b64encode(f.read()).decode('utf-8')
+            except Exception as e:
+                logger.error(f"[NODE] Error leyendo PDF: {str(e)}")
+        
+        datos['pdf_diagnostico_base64'] = pdf_base64
+        
+        # Mapear campos para compatibilidad con el frontend
+        return {
+            "exitoso": True,
+            "folio": datos.get('id'),
+            "fecha_consulta": datos.get('fecha_consulta'),
+            "id_paciente": id_paciente,
+            "nombre_paciente": "Paciente",
+            "ap_paterno_paciente": "",
+            "ap_materno_paciente": "",
+            "edad": datos.get('edad'),
+            "sistolica": datos.get('sistolica'),
+            "diastolica": datos.get('diastolica'),
+            "presion_pdf_sistolica": datos.get('presion_pdf_sistolica'),
+            "presion_pdf_diastolica": datos.get('presion_pdf_diastolica'),
+            "prediccion_crisis": datos.get('prediccion_crisis'),
+            "probabilidad_porcentual": datos.get('probabilidad_porcentual'),
+            "nivel_riesgo": datos.get('nivel_riesgo'),
+            "motor_utilizado": datos.get('motor_utilizado'),
+            "tiene_pdf_cedula": bool(datos.get('pdf_cedula_valido')),
+            "tiene_pdf_diagnostico": bool(datos.get('pdf_diagnostico_valido')),
+            "pdf_diagnostico_base64": pdf_base64,
+            "ruta_pdf_cedula": datos.get('ruta_pdf_cedula'),
+            "ruta_pdf_diagnostico": datos.get('ruta_pdf_diagnostico')
+        }
+        
+    except Exception as e:
+        logger.error(f"[NODE] Error obteniendo expediente: {str(e)}")
+        return {
+            "exitoso": False,
+            "error": str(e)
+        }
+
+
 def procesar_desde_json(payload: Dict[str, Any]) -> Dict[str, Any]:
     """
     Procesa una solicitud desde Node.js via argumentos JSON
-    
-    Args:
-        payload: Diccionario con los datos del paciente
-        
-    Returns:
-        Diccionario con los resultados del analisis
     """
     try:
+        accion = payload.get('accion')
+        
+        # Si es una accion para obtener el ultimo expediente
+        if accion == 'obtener_ultimo_expediente_paciente':
+            return obtener_ultimo_expediente_paciente(payload)
+        
+        # Si es una accion para obtener PDF por folio
+        if accion == 'obtener_pdf_por_folio':
+            folio = payload.get('folio')
+            if not folio:
+                return {
+                    "exitoso": False,
+                    "error": "Se requiere el folio del expediente"
+                }
+            
+            pdf_cedula = GestorAlmacenamientoPDF.obtener_pdf_como_base64(folio, "cedula")
+            pdf_diagnostico = GestorAlmacenamientoPDF.obtener_pdf_como_base64(folio, "diagnostico")
+            
+            return {
+                "exitoso": True,
+                "folio": folio,
+                "tiene_pdf_cedula": pdf_cedula is not None,
+                "tiene_pdf_diagnostico": pdf_diagnostico is not None,
+                "pdf_cedula_base64": pdf_cedula,
+                "pdf_diagnostico_base64": pdf_diagnostico
+            }
+        
+        # Si es una accion para obtener ultimo analisis por cedula
+        if accion == 'obtener_ultimo_analisis':
+            cedula_medico = payload.get('cedula_medico')
+            if not cedula_medico:
+                return {
+                    "exitoso": False,
+                    "error": "Se requiere la cedula del medico"
+                }
+            
+            expediente = GestorBaseDatosRelacional.obtener_ultimo_expediente_por_cedula(cedula_medico)
+            if not expediente:
+                return {
+                    "exitoso": False,
+                    "error": "No hay analisis para esta cedula"
+                }
+            
+            folio = expediente.get('id')
+            pdf_cedula = GestorAlmacenamientoPDF.obtener_pdf_como_base64(folio, "cedula")
+            pdf_diagnostico = GestorAlmacenamientoPDF.obtener_pdf_como_base64(folio, "diagnostico")
+            
+            return {
+                "exitoso": True,
+                "folio": folio,
+                "fecha_consulta": expediente.get('fecha_consulta'),
+                "cedula_medico": expediente.get('cedula_medico_fk'),
+                "edad": expediente.get('edad'),
+                "sistolica": expediente.get('sistolica'),
+                "diastolica": expediente.get('diastolica'),
+                "presion_pdf_sistolica": expediente.get('presion_pdf_sistolica'),
+                "presion_pdf_diastolica": expediente.get('presion_pdf_diastolica'),
+                "prediccion_crisis": expediente.get('prediccion_crisis'),
+                "probabilidad_porcentual": expediente.get('probabilidad_porcentual'),
+                "nivel_riesgo": expediente.get('nivel_riesgo'),
+                "motor_utilizado": expediente.get('motor_utilizado'),
+                "pdf_cedula_valido": expediente.get('pdf_cedula_valido'),
+                "pdf_diagnostico_valido": expediente.get('pdf_diagnostico_valido'),
+                "tiene_pdf_cedula": pdf_cedula is not None,
+                "tiene_pdf_diagnostico": pdf_diagnostico is not None,
+                "pdf_cedula_base64": pdf_cedula,
+                "pdf_diagnostico_base64": pdf_diagnostico
+            }
+        
+        # Si no es una accion especifica, procesar como analisis normal
         logger.info("[NODE] Procesando solicitud desde JSON...")
         
         # Extraer datos del payload
+        id_paciente = payload.get('id_paciente')
+        id_doctor = payload.get('id_doctor')
         edad = payload.get('edad')
         sistolica = payload.get('sistolica')
         diastolica = payload.get('diastolica')
         toma_medicamento = payload.get('toma_medicamento', 0)
-        cedula_medico = payload.get('cedula_medico', '1234567')
+        cedula_medico = payload.get('cedula_medico', '')
         cedula_pdf_base64 = payload.get('cedula_pdf_base64', '')
         diagnostico_pdf_base64 = payload.get('diagnostico_pdf_base64', '')
         
@@ -809,28 +1188,36 @@ def procesar_desde_json(payload: Dict[str, Any]) -> Dict[str, Any]:
                 "error": "Faltan datos requeridos: edad, sistolica, diastolica"
             }
         
+        logger.info(f"[NODE] Datos recibidos - Edad: {edad}, Presion: {sistolica}/{diastolica}")
+        
         # Validar PDF de diagnostico
+        pdf_diagnostico_valido = False
+        texto_diagnostico = ""
+        sistolica_pdf = None
+        diastolica_pdf = None
+        valores_pdf = []
+        
         if diagnostico_pdf_base64:
+            logger.info("[NODE] Validando PDF de diagnostico...")
             pdf_diagnostico_valido, texto_diagnostico, sistolica_pdf, diastolica_pdf, valores_pdf = \
                 ProcesadorDocumentosPDF.validar_documento_hipertension(diagnostico_pdf_base64)
-        else:
-            pdf_diagnostico_valido = False
-            sistolica_pdf = None
-            diastolica_pdf = None
-            valores_pdf = []
+            logger.info(f"[NODE] PDF Diagnostico valido: {pdf_diagnostico_valido}")
         
         # Validar PDF de cedula
+        pdf_cedula_valido = False
+        texto_cedula = ""
+        
         if cedula_pdf_base64 and cedula_medico:
+            logger.info("[NODE] Validando PDF de cedula...")
             pdf_cedula_valido, texto_cedula = ProcesadorDocumentosPDF.validar_documento_cedula(
                 cedula_pdf_base64, cedula_medico
             )
-        else:
-            pdf_cedula_valido = False
-            texto_cedula = ""
+            logger.info(f"[NODE] PDF Cedula valido: {pdf_cedula_valido}")
         
         # Decidir que valores usar (priorizar los del PDF)
         sistolica_final = sistolica
         diastolica_final = diastolica
+        
         if sistolica_pdf is not None and diastolica_pdf is not None:
             sistolica_final = sistolica_pdf
             diastolica_final = diastolica_pdf
@@ -881,7 +1268,7 @@ def procesar_desde_json(payload: Dict[str, Any]) -> Dict[str, Any]:
         texto_token = texto_cedula if texto_cedula else "Token generado para medico"
         GestorBaseDatosRelacional.registrar_o_actualizar_medico(cedula_medico, texto_token)
         
-        # Guardar en base de datos
+        # Guardar en base de datos (primero para obtener el folio)
         valores_texto = ""
         if valores_pdf:
             valores_texto = "|".join([f"{v['sistolica']}/{v['diastolica']}" for v in valores_pdf])
@@ -900,10 +1287,58 @@ def procesar_desde_json(payload: Dict[str, Any]) -> Dict[str, Any]:
             "motor_inferencia_usado": resultado_inferencia["motor_inferencia_usado"],
             "cedula_pdf_valida": pdf_cedula_valido,
             "diagnostico_pdf_valido": pdf_diagnostico_valido,
-            "valores_extraidos_pdf": valores_texto
+            "valores_extraidos_pdf": valores_texto,
+            "ruta_pdf_cedula": "",
+            "ruta_pdf_diagnostico": ""
         }
         
         folio = GestorBaseDatosRelacional.registrar_expediente_completo(datos_db)
+        logger.info(f"[NODE] Expediente registrado con folio: {folio}")
+        
+        # ============================================================
+        # GUARDAR PDFs EN EL SISTEMA DE ARCHIVOS
+        # ============================================================
+        ruta_cedula = ""
+        ruta_diagnostico = ""
+        
+        if cedula_pdf_base64:
+            logger.info(f"[NODE] Guardando PDF de cedula para folio {folio}...")
+            resultado_cedula = GestorAlmacenamientoPDF.guardar_pdf(
+                cedula_pdf_base64, folio, "cedula"
+            )
+            if resultado_cedula["exito"]:
+                ruta_cedula = resultado_cedula["ruta"]
+                logger.info(f"[NODE] PDF cedula guardado en: {ruta_cedula}")
+            else:
+                logger.error(f"[NODE] Error guardando PDF cedula: {resultado_cedula.get('error')}")
+        
+        if diagnostico_pdf_base64:
+            logger.info(f"[NODE] Guardando PDF de diagnostico para folio {folio}...")
+            resultado_diagnostico = GestorAlmacenamientoPDF.guardar_pdf(
+                diagnostico_pdf_base64, folio, "diagnostico"
+            )
+            if resultado_diagnostico["exito"]:
+                ruta_diagnostico = resultado_diagnostico["ruta"]
+                logger.info(f"[NODE] PDF diagnostico guardado en: {ruta_diagnostico}")
+            else:
+                logger.error(f"[NODE] Error guardando PDF diagnostico: {resultado_diagnostico.get('error')}")
+        
+        # ACTUALIZAR rutas en la base de datos
+        if ruta_cedula or ruta_diagnostico:
+            conn = GestorBaseDatosRelacional.conectar()
+            cursor = conn.cursor()
+            try:
+                cursor.execute("""
+                    UPDATE expedientes 
+                    SET ruta_pdf_cedula = ?, ruta_pdf_diagnostico = ?
+                    WHERE id = ?
+                """, (ruta_cedula, ruta_diagnostico, folio))
+                conn.commit()
+                logger.info(f"[DB_DAO] Rutas PDF actualizadas para folio #{folio}")
+            except sqlite3.Error as e:
+                logger.error(f"[DB_DAO] Error actualizando rutas PDF: {str(e)}")
+            finally:
+                conn.close()
         
         logger.info(f"[NODE] Analisis completado. Folio: {folio}")
         
@@ -920,7 +1355,9 @@ def procesar_desde_json(payload: Dict[str, Any]) -> Dict[str, Any]:
             "valores_pdf": valores_pdf,
             "sistolica_usada": sistolica_final,
             "diastolica_usada": diastolica_final,
-            "valores_usados": "pdf" if sistolica_pdf is not None else "payload"
+            "valores_usados": "pdf" if sistolica_pdf is not None else "payload",
+            "ruta_pdf_cedula": ruta_cedula,
+            "ruta_pdf_diagnostico": ruta_diagnostico
         }
         
     except Exception as e:
@@ -995,8 +1432,86 @@ def verificar_salud_servidor():
         "motor_ia_activo": instancia_ia_global.nombre_ganador if instancia_ia_global else "Ninguno",
         "persistencia_db": "Activa (SQLite)",
         "seguridad_pdf": "Activo (Reconocimiento Semantico + Extraccion de Valores)",
-        "version": "3.1.0"
+        "almacenamiento_pdf": f"Activo (Ruta: {PDF_STORAGE_PATH})",
+        "version": "3.3.0"
     }
+
+
+@app.get("/api/ia/obtener-pdf/{folio}")
+def obtener_pdf_por_folio(folio: int):
+    """
+    Obtiene los PDFs asociados a un expediente por su folio
+    """
+    try:
+        expediente = GestorBaseDatosRelacional.obtener_expediente_por_folio(folio)
+        
+        if not expediente:
+            raise HTTPException(status_code=404, detail="Expediente no encontrado")
+        
+        # Obtener PDFs como Base64
+        pdf_cedula = GestorAlmacenamientoPDF.obtener_pdf_como_base64(folio, "cedula")
+        pdf_diagnostico = GestorAlmacenamientoPDF.obtener_pdf_como_base64(folio, "diagnostico")
+        
+        return {
+            "folio": folio,
+            "fecha_consulta": expediente.get("fecha_consulta"),
+            "cedula_medico": expediente.get("cedula_medico_fk"),
+            "edad": expediente.get("edad"),
+            "sistolica": expediente.get("sistolica"),
+            "diastolica": expediente.get("diastolica"),
+            "nivel_riesgo": expediente.get("nivel_riesgo"),
+            "tiene_pdf_cedula": pdf_cedula is not None,
+            "tiene_pdf_diagnostico": pdf_diagnostico is not None,
+            "pdf_cedula_base64": pdf_cedula,
+            "pdf_diagnostico_base64": pdf_diagnostico
+        }
+    except Exception as e:
+        logger.error(f"[API] Error obteniendo PDF: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/ia/ultimo-analisis/{cedula_medico}")
+def obtener_ultimo_analisis(cedula_medico: str):
+    """
+    Obtiene el ultimo analisis realizado por un medico especifico
+    """
+    try:
+        expediente = GestorBaseDatosRelacional.obtener_ultimo_expediente_por_cedula(cedula_medico)
+        
+        if not expediente:
+            raise HTTPException(status_code=404, detail="No hay analisis para esta cedula")
+        
+        folio = expediente.get("id")
+        
+        # Obtener PDFs como Base64
+        pdf_cedula = GestorAlmacenamientoPDF.obtener_pdf_como_base64(folio, "cedula")
+        pdf_diagnostico = GestorAlmacenamientoPDF.obtener_pdf_como_base64(folio, "diagnostico")
+        
+        return {
+            "folio": folio,
+            "fecha_consulta": expediente.get("fecha_consulta"),
+            "cedula_medico": expediente.get("cedula_medico_fk"),
+            "edad": expediente.get("edad"),
+            "sistolica": expediente.get("sistolica"),
+            "diastolica": expediente.get("diastolica"),
+            "presion_pdf_sistolica": expediente.get("presion_pdf_sistolica"),
+            "presion_pdf_diastolica": expediente.get("presion_pdf_diastolica"),
+            "prediccion_crisis": expediente.get("prediccion_crisis"),
+            "probabilidad_porcentual": expediente.get("probabilidad_porcentual"),
+            "nivel_riesgo": expediente.get("nivel_riesgo"),
+            "motor_utilizado": expediente.get("motor_utilizado"),
+            "pdf_cedula_valido": expediente.get("pdf_cedula_valido"),
+            "pdf_diagnostico_valido": expediente.get("pdf_diagnostico_valido"),
+            "tiene_pdf_cedula": pdf_cedula is not None,
+            "tiene_pdf_diagnostico": pdf_diagnostico is not None,
+            "pdf_cedula_base64": pdf_cedula,
+            "pdf_diagnostico_base64": pdf_diagnostico
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"[API] Error obteniendo ultimo analisis: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/api/ia/evaluar-paciente-completo", response_model=RespuestaEvaluacionClinica, status_code=status.HTTP_200_OK)
@@ -1010,6 +1525,7 @@ def evaluar_expediente_completo(payload: SolicitudEvaluacionCompleta):
       3. Registro del medico en el catalogo de base de datos.
       4. Inferencia probabilistica con el mejor de los 3 modelos de ML.
       5. Consolidacion relacional del expediente y devolucion del folio unico.
+      6. Almacenamiento persistente de los PDFs en el sistema de archivos.
     """
     global instancia_ia_global
     if not instancia_ia_global:
@@ -1105,8 +1621,8 @@ def evaluar_expediente_completo(payload: SolicitudEvaluacionCompleta):
         datos_para_base_datos = {
             "cedula_medico": payload.cedula_medico,
             "edad": payload.edad,
-            "sistolica": payload.sistolica,  # Original del payload
-            "diastolica": payload.diastolica,  # Original del payload
+            "sistolica": payload.sistolica,
+            "diastolica": payload.diastolica,
             "presion_pdf_sistolica": sistolica_pdf,
             "presion_pdf_diastolica": diastolica_pdf,
             "toma_medicamento": payload.toma_medicamento,
@@ -1116,7 +1632,9 @@ def evaluar_expediente_completo(payload: SolicitudEvaluacionCompleta):
             "motor_inferencia_usado": resultado_inferencia["motor_inferencia_usado"],
             "cedula_pdf_valida": pdf_cedula_valido,
             "diagnostico_pdf_valido": pdf_diagnostico_valido,
-            "valores_extraidos_pdf": valores_texto
+            "valores_extraidos_pdf": valores_texto,
+            "ruta_pdf_cedula": "",
+            "ruta_pdf_diagnostico": ""
         }
         
         folio_transaccion = GestorBaseDatosRelacional.registrar_expediente_completo(datos_para_base_datos)
@@ -1125,7 +1643,58 @@ def evaluar_expediente_completo(payload: SolicitudEvaluacionCompleta):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=e.mensaje)
 
     # ----------------------------------------------------------------------
-    # PASO 6: EMISION DEL EXPEDIENTE DIGITALIZADO DE RESPUESTA
+    # PASO 6: ALMACENAMIENTO PERSISTENTE DE PDFs
+    # ----------------------------------------------------------------------
+    try:
+        ruta_cedula = ""
+        ruta_diagnostico = ""
+        
+        # Guardar PDF de cedula
+        if payload.cedula_pdf_base64:
+            logger.info(f"[API] Guardando PDF de cedula para folio {folio_transaccion}...")
+            resultado_cedula = GestorAlmacenamientoPDF.guardar_pdf(
+                payload.cedula_pdf_base64, folio_transaccion, "cedula"
+            )
+            if resultado_cedula["exito"]:
+                ruta_cedula = resultado_cedula["ruta"]
+                logger.info(f"[API] PDF Cedula guardado: {ruta_cedula}")
+            else:
+                logger.error(f"[API] Error guardando PDF cedula: {resultado_cedula.get('error')}")
+        
+        # Guardar PDF de diagnostico
+        if payload.diagnostico_pdf_base64:
+            logger.info(f"[API] Guardando PDF de diagnostico para folio {folio_transaccion}...")
+            resultado_diagnostico = GestorAlmacenamientoPDF.guardar_pdf(
+                payload.diagnostico_pdf_base64, folio_transaccion, "diagnostico"
+            )
+            if resultado_diagnostico["exito"]:
+                ruta_diagnostico = resultado_diagnostico["ruta"]
+                logger.info(f"[API] PDF Diagnostico guardado: {ruta_diagnostico}")
+            else:
+                logger.error(f"[API] Error guardando PDF diagnostico: {resultado_diagnostico.get('error')}")
+        
+        # Actualizar rutas en la base de datos
+        if ruta_cedula or ruta_diagnostico:
+            conn = GestorBaseDatosRelacional.conectar()
+            cursor = conn.cursor()
+            try:
+                cursor.execute("""
+                    UPDATE expedientes 
+                    SET ruta_pdf_cedula = ?, ruta_pdf_diagnostico = ?
+                    WHERE id = ?
+                """, (ruta_cedula, ruta_diagnostico, folio_transaccion))
+                conn.commit()
+                logger.info(f"[API] Rutas PDF actualizadas para folio #{folio_transaccion}")
+            except sqlite3.Error as e:
+                logger.error(f"[API] Error actualizando rutas PDF: {str(e)}")
+            finally:
+                conn.close()
+                
+    except Exception as e:
+        logger.error(f"[API] Error en almacenamiento de PDFs: {str(e)}")
+
+    # ----------------------------------------------------------------------
+    # PASO 7: EMISION DEL EXPEDIENTE DIGITALIZADO DE RESPUESTA
     # ----------------------------------------------------------------------
     return {
         "folio_expediente_db": folio_transaccion,
@@ -1136,7 +1705,7 @@ def evaluar_expediente_completo(payload: SolicitudEvaluacionCompleta):
         "nivel_riesgo_clinico": resultado_inferencia["nivel_riesgo_clinico"],
         "protocolo_sugerido": resultado_inferencia["protocolo_sugerido"],
         "motor_inferencia_usado": resultado_inferencia["motor_inferencia_usado"],
-        "mensaje_almacenamiento": f"Expediente persistido exitosamente en SQLite. Folio de control asignado #{folio_transaccion}. Valores usados: {valores_usados}"
+        "mensaje_almacenamiento": f"Expediente persistido exitosamente en SQLite. Folio de control asignado #{folio_transaccion}. Valores usados: {valores_usados}. PDFs almacenados en: {PDF_STORAGE_PATH}"
     }
 
 

@@ -1,0 +1,283 @@
+<app-doctor-menu></app-doctor-menu>
+
+<div class="toast-container" *ngIf="notifications.length > 0">
+    <div *ngFor="let notif of notifications; let i = index" class="toast-notification toast-{{ notif.type }}"
+        [class.toast-exit]="i > 0">
+        <div class="toast-icon">
+            <i class="bi" [class]="
+                notif.type === 'success' ? 'bi-check-circle-fill' :
+                notif.type === 'error' ? 'bi-x-circle-fill' :
+                notif.type === 'warning' ? 'bi-exclamation-triangle-fill' :
+                'bi-info-circle-fill'
+            "></i>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title">{{ notif.title }}</div>
+            <div class="toast-message">{{ notif.message }}</div>
+        </div>
+        <button class="toast-close" (click)="removeToast(notif.id)">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        <div class="toast-progress" [style.animation-duration]="(notif.duration || 5000) + 'ms'"></div>
+    </div>
+</div>
+
+<div class="detalle-container">
+    <!-- Back Section -->
+    <div class="back-section">
+        <button class="btn-back" (click)="volver()">
+            <i class="bi bi-arrow-left"></i>
+            <span>Volver a analisis</span>
+        </button>
+    </div>
+
+    <!-- LOADING -->
+    <div *ngIf="isLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Cargando informacion del analisis...</p>
+    </div>
+
+    <!-- CONTENIDO -->
+    <div *ngIf="!isLoading && resultadoAnalisis" class="detalle-content">
+
+        <!-- Informacion del PACIENTE -->
+        <div class="paciente-info">
+            <div class="paciente-avatar">
+                <span>{{ (patientName || 'P').charAt(0).toUpperCase() }}</span>
+            </div>
+            <div class="paciente-datos">
+                <h3>{{ patientFullName || patientName || 'Paciente' }}</h3>
+                <p>
+                    <i class="bi bi-envelope"></i> {{ patientEmail || 'Sin correo' }}
+                    <span class="separador">•</span>
+                    <i class="bi bi-calendar"></i> Edad: {{ pacienteEdad || 'No disponible' }} anos
+                </p>
+                <p class="folio-info">
+                    <i class="bi bi-hash"></i> Folio: #{{ resultadoAnalisis.folio_expediente_db }}
+                    <span class="separador">•</span>
+                    <i class="bi bi-clock"></i> {{ formatearFechaCompleta(resultadoAnalisis.fecha_consulta) }}
+                </p>
+            </div>
+            <div class="paciente-actions">
+                <button class="btn-pdf" (click)="verPdfExistente()" *ngIf="pdfExistenteBase64">
+                    <i class="bi bi-file-earmark-pdf-fill"></i>
+                    Ver PDF
+                </button>
+            </div>
+        </div>
+
+        <!-- Resultado Banner -->
+        <div class="resultado-banner" [ngClass]="getRiesgoClase(resultadoAnalisis.nivel_riesgo_clinico)">
+            <div class="banner-bloque banner-riesgo">
+                <div class="banner-icono">
+                    <i class="bi" [ngClass]="getRiesgoIcono(resultadoAnalisis.nivel_riesgo_clinico)"></i>
+                </div>
+                <div class="banner-texto">
+                    <span class="banner-label">Nivel de Riesgo Clinico</span>
+                    <strong class="banner-valor">{{ resultadoAnalisis.nivel_riesgo_clinico }}</strong>
+                </div>
+            </div>
+            <div class="banner-divisor"></div>
+            <div class="banner-bloque banner-presion">
+                <span class="banner-label">Presion Arterial</span>
+                <strong class="banner-valor-simple">{{ resultadoAnalisis.sistolica_usada }}/{{
+                    resultadoAnalisis.diastolica_usada }} <small>mmHg</small></strong>
+            </div>
+            <div class="banner-divisor"></div>
+            <div class="banner-bloque banner-probabilidad">
+                <span class="banner-label">Probabilidad</span>
+                <strong class="banner-valor-simple">{{ resultadoAnalisis.probabilidad_porcentual }}%</strong>
+            </div>
+        </div>
+
+        <!-- Grid de Resultados -->
+        <div class="resultados-grid">
+            <div class="resultado-card prediccion-card"
+                [ngClass]="resultadoAnalisis.prediccion_crisis ? 'crisis' : 'normal'">
+                <div class="card-icono">
+                    <i class="bi"
+                        [ngClass]="resultadoAnalisis.prediccion_crisis ? 'bi-exclamation-triangle-fill' : 'bi-check-circle-fill'"></i>
+                </div>
+                <div class="card-contenido">
+                    <span class="card-label">Prediccion de Crisis</span>
+                    <strong class="card-valor">{{ resultadoAnalisis.prediccion_crisis ? 'Positiva' : 'Negativa'
+                        }}</strong>
+                </div>
+            </div>
+
+            <div class="resultado-card motor-card">
+                <div class="card-icono">
+                    <i class="bi bi-cpu"></i>
+                </div>
+                <div class="card-contenido">
+                    <span class="card-label">Motor IA</span>
+                    <strong class="card-valor">{{ resultadoAnalisis.motor_inferencia_usado }}</strong>
+                </div>
+            </div>
+
+            <div class="resultado-card fuente-card">
+                <div class="card-icono">
+                    <i class="bi bi-file-earmark-text"></i>
+                </div>
+                <div class="card-contenido">
+                    <span class="card-label">Fuente de Datos</span>
+                    <strong class="card-valor">{{ resultadoAnalisis.valores_usados === 'pdf' ? 'PDF' : 'Manual'
+                        }}</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Protocolo -->
+        <div class="protocolo-container">
+            <h5><i class="bi bi-file-medical"></i> Protocolo Sugerido</h5>
+            <p>{{ resultadoAnalisis.protocolo_sugerido }}</p>
+        </div>
+
+        <!-- Detalles del Analisis -->
+        <div class="detalles-analisis">
+            <div class="detalle-item">
+                <span class="detalle-label">Folio</span>
+                <span class="detalle-valor">#{{ resultadoAnalisis.folio_expediente_db }}</span>
+            </div>
+            <div class="detalle-item">
+                <span class="detalle-label">PDF Cedula</span>
+                <span class="detalle-valor">
+                    <i class="bi"
+                        [ngClass]="resultadoAnalisis.cedula_pdf_valida ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger'"></i>
+                    {{ resultadoAnalisis.cedula_pdf_valida ? 'Valida' : 'Invalida' }}
+                </span>
+            </div>
+            <div class="detalle-item">
+                <span class="detalle-label">PDF Diagnostico</span>
+                <span class="detalle-valor">
+                    <i class="bi"
+                        [ngClass]="resultadoAnalisis.diagnostico_pdf_valido ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger'"></i>
+                    {{ resultadoAnalisis.diagnostico_pdf_valido ? 'Valido' : 'Invalido' }}
+                </span>
+            </div>
+            <div class="detalle-item">
+                <span class="detalle-label">Fecha de Analisis</span>
+                <span class="detalle-valor">{{ formatearFechaCompleta(resultadoAnalisis.fecha_consulta) }}</span>
+            </div>
+        </div>
+
+        <!-- ACCIONES -->
+        <div class="detalle-acciones">
+            <button class="btn-pdf-resultados" (click)="descargarResultadosPDF()">
+                <i class="bi bi-file-earmark-arrow-down"></i>
+                Descargar PDF
+            </button>
+            <button class="btn-volver" (click)="volver()">
+                <i class="bi bi-arrow-left"></i> Volver
+            </button>
+        </div>
+
+        <!-- SECCION SUBIR EXPEDIENTE -->
+        <div class="upload-section">
+            <div class="upload-header">
+                <h3><i class="bi bi-cloud-upload"></i> Actualizar Expediente</h3>
+                <span class="upload-sub">PDF - Maximo 10MB</span>
+            </div>
+            <div class="upload-container">
+                <div class="file-upload-wrapper">
+                    <input type="file" id="fileExpediente" accept=".pdf" (change)="onExpedienteSelected($event)" hidden>
+                    <label for="fileExpediente" class="file-upload-label">
+                        <i class="bi bi-cloud-upload"></i>
+                        <span>{{ expedienteNombre || 'Selecciona un archivo PDF' }}</span>
+                        <small>Arrastra o haz clic para seleccionar</small>
+                    </label>
+                </div>
+                <button class="btn-subir" (click)="subirExpediente()"
+                    [disabled]="!expedienteArchivo || subiendoExpediente">
+                    <span class="spinner-save" *ngIf="subiendoExpediente"></span>
+                    {{ subiendoExpediente ? 'Subiendo...' : 'Actualizar Expediente' }}
+                </button>
+            </div>
+        </div>
+
+        <!-- SECCION HISTORIAL DE ANALISIS -->
+        <div class="historial-section">
+            <div class="historial-header">
+                <h2><i class="bi bi-clock-history"></i> Historial de Analisis</h2>
+                <span class="historial-count">{{ historialAnalisis.length }} analisis{{
+                    historialAnalisis.length !== 1 ? 's' : '' }}</span>
+            </div>
+
+            <div *ngIf="cargandoHistorial" class="loading-historial">
+                <div class="spinner-small"></div>
+                <span>Cargando historial...</span>
+            </div>
+
+            <div *ngIf="!cargandoHistorial && historialAnalisis.length > 0" class="historial-list">
+                <div *ngFor="let item of historialAnalisis" class="historial-item">
+                    <div class="historial-fecha">
+                        <span class="historial-dia">{{ formatearFecha(item.fecha_analisis) }}</span>
+                        <small>{{ formatearHora(item.fecha_analisis) }}</small>
+                    </div>
+                    <div class="historial-info">
+                        <span class="historial-riesgo" [ngClass]="getRiesgoClase(item.nivel_riesgo_clinico)">
+                            <i class="bi" [ngClass]="getRiesgoIcono(item.nivel_riesgo_clinico)"></i>
+                            {{ item.nivel_riesgo_clinico }}
+                        </span>
+                        <span class="historial-presion">{{ item.sistolica_usada }}/{{ item.diastolica_usada }}
+                            mmHg</span>
+                        <span class="historial-probabilidad">{{ item.probabilidad_porcentual }}%</span>
+                    </div>
+                    <div class="historial-folio">
+                        <span class="badge">Folio #{{ item.folio_expediente_db }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div *ngIf="!cargandoHistorial && historialAnalisis.length === 0" class="empty-historial">
+                <i class="bi bi-clipboard2-pulse"></i>
+                <p>No hay analisis registrados para este paciente</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ERROR STATE -->
+    <div *ngIf="!isLoading && !resultadoAnalisis" class="error-state">
+        <i class="bi bi-clipboard2-pulse"></i>
+        <h3>Analisis no encontrado</h3>
+        <p>El analisis que buscas no existe o ha sido eliminado</p>
+        <button class="btn-primary" (click)="volver()">Volver a analisis</button>
+    </div>
+</div>
+
+<!-- VISTA PREVIA PDF -->
+<div class="pdf-preview-overlay" *ngIf="mostrarVistaPrevia" (click)="cerrarVistaPrevia()">
+    <div class="pdf-preview-container" (click)="$event.stopPropagation()">
+        <div class="pdf-preview-header">
+            <h4 class="pdf-preview-titulo">
+                <i class="bi bi-file-earmark-pdf-fill"></i>
+                {{ vistaPreviaTitulo }}
+            </h4>
+            <button class="pdf-preview-close" (click)="cerrarVistaPrevia()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="pdf-preview-body">
+            <div *ngIf="vistaPreviaCargando" class="pdf-preview-loading">
+                <div class="spinner"></div>
+                <span>Cargando documento...</span>
+            </div>
+            <iframe *ngIf="!vistaPreviaCargando && vistaPreviaUrl" [src]="vistaPreviaUrl" class="pdf-preview-iframe"
+                frameborder="0"></iframe>
+            <div *ngIf="!vistaPreviaCargando && !vistaPreviaUrl" class="pdf-preview-error">
+                <i class="bi bi-file-earmark-pdf"></i>
+                <p>No se pudo cargar el documento</p>
+            </div>
+        </div>
+        <div class="pdf-preview-footer">
+            <button class="btn-pdf-download" (click)="descargarPdfExistente()">
+                <i class="bi bi-download"></i>
+                Descargar PDF
+            </button>
+            <button class="btn-pdf-close" (click)="cerrarVistaPrevia()">
+                Cerrar
+            </button>
+        </div>
+    </div>
+</div>

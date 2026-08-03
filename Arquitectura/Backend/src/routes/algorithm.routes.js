@@ -21,6 +21,18 @@ router.post(
     AlgorithmController.analizarConMultiplesPDFs
 );
 
+// Ruta para obtener el ultimo expediente de un paciente
+router.get(
+    '/ultimo-expediente/:idPaciente',
+    AlgorithmController.obtenerUltimoExpediente
+);
+
+// Ruta para obtener el PDF de un expediente por folio
+router.get(
+    '/pdf/:folio',
+    AlgorithmController.obtenerPDFExpediente
+);
+
 // Ruta para verificar estado del sistema
 router.get(
     '/estado',

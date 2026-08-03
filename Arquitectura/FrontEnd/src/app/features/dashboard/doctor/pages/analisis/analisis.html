@@ -1,0 +1,160 @@
+<app-doctor-menu></app-doctor-menu>
+
+<div class="toast-container" *ngIf="notifications.length > 0">
+    <div *ngFor="let notif of notifications; let i = index" class="toast-notification toast-{{ notif.type }}"
+        [class.toast-exit]="i > 0">
+        <div class="toast-icon">
+            <i class="bi" [class]="
+                notif.type === 'success' ? 'bi-check-circle-fill' :
+                notif.type === 'error' ? 'bi-x-circle-fill' :
+                notif.type === 'warning' ? 'bi-exclamation-triangle-fill' :
+                'bi-info-circle-fill'
+            "></i>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title">{{ notif.title }}</div>
+            <div class="toast-message">{{ notif.message }}</div>
+        </div>
+        <button class="toast-close" (click)="removeToast(notif.id)">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        <div class="toast-progress" [style.animation-duration]="(notif.duration || 5000) + 'ms'"></div>
+    </div>
+</div>
+
+<div class="analisis-container">
+    <!-- HEADER -->
+    <header class="page-header">
+        <div class="header-top">
+            <div class="header-info">
+                <h1><i class="bi bi-clipboard2-pulse"></i> Análisis de Hipertensión</h1>
+                <p>Gestiona los análisis de presión arterial de todos los pacientes</p>
+            </div>
+            <div class="header-actions">
+                <span class="estado-indicador" [ngClass]="{'activo': sistemaActivo, 'inactivo': !sistemaActivo}">
+                    <i class="bi bi-circle-fill"></i>
+                    {{ sistemaActivo ? 'Sistema activo' : 'Sistema desconectado' }}
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- LOADING -->
+    <div *ngIf="isLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Cargando análisis...</p>
+    </div>
+
+    <!-- CONTENIDO -->
+    <div *ngIf="!isLoading" class="analisis-content">
+
+        <!-- ESTADÍSTICAS -->
+        <section class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card" (click)="aplicarFiltro('todos')" [class.active]="filterEstado === 'todos'">
+                    <span class="stat-number">{{ estadisticas.total }}</span>
+                    <span class="stat-label">Total Análisis</span>
+                </div>
+                <div class="stat-card stat-critico" (click)="aplicarFiltro('critico')"
+                    [class.active]="filterEstado === 'critico'">
+                    <span class="stat-number">{{ estadisticas.criticos }}</span>
+                    <span class="stat-label">Críticos</span>
+                </div>
+                <div class="stat-card stat-moderado" (click)="aplicarFiltro('moderado')"
+                    [class.active]="filterEstado === 'moderado'">
+                    <span class="stat-number">{{ estadisticas.moderados }}</span>
+                    <span class="stat-label">Moderados</span>
+                </div>
+                <div class="stat-card stat-estable" (click)="aplicarFiltro('estable')"
+                    [class.active]="filterEstado === 'estable'">
+                    <span class="stat-number">{{ estadisticas.estables }}</span>
+                    <span class="stat-label">Estables</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- LISTA DE ANÁLISIS -->
+        <section class="analisis-section">
+            <div class="section-header">
+                <h2><i class="bi bi-list-ul"></i> Historial de Análisis</h2>
+                <span class="analisis-count">{{ analisisFiltrados.length }} análisis{{
+                    analisisFiltrados.length !== 1 ? 's' : '' }}</span>
+            </div>
+
+            <!-- BÚSQUEDA -->
+            <div class="search-section">
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" [(ngModel)]="searchTerm" (input)="buscarAnalisis()"
+                        placeholder="Buscar por folio, nivel de riesgo o paciente..." class="search-input" />
+                    <button *ngIf="searchTerm" class="btn-clear" (click)="searchTerm = ''; buscarAnalisis()">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- CARDS DE ANÁLISIS -->
+            <div class="analisis-list">
+                <div *ngFor="let item of analisisFiltrados" class="analisis-card" (click)="verDetalle(item)">
+                    <div class="analisis-header">
+                        <div class="analisis-icon" [ngClass]="getRiesgoClase(item.nivel_riesgo_clinico)">
+                            <i class="bi" [ngClass]="getRiesgoIcono(item.nivel_riesgo_clinico)"></i>
+                        </div>
+                        <div class="analisis-info">
+                            <h3>Folio #{{ item.folio_expediente_db }}</h3>
+                            <p class="analisis-fecha">
+                                <i class="bi bi-clock"></i> {{ formatearFechaAnalisis(item.fecha_analisis) }}
+                            </p>
+                            <p class="analisis-paciente">
+                                <i class="bi bi-person"></i> {{ item.nombre_paciente || 'Paciente' }}
+                            </p>
+                            <p class="analisis-presion">
+                                <i class="bi bi-heart-pulse"></i>
+                                {{ item.sistolica_usada }}/{{ item.diastolica_usada }} mmHg
+                            </p>
+                        </div>
+                        <span class="riesgo-badge" [ngClass]="getRiesgoClase(item.nivel_riesgo_clinico)">
+                            <i class="bi" [ngClass]="getRiesgoIcono(item.nivel_riesgo_clinico)"></i>
+                            {{ item.nivel_riesgo_clinico }}
+                        </span>
+                    </div>
+
+                    <div class="analisis-body">
+                        <div class="analisis-detalles">
+                            <div class="detalle" *ngIf="item.probabilidad_porcentual">
+                                <i class="bi bi-percent"></i>
+                                <span>Probabilidad: {{ item.probabilidad_porcentual }}%</span>
+                            </div>
+                            <div class="detalle" *ngIf="item.prediccion_crisis !== undefined">
+                                <i class="bi"
+                                    [ngClass]="item.prediccion_crisis ? 'bi-exclamation-triangle-fill' : 'bi-check-circle-fill'"></i>
+                                <span
+                                    [ngClass]="{'text-danger': item.prediccion_crisis, 'text-success': !item.prediccion_crisis}">
+                                    {{ item.prediccion_crisis ? 'Crisis Positiva' : 'Crisis Negativa' }}
+                                </span>
+                            </div>
+                            <div class="detalle" *ngIf="item.motor_inferencia_usado">
+                                <i class="bi bi-cpu"></i>
+                                <span>{{ item.motor_inferencia_usado }}</span>
+                            </div>
+                        </div>
+
+                        <div class="analisis-acciones">
+                            <button class="btn-detalle" (click)="$event.stopPropagation(); verDetalle(item)"
+                                title="Ver detalle">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EMPTY STATE -->
+                <div *ngIf="!analisisFiltrados.length" class="empty-state">
+                    <i class="bi bi-clipboard2-pulse"></i>
+                    <p>No hay análisis registrados</p>
+                    <p class="empty-sub">Realiza un análisis desde el detalle de un paciente</p>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>

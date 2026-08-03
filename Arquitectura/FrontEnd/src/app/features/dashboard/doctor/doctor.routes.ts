@@ -23,6 +23,8 @@ import { DoctorNuevoMedicamento } from './pages/medicamentos/nuevo-medicamento/n
 import { DoctorDispositivos } from './pages/dispositivos/dispositivos';
 import { DoctorDispositivoDetalle } from './pages/dispositivos/dispositivo-detalle/dispositivo-detalle';
 import { DoctorNuevoDispositivo } from './pages/dispositivos/nuevo-dispositivo/nuevo-dispositivo';
+import { DoctorAnalisis } from './pages/analisis/analisis';
+import { DoctorAnalisisDetalle } from './pages/analisis/analisis-detalle/analisis-detalle';
 
 export const DOCTOR_ROUTES: Routes = [
     {
@@ -62,6 +64,10 @@ export const DOCTOR_ROUTES: Routes = [
             { path: 'dispositivos', component: DoctorDispositivos },
             { path: 'dispositivos/detalle/:id', component: DoctorDispositivoDetalle },
             { path: 'dispositivos/nuevo', component: DoctorNuevoDispositivo },
+
+            // Analisis
+            { path: 'analisis', component: DoctorAnalisis },
+            { path: 'analisis/detalle/:id/:folio', component: DoctorAnalisisDetalle },
         ]
     }
 ];

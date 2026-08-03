@@ -24,6 +24,7 @@ export class DoctorMenu {
         { path: '/doctor/tratamientos', icon: 'bi-heart-pulse', label: 'Tratamientos' },
         { path: '/doctor/medicamentos', icon: 'bi-capsule', label: 'Medicamentos' },
         { path: '/doctor/dispositivos', icon: 'bi-device-hdd', label: 'Dispositivos' },
+        { path: '/doctor/analisis', icon: 'bi-clipboard2-pulse', label: 'Analisis' },
         { path: '/doctor/perfil', icon: 'bi-person', label: 'Perfil' }
     ];
 
