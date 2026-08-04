@@ -1,1 +1,489 @@
-<p>terminos-condiciones works!</p>
+<div class="legal-page-container">
+
+    <!-- Fondo decorativo -->
+    <div class="background-circles">
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+        <div class="circle circle-3"></div>
+    </div>
+
+    <!-- Botón volver -->
+    <button class="back-button" (click)="volver()">
+        <i class="bi bi-arrow-left"></i>
+        <span>Volver</span>
+    </button>
+
+    <!-- Contenido principal -->
+    <div class="legal-card">
+
+        <!-- Encabezado -->
+        <div class="legal-header">
+            <div class="header-icon">
+                <i class="bi bi-file-earmark-check-fill"></i>
+            </div>
+            <div class="header-text">
+                <h1>Términos y Condiciones</h1>
+                <p class="header-subtitle">Health Tracking & Alert System (HTAS)</p>
+                <div class="header-meta">
+                    <span class="badge"><i class="bi bi-calendar3"></i> Última actualización: Agosto 2026</span>
+                    <span class="badge"><i class="bi bi-geo-alt-fill"></i> México</span>
+                    <span class="badge version-badge"><i class="bi bi-tag-fill"></i> v2.0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Barra de progreso de lectura -->
+        <div class="reading-progress-bar">
+            <div class="progress-fill" [style.width.%]="readingProgress"></div>
+        </div>
+
+        <!-- Tabla de contenido -->
+        <nav class="toc-nav">
+            <h3><i class="bi bi-list-ul"></i> Contenido</h3>
+            <ul>
+                <li><a (click)="scrollTo('aceptacion')">1. Aceptación</a></li>
+                <li><a (click)="scrollTo('descripcion')">2. Descripción del servicio</a></li>
+                <li><a (click)="scrollTo('registro')">3. Registro y cuenta</a></li>
+                <li><a (click)="scrollTo('uso-aceptable')">4. Uso aceptable</a></li>
+                <li><a (click)="scrollTo('responsabilidades')">5. Responsabilidades</a></li>
+                <li><a (click)="scrollTo('propiedad')">6. Propiedad intelectual</a></li>
+                <li><a (click)="scrollTo('limitaciones')">7. Limitación de responsabilidad</a></li>
+                <li><a (click)="scrollTo('suspension')">8. Suspensión y cancelación</a></li>
+                <li><a (click)="scrollTo('ley')">9. Ley aplicable</a></li>
+                <li><a (click)="scrollTo('contacto')">10. Contacto</a></li>
+            </ul>
+        </nav>
+
+        <!-- Introducción -->
+        <div class="intro-banner">
+            <i class="bi bi-info-circle-fill"></i>
+            <p>
+                Al registrarte y utilizar la plataforma <strong>HTAS</strong>, aceptas expresamente estos Términos y
+                Condiciones.
+                Si no estás de acuerdo con alguno de ellos, te pedimos no hacer uso de los servicios.
+                Estos términos constituyen un acuerdo legal vinculante entre tú y HTAS.
+            </p>
+        </div>
+
+        <!-- Resumen rápido -->
+        <div class="quick-summary">
+            <h3><i class="bi bi-lightning-charge-fill"></i> Resumen rápido</h3>
+            <div class="summary-grid">
+                <div class="summary-item ok">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span>Uso personal y no comercial de la plataforma</span>
+                </div>
+                <div class="summary-item ok">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span>Información veraz en tu perfil y expediente</span>
+                </div>
+                <div class="summary-item ok">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span>Confidencialidad de credenciales de acceso</span>
+                </div>
+                <div class="summary-item no">
+                    <i class="bi bi-x-circle-fill"></i>
+                    <span>No compartir acceso con terceros no autorizados</span>
+                </div>
+                <div class="summary-item no">
+                    <i class="bi bi-x-circle-fill"></i>
+                    <span>No usar la plataforma para actividades ilícitas</span>
+                </div>
+                <div class="summary-item no">
+                    <i class="bi bi-x-circle-fill"></i>
+                    <span>No intentar vulnerar la seguridad del sistema</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Secciones -->
+        <div class="legal-sections">
+
+            <!-- Sección 1 -->
+            <div class="section" id="aceptacion">
+                <div class="section-header">
+                    <div class="section-number">01</div>
+                    <div class="section-title">
+                        <h2>Aceptación de los Términos</h2>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <p>
+                        Al acceder, registrarte o utilizar los servicios de <strong>HTAS</strong>, confirmas que:
+                    </p>
+                    <div class="acceptance-list">
+                        <div class="acceptance-item">
+                            <i class="bi bi-check2-circle"></i>
+                            <span>Tienes al menos <strong>18 años</strong> de edad o cuentas con autorización de un
+                                tutor legal.</span>
+                        </div>
+                        <div class="acceptance-item">
+                            <i class="bi bi-check2-circle"></i>
+                            <span>Has leído, entendido y aceptas estos Términos y Condiciones en su totalidad.</span>
+                        </div>
+                        <div class="acceptance-item">
+                            <i class="bi bi-check2-circle"></i>
+                            <span>Has revisado y aceptas nuestro <a (click)="irAAviso()">Aviso de Privacidad</a>.</span>
+                        </div>
+                        <div class="acceptance-item">
+                            <i class="bi bi-check2-circle"></i>
+                            <span>Tienes capacidad legal para celebrar contratos vinculantes.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección 2 -->
+            <div class="section" id="descripcion">
+                <div class="section-header">
+                    <div class="section-number">02</div>
+                    <div class="section-title">
+                        <h2>Descripción del Servicio</h2>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <p>HTAS es una plataforma digital de salud que ofrece los siguientes servicios:</p>
+                    <div class="services-grid">
+                        <div class="service-card">
+                            <i class="bi bi-heart-pulse-fill"></i>
+                            <h4>Monitoreo de Salud</h4>
+                            <p>Seguimiento de signos vitales, métricas y condiciones médicas en tiempo real.</p>
+                        </div>
+                        <div class="service-card">
+                            <i class="bi bi-bell-fill"></i>
+                            <h4>Sistema de Alertas</h4>
+                            <p>Notificaciones automáticas ante situaciones de riesgo o valores anómalos.</p>
+                        </div>
+                        <div class="service-card">
+                            <i class="bi bi-people-fill"></i>
+                            <h4>Comunicación Médica</h4>
+                            <p>Canal seguro entre pacientes, médicos y acompañantes para seguimiento clínico.</p>
+                        </div>
+                        <div class="service-card">
+                            <i class="bi bi-journal-medical"></i>
+                            <h4>Expediente Digital</h4>
+                            <p>Gestión y acceso a historial médico, diagnósticos y medicamentos.</p>
+                        </div>
+                    </div>
+                    <div class="alert-box info">
+                        <i class="bi bi-info-circle-fill"></i>
+                        <p><strong>Nota importante:</strong> HTAS es una herramienta de apoyo médico y <strong>no
+                                sustituye</strong> la consulta médica presencial ni el juicio clínico de un profesional
+                            de la salud.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección 3 -->
+            <div class="section" id="registro">
+                <div class="section-header">
+                    <div class="section-number">03</div>
+                    <div class="section-title">
+                        <h2>Registro y Cuenta de Usuario</h2>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <p>Para acceder a los servicios de HTAS deberás crear una cuenta. Al hacerlo, te comprometes a:</p>
+
+                    <div class="roles-grid">
+                        <div class="role-card">
+                            <div class="role-icon patient">
+                                <i class="bi bi-person-heart"></i>
+                            </div>
+                            <h4>Paciente</h4>
+                            <ul>
+                                <li>Proporcionar NSS válido</li>
+                                <li>Información médica verídica</li>
+                                <li>Un médico asignado</li>
+                            </ul>
+                        </div>
+                        <div class="role-card">
+                            <div class="role-icon doctor">
+                                <i class="bi bi-hospital"></i>
+                            </div>
+                            <h4>Doctor</h4>
+                            <ul>
+                                <li>Cédula profesional vigente</li>
+                                <li>Especialidad y clínica</li>
+                                <li>Responsabilidad clínica</li>
+                            </ul>
+                        </div>
+                        <div class="role-card">
+                            <div class="role-icon caregiver">
+                                <i class="bi bi-people"></i>
+                            </div>
+                            <h4>Acompañante</h4>
+                            <ul>
+                                <li>Autorización del paciente</li>
+                                <li>Fecha de asignación</li>
+                                <li>Acceso supervisado</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="account-obligations">
+                        <h4><i class="bi bi-shield-check"></i> Obligaciones de la cuenta</h4>
+                        <ul>
+                            <li>Mantener tus credenciales de acceso en confidencialidad</li>
+                            <li>Notificar de inmediato sobre acceso no autorizado a tu cuenta</li>
+                            <li>No compartir ni transferir tu cuenta a terceros</li>
+                            <li>Proporcionar información veraz, precisa y actualizada</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección 4 -->
+            <div class="section" id="uso-aceptable">
+                <div class="section-header">
+                    <div class="section-number">04</div>
+                    <div class="section-title">
+                        <h2>Uso Aceptable de la Plataforma</h2>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <div class="uso-columns">
+                        <div class="uso-col allowed">
+                            <h4><i class="bi bi-check-circle-fill"></i> Está permitido</h4>
+                            <ul>
+                                <li>Usar la plataforma para fines de salud personal</li>
+                                <li>Compartir información médica con tu equipo de salud autorizado</li>
+                                <li>Consultar tu historial y registros propios</li>
+                                <li>Reportar errores o problemas técnicos</li>
+                                <li>Usar la plataforma desde múltiples dispositivos propios</li>
+                            </ul>
+                        </div>
+                        <div class="uso-col prohibited">
+                            <h4><i class="bi bi-x-circle-fill"></i> Está prohibido</h4>
+                            <ul>
+                                <li>Proporcionar información médica falsa o engañosa</li>
+                                <li>Intentar acceder a cuentas de otros usuarios</li>
+                                <li>Realizar ingeniería inversa o hackear el sistema</li>
+                                <li>Usar la plataforma con fines comerciales no autorizados</li>
+                                <li>Distribuir malware o código malicioso</li>
+                                <li>Acosar o intimidar a otros usuarios</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección 5 -->
+            <div class="section" id="responsabilidades">
+                <div class="section-header">
+                    <div class="section-number">05</div>
+                    <div class="section-title">
+                        <h2>Responsabilidades</h2>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <div class="responsibility-grid">
+                        <div class="responsibility-card htas">
+                            <div class="resp-header">
+                                <i class="bi bi-building-check"></i>
+                                <h4>HTAS se compromete a:</h4>
+                            </div>
+                            <ul>
+                                <li>Mantener la plataforma disponible con alta disponibilidad</li>
+                                <li>Proteger tus datos con cifrado y seguridad de alto nivel</li>
+                                <li>Notificarte cambios relevantes en el servicio</li>
+                                <li>Proporcionar soporte técnico oportuno</li>
+                                <li>Cumplir con la legislación mexicana aplicable</li>
+                            </ul>
+                        </div>
+                        <div class="responsibility-card user">
+                            <div class="resp-header">
+                                <i class="bi bi-person-check-fill"></i>
+                                <h4>El usuario se compromete a:</h4>
+                            </div>
+                            <ul>
+                                <li>Proporcionar datos verídicos y actualizados</li>
+                                <li>Usar el servicio dentro del marco legal</li>
+                                <li>No intentar vulnerar la seguridad de la plataforma</li>
+                                <li>Reportar incidentes de seguridad que detecte</li>
+                                <li>Respetar los derechos de otros usuarios</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección 6 -->
+            <div class="section" id="propiedad">
+                <div class="section-header">
+                    <div class="section-number">06</div>
+                    <div class="section-title">
+                        <h2>Propiedad Intelectual</h2>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <div class="ip-banner">
+                        <i class="bi bi-c-circle-fill"></i>
+                        <div>
+                            <h4>Todo el contenido es propiedad de HTAS</h4>
+                            <p>
+                                El software, diseño, marca, logotipos, interfaces, código fuente, algoritmos y
+                                documentación de HTAS
+                                están protegidos por las leyes de propiedad intelectual mexicanas e internacionales.
+                                Queda estrictamente prohibida su reproducción, distribución o modificación sin
+                                autorización expresa por escrito.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="ip-grants">
+                        <h4>Licencia de uso</h4>
+                        <p>
+                            HTAS te otorga una <strong>licencia limitada, no exclusiva, intransferible y
+                                revocable</strong>
+                            para acceder y usar la plataforma exclusivamente para los fines descritos en estos Términos.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección 7 -->
+            <div class="section" id="limitaciones">
+                <div class="section-header">
+                    <div class="section-number">07</div>
+                    <div class="section-title">
+                        <h2>Limitación de Responsabilidad</h2>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <div class="alert-box caution">
+                        <i class="bi bi-exclamation-octagon-fill"></i>
+                        <p>
+                            HTAS no será responsable por decisiones médicas tomadas con base exclusiva en la información
+                            de la plataforma. La información proporcionada es de carácter <strong>informativo y de
+                                apoyo</strong>,
+                            y no reemplaza el criterio de un profesional de la salud calificado.
+                        </p>
+                    </div>
+                    <div class="limitation-list">
+                        <div class="limitation-item">
+                            <i class="bi bi-dash-circle"></i>
+                            <span>Interrupciones del servicio por mantenimiento programado o causas de fuerza
+                                mayor</span>
+                        </div>
+                        <div class="limitation-item">
+                            <i class="bi bi-dash-circle"></i>
+                            <span>Pérdida de datos derivada de uso indebido de credenciales</span>
+                        </div>
+                        <div class="limitation-item">
+                            <i class="bi bi-dash-circle"></i>
+                            <span>Daños causados por información incorrecta proporcionada por el usuario</span>
+                        </div>
+                        <div class="limitation-item">
+                            <i class="bi bi-dash-circle"></i>
+                            <span>Contenido de sitios web de terceros enlazados desde la plataforma</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección 8 -->
+            <div class="section" id="suspension">
+                <div class="section-header">
+                    <div class="section-number">08</div>
+                    <div class="section-title">
+                        <h2>Suspensión y Cancelación</h2>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <div class="suspension-grid">
+                        <div class="suspension-card user-cancel">
+                            <i class="bi bi-person-x-fill"></i>
+                            <h4>Cancelación por el usuario</h4>
+                            <p>
+                                Puedes cancelar tu cuenta en cualquier momento desde la configuración de perfil o
+                                contactando a soporte.
+                                Tus datos de salud serán eliminados en un plazo de <strong>30 días hábiles</strong>.
+                            </p>
+                        </div>
+                        <div class="suspension-card htas-suspend">
+                            <i class="bi bi-shield-exclamation"></i>
+                            <h4>Suspensión por HTAS</h4>
+                            <p>
+                                Podemos suspender o cancelar cuentas que violen estos Términos, sin previo aviso en
+                                casos de
+                                actividad fraudulenta o que ponga en riesgo la seguridad de otros usuarios.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección 9 -->
+            <div class="section" id="ley">
+                <div class="section-header">
+                    <div class="section-number">09</div>
+                    <div class="section-title">
+                        <h2>Ley Aplicable y Jurisdicción</h2>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <div class="law-card">
+                        <i class="bi bi-balance-scale-fill"></i>
+                        <div>
+                            <p>
+                                Estos Términos y Condiciones se rigen por las leyes de los <strong>Estados Unidos
+                                    Mexicanos</strong>.
+                                Cualquier controversia derivada de la interpretación o cumplimiento de estos términos
+                                será sometida a la
+                                jurisdicción de los tribunales competentes de la <strong>Ciudad de México</strong>,
+                                renunciando expresamente a cualquier otro fuero que pudiera corresponder.
+                            </p>
+                            <div class="law-refs">
+                                <span class="law-ref"><i class="bi bi-book-fill"></i> LFPDPPP</span>
+                                <span class="law-ref"><i class="bi bi-book-fill"></i> Código de Comercio</span>
+                                <span class="law-ref"><i class="bi bi-book-fill"></i> NOM-024-SSA3</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección 10 -->
+            <div class="section" id="contacto">
+                <div class="section-header">
+                    <div class="section-number">10</div>
+                    <div class="section-title">
+                        <h2>Contacto y Soporte</h2>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <p>Para cualquier consulta sobre estos Términos y Condiciones, contáctanos:</p>
+                    <div class="contact-grid">
+                        <div class="contact-card">
+                            <i class="bi bi-envelope-fill"></i>
+                            <span>20233l001139&#64;uctv.edu.mx</span>
+                        </div>
+                        <div class="contact-card">
+                            <i class="bi bi-telephone-fill"></i>
+                            <span>+52 (27) 1215-1950</span>
+                        </div>
+                    </div>
+                    <div class="schedule-info">
+                        <i class="bi bi-clock-fill"></i>
+                        <span>Horario de atención: Lunes a Viernes de 9:00 a 18:00 hrs (CDMX)</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer de la página legal -->
+        <div class="legal-footer">
+            <div class="footer-actions">
+                <button class="btn-secondary" (click)="volver()">
+                    <i class="bi bi-arrow-left"></i> Regresar
+                </button>
+                <button class="btn-primary" (click)="irAAviso()">
+                    Ver Aviso de Privacidad <i class="bi bi-arrow-right"></i>
+                </button>
+            </div>
+            <p class="footer-copy">© 2026 HTAS — Health Tracking & Alert System. Todos los derechos reservados.</p>
+        </div>
+
+    </div>
+</div>

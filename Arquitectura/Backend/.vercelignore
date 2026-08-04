@@ -1,0 +1,12 @@
+node_modules/
+*.pyc
+__pycache__/
+*.log
+.DS_Store
+.env
+uploads/pdfs/*.pdf
+*.db
+.git/
+*.txt
+noticias.html
+Esquema/

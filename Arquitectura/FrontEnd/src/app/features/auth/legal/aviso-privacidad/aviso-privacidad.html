@@ -1,1 +1,397 @@
-<p>aviso-privacidad works!</p>
+<div class="legal-page-container">
+
+    <!-- Fondo decorativo -->
+    <div class="background-circles">
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+        <div class="circle circle-3"></div>
+    </div>
+
+    <!-- Botón volver -->
+    <button class="back-button" (click)="volver()">
+        <i class="bi bi-arrow-left"></i>
+        <span>Volver</span>
+    </button>
+
+    <!-- Contenido principal -->
+    <div class="legal-card">
+
+        <!-- Encabezado -->
+        <div class="legal-header">
+            <div class="header-icon">
+                <i class="bi bi-shield-lock-fill"></i>
+            </div>
+            <div class="header-text">
+                <h1>Aviso de Privacidad</h1>
+                <p class="header-subtitle">Health Tracking & Alert System (HTAS)</p>
+                <div class="header-meta">
+                    <span class="badge"><i class="bi bi-calendar3"></i> Última actualización: Agosto 2026</span>
+                    <span class="badge"><i class="bi bi-geo-alt-fill"></i> México</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Barra de progreso de lectura -->
+        <div class="reading-progress-bar">
+            <div class="progress-fill" [style.width.%]="readingProgress"></div>
+        </div>
+
+        <!-- Tabla de contenido -->
+        <nav class="toc-nav">
+            <h3><i class="bi bi-list-ul"></i> Contenido</h3>
+            <ul>
+                <li><a (click)="scrollTo('responsable')">1. Responsable del tratamiento</a></li>
+                <li><a (click)="scrollTo('datos')">2. Datos personales recabados</a></li>
+                <li><a (click)="scrollTo('finalidades')">3. Finalidades del tratamiento</a></li>
+                <li><a (click)="scrollTo('transferencias')">4. Transferencias</a></li>
+                <li><a (click)="scrollTo('derechos')">5. Derechos ARCO</a></li>
+                <li><a (click)="scrollTo('cookies')">6. Cookies y tecnologías similares</a></li>
+                <li><a (click)="scrollTo('cambios')">7. Cambios al aviso</a></li>
+                <li><a (click)="scrollTo('contacto')">8. Contacto</a></li>
+            </ul>
+        </nav>
+
+        <!-- Introducción -->
+        <div class="intro-banner">
+            <i class="bi bi-info-circle-fill"></i>
+            <p>
+                En <strong>HTAS</strong>, la privacidad de tus datos de salud es nuestra prioridad. Este aviso describe
+                cómo recopilamos, usamos y protegemos tu información personal conforme a la
+                <strong>Ley Federal de Protección de Datos Personales en Posesión de los Particulares
+                    (LFPDPPP)</strong>.
+            </p>
+        </div>
+
+        <!-- Secciones -->
+        <div class="legal-sections">
+
+            <!-- Sección 1 -->
+            <div class="section" id="responsable">
+                <div class="section-header">
+                    <div class="section-number">01</div>
+                    <div class="section-title">
+                        <h2>Responsable del Tratamiento de Datos</h2>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <div class="info-card">
+                        <div class="info-item">
+                            <i class="bi bi-building"></i>
+                            <div>
+                                <strong>Razón Social</strong>
+                                <span>Health Tracking & Alert System (HTAS)</span>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <i class="bi bi-envelope-fill"></i>
+                            <div>
+                                <strong>Correo electrónico</strong>
+                                <span>20233l001139&#64;uctv.edu.mx</span>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <i class="bi bi-telephone-fill"></i>
+                            <div>
+                                <strong>Teléfono</strong>
+                                <span>+52 (27) 1215-1950</span>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <i class="bi bi-geo-alt-fill"></i>
+                            <div>
+                                <strong>Domicilio</strong>
+                                <span>Ciudad de México, México</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección 2 -->
+            <div class="section" id="datos">
+                <div class="section-header">
+                    <div class="section-number">02</div>
+                    <div class="section-title">
+                        <h2>Datos Personales Recabados</h2>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <p>Recopilamos las siguientes categorías de datos personales:</p>
+                    <div class="data-grid">
+                        <div class="data-category">
+                            <i class="bi bi-person-vcard-fill"></i>
+                            <h4>Datos de Identificación</h4>
+                            <ul>
+                                <li>Nombre completo</li>
+                                <li>Correo electrónico</li>
+                                <li>Número de teléfono</li>
+                                <li>Número de Seguridad Social (NSS)</li>
+                            </ul>
+                        </div>
+                        <div class="data-category sensitive">
+                            <i class="bi bi-heart-pulse-fill"></i>
+                            <h4>Datos de Salud <span class="tag-sensitive">Sensibles</span></h4>
+                            <ul>
+                                <li>Historial médico</li>
+                                <li>Diagnósticos y condiciones</li>
+                                <li>Signos vitales y métricas</li>
+                                <li>Medicamentos y dosis</li>
+                            </ul>
+                        </div>
+                        <div class="data-category">
+                            <i class="bi bi-shield-lock-fill"></i>
+                            <h4>Datos de Autenticación</h4>
+                            <ul>
+                                <li>Credenciales de acceso (cifradas)</li>
+                                <li>Rol en la plataforma</li>
+                                <li>Cédula profesional (doctores)</li>
+                            </ul>
+                        </div>
+                        <div class="data-category">
+                            <i class="bi bi-wifi"></i>
+                            <h4>Datos de Uso</h4>
+                            <ul>
+                                <li>Dirección IP</li>
+                                <li>Dispositivo y navegador</li>
+                                <li>Registros de actividad</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="alert-box warning">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <p>Los datos de salud son considerados <strong>datos sensibles</strong> y reciben protección
+                            especial conforme a la LFPDPPP.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección 3 -->
+            <div class="section" id="finalidades">
+                <div class="section-header">
+                    <div class="section-number">03</div>
+                    <div class="section-title">
+                        <h2>Finalidades del Tratamiento</h2>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <div class="finalidades-grid">
+                        <div class="finalidad-item primary">
+                            <i class="bi bi-stars"></i>
+                            <div>
+                                <h4>Primarias (necesarias)</h4>
+                                <ul>
+                                    <li>Crear y gestionar tu cuenta de usuario</li>
+                                    <li>Monitoreo y seguimiento de salud</li>
+                                    <li>Envío de alertas médicas</li>
+                                    <li>Comunicación médico-paciente</li>
+                                    <li>Gestión de citas y expedientes clínicos</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="finalidad-item secondary">
+                            <i class="bi bi-graph-up-arrow"></i>
+                            <div>
+                                <h4>Secundarias (opcionales)</h4>
+                                <ul>
+                                    <li>Mejora de la plataforma y servicios</li>
+                                    <li>Análisis estadístico anonimizado</li>
+                                    <li>Envío de comunicaciones informativas</li>
+                                </ul>
+                                <p class="opt-out-note"><i class="bi bi-toggle-off"></i> Puedes oponerte a estas
+                                    finalidades ejerciendo tus derechos ARCO.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección 4 -->
+            <div class="section" id="transferencias">
+                <div class="section-header">
+                    <div class="section-number">04</div>
+                    <div class="section-title">
+                        <h2>Transferencias de Datos</h2>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <p>HTAS <strong>no vende ni comercializa</strong> tus datos personales. Únicamente los compartimos
+                        con:</p>
+                    <div class="transfer-list">
+                        <div class="transfer-item">
+                            <i class="bi bi-google"></i>
+                            <div>
+                                <strong>Google LLC</strong>
+                                <span>Para autenticación segura mediante Google Sign-In y servicios de Firebase (base de
+                                    datos y almacenamiento).</span>
+                            </div>
+                        </div>
+                        <div class="transfer-item">
+                            <i class="bi bi-person-badge-fill"></i>
+                            <div>
+                                <strong>Personal Médico</strong>
+                                <span>Tu médico tratante tiene acceso a tus datos clínicos según la relación establecida
+                                    en la plataforma.</span>
+                            </div>
+                        </div>
+                        <div class="transfer-item">
+                            <i class="bi bi-balance-scale-fill"></i>
+                            <div>
+                                <strong>Autoridades</strong>
+                                <span>Solo cuando exista obligación legal o requerimiento de autoridad
+                                    competente.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección 5 -->
+            <div class="section" id="derechos">
+                <div class="section-header">
+                    <div class="section-number">05</div>
+                    <div class="section-title">
+                        <h2>Derechos ARCO</h2>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <p>Como titular de tus datos, tienes derecho a:</p>
+                    <div class="arco-grid">
+                        <div class="arco-card">
+                            <div class="arco-letter">A</div>
+                            <h4>Acceso</h4>
+                            <p>Conocer qué datos tuyos tenemos y cómo los usamos.</p>
+                        </div>
+                        <div class="arco-card">
+                            <div class="arco-letter">R</div>
+                            <h4>Rectificación</h4>
+                            <p>Corregir datos inexactos o incompletos.</p>
+                        </div>
+                        <div class="arco-card">
+                            <div class="arco-letter">C</div>
+                            <h4>Cancelación</h4>
+                            <p>Solicitar la eliminación de tus datos cuando proceda.</p>
+                        </div>
+                        <div class="arco-card">
+                            <div class="arco-letter">O</div>
+                            <h4>Oposición</h4>
+                            <p>Oponerte al tratamiento de tus datos para fines específicos.</p>
+                        </div>
+                    </div>
+                    <div class="arco-contact">
+                        <i class="bi bi-send-fill"></i>
+                        <p>Para ejercer tus derechos, envía un correo a <strong>privacidad&#64;htas.mx</strong> con
+                            identificación oficial. Responderemos en un máximo de <strong>20 días hábiles</strong>.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección 6 -->
+            <div class="section" id="cookies">
+                <div class="section-header">
+                    <div class="section-number">06</div>
+                    <div class="section-title">
+                        <h2>Cookies y Tecnologías Similares</h2>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <p>Utilizamos cookies para mejorar tu experiencia en la plataforma:</p>
+                    <div class="cookies-table">
+                        <div class="cookie-row header">
+                            <span>Tipo</span>
+                            <span>Propósito</span>
+                            <span>Duración</span>
+                        </div>
+                        <div class="cookie-row">
+                            <span><i class="bi bi-lock-fill"></i> Sesión</span>
+                            <span>Mantener tu sesión activa y seguridad</span>
+                            <span>Al cerrar sesión</span>
+                        </div>
+                        <div class="cookie-row">
+                            <span><i class="bi bi-sliders"></i> Preferencias</span>
+                            <span>Recordar tus configuraciones</span>
+                            <span>1 año</span>
+                        </div>
+                        <div class="cookie-row">
+                            <span><i class="bi bi-graph-up"></i> Analíticas</span>
+                            <span>Mejorar la plataforma (Google Analytics)</span>
+                            <span>2 años</span>
+                        </div>
+                    </div>
+                    <p class="cookie-note">Puedes desactivar cookies en tu navegador, aunque algunas funciones pueden
+                        verse limitadas.</p>
+                </div>
+            </div>
+
+            <!-- Sección 7 -->
+            <div class="section" id="cambios">
+                <div class="section-header">
+                    <div class="section-number">07</div>
+                    <div class="section-title">
+                        <h2>Cambios al Aviso de Privacidad</h2>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <p>
+                        HTAS se reserva el derecho de actualizar este Aviso de Privacidad en cualquier momento.
+                        Los cambios serán notificados a través de nuestra plataforma y/o correo electrónico registrado
+                        con al menos <strong>15 días de anticipación</strong>. Te recomendamos revisarlo periódicamente.
+                    </p>
+                    <div class="update-timeline">
+                        <div class="timeline-item active">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <strong>Agosto 2026</strong>
+                                <span>Versión actual — Actualización general y adecuación a servicios Firebase.</span>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <strong>Enero 2026</strong>
+                                <span>Versión inicial de la plataforma HTAS.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección 8 -->
+            <div class="section" id="contacto">
+                <div class="section-header">
+                    <div class="section-number">08</div>
+                    <div class="section-title">
+                        <h2>Contacto</h2>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <p>Si tienes dudas sobre este Aviso de Privacidad, contáctanos:</p>
+                    <div class="contact-grid">
+                        <div class="contact-card">
+                            <i class="bi bi-envelope-fill"></i>
+                            <span>20233l001139&#64;uctv.edu.mx</span>
+                        </div>
+                        <div class="contact-card">
+                            <i class="bi bi-telephone-fill"></i>
+                            <span>+52 (27) 1215-1950</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer de la página legal -->
+        <div class="legal-footer">
+            <div class="footer-actions">
+                <button class="btn-secondary" (click)="volver()">
+                    <i class="bi bi-arrow-left"></i> Regresar
+                </button>
+                <button class="btn-primary" (click)="irATerminos()">
+                    Ver Términos y Condiciones <i class="bi bi-arrow-right"></i>
+                </button>
+            </div>
+            <p class="footer-copy">© 2026 HTAS — Health Tracking & Alert System. Todos los derechos reservados.</p>
+        </div>
+
+    </div>
+</div>
