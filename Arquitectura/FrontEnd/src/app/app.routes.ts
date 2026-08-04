@@ -2,6 +2,8 @@ import { Routes } from '@angular/router';
 import { Landing } from './features/landing/landing/landing';
 import { Login } from './features/auth/login/login';
 import { Register } from './features/auth/register/register';
+import { AvisoPrivacidad } from './features/auth/legal/aviso-privacidad/aviso-privacidad';
+import { TerminosCondiciones } from './features/auth/legal/terminos-condiciones/terminos-condiciones';
 import { Nosotros } from './features/landing/pages/nosotros/nosotros';
 import { Recursos } from './features/landing/pages/recursos/recursos';
 import { Contacto } from './features/landing/pages/contacto/contacto';
@@ -26,6 +28,16 @@ export const routes: Routes = [
   {
     path: 'register',
     component: Register,
+  },
+  {
+    path: 'legal/aviso-privacidad',
+    component: AvisoPrivacidad,
+    title: 'Aviso de Privacidad',
+  },
+  {
+    path: 'legal/terminos-condiciones',
+    component: TerminosCondiciones,
+    title: 'Términos y Condiciones',
   },
   {
     path: 'nosotros',

@@ -73,9 +73,14 @@
           <p class="mobile-toggle"><a (click)="esperandoPin = false">Intentar con otra cuenta</a></p>
         </div>
 
-        <div *ngIf="!esperandoPin" class="security-badge">
-          <i class="bi bi-patch-check-fill"></i>
-          <span>Protección de datos</span>
+        <!-- TÉRMINOS Y CONDICIONES - CORREGIDO -->
+        <div class="legal-terms" *ngIf="!esperandoPin">
+          <p>
+            Al continuar, aceptas nuestro
+            <a href="/legal/aviso-privacidad" target="_blank">Aviso de Privacidad</a>
+            y los
+            <a href="/legal/terminos-condiciones" target="_blank">Términos y Condiciones</a>.
+          </p>
         </div>
 
         <p *ngIf="!esperandoPin" class="mobile-toggle">¿No tienes cuenta? <a (click)="toggleToSignUp()">Regístrate
@@ -150,6 +155,16 @@
             <i class="bi bi-envelope"></i>
             <input type="email" formControlName="Email" placeholder="Correo Electrónico">
           </div>
+
+          <!-- TÉRMINOS Y CONDICIONES EN PASO 1 - CORREGIDO -->
+          <div class="legal-terms register-terms">
+            <p>
+              Al continuar, aceptas nuestro
+              <a href="/legal/aviso-privacidad" target="_blank">Aviso de Privacidad</a>
+              y los
+              <a href="/legal/terminos-condiciones" target="_blank">Términos y Condiciones</a>.
+            </p>
+          </div>
         </div>
 
         <!-- PASO 2: Seguridad -->
@@ -168,6 +183,16 @@
               placeholder="Confirmar Contraseña">
             <i class="bi" [ngClass]="showConfirmPassword ? 'bi-eye-slash' : 'bi-eye'"
               (click)="toggleConfirmPassword()"></i>
+          </div>
+
+          <!-- TÉRMINOS Y CONDICIONES EN PASO 2 - CORREGIDO -->
+          <div class="legal-terms register-terms">
+            <p>
+              Al continuar, aceptas nuestro
+              <a href="/legal/aviso-privacidad" target="_blank">Aviso de Privacidad</a>
+              y los
+              <a href="/legal/terminos-condiciones" target="_blank">Términos y Condiciones</a>.
+            </p>
           </div>
         </div>
 
@@ -225,13 +250,23 @@
                 class="input-clean" (focus)="inicializarCalendario()" readonly>
             </div>
           </ng-container>
-        </div>
 
-        <!-- reCAPTCHA - Movido ARRIBA de los botones -->
-        <div *ngIf="currentStep === 3" class="recaptcha-wrapper">
-          <re-captcha #recaptchaRegister mode="invisible" formControlName="recaptcha" [formGroup]="registerForm"
-            [siteKey]="recaptchaSiteKey" (resolved)="onCaptchaRegisterResolved($event)">
-          </re-captcha>
+          <!-- reCAPTCHA -->
+          <div class="recaptcha-wrapper">
+            <re-captcha #recaptchaRegister mode="invisible" formControlName="recaptcha" [formGroup]="registerForm"
+              [siteKey]="recaptchaSiteKey" (resolved)="onCaptchaRegisterResolved($event)">
+            </re-captcha>
+          </div>
+
+          <!-- TÉRMINOS Y CONDICIONES EN PASO 3 - CORREGIDO -->
+          <div class="legal-terms register-terms">
+            <p>
+              Al continuar, aceptas nuestro
+              <a href="/legal/aviso-privacidad" target="_blank">Aviso de Privacidad</a>
+              y los
+              <a href="/legal/terminos-condiciones" target="_blank">Términos y Condiciones</a>.
+            </p>
+          </div>
         </div>
 
         <!-- Botones de navegación -->
