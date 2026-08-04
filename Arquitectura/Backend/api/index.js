@@ -5,20 +5,27 @@ const serverless = require('serverless-http');
 const path = require('path');
 const axios = require('axios');
 
-const app = express();
+// Importar tu app original
+const app = require('../src/app');
+
+// =============================================
+// SOBREESCRIBIR LA RUTA PRINCIPAL PARA VERCEL
+// =============================================
+// Guardamos la app original y la modificamos
+const vercelApp = express();
 
 // Middlewares
-app.use(cors());
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
+vercelApp.use(cors());
+vercelApp.use(express.json({ limit: '50mb' }));
+vercelApp.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Servir archivos estáticos
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+vercelApp.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // =============================================
-// RUTA PRINCIPAL (¡PONER AQUÍ, ANTES DE TODO!)
+// RUTA PRINCIPAL PARA VERCEL
 // =============================================
-app.get('/', (req, res) => {
+vercelApp.get('/', (req, res) => {
     res.json({
         mensaje: '✅ HTAS API funcionando en Vercel',
         version: '1.0.0',
@@ -33,9 +40,9 @@ app.get('/', (req, res) => {
 });
 
 // =============================================
-// RUTA DE ESTADO (también antes del proxy)
+// RUTA DE ESTADO
 // =============================================
-app.get('/api/estado', (req, res) => {
+vercelApp.get('/api/estado', (req, res) => {
     res.json({
         success: true,
         mensaje: 'Servidor HTAS funcionando',
@@ -45,12 +52,11 @@ app.get('/api/estado', (req, res) => {
 });
 
 // =============================================
-// REDIRIGIR A PYTHON PARA RUTAS DE ALGORITHM
+// PROXY A PYTHON
 // =============================================
 const PYTHON_API_URL = process.env.PYTHON_API_URL || '/python-api';
 
-app.use('/api/algorithm', async (req, res, next) => {
-    // Si la ruta es de análisis, redirigir a Python
+vercelApp.use('/api/algorithm', async (req, res, next) => {
     if (req.path.includes('analizar') ||
         req.path.includes('ultimo-expediente') ||
         req.path.includes('pdf') ||
@@ -74,33 +80,41 @@ app.use('/api/algorithm', async (req, res, next) => {
 });
 
 // =============================================
-// TUS RUTAS EXISTENTES
+// USAR LAS RUTAS DE LA APP ORIGINAL
 // =============================================
-app.use('/api/auth', require('../src/routes/auth.routes'));
-app.use('/api/usuarios', require('../src/routes/usuarios.routes'));
-app.use('/api/citas', require('../src/routes/citas.routes'));
-app.use('/api/mediciones', require('../src/routes/mediciones.routes'));
-app.use('/api/medicamentos', require('../src/routes/medicamentos.routes'));
-app.use('/api/tratamientos', require('../src/routes/tratamientos.routes'));
-app.use('/api/tomas', require('../src/routes/tomas.routes'));
-app.use('/api/dispositivos', require('../src/routes/dispositivos.routes'));
-app.use('/api/pagos', require('../src/routes/pagos.routes'));
-app.use('/api/contacto', require('../src/routes/contacto.routes'));
-app.use('/api/googlefit', require('../src/routes/googlefit.routes'));
-app.use('/api/solicitudes', require('../src/routes/solicitudes.routes'));
+vercelApp.use('/api/auth', require('../src/routes/auth.routes'));
+vercelApp.use('/api/usuarios', require('../src/routes/usuarios.routes'));
+vercelApp.use('/api/citas', require('../src/routes/citas.routes'));
+vercelApp.use('/api/mediciones', require('../src/routes/mediciones.routes'));
+vercelApp.use('/api/medicamentos', require('../src/routes/medicamentos.routes'));
+vercelApp.use('/api/tratamientos', require('../src/routes/tratamientos.routes'));
+vercelApp.use('/api/tomas', require('../src/routes/tomas.routes'));
+vercelApp.use('/api/dispositivos', require('../src/routes/dispositivos.routes'));
+vercelApp.use('/api/pagos', require('../src/routes/pagos.routes'));
+vercelApp.use('/api/contacto', require('../src/routes/contacto.routes'));
+vercelApp.use('/api/googlefit', require('../src/routes/googlefit.routes'));
+vercelApp.use('/api/solicitudes', require('../src/routes/solicitudes.routes'));
 
-// Manejo de errores
-app.use((req, res) => {
-    res.status(404).json({ error: 'Ruta no encontrada' });
+// =============================================
+// MANEJO DE ERRORES
+// =============================================
+vercelApp.use((req, res) => {
+    res.status(404).json({
+        success: false,
+        error: 'Ruta no encontrada'
+    });
 });
 
-app.use((err, req, res, next) => {
+vercelApp.use((err, req, res, next) => {
     console.error('Error:', err.stack);
-    res.status(500).json({ error: 'Error interno del servidor' });
+    res.status(500).json({
+        success: false,
+        error: 'Error interno del servidor'
+    });
 });
 
 // =============================================
 // EXPORTAR PARA VERCEL
 // =============================================
-module.exports = app;
-module.exports.handler = serverless(app);
+module.exports = vercelApp;
+module.exports.handler = serverless(vercelApp);
