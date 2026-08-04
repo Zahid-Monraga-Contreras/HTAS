@@ -1,3 +1,11 @@
+/* ==========================================================================
+   ESTILOS PRINCIPALES DEL CONTENIDO - VERSIÓN COMPLETA Y RESPONSIVA
+   ========================================================================== */
+
+/* ============================================================
+   CONTENEDOR PRINCIPAL
+   ============================================================ */
+
 .main-content {
     margin-left: 250px;
     padding: 85px 40px 40px;
@@ -11,12 +19,17 @@
     padding-left: 30px;
 }
 
+/* ============================================================
+   HEADER SECTION
+   ============================================================ */
+
 .header-section {
     margin-bottom: 2.5rem;
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
     gap: 30px;
+    flex-wrap: wrap;
 }
 
 .title-page {
@@ -37,7 +50,12 @@
     display: flex;
     align-items: center;
     gap: 20px;
+    flex-wrap: wrap;
 }
+
+/* ============================================================
+   SEARCH BOX PILL
+   ============================================================ */
 
 .search-box-pill {
     position: relative;
@@ -74,6 +92,14 @@
     color: #2c3e50;
 }
 
+.search-box-pill input::placeholder {
+    color: #b1b9c1;
+}
+
+/* ============================================================
+   ACTION BUTTONS GROUP
+   ============================================================ */
+
 .action-buttons-group {
     display: flex;
     gap: 12px;
@@ -90,7 +116,7 @@
 }
 
 .btn-action {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 8px;
     padding: 10px 20px;
@@ -100,6 +126,7 @@
     cursor: pointer;
     border: none;
     transition: all 0.2s ease;
+    white-space: nowrap;
 }
 
 .btn-edit-premium {
@@ -111,6 +138,7 @@
     background: #0061f2;
     color: white;
     transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 97, 242, 0.2);
 }
 
 .btn-edit-premium:disabled {
@@ -123,10 +151,16 @@
     color: #e81123;
 }
 
-.btn-delete-premium:hover {
+.btn-delete-premium:hover:not(:disabled) {
     background: #e81123;
     color: white;
     transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(232, 17, 35, 0.2);
+}
+
+.btn-delete-premium:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .btn-save {
@@ -138,24 +172,48 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 8px;
     font-size: 0.9rem;
 }
 
-.btn-save:hover {
+.btn-save:hover:not(:disabled) {
     background: #8e0018;
     transform: translateY(-1px);
 }
+
+.btn-save:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* ============================================================
+   TABLE CARD DESIGN
+   ============================================================ */
 
 .table-card {
     background: white;
     border-radius: 20px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
     border: 1px solid #f0f3f6;
-    overflow: visible;
+    overflow: hidden;
 }
+
+/* ============================================================
+   WRAPPER PARA SCROLL HORIZONTAL
+   ============================================================ */
+
+.table-responsive-wrapper {
+    width: 100%;
+    overflow-x: visible;
+    overflow-y: visible;
+}
+
+/* ============================================================
+   CUSTOM TABLE
+   ============================================================ */
 
 .custom-table {
     width: 100%;
@@ -173,6 +231,7 @@
     text-transform: uppercase;
     letter-spacing: 1px;
     border-bottom: 1px solid #f0f3f6;
+    white-space: nowrap;
 }
 
 .custom-table th:first-child {
@@ -196,7 +255,10 @@
 .user-row.selected {
     background: #f8faff;
     position: relative;
-    box-shadow: inset 4px 0 0 0 #b0001e;
+}
+
+.user-row.selected td:first-child {
+    border-left: 4px solid #b0001e;
 }
 
 .user-row td {
@@ -204,6 +266,10 @@
     border-bottom: 1px solid #f8faff;
     vertical-align: middle;
 }
+
+/* ============================================================
+   CELLS STYLING
+   ============================================================ */
 
 .name-cell-premium {
     display: flex;
@@ -222,17 +288,23 @@
     color: #b0001e;
     font-size: 1.1rem;
     flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(176, 0, 30, 0.08);
 }
 
 .user-info-stack {
     display: flex;
     flex-direction: column;
+    min-width: 0;
 }
 
 .user-name-main {
     font-weight: 700;
     color: #2c3e50;
     font-size: 1rem;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: normal;
+    line-height: 1.3;
 }
 
 .text-muted {
@@ -241,12 +313,12 @@
 }
 
 .text-cell-truncate {
-    max-width: 220px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
     font-size: 0.9rem;
     color: #4b5563;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: normal;
+    line-height: 1.3;
 }
 
 .date-cell {
@@ -254,7 +326,19 @@
     color: #4b5563;
     display: flex;
     align-items: center;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: normal;
+    line-height: 1.3;
 }
+
+.date-cell i {
+    flex-shrink: 0;
+}
+
+/* ============================================================
+   STATUS CHIP
+   ============================================================ */
 
 .status-pill-container {
     display: flex;
@@ -267,6 +351,7 @@
     font-weight: 600;
     background: #f3f4f6;
     color: #6b7280;
+    white-space: nowrap;
 }
 
 .status-chip.active-chip {
@@ -284,26 +369,9 @@
     color: #991b1b;
 }
 
-.btn-inline-edit {
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
-    background: #f8fafc;
-    color: #64748b;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-size: 0.95rem;
-}
-
-.btn-inline-edit:hover {
-    background: #b0001e;
-    color: white;
-    border-color: #b0001e;
-}
+/* ============================================================
+   EMPTY STATE
+   ============================================================ */
 
 .empty-state {
     text-align: center;
@@ -322,6 +390,10 @@
     font-size: 0.95rem;
 }
 
+/* ============================================================
+   PAGINATION
+   ============================================================ */
+
 .pagination-bar {
     padding: 24px 30px;
     display: flex;
@@ -332,6 +404,8 @@
     border-bottom-right-radius: 20px;
     color: #64748b;
     font-size: 0.9rem;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .nav-arrows {
@@ -360,6 +434,11 @@
     color: #334155;
 }
 
+.nav-arrows button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
 .page-num {
     font-weight: 700;
     background: #f8faff;
@@ -367,6 +446,10 @@
     padding: 5px 12px;
     border-radius: 8px;
 }
+
+/* ============================================================
+   MODALES
+   ============================================================ */
 
 .modal-overlay {
     backdrop-filter: blur(5px);
@@ -380,6 +463,7 @@
     justify-content: center;
     align-items: center;
     z-index: 2000;
+    padding: 20px;
 }
 
 .modal-premium-card {
@@ -427,6 +511,19 @@
     padding: 1.5rem 2rem;
     overflow-y: auto;
     flex: 1;
+}
+
+.modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
 }
 
 .form-grid-modal {
@@ -477,6 +574,15 @@
     background: white;
 }
 
+select.form-control-premium {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a5a6e' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+    cursor: pointer;
+}
+
 .modal-footer-premium {
     display: flex;
     justify-content: flex-end;
@@ -511,7 +617,7 @@
     font-weight: 600;
     font-size: 1rem;
     cursor: pointer;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 0.5rem;
     transition: all 0.2s;
@@ -526,11 +632,16 @@
     cursor: not-allowed;
 }
 
+/* ============================================================
+   MODAL DANGER
+   ============================================================ */
+
 .modal-content {
     background: white;
     padding: 35px;
     border-radius: 20px;
     width: 500px;
+    max-width: 95vw;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     text-align: center;
 }
@@ -564,6 +675,7 @@
     display: flex;
     gap: 12px;
     justify-content: center;
+    flex-wrap: wrap;
 }
 
 .btn-danger-confirm {
@@ -574,14 +686,19 @@
     border-radius: 10px;
     font-weight: 600;
     cursor: pointer;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 8px;
     transition: all 0.2s;
 }
 
-.btn-danger-confirm:hover {
+.btn-danger-confirm:hover:not(:disabled) {
     background: #b91c1c;
+}
+
+.btn-danger-confirm:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 .btn-outline-cancel {
@@ -595,36 +712,18 @@
     transition: all 0.2s;
 }
 
-.btn-outline-cancel:hover {
+.btn-outline-cancel:hover:not(:disabled) {
     background: #f1f5f9;
 }
 
-.spinner-save {
-    width: 18px;
-    height: 18px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    border-top-color: white;
-    animation: spin 0.8s linear infinite;
+.btn-outline-cancel:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-@keyframes scaleUpPremium {
-    from {
-        transform: scale(0.96);
-        opacity: 0;
-    }
-
-    to {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
+/* ============================================================
+   TOAST NOTIFICACIONES
+   ============================================================ */
 
 .toast-premium-container {
     position: fixed;
@@ -683,19 +782,844 @@
     }
 }
 
-@media (max-width: 768px) {
+/* ============================================================
+   SPINNER & ANIMACIONES
+   ============================================================ */
+
+.spinner-save {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes scaleUpPremium {
+    from {
+        transform: scale(0.96);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE - TABLETS (max-width: 1024px)
+   ============================================================ */
+
+@media (max-width: 1024px) {
     .main-content {
+        margin-left: 70px;
+        padding: 80px 25px 30px;
+    }
+
+    .main-content.menu-collapsed {
         margin-left: 0;
-        padding: 1rem;
+        padding-left: 20px;
+        padding-right: 20px;
     }
 
     .header-section {
         flex-direction: column;
         align-items: flex-start;
-        gap: 1rem;
+        gap: 20px;
+    }
+
+    .header-controls {
+        width: 100%;
+        flex-wrap: wrap;
     }
 
     .search-box-pill {
         width: 100%;
+        max-width: 400px;
+    }
+
+    .title-page {
+        font-size: 1.75rem;
+    }
+
+    .form-grid-modal {
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .modal-premium-card {
+        max-width: 520px;
+    }
+
+    .modal-content {
+        width: 90%;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE - MÓVILES (max-width: 768px) - SCROLL HORIZONTAL ACTIVADO
+   ============================================================ */
+
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 0;
+        padding: 80px 12px 20px;
+    }
+
+    .main-content.menu-collapsed {
+        margin-left: 0;
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    /* ============================================================
+       HEADER
+       ============================================================ */
+    .header-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .title-page {
+        font-size: 1.4rem;
+        margin-top: 2px;
+    }
+
+    .subtitle-page {
+        font-size: 0.85rem;
+    }
+
+    .header-controls {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .search-box-pill {
+        width: 100%;
+        max-width: 100%;
+        border-radius: 12px;
+        padding: 2px 2px 2px 15px;
+    }
+
+    .search-box-pill:focus-within {
+        width: 100%;
+    }
+
+    .search-box-pill input {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+
+    .action-buttons-group {
+        width: 100%;
+        justify-content: flex-start;
+        gap: 8px;
+    }
+
+    .action-buttons-group.visible {
+        transform: translateX(0);
+    }
+
+    .btn-action {
+        padding: 8px 14px;
+        font-size: 0.8rem;
+        flex: 1;
+        justify-content: center;
+    }
+
+    .btn-save {
+        width: 100%;
+        justify-content: center;
+        padding: 10px 20px;
+        font-size: 0.85rem;
+    }
+
+    /* ============================================================
+       TABLA CON SCROLL HORIZONTAL EN MÓVIL - ACTIVADO
+       ============================================================ */
+    .table-card {
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .table-responsive-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table-responsive-wrapper::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .table-responsive-wrapper::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 3px;
+    }
+
+    .table-responsive-wrapper::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+    }
+
+    .custom-table {
+        min-width: 650px;
+        font-size: 0.8rem;
+    }
+
+    .custom-table th {
+        padding: 14px 16px;
+        font-size: 0.65rem;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+    }
+
+    .custom-table th:first-child {
+        border-top-left-radius: 16px;
+    }
+
+    .custom-table th:last-child {
+        border-top-right-radius: 16px;
+    }
+
+    .user-row td {
+        padding: 14px 16px;
+        font-size: 0.8rem;
+    }
+
+    .user-name-main {
+        font-size: 0.85rem;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        word-break: normal;
+        line-height: 1.2;
+    }
+
+    .avatar-icon-circle {
+        width: 34px;
+        height: 34px;
+        font-size: 0.9rem;
+    }
+
+    .text-cell-truncate {
+        font-size: 0.75rem;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        word-break: normal;
+        line-height: 1.2;
+    }
+
+    .date-cell {
+        font-size: 0.75rem;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        word-break: normal;
+        line-height: 1.2;
+    }
+
+    .date-cell i {
+        flex-shrink: 0;
+        margin-right: 4px;
+    }
+
+    .status-chip {
+        font-size: 0.7rem;
+        padding: 3px 10px;
+    }
+
+    /* ============================================================
+       PAGINACIÓN
+       ============================================================ */
+    .pagination-bar {
+        padding: 16px;
+        flex-direction: column;
+        gap: 10px;
+        border-radius: 0 0 16px 16px;
+        font-size: 0.8rem;
+        border: 1px solid #eef2f6;
+        border-top: none;
+    }
+
+    .nav-arrows button {
+        width: 34px;
+        height: 34px;
+        font-size: 0.8rem;
+    }
+
+    .page-num {
+        font-size: 0.8rem;
+        padding: 4px 10px;
+    }
+
+    /* ============================================================
+       EMPTY STATE
+       ============================================================ */
+    .empty-state {
+        padding: 2rem 1rem !important;
+    }
+
+    .empty-state i {
+        font-size: 2rem;
+    }
+
+    .empty-state p {
+        font-size: 0.85rem;
+    }
+
+    /* ============================================================
+       MODAL
+       ============================================================ */
+    .modal-premium-card {
+        max-width: 100%;
+        border-radius: 14px;
+        max-height: 95vh;
+    }
+
+    .modal-header {
+        padding: 1.25rem 1.25rem 0.75rem;
+    }
+
+    .modal-header h3 {
+        font-size: 1.15rem;
+    }
+
+    .modal-body {
+        padding: 1.25rem 1.25rem;
+    }
+
+    .form-grid-modal {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .modal-footer-premium {
+        padding: 1rem 1.25rem 1.25rem;
+        flex-direction: column-reverse;
+        gap: 0.75rem;
+    }
+
+    .modal-footer-premium button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .form-control-premium {
+        font-size: 0.9rem;
+        padding: 0.6rem 0.8rem;
+    }
+
+    .btn-cancel-premium {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.85rem;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .btn-save-appointment {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.85rem;
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* ============================================================
+       MODAL DANGER
+       ============================================================ */
+    .modal-content {
+        padding: 25px 20px;
+        width: calc(100% - 30px);
+        border-radius: 16px;
+    }
+
+    .modal-danger h3 {
+        font-size: 1.2rem;
+    }
+
+    .warning-icon-circle {
+        width: 56px;
+        height: 56px;
+        font-size: 1.5rem;
+    }
+
+    .modal-footer-danger {
+        flex-direction: column-reverse;
+        gap: 10px;
+    }
+
+    .modal-footer-danger button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .btn-danger-confirm {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .btn-outline-cancel {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* ============================================================
+       TOAST
+       ============================================================ */
+    .toast-premium-container {
+        top: 15px;
+        right: 15px;
+        left: 15px;
+        max-width: none;
+        border-radius: 12px;
+        padding: 0.8rem 1.2rem;
+    }
+
+    .toast-message {
+        font-size: 0.85rem;
+    }
+
+    .icon-toast {
+        font-size: 1.1rem;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE - MÓVILES PEQUEÑOS (max-width: 480px)
+   ============================================================ */
+
+@media (max-width: 480px) {
+    .main-content {
+        padding: 72px 8px 15px;
+    }
+
+    .title-page {
+        font-size: 1.2rem;
+    }
+
+    .subtitle-page {
+        font-size: 0.75rem;
+    }
+
+    .btn-action {
+        font-size: 0.7rem;
+        padding: 6px 10px;
+        gap: 4px;
+    }
+
+    .btn-save {
+        font-size: 0.8rem;
+        padding: 8px 16px;
+    }
+
+    .custom-table {
+        min-width: 550px;
+        font-size: 0.7rem;
+    }
+
+    .custom-table th {
+        padding: 10px 12px;
+        font-size: 0.6rem;
+    }
+
+    .user-row td {
+        padding: 10px 12px;
+        font-size: 0.7rem;
+    }
+
+    .user-name-main {
+        font-size: 0.75rem;
+    }
+
+    .avatar-icon-circle {
+        width: 28px;
+        height: 28px;
+        font-size: 0.75rem;
+    }
+
+    .text-cell-truncate {
+        font-size: 0.68rem;
+    }
+
+    .date-cell {
+        font-size: 0.65rem;
+    }
+
+    .status-chip {
+        font-size: 0.6rem;
+        padding: 2px 8px;
+    }
+
+    .pagination-bar {
+        padding: 12px;
+        font-size: 0.7rem;
+    }
+
+    .nav-arrows button {
+        width: 30px;
+        height: 30px;
+        font-size: 0.7rem;
+    }
+
+    .page-num {
+        font-size: 0.7rem;
+        padding: 3px 8px;
+    }
+
+    .empty-state {
+        padding: 1.5rem 0.5rem !important;
+    }
+
+    .empty-state i {
+        font-size: 1.8rem;
+    }
+
+    .empty-state p {
+        font-size: 0.8rem;
+    }
+
+    .modal-header {
+        padding: 1rem 1rem 0.75rem;
+    }
+
+    .modal-header h3 {
+        font-size: 1.05rem;
+    }
+
+    .modal-body {
+        padding: 1rem 1rem;
+    }
+
+    .modal-footer-premium {
+        padding: 0.75rem 1rem 1rem;
+    }
+
+    .form-control-premium {
+        font-size: 0.85rem;
+        padding: 0.5rem 0.7rem;
+    }
+
+    .btn-cancel-premium {
+        font-size: 0.8rem;
+        padding: 0.5rem 1rem;
+    }
+
+    .btn-save-appointment {
+        font-size: 0.8rem;
+        padding: 0.5rem 1rem;
+    }
+
+    .modal-content {
+        padding: 20px 15px;
+        border-radius: 14px;
+    }
+
+    .modal-danger h3 {
+        font-size: 1.05rem;
+    }
+
+    .warning-icon-circle {
+        width: 48px;
+        height: 48px;
+        font-size: 1.3rem;
+    }
+
+    .btn-danger-confirm {
+        font-size: 0.8rem;
+        padding: 8px 16px;
+    }
+
+    .btn-outline-cancel {
+        font-size: 0.8rem;
+        padding: 8px 16px;
+    }
+
+    .toast-premium-container {
+        padding: 0.6rem 0.8rem;
+        border-radius: 10px;
+    }
+
+    .toast-message {
+        font-size: 0.8rem;
+    }
+
+    .icon-toast {
+        font-size: 1rem;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE - ORIENTACIÓN HORIZONTAL EN MÓVILES
+   ============================================================ */
+
+@media (max-width: 768px) and (orientation: landscape) {
+    .main-content {
+        padding: 70px 20px 15px;
+    }
+
+    .header-section {
+        flex-direction: row;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .header-controls {
+        flex-direction: row;
+        align-items: center;
+        width: auto;
+        gap: 10px;
+    }
+
+    .search-box-pill {
+        width: 200px;
+        max-width: 300px;
+    }
+
+    .action-buttons-group {
+        width: auto;
+    }
+
+    .btn-action {
+        padding: 6px 12px;
+        font-size: 0.75rem;
+    }
+
+    .btn-save {
+        width: auto;
+        padding: 6px 16px;
+        font-size: 0.8rem;
+    }
+
+    .custom-table {
+        min-width: 700px;
+    }
+
+    .pagination-bar {
+        flex-direction: row;
+        gap: 15px;
+    }
+
+    .modal-premium-card {
+        max-width: 600px;
+    }
+
+    .modal-footer-premium {
+        flex-direction: row;
+        gap: 0.75rem;
+    }
+
+    .modal-footer-premium button {
+        width: auto;
+    }
+
+    .form-grid-modal {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem 1rem;
+    }
+
+    .modal-footer-danger {
+        flex-direction: row;
+    }
+
+    .modal-footer-danger button {
+        width: auto;
+    }
+
+    .modal-content {
+        width: auto;
+        max-width: 500px;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE - PANTALLAS GRANDES (min-width: 1400px)
+   ============================================================ */
+
+@media (min-width: 1400px) {
+    .main-content {
+        padding: 90px 60px 50px;
+    }
+
+    .search-box-pill {
+        width: 400px;
+    }
+
+    .title-page {
+        font-size: 2.3rem;
+    }
+
+    .custom-table th,
+    .user-row td {
+        padding: 24px 32px;
+    }
+
+    .modal-premium-card {
+        max-width: 720px;
+    }
+
+    .modal-header {
+        padding: 2rem 2.5rem;
+    }
+
+    .modal-body {
+        padding: 2.25rem 2.5rem;
+    }
+
+    .modal-footer-premium {
+        padding: 1.5rem 2.5rem 2rem;
+    }
+}
+
+/* ============================================================
+   UTILITARIOS RESPONSIVE ADICIONALES
+   ============================================================ */
+
+/* Ocultar en móvil */
+.hide-mobile {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .hide-mobile {
+        display: none !important;
+    }
+}
+
+/* Mostrar solo en móvil */
+.show-mobile {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .show-mobile {
+        display: block !important;
+    }
+
+    .show-mobile-inline {
+        display: inline-block !important;
+    }
+
+    .show-mobile-flex {
+        display: flex !important;
+    }
+}
+
+/* Ajustes de espaciado en móvil */
+@media (max-width: 768px) {
+    .gap-2 {
+        gap: 0.5rem !important;
+    }
+
+    .gap-3 {
+        gap: 0.75rem !important;
+    }
+
+    .gap-4 {
+        gap: 1rem !important;
+    }
+
+    .mb-2 {
+        margin-bottom: 0.5rem !important;
+    }
+
+    .mb-3 {
+        margin-bottom: 0.75rem !important;
+    }
+
+    .mb-4 {
+        margin-bottom: 1rem !important;
+    }
+
+    .p-2 {
+        padding: 0.5rem !important;
+    }
+
+    .p-3 {
+        padding: 0.75rem !important;
+    }
+
+    .p-4 {
+        padding: 1rem !important;
+    }
+
+    .mt-2 {
+        margin-top: 0.5rem !important;
+    }
+
+    .mt-3 {
+        margin-top: 0.75rem !important;
+    }
+
+    .mt-4 {
+        margin-top: 1rem !important;
+    }
+}
+
+/* Eliminar hover en móvil para mejor experiencia táctil */
+@media (max-width: 768px) {
+    .user-row:hover {
+        background: white;
+    }
+
+    .user-row.selected {
+        background: #f8faff;
+    }
+
+    .btn-edit-premium:hover:not(:disabled) {
+        background: #f1f4f9;
+        color: #0061f2;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .btn-delete-premium:hover:not(:disabled) {
+        background: #fff0f0;
+        color: #e81123;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .btn-save:hover:not(:disabled) {
+        background: #b0001e;
+        transform: none;
+    }
+
+    .nav-arrows button:hover:not(:disabled) {
+        background: white;
+        border-color: #e2e8f0;
+        color: #64748b;
+    }
+
+    .btn-save-appointment:hover:not(:disabled) {
+        background: #b0001e;
+    }
+
+    .btn-cancel-premium:hover {
+        background: white;
+        color: #475569;
+        border-color: #cbd5e1;
+    }
+
+    .btn-danger-confirm:hover:not(:disabled) {
+        background: #dc2626;
+        transform: none;
+    }
+
+    .btn-outline-cancel:hover:not(:disabled) {
+        background: white;
+        color: #64748b;
+        border-color: #e2e8f0;
     }
 }

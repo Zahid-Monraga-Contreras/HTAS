@@ -30,108 +30,111 @@
         </div>
 
         <div class="table-card">
-            <table class="custom-table">
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Correo</th>
-                        <th>Rol</th>
-                        <th>NSS</th>
-                        <th>Estado</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @for (u of usuariosPaginados; track u.idusuario) {
-                    <tr class="user-row" (click)="seleccionar(u)"
-                        [class.selected]="usuarioSeleccionado?.idusuario === u.idusuario"
-                        [class.expanded]="expandedId === u.idusuario">
-                        <td>
-                            <div class="name-cell-premium">
-                                <button class="btn-expand-circle" (click)="toggleExpand(u.idusuario, $event)">
-                                    <i class="bi bi-chevron-right" [class.rotated]="expandedId === u.idusuario"></i>
-                                </button>
-                                <div class="user-info-stack">
-                                    <span class="user-name-main">{{u.nombre}} {{u.apPaterno}} {{u.apMaterno}}</span>
+            <!-- AGREGADO: Wrapper para scroll horizontal -->
+            <div class="table-responsive-wrapper">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Correo</th>
+                            <th>Rol</th>
+                            <th>NSS</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (u of usuariosPaginados; track u.idusuario) {
+                        <tr class="user-row" (click)="seleccionar(u)"
+                            [class.selected]="usuarioSeleccionado?.idusuario === u.idusuario"
+                            [class.expanded]="expandedId === u.idusuario">
+                            <td>
+                                <div class="name-cell-premium">
+                                    <button class="btn-expand-circle" (click)="toggleExpand(u.idusuario, $event)">
+                                        <i class="bi bi-chevron-right" [class.rotated]="expandedId === u.idusuario"></i>
+                                    </button>
+                                    <div class="user-info-stack">
+                                        <span class="user-name-main">{{u.nombre}} {{u.apPaterno}} {{u.apMaterno}}</span>
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="email-cell">
-                                <i class="bi bi-envelope-at me-2 text-muted"></i>
-                                {{u.correo}}
-                            </div>
-                        </td>
-                        <td>
-                            <span class="badge-premium" [attr.data-rol]="u.rol">
-                                <span class="dot-indicator"></span>
-                                {{u.rol}}
-                            </span>
-                        </td>
-
-                        <td>
-                            <div class="date-cell">
-                                <i class="bi bi-shield-check me-2 text-muted"></i>
-                                {{u.nss || 'No asignado' }}
-                            </div>
-                        </td>
-                        <td>
-                            <div class="status-pill-container">
-                                <span class="status-chip" [class.active-chip]="u.activo">
-                                    {{u.activo ? 'Activo' : 'Inactivo'}}
+                            </td>
+                            <td>
+                                <div class="email-cell">
+                                    <i class="bi bi-envelope-at me-2 text-muted"></i>
+                                    {{u.correo}}
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge-premium" [attr.data-rol]="u.rol">
+                                    <span class="dot-indicator"></span>
+                                    {{u.rol}}
                                 </span>
-                            </div>
-                        </td>
-                    </tr>
-                    @if (expandedId === u.idusuario) {
-                    <tr class="detail-row">
-                        <td colspan="5">
-                            <div class="detail-content">
-                                <div class="detail-cards-grid">
-                                    <div class="detail-card-item">
-                                        <div class="detail-icon"><i class="bi bi-person"></i></div>
-                                        <div class="detail-data">
-                                            <label>Nombre Completo</label>
-                                            <span class="uid-text-display">{{u.nombre}} {{u.apPaterno}}
-                                                {{u.apMaterno}}</span>
+                            </td>
+
+                            <td>
+                                <div class="date-cell">
+                                    <i class="bi bi-shield-check me-2 text-muted"></i>
+                                    {{u.nss || 'No asignado' }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="status-pill-container">
+                                    <span class="status-chip" [class.active-chip]="u.activo">
+                                        {{u.activo ? 'Activo' : 'Inactivo'}}
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
+                        @if (expandedId === u.idusuario) {
+                        <tr class="detail-row">
+                            <td colspan="5">
+                                <div class="detail-content">
+                                    <div class="detail-cards-grid">
+                                        <div class="detail-card-item">
+                                            <div class="detail-icon"><i class="bi bi-person"></i></div>
+                                            <div class="detail-data">
+                                                <label>Nombre Completo</label>
+                                                <span class="uid-text-display">{{u.nombre}} {{u.apPaterno}}
+                                                    {{u.apMaterno}}</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="detail-card-item">
-                                        <div class="detail-icon"><i class="bi bi-telephone"></i></div>
-                                        <div class="detail-data">
-                                            <label>Teléfono de Contacto</label>
-                                            <span>{{u.telefono || 'No registrado'}}</span>
+                                        <div class="detail-card-item">
+                                            <div class="detail-icon"><i class="bi bi-telephone"></i></div>
+                                            <div class="detail-data">
+                                                <label>Teléfono de Contacto</label>
+                                                <span>{{u.telefono || 'No registrado'}}</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="detail-card-item">
-                                        <div class="detail-icon"><i class="bi bi-hash"></i></div>
-                                        <div class="detail-data">
-                                            <label>NSS</label>
-                                            <span>{{u.nss || 'Pendiente de asignar'}}</span>
+                                        <div class="detail-card-item">
+                                            <div class="detail-icon"><i class="bi bi-hash"></i></div>
+                                            <div class="detail-data">
+                                                <label>NSS</label>
+                                                <span>{{u.nss || 'Pendiente de asignar'}}</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="detail-card-item">
-                                        <div class="detail-icon"><i class="bi bi-envelope-at"></i></div>
-                                        <div class="detail-data">
-                                            <label>Correo Electrónico</label>
-                                            <span>{{u.correo}}</span>
+                                        <div class="detail-card-item">
+                                            <div class="detail-icon"><i class="bi bi-envelope-at"></i></div>
+                                            <div class="detail-data">
+                                                <label>Correo Electrónico</label>
+                                                <span>{{u.correo}}</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </td>
-                    </tr>
-                    }
-                    }
-                    @if (usuariosPaginados.length === 0) {
-                    <tr>
-                        <td colspan="5" class="empty-state">
-                            <i class="bi bi-people"></i>
-                            <p>No se encontraron pacientes registrados.</p>
-                        </td>
-                    </tr>
-                    }
-                </tbody>
-            </table>
+                            </td>
+                        </tr>
+                        }
+                        }
+                        @if (usuariosPaginados.length === 0) {
+                        <tr>
+                            <td colspan="5" class="empty-state">
+                                <i class="bi bi-people"></i>
+                                <p>No se encontraron pacientes registrados.</p>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
 
             <div class="pagination-bar">
                 <span>Mostrando {{usuariosPaginados.length}} de {{usuariosFiltrados.length}} pacientes</span>
@@ -149,8 +152,6 @@
         </div>
     </div>
 </main>
-
-
 
 @if (mostrarModalDelete) {
 <div class="modal-overlay">

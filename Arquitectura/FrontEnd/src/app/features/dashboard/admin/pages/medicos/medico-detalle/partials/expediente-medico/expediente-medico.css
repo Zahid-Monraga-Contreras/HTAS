@@ -1,3 +1,11 @@
+/* ==========================================================================
+   ESTILOS DEL EXPEDIENTE MÉDICO - VERSIÓN COMPLETA Y RESPONSIVA
+   ========================================================================== */
+
+/* ============================================================
+   TOOLBAR
+   ============================================================ */
+
 .expediente-toolbar {
     display: flex;
     align-items: center;
@@ -33,6 +41,7 @@
     align-items: center;
     gap: 0.6rem;
     box-shadow: 0 4px 12px rgba(10, 22, 40, 0.2);
+    transition: all 0.3s ease;
 }
 
 .btn-download-expediente:hover {
@@ -43,6 +52,10 @@
 .btn-download-expediente i {
     font-size: 1.1rem;
 }
+
+/* ============================================================
+   EXPEDIENTE HOJA
+   ============================================================ */
 
 .expediente-wrapper {
     display: flex;
@@ -71,6 +84,10 @@
     background: linear-gradient(90deg, #b0001e, #8a0016);
     border-radius: 6px 6px 0 0;
 }
+
+/* ============================================================
+   MEMBRETE
+   ============================================================ */
 
 .expediente-membrete {
     display: flex;
@@ -139,12 +156,20 @@
     font-weight: 800;
 }
 
+/* ============================================================
+   LÍNEA DECORATIVA
+   ============================================================ */
+
 .expediente-linea-doble {
     height: 3px;
     background: repeating-linear-gradient(90deg, #0a1628 0, #0a1628 6px, transparent 6px, transparent 10px);
     opacity: 0.15;
     margin-bottom: 2rem;
 }
+
+/* ============================================================
+   ENCABEZADO PACIENTE
+   ============================================================ */
 
 .expediente-encabezado-paciente {
     display: flex;
@@ -201,6 +226,10 @@
     color: #7a8a9e;
 }
 
+/* ============================================================
+   SECCIONES
+   ============================================================ */
+
 .expediente-seccion {
     margin-bottom: 1.9rem;
 }
@@ -223,6 +252,10 @@
     color: #b0001e;
     font-size: 1rem;
 }
+
+/* ============================================================
+   GRID DE CAMPOS
+   ============================================================ */
 
 .expediente-grid {
     display: grid;
@@ -261,6 +294,10 @@
     color: #4a5a6e;
     line-height: 1.5;
 }
+
+/* ============================================================
+   MEDICIONES
+   ============================================================ */
 
 .expediente-medicion-grid {
     display: grid;
@@ -321,6 +358,10 @@
     font-size: 1rem;
 }
 
+/* ============================================================
+   TABLA
+   ============================================================ */
+
 .expediente-tabla {
     width: 100%;
     border-collapse: collapse;
@@ -355,6 +396,10 @@
     padding: 1.25rem !important;
     font-style: italic;
 }
+
+/* ============================================================
+   PIE DE PÁGINA
+   ============================================================ */
 
 .expediente-pie {
     display: flex;
@@ -400,6 +445,10 @@
     font-size: 1rem;
 }
 
+/* ============================================================
+   IMPRESIÓN
+   ============================================================ */
+
 @media print {
     .expediente-toolbar {
         display: none !important;
@@ -428,6 +477,10 @@
     }
 }
 
+/* ============================================================
+   RESPONSIVE - TABLETS GRANDES (max-width: 1200px)
+   ============================================================ */
+
 @media (max-width: 1200px) {
     .expediente-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -438,17 +491,100 @@
     }
 }
 
-@media (max-width: 768px) {
+/* ============================================================
+   RESPONSIVE - TABLETS (max-width: 992px)
+   ============================================================ */
+
+@media (max-width: 992px) {
     .expediente-hoja {
-        padding: 2rem 1.5rem;
+        padding: 2.5rem 2rem 2rem;
     }
 
     .expediente-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
     }
 
+    .expediente-encabezado-paciente {
+        padding: 1rem 1.25rem;
+        gap: 1rem;
+    }
+
+    .expediente-nombre-bloque h2 {
+        font-size: 1.2rem;
+    }
+
+    .expediente-medicion-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.8rem 1.2rem;
+        padding: 0.8rem 1rem;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE - MÓVILES (max-width: 768px)
+   ============================================================ */
+
+@media (max-width: 768px) {
+
+    /* ============================================================
+       TOOLBAR
+       ============================================================ */
+    .expediente-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+
+    .expediente-toolbar p {
+        font-size: 0.8rem;
+        justify-content: center;
+    }
+
+    .btn-download-expediente {
+        justify-content: center;
+        padding: 0.6rem 1rem;
+        font-size: 0.8rem;
+    }
+
+    /* ============================================================
+       HOJA
+       ============================================================ */
+    .expediente-hoja {
+        padding: 1.5rem 1.2rem 1.2rem;
+        border-radius: 4px;
+    }
+
+    .expediente-hoja::before {
+        height: 5px;
+    }
+
+    /* ============================================================
+       MEMBRETE
+       ============================================================ */
     .expediente-membrete {
         flex-wrap: wrap;
+        gap: 0.8rem;
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .membrete-logo {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+    }
+
+    .membrete-logo i {
+        font-size: 1.3rem;
+    }
+
+    .membrete-texto h1 {
+        font-size: 1.2rem;
+    }
+
+    .membrete-texto p {
+        font-size: 0.7rem;
     }
 
     .membrete-folio {
@@ -456,38 +592,553 @@
         width: 100%;
     }
 
-    .expediente-toolbar {
+    .membrete-folio strong {
+        font-size: 1rem;
+    }
+
+    /* ============================================================
+       LÍNEA DECORATIVA
+       ============================================================ */
+    .expediente-linea-doble {
+        margin-bottom: 1.25rem;
+    }
+
+    /* ============================================================
+       ENCABEZADO PACIENTE
+       ============================================================ */
+    .expediente-encabezado-paciente {
         flex-direction: column;
-        align-items: stretch;
+        text-align: center;
+        padding: 0.9rem 1rem;
+        gap: 0.7rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
     }
 
-    .btn-download-expediente {
-        justify-content: center;
+    .expediente-avatar {
+        width: 56px;
+        height: 56px;
     }
 
-    .expediente-medicion-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 0.75rem;
-        padding: 0.75rem 1rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .expediente-hoja {
-        padding: 1.5rem 1rem;
+    .expediente-avatar i {
+        font-size: 1.6rem;
     }
 
-    .expediente-medicion-grid {
+    .expediente-nombre-bloque {
+        align-items: center;
+    }
+
+    .expediente-nombre-bloque h2 {
+        font-size: 1.2rem;
+    }
+
+    .expediente-subetiqueta {
+        font-size: 0.78rem;
+    }
+
+    /* ============================================================
+       GRID
+       ============================================================ */
+    .expediente-grid {
         grid-template-columns: 1fr;
-        gap: 0.5rem;
-        padding: 0.6rem 0.8rem;
+        gap: 0.8rem;
     }
 
-    .expediente-medicion-item strong {
+    .expediente-campo {
+        padding: 0.4rem 0;
+        border-bottom: 1px solid #f5f7fa;
+    }
+
+    .expediente-campo:last-child {
+        border-bottom: none;
+    }
+
+    .expediente-campo span {
+        font-size: 0.6rem;
+    }
+
+    .expediente-campo strong {
         font-size: 0.9rem;
     }
 
+    .expediente-direccion {
+        font-size: 0.85rem;
+    }
+
+    /* ============================================================
+       SECCIONES
+       ============================================================ */
+    .expediente-seccion {
+        margin-bottom: 1.25rem;
+    }
+
+    .expediente-titulo-seccion {
+        font-size: 0.85rem;
+        margin-bottom: 0.8rem;
+        padding-bottom: 0.4rem;
+    }
+
+    .expediente-titulo-seccion i {
+        font-size: 0.9rem;
+    }
+
+    /* ============================================================
+       MEDICIONES
+       ============================================================ */
+    .expediente-medicion-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.6rem 0.8rem;
+        padding: 0.7rem 0.9rem;
+        border-radius: 10px;
+    }
+
     .expediente-medicion-item span {
+        font-size: 0.55rem;
+    }
+
+    .expediente-medicion-item strong {
+        font-size: 1rem;
+    }
+
+    .expediente-sin-medicion {
+        font-size: 0.82rem;
+        padding: 0.6rem 0.8rem;
+    }
+
+    /* ============================================================
+       TABLA
+       ============================================================ */
+    .expediente-tabla {
+        font-size: 0.78rem;
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .expediente-tabla thead th {
+        padding: 0.4rem 0.6rem;
         font-size: 0.6rem;
+    }
+
+    .expediente-tabla tbody td {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.75rem;
+    }
+
+    /* ============================================================
+       PIE DE PÁGINA
+       ============================================================ */
+    .expediente-pie {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 1.25rem;
+        gap: 1.2rem;
+    }
+
+    .expediente-firma {
+        min-width: 180px;
+        width: 100%;
+    }
+
+    .expediente-sello {
+        font-size: 0.7rem;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE - MÓVILES PEQUEÑOS (max-width: 480px)
+   ============================================================ */
+
+@media (max-width: 480px) {
+
+    /* ============================================================
+       HOJA
+       ============================================================ */
+    .expediente-hoja {
+        padding: 1rem 0.8rem 0.8rem;
+        border-radius: 4px;
+    }
+
+    /* ============================================================
+       TOOLBAR
+       ============================================================ */
+    .expediente-toolbar p {
+        font-size: 0.7rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .btn-download-expediente {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.8rem;
+    }
+
+    .btn-download-expediente i {
+        font-size: 0.9rem;
+    }
+
+    /* ============================================================
+       MEMBRETE
+       ============================================================ */
+    .membrete-logo {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+    }
+
+    .membrete-logo i {
+        font-size: 1.1rem;
+    }
+
+    .membrete-texto h1 {
+        font-size: 1rem;
+    }
+
+    .membrete-texto p {
+        font-size: 0.6rem;
+    }
+
+    .membrete-folio small {
+        font-size: 0.55rem;
+    }
+
+    .membrete-folio strong {
+        font-size: 0.85rem;
+    }
+
+    /* ============================================================
+       ENCABEZADO PACIENTE
+       ============================================================ */
+    .expediente-encabezado-paciente {
+        padding: 0.7rem 0.8rem;
+        gap: 0.5rem;
+    }
+
+    .expediente-avatar {
+        width: 48px;
+        height: 48px;
+    }
+
+    .expediente-avatar i {
+        font-size: 1.3rem;
+    }
+
+    .expediente-nombre-bloque h2 {
+        font-size: 1rem;
+    }
+
+    .expediente-subetiqueta {
+        font-size: 0.7rem;
+    }
+
+    .expediente-etiqueta {
+        font-size: 0.55rem;
+    }
+
+    /* ============================================================
+       GRID
+       ============================================================ */
+    .expediente-grid {
+        gap: 0.5rem;
+    }
+
+    .expediente-campo {
+        padding: 0.3rem 0;
+    }
+
+    .expediente-campo strong {
+        font-size: 0.82rem;
+    }
+
+    .expediente-direccion {
+        font-size: 0.78rem;
+    }
+
+    /* ============================================================
+       SECCIONES
+       ============================================================ */
+    .expediente-seccion {
+        margin-bottom: 1rem;
+    }
+
+    .expediente-titulo-seccion {
+        font-size: 0.75rem;
+        gap: 0.4rem;
+    }
+
+    .expediente-titulo-seccion i {
+        font-size: 0.8rem;
+    }
+
+    /* ============================================================
+       MEDICIONES
+       ============================================================ */
+    .expediente-medicion-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.4rem 0.6rem;
+        padding: 0.5rem 0.6rem;
+        border-radius: 8px;
+    }
+
+    .expediente-medicion-item span {
+        font-size: 0.5rem;
+    }
+
+    .expediente-medicion-item strong {
+        font-size: 0.85rem;
+    }
+
+    .expediente-sin-medicion {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.6rem;
+    }
+
+    .expediente-sin-medicion i {
+        font-size: 0.8rem;
+    }
+
+    /* ============================================================
+       TABLA
+       ============================================================ */
+    .expediente-tabla {
+        font-size: 0.7rem;
+    }
+
+    .expediente-tabla thead th {
+        padding: 0.3rem 0.4rem;
+        font-size: 0.55rem;
+    }
+
+    .expediente-tabla tbody td {
+        padding: 0.3rem 0.4rem;
+        font-size: 0.68rem;
+    }
+
+    /* ============================================================
+       PIE DE PÁGINA
+       ============================================================ */
+    .expediente-pie {
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        gap: 0.8rem;
+    }
+
+    .expediente-firma {
+        min-width: 140px;
+    }
+
+    .expediente-firma span {
+        font-size: 0.65rem;
+    }
+
+    .expediente-sello {
+        font-size: 0.65rem;
+    }
+
+    .expediente-sello i {
+        font-size: 0.8rem;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE - ORIENTACIÓN HORIZONTAL EN MÓVILES
+   ============================================================ */
+
+@media (max-width: 768px) and (orientation: landscape) {
+    .expediente-hoja {
+        padding: 1.5rem 2rem;
+    }
+
+    .expediente-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.8rem 1.2rem;
+    }
+
+    .expediente-encabezado-paciente {
+        flex-direction: row;
+        text-align: left;
+        padding: 0.8rem 1rem;
+    }
+
+    .expediente-nombre-bloque {
+        align-items: flex-start;
+    }
+
+    .expediente-medicion-grid {
+        grid-template-columns: repeat(4, 1fr);
+        padding: 0.6rem 0.8rem;
+    }
+
+    .expediente-toolbar {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .expediente-toolbar p {
+        justify-content: flex-start;
+    }
+
+    .btn-download-expediente {
+        width: auto;
+    }
+
+    .expediente-pie {
+        flex-direction: row;
+        text-align: left;
+        align-items: flex-end;
+    }
+
+    .expediente-firma {
+        width: auto;
+    }
+
+    .membrete-folio {
+        text-align: right;
+        width: auto;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE - PANTALLAS GRANDES (min-width: 1400px)
+   ============================================================ */
+
+@media (min-width: 1400px) {
+    .expediente-hoja {
+        max-width: 950px;
+        padding: 4rem 4rem 3.5rem;
+        border-radius: 8px;
+    }
+
+    .expediente-grid {
+        gap: 1.5rem 2rem;
+    }
+
+    .expediente-medicion-grid {
+        padding: 1.25rem 1.5rem;
+        gap: 1.25rem 2rem;
+    }
+
+    .expediente-nombre-bloque h2 {
+        font-size: 1.6rem;
+    }
+
+    .membrete-texto h1 {
+        font-size: 1.7rem;
+    }
+}
+
+/* ============================================================
+   UTILITARIOS RESPONSIVE ADICIONALES
+   ============================================================ */
+
+/* Ocultar en móvil */
+.hide-mobile {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .hide-mobile {
+        display: none !important;
+    }
+}
+
+/* Mostrar solo en móvil */
+.show-mobile {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .show-mobile {
+        display: block !important;
+    }
+
+    .show-mobile-inline {
+        display: inline-block !important;
+    }
+
+    .show-mobile-flex {
+        display: flex !important;
+    }
+}
+
+/* Texto truncado en móvil */
+@media (max-width: 768px) {
+    .text-truncate-mobile {
+        max-width: 120px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .text-truncate-mobile-sm {
+        max-width: 80px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+/* Ajustes de espaciado en móvil */
+@media (max-width: 768px) {
+    .gap-2 {
+        gap: 0.5rem !important;
+    }
+
+    .gap-3 {
+        gap: 0.75rem !important;
+    }
+
+    .gap-4 {
+        gap: 1rem !important;
+    }
+
+    .mb-2 {
+        margin-bottom: 0.5rem !important;
+    }
+
+    .mb-3 {
+        margin-bottom: 0.75rem !important;
+    }
+
+    .mb-4 {
+        margin-bottom: 1rem !important;
+    }
+
+    .p-2 {
+        padding: 0.5rem !important;
+    }
+
+    .p-3 {
+        padding: 0.75rem !important;
+    }
+
+    .p-4 {
+        padding: 1rem !important;
+    }
+
+    .mt-2 {
+        margin-top: 0.5rem !important;
+    }
+
+    .mt-3 {
+        margin-top: 0.75rem !important;
+    }
+
+    .mt-4 {
+        margin-top: 1rem !important;
+    }
+}
+
+/* Eliminar hover en móvil para mejor experiencia táctil */
+@media (max-width: 768px) {
+    .btn-download-expediente:hover {
+        background: linear-gradient(135deg, #0a1628, #1a2938);
+        box-shadow: 0 4px 12px rgba(10, 22, 40, 0.2);
+    }
+
+    .expediente-hoja:hover {
+        box-shadow: 0 20px 60px rgba(10, 22, 40, 0.1), 0 2px 8px rgba(10, 22, 40, 0.06);
     }
 }

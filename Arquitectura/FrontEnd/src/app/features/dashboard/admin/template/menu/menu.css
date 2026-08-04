@@ -10,11 +10,9 @@
     width: 100%;
     z-index: 1050;
     padding-right: 20px;
-    /* Evita que el perfil se pegue a la orilla de la pantalla */
     box-sizing: border-box;
 }
 
-/* El cuadro azul/rojo de HTAS */
 .logo-box {
     width: 250px;
     height: 60px;
@@ -27,27 +25,64 @@
     width: 70px;
 }
 
-.logo-text {
+.logo-box .logo-text {
     color: white;
     font-weight: bold;
     font-size: 1.5rem;
     letter-spacing: 2px;
 }
 
+/* ==========================================================================
+   2. BOTON HAMBURGUESA - SIEMPRE TRES LINEAS VISIBLES (CORREGIDO)
+   ========================================================================== */
 .btn-toggle-menu {
     background: none;
     border: none;
-    font-size: 1.8rem;
-    color: #333;
     margin-left: 15px;
     cursor: pointer;
+    padding: 8px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 30px;
+    height: 24px;
+    position: relative;
+    transition: background-color 0.3s ease;
+    z-index: 1060;
+    flex-shrink: 0;
+    border-radius: 6px;
+}
+
+.btn-toggle-menu .hamburger-line {
+    display: block;
+    width: 100%;
+    height: 3px;
+    background-color: #333;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    transform-origin: center;
+    flex-shrink: 0;
+}
+
+.btn-toggle-menu:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.btn-toggle-menu:hover .hamburger-line {
+    background-color: #b0001e;
 }
 
 /* ==========================================================================
-   2. ICONOS DERECHA Y BUSCADOR
+   3. ICONOS DERECHA Y BUSCADOR
    ========================================================================== */
 .header-right-icons {
     height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .header-right-icons i {
@@ -55,7 +90,6 @@
     cursor: pointer;
 }
 
-/* Contenedor del buscador */
 .search-container {
     display: flex;
     align-items: center;
@@ -66,7 +100,7 @@
     width: 42px;
     height: 42px;
     overflow: hidden;
-    margin-right: 15px;
+    margin-right: 5px;
     border: 1px solid transparent;
     position: relative;
 }
@@ -78,7 +112,7 @@
     box-shadow: 0 4px 12px rgba(176, 0, 30, 0.1);
 }
 
-.search-input {
+.search-container .search-input {
     width: 0;
     padding: 0;
     border: none;
@@ -108,13 +142,12 @@
 }
 
 /* ==========================================================================
-   3. GRUPO DE ACCIONES (NOTIFICACIONES Y PERFIL)
+   4. GRUPO DE ACCIONES
    ========================================================================== */
 .actions-group {
     display: flex;
     align-items: center;
     gap: 8px;
-    /* Controla el espacio exacto y pegado entre la campana y el perfil */
     transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
@@ -136,15 +169,14 @@
     align-items: center;
     justify-content: center;
     width: 40px;
-    /* Ancho fijo para centrar la campana */
     height: 40px;
+    text-decoration: none;
 }
 
 .notif-badge {
     position: absolute;
     top: 0px;
     right: 2px;
-    /* Reajustado para que no baile por los márgenes antiguos */
     background-color: #b0001e;
     color: white;
     font-size: 10px;
@@ -173,7 +205,7 @@
     background-color: #f8f9fa;
 }
 
-.user-img {
+.user-pill .user-img {
     width: 32px;
     height: 32px;
     border-radius: 50%;
@@ -181,7 +213,7 @@
     object-fit: cover;
 }
 
-.user-name-text {
+.user-pill .user-name-text {
     font-weight: 600;
     color: #444;
     font-size: 0.95rem;
@@ -189,7 +221,7 @@
 }
 
 /* ==========================================================================
-   4. MENU LATERAL CON SCROLL INDEPENDIENTE (SIDEBAR-MENU)
+   5. MENU LATERAL
    ========================================================================== */
 .sidebar-menu {
     width: 250px;
@@ -198,10 +230,8 @@
     position: fixed;
     top: 60px;
     left: 0;
-    transition: width 0.3s ease;
-    z-index: 1000;
-
-    /* Modificaciones para habilitar scroll interno */
+    transition: transform 0.3s ease, width 0.3s ease;
+    z-index: 1040;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
@@ -211,10 +241,62 @@
     width: 70px;
 }
 
+/* Estilos para movil - oculto por defecto */
+@media (max-width: 768px) {
+    .sidebar-menu {
+        transform: translateX(-100%);
+        width: 280px;
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .sidebar-menu.mobile-open {
+        transform: translateX(0);
+    }
+
+    .sidebar-menu.collapsed {
+        width: 280px;
+    }
+}
+
+/* ==========================================================================
+   6. OVERLAY PARA MOVIL
+   ========================================================================== */
+.menu-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1039;
+    animation: fadeIn 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .menu-overlay {
+        display: block;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* ==========================================================================
+   7. LISTA DE NAVEGACION
+   ========================================================================== */
 .nav-links-list {
     list-style: none;
     padding: 5px 0;
     margin: 0;
+    flex: 1;
 }
 
 .nav-item-link {
@@ -233,40 +315,12 @@
     min-width: 25px;
 }
 
-/* Estilo cuando el menú está colapsado */
-.sidebar-menu.collapsed .nav-item-link {
-    justify-content: center;
-    padding: 12px 0;
-}
-
-.sidebar-menu.collapsed i {
-    margin: 0;
-}
-
-/* Títulos de las categorías */
-.nav-section-title {
-    padding: 12px 18px 4px;
-    font-size: 0.65rem;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.5);
-    letter-spacing: 0.5px;
-    font-weight: 700;
-}
-
-/* Divisor horizontal para el estado colapsado */
-.sidebar-divider {
-    border: 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    margin: 5px 15px;
-}
-
-/* Estados interactivos (Hover y Active) */
 .nav-item-link:hover {
     background-color: rgba(255, 255, 255, 0.08);
     color: #fff;
 }
 
-.active-item {
+.nav-item-link.active-item {
     background-color: rgba(255, 255, 255, 0.2);
     border-left: 4px solid #fff;
     font-weight: 500;
@@ -276,8 +330,213 @@
     margin-left: 10px;
 }
 
+.nav-section-title {
+    padding: 12px 18px 4px;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 0.5px;
+    font-weight: 700;
+}
+
+.sidebar-divider {
+    border: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 5px 15px;
+}
+
 /* ==========================================================================
-   5. DISEÑO ESTÉTICO DE LA BARRA DE SCROLL DE LA SIDEBAR
+   8. ESTILOS PARA MOVIL - COLORES UNIFICADOS
+   ========================================================================== */
+@media (max-width: 768px) {
+    .navbar-top {
+        background-color: #b0001e;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-right: 10px;
+    }
+
+    .logo-box {
+        width: auto;
+        height: 60px;
+        background-color: transparent;
+        padding: 0 15px;
+    }
+
+    .logo-box .logo-text {
+        color: white;
+        font-size: 1.2rem;
+        letter-spacing: 2px;
+    }
+
+    /* Boton hamburguesa: fondo visible para que se note que es tapeable */
+    .btn-toggle-menu {
+        margin-left: 10px;
+        background-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-toggle-menu .hamburger-line {
+        background-color: white;
+    }
+
+    .btn-toggle-menu:hover {
+        background-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .btn-toggle-menu:hover .hamburger-line {
+        background-color: white;
+    }
+
+    .header-right-icons i {
+        color: white;
+    }
+
+    .header-right-icons .icon-gray {
+        color: white;
+    }
+
+    /* BUSCADOR EN MOVIL - ya NO usa position:absolute para no tapar otros iconos */
+    .search-container {
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        width: 36px;
+        height: 36px;
+        padding: 4px 8px;
+        position: relative;
+        z-index: 1060;
+        flex-shrink: 0;
+    }
+
+    .search-container.active {
+        width: 190px;
+        background: white;
+        border: 1px solid white;
+        z-index: 1061;
+    }
+
+    .search-container.active .search-input {
+        color: #333;
+        font-size: 0.9rem;
+    }
+
+    .search-container.active .search-input::placeholder {
+        color: #999;
+    }
+
+    .search-container.active .bi-search {
+        color: #b0001e;
+    }
+
+    .search-container .search-input {
+        color: white;
+        font-size: 0.9rem;
+    }
+
+    .search-container .search-input::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .search-container .bi-search {
+        color: white;
+        font-size: 1.1rem;
+    }
+
+    .user-name-text {
+        display: none;
+    }
+
+    .user-pill {
+        padding: 4px;
+    }
+
+    .user-pill .user-img {
+        width: 28px;
+        height: 28px;
+        margin-right: 0;
+        border: 2px solid white;
+    }
+
+    .actions-group {
+        gap: 4px;
+    }
+
+    /* Ahora SI se oculta el grupo de acciones cuando el buscador esta activo,
+       para que no se tapen entre si */
+    .actions-group.fade-out {
+        display: none;
+    }
+
+    .notif-wrapper {
+        width: 36px;
+        height: 36px;
+    }
+
+    .notif-badge {
+        border-color: #b0001e;
+    }
+
+    .sidebar-menu {
+        width: 280px !important;
+        transform: translateX(-100%);
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+        background-color: #b0001e;
+    }
+
+    .sidebar-menu.mobile-open {
+        transform: translateX(0);
+    }
+
+    .sidebar-menu .nav-item-link {
+        padding: 12px 20px;
+        font-size: 0.95rem;
+    }
+
+    .sidebar-menu .nav-item-link i {
+        font-size: 1.3rem;
+        min-width: 30px;
+    }
+
+    .sidebar-menu .nav-label {
+        margin-left: 15px;
+    }
+
+    .sidebar-menu .nav-section-title {
+        padding: 15px 20px 5px;
+        font-size: 0.7rem;
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .sidebar-menu.collapsed {
+        width: 280px !important;
+    }
+}
+
+/* ==========================================================================
+   9. RESPONSIVE PARA TABLETS
+   ========================================================================== */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .logo-box {
+        width: 200px;
+    }
+
+    .logo-box.collapsed {
+        width: 70px;
+    }
+
+    .search-container.active {
+        width: 200px;
+    }
+
+    .sidebar-menu {
+        width: 200px;
+    }
+
+    .sidebar-menu.collapsed {
+        width: 70px;
+    }
+}
+
+/* ==========================================================================
+   10. SCROLLBAR ESTILOS
    ========================================================================== */
 .sidebar-menu::-webkit-scrollbar {
     width: 6px;
@@ -294,4 +553,113 @@
 
 .sidebar-menu::-webkit-scrollbar-thumb:hover {
     background-color: rgba(255, 255, 255, 0.4);
+}
+
+/* ==========================================================================
+   11. AJUSTES PARA PANTALLAS MUY PEQUEÑAS
+   ========================================================================== */
+@media (max-width: 480px) {
+    .navbar-top {
+        height: 55px;
+        padding-right: 8px;
+        background-color: #b0001e;
+    }
+
+    .logo-box {
+        height: 55px;
+        padding: 0 10px;
+    }
+
+    .logo-box .logo-text {
+        font-size: 1rem;
+    }
+
+    .btn-toggle-menu {
+        width: 24px;
+        height: 20px;
+        margin-left: 8px;
+        gap: 4px;
+    }
+
+    .btn-toggle-menu .hamburger-line {
+        height: 2px;
+        background-color: white;
+    }
+
+    .search-container {
+        width: 32px;
+        height: 32px;
+        padding: 3px 6px;
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .search-container.active {
+        width: 150px;
+        background: white;
+        padding: 3px 8px;
+    }
+
+    .search-container .search-input {
+        font-size: 0.8rem;
+        color: white;
+    }
+
+    .search-container.active .search-input {
+        color: #333;
+        font-size: 0.8rem;
+    }
+
+    .search-container .bi-search {
+        font-size: 0.9rem;
+        color: white;
+    }
+
+    .search-container.active .bi-search {
+        color: #b0001e;
+    }
+
+    .notif-wrapper {
+        width: 32px;
+        height: 32px;
+    }
+
+    .notif-badge {
+        font-size: 8px;
+        min-width: 14px;
+        height: 14px;
+        padding: 2px 3px;
+        top: -2px;
+        right: 0px;
+    }
+
+    .icon-gray {
+        font-size: 1rem;
+        color: white;
+    }
+
+    .user-pill .user-img {
+        width: 24px;
+        height: 24px;
+        border: 2px solid white;
+    }
+
+    .sidebar-menu {
+        width: 260px !important;
+        top: 55px;
+        height: calc(100vh - 55px);
+    }
+
+    .sidebar-menu .nav-item-link {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+    }
+
+    .sidebar-menu .nav-item-link i {
+        font-size: 1.1rem;
+        min-width: 25px;
+    }
+
+    .sidebar-menu .nav-label {
+        margin-left: 12px;
+    }
 }

@@ -67,67 +67,70 @@
         </div>
 
         <div class="table-card">
-            <table class="custom-table">
-                <thead>
-                    <tr>
-                        <th>Nombre del Dispositivo</th>
-                        <th>Dirección MAC</th>
-                        <th>Paciente Asociado</th>
-                        <th>Estado</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @for (d of dispositivosPaginados; track d.iddispositivo) {
-                    <tr class="user-row" (click)="seleccionarDispositivo(d)"
-                        [class.selected]="dispositivoSeleccionado?.iddispositivo === d.iddispositivo">
-                        <td>
-                            <div class="name-cell-premium">
-                                <div class="avatar-icon-circle">
-                                    <i class="bi bi-cpu-fill"></i>
+            <!-- AGREGADO: Wrapper para scroll horizontal -->
+            <div class="table-responsive-wrapper">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre del Dispositivo</th>
+                            <th>Dirección MAC</th>
+                            <th>Paciente Asociado</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (d of dispositivosPaginados; track d.iddispositivo) {
+                        <tr class="user-row" (click)="seleccionarDispositivo(d)"
+                            [class.selected]="dispositivoSeleccionado?.iddispositivo === d.iddispositivo">
+                            <td>
+                                <div class="name-cell-premium">
+                                    <div class="avatar-icon-circle">
+                                        <i class="bi bi-cpu-fill"></i>
+                                    </div>
+                                    <div class="user-info-stack">
+                                        <span class="user-name-main">{{ d.nombre }}</span>
+                                        <small class="text-muted">ID: #{{ d.iddispositivo }}</small>
+                                    </div>
                                 </div>
-                                <div class="user-info-stack">
-                                    <span class="user-name-main">{{ d.nombre }}</span>
-                                    <small class="text-muted">ID: #{{ d.iddispositivo }}</small>
+                            </td>
+                            <td>
+                                <div class="date-cell mono-text">
+                                    <i class="bi bi-hdd-network me-2 text-muted"></i>
+                                    {{ d.direccionmac }}
                                 </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="date-cell mono-text">
-                                <i class="bi bi-hdd-network me-2 text-muted"></i>
-                                {{ d.direccionmac }}
-                            </div>
-                        </td>
-                        <td>
-                            <div class="date-cell">
-                                @if (d.nombrepaciente) {
-                                <i class="bi bi-person-fill me-2 text-primary"></i>
-                                {{ getNombreCompletoPaciente(d) }}
-                                } @else {
-                                <i class="bi bi-person-dash me-2 text-muted"></i>
-                                <span class="text-muted">Sin vincular</span>
-                                }
-                            </div>
-                        </td>
-                        <td>
-                            <div class="status-pill-container">
-                                <span class="status-chip" [class.active-chip]="d.activo"
-                                    [class.danger-chip]="!d.activo">
-                                    {{ d.activo ? 'Activo' : 'Inactivo' }}
-                                </span>
-                            </div>
-                        </td>
-                    </tr>
-                    }
-                    @if (dispositivosPaginados.length === 0) {
-                    <tr>
-                        <td colspan="4" class="empty-state">
-                            <i class="bi bi-router"></i>
-                            <p>No se encontraron dispositivos registrados.</p>
-                        </td>
-                    </tr>
-                    }
-                </tbody>
-            </table>
+                            </td>
+                            <td>
+                                <div class="date-cell">
+                                    @if (d.nombrepaciente) {
+                                    <i class="bi bi-person-fill me-2 text-primary"></i>
+                                    {{ getNombreCompletoPaciente(d) }}
+                                    } @else {
+                                    <i class="bi bi-person-dash me-2 text-muted"></i>
+                                    <span class="text-muted">Sin vincular</span>
+                                    }
+                                </div>
+                            </td>
+                            <td>
+                                <div class="status-pill-container">
+                                    <span class="status-chip" [class.active-chip]="d.activo"
+                                        [class.danger-chip]="!d.activo">
+                                        {{ d.activo ? 'Activo' : 'Inactivo' }}
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
+                        }
+                        @if (dispositivosPaginados.length === 0) {
+                        <tr>
+                            <td colspan="4" class="empty-state">
+                                <i class="bi bi-router"></i>
+                                <p>No se encontraron dispositivos registrados.</p>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
 
             <div class="pagination-bar">
                 <span>Mostrando {{ dispositivosPaginados.length }} de {{ dispositivosFiltrados.length }}

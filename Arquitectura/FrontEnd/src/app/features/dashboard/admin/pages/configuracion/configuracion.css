@@ -1,3 +1,11 @@
+/* ==========================================================================
+   CONFIGURACIÓN - ESTILOS COMPLETOS Y RESPONSIVOS
+   ========================================================================== */
+
+/* ============================================================
+   CONTENEDOR PRINCIPAL
+   ============================================================ */
+
 .main-container {
     margin-left: 250px;
     padding-top: 60px;
@@ -9,6 +17,10 @@
 .main-container.menu-collapsed {
     margin-left: 80px;
 }
+
+/* ============================================================
+   CONTENIDO CONFIGURACIÓN
+   ============================================================ */
 
 .config-content {
     padding: 40px;
@@ -34,7 +46,10 @@
     background: #ffffff;
 }
 
-/* Inputs Corporativos de HTAS */
+/* ============================================================
+   INPUTS CORPORATIVOS DE HTAS
+   ============================================================ */
+
 .htas-input {
     border-radius: 8px;
     border: 1px solid #cbd5e1;
@@ -42,6 +57,7 @@
     font-size: 0.9rem;
     color: #334155;
     transition: all 0.2s ease;
+    width: 100%;
 }
 
 .htas-input:focus {
@@ -50,7 +66,10 @@
     outline: none;
 }
 
-/* Botón de envío */
+/* ============================================================
+   BOTÓN DE ENVÍO
+   ============================================================ */
+
 .btn-htas-submit {
     background-color: #b0001e;
     color: white;
@@ -58,25 +77,36 @@
     border-radius: 8px;
     font-size: 0.9rem;
     transition: background-color 0.2s ease;
+    padding: 10px 24px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .btn-htas-submit:hover:not(:disabled) {
     background-color: #8c0018;
     color: white;
+    transform: translateY(-1px);
 }
 
 .btn-htas-submit:disabled {
     background-color: #e2e8f0;
     color: #94a3b8;
     cursor: not-allowed;
+    transform: none !important;
 }
 
-/* Estilos de la tarjeta de perfil lateral */
+/* ============================================================
+   PERFIL PREVIEW
+   ============================================================ */
+
 .profile-preview {
     width: 110px;
     height: 110px;
     object-fit: cover;
     border: 4px solid #fff;
+    border-radius: 50%;
 }
 
 .extra-small {
@@ -84,7 +114,7 @@
 }
 
 /* ============================================================
-   BADGES DE ROLES - MISMOS COLORES QUE GRÁFICA Y TARJETAS
+   BADGES DE ROLES
    ============================================================ */
 
 .badge-rol {
@@ -96,28 +126,27 @@
     letter-spacing: 0.5px;
 }
 
-/* Paciente - Morado (#6d28d9) */
 .badge-rol.paciente {
     background-color: #ede9fe;
     color: #6d28d9;
 }
 
-/* Médico / Doctor - Azul (#0369a1) */
 .badge-rol.medico,
 .badge-rol.doctor {
     background-color: #e0f2fe;
     color: #0369a1;
 }
 
-/* Acompañante - Verde (#15803d) */
-/* Incluye ambas variantes (con y sin tilde) */
 .badge-rol.acompanante,
 .badge-rol.acompañante {
     background-color: #dcfce7;
     color: #15803d;
 }
 
-/* SISTEMA TOAST FLOTANTE */
+/* ============================================================
+   TOAST FLOTANTE
+   ============================================================ */
+
 .htas-toast-container {
     position: fixed;
     bottom: 24px;
@@ -128,6 +157,10 @@
     color: white;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    max-width: 420px;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
 }
 
 .htas-toast-container.success {
@@ -143,6 +176,10 @@
     color: #1e293b;
 }
 
+.htas-toast-container i {
+    font-size: 1.3rem;
+}
+
 @keyframes slideIn {
     from {
         transform: translateY(100px);
@@ -155,14 +192,429 @@
     }
 }
 
-@media (max-width: 768px) {
+/* ============================================================
+   RESPONSIVIDAD - TABLETS (max-width: 1024px)
+   ============================================================ */
+
+@media (max-width: 1024px) {
     .main-container {
+        margin-left: 70px;
+        padding-top: 60px;
+    }
+
+    .main-container.menu-collapsed {
         margin-left: 0;
-        padding: 15px;
-        padding-top: 80px;
     }
 
     .config-content {
-        padding: 0;
+        padding: 30px 25px;
+    }
+
+    .panel-title {
+        font-size: 1.05rem;
+    }
+
+    .profile-preview {
+        width: 90px;
+        height: 90px;
+    }
+}
+
+/* ============================================================
+   RESPONSIVIDAD - MÓVILES (max-width: 768px)
+   ============================================================ */
+
+@media (max-width: 768px) {
+    .main-container {
+        margin-left: 0;
+        padding-top: 80px;
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .main-container.menu-collapsed {
+        margin-left: 0;
+    }
+
+    .config-content {
+        padding: 15px 12px 20px;
+    }
+
+    /* ============================================================
+       TÍTULOS
+       ============================================================ */
+    .panel-title {
+        font-size: 0.95rem;
+    }
+
+    .text-slate {
+        font-size: 0.9rem;
+    }
+
+    /* ============================================================
+       TARJETAS
+       ============================================================ */
+    .rounded-card {
+        border-radius: 12px;
+        padding: 0.75rem !important;
+    }
+
+    /* ============================================================
+       PERFIL
+       ============================================================ */
+    .profile-preview {
+        width: 72px;
+        height: 72px;
+        border-width: 3px;
+    }
+
+    .extra-small {
+        font-size: 0.65rem;
+    }
+
+    /* ============================================================
+       BADGES
+       ============================================================ */
+    .badge-rol {
+        font-size: 0.65rem;
+        padding: 4px 12px;
+    }
+
+    /* ============================================================
+       INPUTS
+       ============================================================ */
+    .htas-input {
+        font-size: 0.85rem;
+        padding: 8px 12px;
+        border-radius: 6px;
+    }
+
+    /* ============================================================
+       BOTONES
+       ============================================================ */
+    .btn-htas-submit {
+        font-size: 0.85rem;
+        padding: 8px 18px;
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* ============================================================
+       TOAST
+       ============================================================ */
+    .htas-toast-container {
+        bottom: 16px;
+        right: 16px;
+        left: 16px;
+        max-width: none;
+        border-radius: 10px;
+        padding: 12px 18px;
+        font-size: 0.85rem;
+    }
+
+    .htas-toast-container i {
+        font-size: 1.1rem;
+    }
+
+    /* ============================================================
+       GRID DE TARJETAS
+       ============================================================ */
+    .row.g-4 {
+        --bs-gutter-y: 0.75rem;
+        --bs-gutter-x: 0.75rem;
+    }
+
+    .row.g-4>* {
+        padding: 0 0.375rem;
+    }
+
+    /* ============================================================
+       CAMPOS DE FORMULARIO EN COLUMNA
+       ============================================================ */
+    .d-flex.flex-wrap {
+        flex-direction: column !important;
+        gap: 0.75rem !important;
+    }
+
+    .d-flex.flex-wrap .ms-auto {
+        margin-left: 0 !important;
+        width: 100%;
+    }
+}
+
+/* ============================================================
+   RESPONSIVIDAD - MÓVILES PEQUEÑOS (max-width: 480px)
+   ============================================================ */
+
+@media (max-width: 480px) {
+    .config-content {
+        padding: 10px 8px 15px;
+    }
+
+    .panel-title {
+        font-size: 0.85rem;
+    }
+
+    .text-slate {
+        font-size: 0.8rem;
+    }
+
+    .rounded-card {
+        padding: 0.5rem !important;
+        border-radius: 10px;
+    }
+
+    .profile-preview {
+        width: 60px;
+        height: 60px;
+        border-width: 2px;
+    }
+
+    .badge-rol {
+        font-size: 0.55rem;
+        padding: 3px 10px;
+    }
+
+    .htas-input {
+        font-size: 0.8rem;
+        padding: 6px 10px;
+    }
+
+    .btn-htas-submit {
+        font-size: 0.8rem;
+        padding: 6px 14px;
+    }
+
+    .extra-small {
+        font-size: 0.55rem;
+    }
+
+    .htas-toast-container {
+        padding: 10px 14px;
+        font-size: 0.8rem;
+        bottom: 12px;
+        right: 12px;
+        left: 12px;
+        border-radius: 8px;
+    }
+
+    .htas-toast-container i {
+        font-size: 1rem;
+    }
+
+    .row.g-4 {
+        --bs-gutter-y: 0.5rem;
+        --bs-gutter-x: 0.5rem;
+    }
+
+    .row.g-4>* {
+        flex: 0 0 100%;
+        max-width: 100%;
+        padding: 0 0.25rem;
+    }
+}
+
+/* ============================================================
+   RESPONSIVIDAD - ORIENTACIÓN HORIZONTAL EN MÓVILES
+   ============================================================ */
+
+@media (max-width: 768px) and (orientation: landscape) {
+    .main-container {
+        padding-top: 70px;
+    }
+
+    .config-content {
+        padding: 20px 20px 15px;
+    }
+
+    .profile-preview {
+        width: 80px;
+        height: 80px;
+    }
+
+    .row.g-4>* {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+
+    .d-flex.flex-wrap {
+        flex-direction: row !important;
+        align-items: center;
+    }
+
+    .d-flex.flex-wrap .ms-auto {
+        margin-left: auto !important;
+        width: auto;
+    }
+
+    .btn-htas-submit {
+        width: auto;
+        padding: 8px 20px;
+    }
+
+    .htas-toast-container {
+        bottom: 16px;
+        right: 20px;
+        left: auto;
+        max-width: 380px;
+        padding: 10px 16px;
+    }
+}
+
+/* ============================================================
+   RESPONSIVIDAD - PANTALLAS GRANDES (min-width: 1400px)
+   ============================================================ */
+
+@media (min-width: 1400px) {
+    .main-container {
+        padding-top: 70px;
+    }
+
+    .config-content {
+        padding: 50px 60px;
+    }
+
+    .panel-title {
+        font-size: 1.3rem;
+    }
+
+    .rounded-card {
+        border-radius: 20px;
+        padding: 2rem !important;
+    }
+
+    .profile-preview {
+        width: 130px;
+        height: 130px;
+        border-width: 5px;
+    }
+
+    .htas-input {
+        font-size: 1rem;
+        padding: 12px 16px;
+    }
+
+    .btn-htas-submit {
+        font-size: 1rem;
+        padding: 12px 30px;
+    }
+
+    .badge-rol {
+        font-size: 0.85rem;
+        padding: 8px 20px;
+    }
+}
+
+/* ============================================================
+   UTILITARIOS RESPONSIVE ADICIONALES
+   ============================================================ */
+
+/* Ocultar en móvil */
+.hide-mobile {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .hide-mobile {
+        display: none !important;
+    }
+}
+
+/* Mostrar solo en móvil */
+.show-mobile {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .show-mobile {
+        display: block !important;
+    }
+
+    .show-mobile-inline {
+        display: inline-block !important;
+    }
+
+    .show-mobile-flex {
+        display: flex !important;
+    }
+}
+
+/* Texto truncado en móvil */
+@media (max-width: 768px) {
+    .text-truncate-mobile {
+        max-width: 120px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .text-truncate-mobile-sm {
+        max-width: 80px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+/* Ajustes de espaciado en móvil */
+@media (max-width: 768px) {
+    .gap-2 {
+        gap: 0.5rem !important;
+    }
+
+    .gap-3 {
+        gap: 0.75rem !important;
+    }
+
+    .gap-4 {
+        gap: 1rem !important;
+    }
+
+    .mb-2 {
+        margin-bottom: 0.5rem !important;
+    }
+
+    .mb-3 {
+        margin-bottom: 0.75rem !important;
+    }
+
+    .mb-4 {
+        margin-bottom: 1rem !important;
+    }
+
+    .p-2 {
+        padding: 0.5rem !important;
+    }
+
+    .p-3 {
+        padding: 0.75rem !important;
+    }
+
+    .p-4 {
+        padding: 1rem !important;
+    }
+
+    .mt-2 {
+        margin-top: 0.5rem !important;
+    }
+
+    .mt-3 {
+        margin-top: 0.75rem !important;
+    }
+
+    .mt-4 {
+        margin-top: 1rem !important;
+    }
+}
+
+/* Eliminar hover en móvil para mejor experiencia táctil */
+@media (max-width: 768px) {
+    .btn-htas-submit:hover:not(:disabled) {
+        background-color: #b0001e;
+        transform: none;
+    }
+
+    .rounded-card:hover {
+        box-shadow: none;
     }
 }

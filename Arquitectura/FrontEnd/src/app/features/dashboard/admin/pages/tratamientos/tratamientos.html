@@ -55,72 +55,75 @@
         </div>
 
         <div class="table-card">
-            <table class="custom-table">
-                <thead>
-                    <tr>
-                        <th>Paciente</th>
-                        <th>Medicamento</th>
-                        <th>Dosis / Frecuencia</th>
-                        <th>Periodo del Tratamiento</th>
-                        <th>Estado</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @for (t of tratamientosPaginados; track t.idtratamiento ?? t.id) {
-                    <tr class="user-row" (click)="seleccionarTratamiento(t)"
-                        [class.selected]="tratamientoSeleccionado?.idtratamiento === t.idtratamiento">
-                        <td>
-                            <div class="name-cell-premium">
-                                <div class="avatar-icon-circle">
-                                    <i class="bi bi-heart-pulse-fill"></i>
+            <!-- AGREGADO: Wrapper para scroll horizontal -->
+            <div class="table-responsive-wrapper">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Paciente</th>
+                            <th>Medicamento</th>
+                            <th>Dosis / Frecuencia</th>
+                            <th>Periodo del Tratamiento</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (t of tratamientosPaginados; track t.idtratamiento ?? t.id) {
+                        <tr class="user-row" (click)="seleccionarTratamiento(t)"
+                            [class.selected]="tratamientoSeleccionado?.idtratamiento === t.idtratamiento">
+                            <td>
+                                <div class="name-cell-premium">
+                                    <div class="avatar-icon-circle">
+                                        <i class="bi bi-heart-pulse-fill"></i>
+                                    </div>
+                                    <div class="user-info-stack">
+                                        <span class="user-name-main">
+                                            {{ t.nombre_paciente || t.nombrepaciente || 'Paciente #' + t.idpaciente }}
+                                            {{ t.appaternopaciente || '' }} {{ t.apmaternopaciente || '' }}
+                                        </span>
+                                    </div>
                                 </div>
-                                <div class="user-info-stack">
-                                    <span class="user-name-main">
-                                        {{ t.nombre_paciente || t.nombrepaciente || 'Paciente #' + t.idpaciente }}
-                                        {{ t.appaternopaciente || '' }} {{ t.apmaternopaciente || '' }}
+                            </td>
+                            <td>
+                                <div class="text-cell-truncate">
+                                    <strong>{{ t.nombre_medicamento || t.nombremedicamento || 'Medicamento #' +
+                                        t.idmedicamento }}</strong>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="text-cell-truncate">
+                                    {{ t.dosis }} / cada {{ t.frecuenciahoras || t.frecuenciaHoras }} hrs
+                                </div>
+                            </td>
+                            <td>
+                                <div class="date-cell">
+                                    <i class="bi bi-calendar-range me-2 text-muted"></i>
+                                    {{ (t.fechainicio || t.fechaInicio) | date:'dd/MM/yyyy' }} - {{ (t.fechafin ||
+                                    t.fechaFin) | date:'dd/MM/yyyy' }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="status-pill-container">
+                                    <span class="status-chip"
+                                        [class.active-chip]="t.activo === true || t.activo === 'true' || t.estado === 'Activo'"
+                                        [class.danger-chip]="t.activo === false || t.activo === 'false' || t.estado === 'Inactivo'">
+                                        {{ (t.activo === true || t.activo === 'true') ? 'Activo' : 'Inactivo' }}
                                     </span>
                                 </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="text-cell-truncate">
-                                <strong>{{ t.nombre_medicamento || t.nombremedicamento || 'Medicamento #' +
-                                    t.idmedicamento }}</strong>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="text-cell-truncate">
-                                {{ t.dosis }} / cada {{ t.frecuenciahoras || t.frecuenciaHoras }} hrs
-                            </div>
-                        </td>
-                        <td>
-                            <div class="date-cell">
-                                <i class="bi bi-calendar-range me-2 text-muted"></i>
-                                {{ (t.fechainicio || t.fechaInicio) | date:'dd/MM/yyyy' }} - {{ (t.fechafin ||
-                                t.fechaFin) | date:'dd/MM/yyyy' }}
-                            </div>
-                        </td>
-                        <td>
-                            <div class="status-pill-container">
-                                <span class="status-chip"
-                                    [class.active-chip]="t.activo === true || t.activo === 'true' || t.estado === 'Activo'"
-                                    [class.danger-chip]="t.activo === false || t.activo === 'false' || t.estado === 'Inactivo'">
-                                    {{ (t.activo === true || t.activo === 'true') ? 'Activo' : 'Inactivo' }}
-                                </span>
-                            </div>
-                        </td>
-                    </tr>
-                    }
-                    @if (tratamientosPaginados.length === 0) {
-                    <tr>
-                        <td colspan="5" class="empty-state">
-                            <i class="bi bi-clipboard-pulse"></i>
-                            <p>No se encontraron tratamientos registrados.</p>
-                        </td>
-                    </tr>
-                    }
-                </tbody>
-            </table>
+                            </td>
+                        </tr>
+                        }
+                        @if (tratamientosPaginados.length === 0) {
+                        <tr>
+                            <td colspan="5" class="empty-state">
+                                <i class="bi bi-clipboard-pulse"></i>
+                                <p>No se encontraron tratamientos registrados.</p>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
 
             <div class="pagination-bar">
                 <span>Mostrando {{ tratamientosPaginados.length }} de {{ tratamientosFiltrados.length }}

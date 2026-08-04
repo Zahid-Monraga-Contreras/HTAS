@@ -5,8 +5,10 @@
                 <span class="logo-text">HTAS</span>
             </div>
 
-            <button class="btn-toggle-menu" (click)="toggleSidebar()">
-                <i class="bi bi-list"></i>
+            <button class="btn-toggle-menu" (click)="toggleSidebar()" [class.active]="mobileMenuOpen">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
             </button>
         </div>
 
@@ -20,6 +22,7 @@
             <div class="actions-group d-flex align-items-center">
                 <a routerLink="/admin/notificaciones" class="notif-wrapper">
                     <i class="bi bi-bell icon-gray"></i>
+                    <span class="notif-badge" *ngIf="notificacionesNoLeidas > 0">{{ notificacionesNoLeidas }}</span>
                 </a>
 
                 <ng-container *ngIf="userName !== 'Invitado'; else noUser">
@@ -41,11 +44,10 @@
         </div>
     </nav>
 
-    <aside class="sidebar-menu" [class.collapsed]="isCollapsed">
+    <aside class="sidebar-menu" [class.collapsed]="isCollapsed" [class.mobile-open]="mobileMenuOpen">
         <ul class="nav-links-list">
-
             @for (section of menuFiltrado; track section.category) {
-            @if (!isCollapsed) {
+            @if (!isCollapsed || mobileMenuOpen) {
             <li class="nav-section-title">{{ section.category }}</li>
             } @else {
             <hr class="sidebar-divider">
@@ -54,9 +56,9 @@
             @for (item of section.items; track item.label) {
             <li>
                 <a [routerLink]="item.route" [queryParams]="item.queryParams" [class.active-item]="isActive(item.route)"
-                    class="nav-item-link">
+                    class="nav-item-link" (click)="closeMobileMenu()">
                     <i class="bi {{item.icon}}"></i>
-                    @if (!isCollapsed) {
+                    @if (!isCollapsed || mobileMenuOpen) {
                     <span class="nav-label">{{item.label}}</span>
                     }
                 </a>
@@ -66,16 +68,17 @@
 
             <hr class="sidebar-divider">
             <li>
-                <button (click)="logout()"
+                <button (click)="logout(); closeMobileMenu()"
                     class="nav-item-link w-100 text-start bg-transparent border-0 d-flex align-items-center"
                     style="cursor: pointer;">
                     <i class="bi bi-box-arrow-right"></i>
-                    @if (!isCollapsed) {
+                    @if (!isCollapsed || mobileMenuOpen) {
                     <span class="nav-label">Cerrar Sesión</span>
                     }
                 </button>
             </li>
-
         </ul>
     </aside>
+
+    <div class="menu-overlay" *ngIf="mobileMenuOpen" (click)="closeMobileMenu()"></div>
 </div>

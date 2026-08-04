@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { Subscription, Observable, combineLatest, of } from 'rxjs';
@@ -23,8 +23,10 @@ export class Menu implements OnInit, OnDestroy {
   private routerSub?: Subscription;
 
   isCollapsed = false;
+  mobileMenuOpen = false;
   showSearch = false;
   currentRoute: string = '';
+  notificacionesNoLeidas = 0;
 
   public user$: Observable<any> = this.googleService.user$;
   userName: string = 'Usuario';
@@ -45,7 +47,7 @@ export class Menu implements OnInit, OnDestroy {
       ]
     },
     {
-      category: 'Administración',
+      category: 'Administracion',
       items: [
         {
           route: '/admin/usuarios',
@@ -119,7 +121,7 @@ export class Menu implements OnInit, OnDestroy {
         {
           route: '/admin/configuracion',
           icon: 'bi-gear',
-          label: 'Configuración',
+          label: 'Configuracion',
           queryParams: { canAdd: false, canEdit: true, canDelete: false }
         }
       ]
@@ -127,6 +129,22 @@ export class Menu implements OnInit, OnDestroy {
   ];
 
   menuFiltrado: any[] = [];
+
+  constructor() {
+    this.checkMobileView();
+  }
+
+  @HostListener('window:resize')
+  onResize() {
+    this.checkMobileView();
+  }
+
+  checkMobileView() {
+    const isMobile = window.innerWidth <= 768;
+    if (!isMobile) {
+      this.mobileMenuOpen = false;
+    }
+  }
 
   ngOnInit() {
     const uService = this.usersService as any;
@@ -190,10 +208,7 @@ export class Menu implements OnInit, OnDestroy {
     const rol = this.userRol.toLowerCase();
 
     this.menuFiltrado = mapeoOriginal.filter((section: any) => {
-
-      // ADMIN - todos los permisos
       if (rol === 'admin' || rol === 'administrador') {
-        // Mantener todos los permisos por defecto
         if (section.category === 'Cuenta') {
           section.items.forEach((item: any) => {
             item.queryParams = { canAdd: false, canEdit: true, canDelete: false };
@@ -209,8 +224,6 @@ export class Menu implements OnInit, OnDestroy {
         return true;
       }
 
-      // OTROS ROLES - solo ven lo que les corresponde
-      // Si no es admin, solo mostrar general y cuenta
       if (section.category === 'General' || section.category === 'Cuenta') {
         return true;
       }
@@ -243,7 +256,18 @@ export class Menu implements OnInit, OnDestroy {
   }
 
   toggleSidebar() {
-    this.isCollapsed = !this.isCollapsed;
+    const isMobile = window.innerWidth <= 768;
+    if (isMobile) {
+      this.mobileMenuOpen = !this.mobileMenuOpen;
+    } else {
+      this.isCollapsed = !this.isCollapsed;
+    }
+  }
+
+  closeMobileMenu() {
+    if (this.mobileMenuOpen) {
+      this.mobileMenuOpen = false;
+    }
   }
 
   toggleSearch() {

@@ -1,8 +1,11 @@
 /* ==========================================================================
-   ESTILOS DE LA PESTAÑA DE INFORMACIÓN DEL ACOMPAÑANTE
+   ESTILOS DE LA PESTAÑA DE INFORMACIÓN DEL ACOMPAÑANTE - VERSIÓN COMPLETA Y RESPONSIVA
    ========================================================================== */
 
-/* HEADER SECTION */
+/* ============================================================
+   HEADER SECTION
+   ============================================================ */
+
 .header-section {
     margin-bottom: 1.75rem;
     display: flex;
@@ -11,6 +14,7 @@
     gap: 30px;
     padding-bottom: 1.25rem;
     border-bottom: 2px solid #e9edf2;
+    flex-wrap: wrap;
 }
 
 .title-group {
@@ -42,7 +46,10 @@
     flex-wrap: wrap;
 }
 
-/* ESTADO DEL ACOMPAÑANTE */
+/* ============================================================
+   ESTADO DEL ACOMPAÑANTE
+   ============================================================ */
+
 .estado-acompanante {
     display: inline-flex;
     align-items: center;
@@ -85,7 +92,10 @@
     border: 1px solid #dee2e6;
 }
 
-/* RESUMEN DEL ACOMPAÑANTE */
+/* ============================================================
+   RESUMEN DEL ACOMPAÑANTE
+   ============================================================ */
+
 .resumen-acompanante {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
@@ -122,12 +132,14 @@
     min-width: 36px;
     text-align: center;
     opacity: 0.85;
+    flex-shrink: 0;
 }
 
 .resumen-item div {
     display: flex;
     flex-direction: column;
     gap: 0.1rem;
+    min-width: 0;
 }
 
 .resumen-item small {
@@ -145,7 +157,10 @@
     word-break: break-word;
 }
 
-/* DETALLE CARD Y FORMULARIO */
+/* ============================================================
+   DETALLE CARD Y FORMULARIO
+   ============================================================ */
+
 .detail-card {
     background: #ffffff;
     border-radius: 20px;
@@ -241,7 +256,10 @@ select.form-control-premium {
     grid-column: 1 / -1;
 }
 
-/* INPUT PICKER WRAPPER */
+/* ============================================================
+   INPUT PICKER WRAPPER
+   ============================================================ */
+
 .input-picker-wrapper {
     position: relative;
     display: flex;
@@ -275,7 +293,10 @@ select.form-control-premium {
     transform: scale(1.05);
 }
 
-/* UBICACIÓN */
+/* ============================================================
+   UBICACIÓN
+   ============================================================ */
+
 .ubicacion-section {
     margin-top: 1.5rem;
     padding: 1.25rem 1.5rem 1.5rem;
@@ -347,9 +368,13 @@ select.form-control-premium {
 .ubicacion-resumen i {
     font-size: 1.1rem;
     color: #3b82f6;
+    flex-shrink: 0;
 }
 
-/* ACCIONES FOOTER */
+/* ============================================================
+   ACCIONES FOOTER
+   ============================================================ */
+
 .action-footer {
     display: flex;
     justify-content: flex-end;
@@ -363,7 +388,10 @@ select.form-control-premium {
     gap: 1rem;
 }
 
-/* BOTONES */
+/* ============================================================
+   BOTONES
+   ============================================================ */
+
 .btn-cancel-premium {
     padding: 0.65rem 1.5rem;
     background: #ffffff;
@@ -433,12 +461,23 @@ select.form-control-premium {
     }
 }
 
-/* RESPONSIVIDAD */
+/* ============================================================
+   RESPONSIVE - TABLETS GRANDES (max-width: 1200px)
+   ============================================================ */
+
 @media (max-width: 1200px) {
     .form-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+
+    .ubicacion-grid {
+        grid-template-columns: 1fr 1fr;
+    }
 }
+
+/* ============================================================
+   RESPONSIVE - TABLETS (max-width: 992px)
+   ============================================================ */
 
 @media (max-width: 992px) {
     .resumen-acompanante {
@@ -457,49 +496,169 @@ select.form-control-premium {
     .ubicacion-grid {
         grid-template-columns: 1fr 1fr;
     }
+
+    .detail-card {
+        padding: 2rem 1.5rem 1.5rem;
+    }
 }
 
+/* ============================================================
+   RESPONSIVE - MÓVILES (max-width: 768px)
+   ============================================================ */
+
 @media (max-width: 768px) {
+
+    /* ============================================================
+       HEADER
+       ============================================================ */
     .header-section {
         flex-direction: column;
         align-items: flex-start;
         gap: 1.25rem;
         padding-bottom: 1rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .title-page {
+        font-size: 1.3rem;
+        margin-top: 2px;
+    }
+
+    .subtitle-page {
+        font-size: 0.8rem;
     }
 
     .header-controls {
         width: 100%;
         flex-direction: column;
         align-items: stretch;
+        gap: 10px;
     }
 
-    .header-controls button {
+    .header-controls .estado-acompanante {
         width: 100%;
         justify-content: center;
+        padding: 0.5rem 1rem;
+        font-size: 0.75rem;
     }
 
-    .estado-acompanante {
+    .header-controls .btn-cancel-premium {
         width: 100%;
         justify-content: center;
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
     }
 
-    .form-grid {
-        grid-template-columns: 1fr;
-        gap: 1.25rem;
-    }
-
+    /* ============================================================
+       RESUMEN ACOMPAÑANTE - 1 COLUMNA
+       ============================================================ */
     .resumen-acompanante {
         grid-template-columns: 1fr;
         border-radius: 12px;
+        margin-bottom: 1.25rem;
     }
 
     .resumen-item {
         border-bottom: 1px solid #e9edf2;
         padding: 0.9rem 1.25rem;
+        border-right: none;
     }
 
     .resumen-item:last-child {
         border-bottom: none;
+    }
+
+    .resumen-item:hover {
+        background: transparent;
+    }
+
+    .resumen-item i {
+        font-size: 1.3rem;
+        min-width: 32px;
+    }
+
+    .resumen-item strong {
+        font-size: 0.95rem;
+    }
+
+    /* ============================================================
+       FORM GRID - 1 COLUMNA
+       ============================================================ */
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .full-width {
+        grid-column: 1;
+    }
+
+    /* ============================================================
+       DETAIL CARD
+       ============================================================ */
+    .detail-card {
+        padding: 1.25rem;
+        border-radius: 16px;
+    }
+
+    /* ============================================================
+       FORM CONTROLS
+       ============================================================ */
+    .form-control-premium {
+        font-size: 0.9rem;
+        padding: 0.65rem 0.9rem;
+        border-radius: 8px;
+    }
+
+    .form-group label {
+        font-size: 0.65rem;
+    }
+
+    /* ============================================================
+       UBICACIÓN SECTION
+       ============================================================ */
+    .ubicacion-section {
+        padding: 1rem;
+        border-radius: 12px;
+    }
+
+    .ubicacion-header {
+        font-size: 0.9rem;
+        padding-bottom: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .ubicacion-header i {
+        font-size: 1rem;
+    }
+
+    .ubicacion-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .ubicacion-item.full-width {
+        grid-column: 1;
+    }
+
+    .ubicacion-resumen {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.8rem;
+        border-radius: 8px;
+        flex-wrap: wrap;
+    }
+
+    .ubicacion-resumen i {
+        font-size: 1rem;
+    }
+
+    /* ============================================================
+       ACTION FOOTER - BOTONES A ANCHO COMPLETO
+       ============================================================ */
+    .action-footer {
+        margin-top: 1.75rem;
+        padding-top: 1.25rem;
     }
 
     .footer-buttons {
@@ -511,58 +670,307 @@ select.form-control-premium {
     .footer-buttons button {
         width: 100%;
         justify-content: center;
+        padding: 0.7rem 1.5rem;
     }
 
-    .detail-card {
-        padding: 1.25rem;
-        border-radius: 16px;
+    /* ============================================================
+       BOTONES
+       ============================================================ */
+    .btn-save {
+        font-size: 0.85rem;
+        padding: 0.7rem 1.5rem;
     }
 
-    .action-footer {
-        margin-top: 1.75rem;
-        padding-top: 1.25rem;
-    }
-
-    .ubicacion-section {
-        padding: 1rem;
-    }
-
-    .ubicacion-grid {
-        grid-template-columns: 1fr;
-        gap: 0.75rem;
-    }
-
-    .ubicacion-item.full-width {
-        grid-column: 1;
+    .btn-cancel-premium {
+        font-size: 0.85rem;
+        padding: 0.7rem 1.5rem;
     }
 }
 
+/* ============================================================
+   RESPONSIVE - MÓVILES PEQUEÑOS (max-width: 480px)
+   ============================================================ */
+
 @media (max-width: 480px) {
+
+    /* ============================================================
+       HEADER
+       ============================================================ */
     .title-page {
-        font-size: 1.5rem;
+        font-size: 1.1rem;
     }
 
     .subtitle-page {
+        font-size: 0.7rem;
+    }
+
+    .header-controls .estado-acompanante {
+        font-size: 0.7rem;
+        padding: 0.4rem 0.8rem;
+    }
+
+    .header-controls .btn-cancel-premium {
+        font-size: 0.8rem;
+        padding: 0.5rem 0.8rem;
+    }
+
+    /* ============================================================
+       RESUMEN ACOMPAÑANTE
+       ============================================================ */
+    .resumen-item {
+        padding: 0.75rem 1rem;
+        gap: 0.7rem;
+    }
+
+    .resumen-item strong {
         font-size: 0.85rem;
     }
 
+    .resumen-item small {
+        font-size: 0.55rem;
+        letter-spacing: 0.4px;
+    }
+
+    .resumen-item i {
+        font-size: 1.1rem;
+        min-width: 28px;
+    }
+
+    /* ============================================================
+       DETAIL CARD
+       ============================================================ */
+    .detail-card {
+        padding: 1rem;
+        border-radius: 14px;
+    }
+
+    /* ============================================================
+       FORM CONTROLS
+       ============================================================ */
     .form-control-premium {
+        font-size: 0.85rem;
+        padding: 0.55rem 0.8rem;
+        border-radius: 8px;
+    }
+
+    .form-grid {
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .form-group {
+        gap: 0.3rem;
+    }
+
+    /* ============================================================
+       UBICACIÓN SECTION
+       ============================================================ */
+    .ubicacion-section {
+        padding: 0.8rem;
+        border-radius: 10px;
+        margin-top: 1rem;
+    }
+
+    .ubicacion-header {
+        font-size: 0.85rem;
+        gap: 0.5rem;
+    }
+
+    .ubicacion-header i {
         font-size: 0.9rem;
-        padding: 0.6rem 0.8rem;
+    }
+
+    .ubicacion-item label {
+        font-size: 0.6rem;
+    }
+
+    .ubicacion-item .form-text {
+        font-size: 0.6rem;
+    }
+
+    .ubicacion-resumen {
+        padding: 0.5rem 0.7rem;
+        font-size: 0.75rem;
+        gap: 0.5rem;
+    }
+
+    .ubicacion-resumen i {
+        font-size: 0.9rem;
+    }
+
+    /* ============================================================
+       ACTION FOOTER
+       ============================================================ */
+    .action-footer {
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+    }
+
+    .footer-buttons {
+        gap: 0.6rem;
+    }
+
+    .footer-buttons button {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.82rem;
+    }
+
+    /* ============================================================
+       BOTONES
+       ============================================================ */
+    .btn-save,
+    .btn-cancel-premium {
+        font-size: 0.82rem;
+        padding: 0.6rem 1.2rem;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE - ORIENTACIÓN HORIZONTAL EN MÓVILES
+   ============================================================ */
+
+@media (max-width: 768px) and (orientation: landscape) {
+    .resumen-acompanante {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .resumen-item {
+        border-bottom: 1px solid #e9edf2;
+        border-right: 1px solid #e9edf2;
+        padding: 0.7rem 1rem;
+    }
+
+    .resumen-item:nth-child(even) {
+        border-right: none;
+    }
+
+    .resumen-item:nth-last-child(-n+2) {
+        border-bottom: none;
+    }
+
+    .form-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    .form-grid .full-width {
+        grid-column: 1 / -1;
+    }
+
+    .ubicacion-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem 1rem;
+    }
+
+    .ubicacion-item.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .action-footer {
+        justify-content: flex-end;
+    }
+
+    .footer-buttons {
+        flex-direction: row;
+        width: auto;
+        gap: 0.75rem;
+    }
+
+    .footer-buttons button {
+        width: auto;
+        padding: 0.5rem 1.2rem;
+    }
+
+    .header-section {
+        flex-direction: row;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .header-controls {
+        flex-direction: row;
+        align-items: center;
+        width: auto;
+        gap: 10px;
+    }
+
+    .header-controls .estado-acompanante {
+        width: auto;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.7rem;
+    }
+
+    .header-controls .btn-cancel-premium {
+        width: auto;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+    }
+
+    .detail-card {
+        padding: 1.5rem;
+    }
+
+    .resumen-item:hover {
+        background: transparent;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE - PANTALLAS GRANDES (min-width: 1400px)
+   ============================================================ */
+
+@media (min-width: 1400px) {
+    .detail-card {
+        padding: 3rem 3rem 2.5rem;
+        border-radius: 24px;
+    }
+
+    .resumen-acompanante {
+        border-radius: 20px;
+    }
+
+    .resumen-item {
+        padding: 1.3rem 1.8rem;
+    }
+
+    .resumen-item i {
+        font-size: 1.7rem;
+        min-width: 42px;
+    }
+
+    .resumen-item strong {
+        font-size: 1.1rem;
+    }
+
+    .form-grid {
+        gap: 2rem;
+    }
+
+    .form-control-premium {
+        font-size: 1rem;
+        padding: 0.8rem 1.2rem;
+    }
+
+    .ubicacion-section {
+        padding: 1.5rem 2rem 2rem;
+        border-radius: 20px;
+    }
+
+    .ubicacion-grid {
+        gap: 1.5rem 2rem;
     }
 
     .btn-save,
     .btn-cancel-premium {
-        font-size: 0.85rem;
-        padding: 0.6rem 1.2rem;
-    }
-
-    .resumen-item strong {
-        font-size: 0.9rem;
+        padding: 0.8rem 2.5rem;
+        font-size: 1rem;
     }
 }
 
-/* UTILIDADES */
+/* ============================================================
+   UTILIDADES
+   ============================================================ */
+
 .tab-panel {
     animation: fadeIn 0.35s ease;
 }
@@ -582,4 +990,139 @@ select.form-control-premium {
 ::selection {
     background: rgba(176, 0, 30, 0.15);
     color: #b0001e;
+}
+
+/* ============================================================
+   UTILITARIOS RESPONSIVE ADICIONALES
+   ============================================================ */
+
+/* Ocultar en móvil */
+.hide-mobile {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .hide-mobile {
+        display: none !important;
+    }
+}
+
+/* Mostrar solo en móvil */
+.show-mobile {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .show-mobile {
+        display: block !important;
+    }
+
+    .show-mobile-inline {
+        display: inline-block !important;
+    }
+
+    .show-mobile-flex {
+        display: flex !important;
+    }
+}
+
+/* Texto truncado en móvil */
+@media (max-width: 768px) {
+    .text-truncate-mobile {
+        max-width: 120px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .text-truncate-mobile-sm {
+        max-width: 80px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+/* Ajustes de espaciado en móvil */
+@media (max-width: 768px) {
+    .gap-2 {
+        gap: 0.5rem !important;
+    }
+
+    .gap-3 {
+        gap: 0.75rem !important;
+    }
+
+    .gap-4 {
+        gap: 1rem !important;
+    }
+
+    .mb-2 {
+        margin-bottom: 0.5rem !important;
+    }
+
+    .mb-3 {
+        margin-bottom: 0.75rem !important;
+    }
+
+    .mb-4 {
+        margin-bottom: 1rem !important;
+    }
+
+    .p-2 {
+        padding: 0.5rem !important;
+    }
+
+    .p-3 {
+        padding: 0.75rem !important;
+    }
+
+    .p-4 {
+        padding: 1rem !important;
+    }
+
+    .mt-2 {
+        margin-top: 0.5rem !important;
+    }
+
+    .mt-3 {
+        margin-top: 0.75rem !important;
+    }
+
+    .mt-4 {
+        margin-top: 1rem !important;
+    }
+}
+
+/* Eliminar hover en móvil para mejor experiencia táctil */
+@media (max-width: 768px) {
+    .resumen-item:hover {
+        background: transparent;
+    }
+
+    .detail-card:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    }
+
+    .btn-cancel-premium:hover:not(:disabled) {
+        background: #ffffff;
+        color: #4a5a6e;
+        border-color: #dce1e8;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        transform: none;
+    }
+
+    .btn-save:hover:not(:disabled) {
+        background: linear-gradient(135deg, #b0001e, #8a0016);
+        box-shadow: 0 4px 12px rgba(176, 0, 30, 0.25);
+        transform: none;
+    }
+
+    .form-control-premium:hover {
+        border-color: #e2e7ee;
+    }
+
+    .input-picker-wrapper:focus-within .icon-embed {
+        transform: none;
+    }
 }

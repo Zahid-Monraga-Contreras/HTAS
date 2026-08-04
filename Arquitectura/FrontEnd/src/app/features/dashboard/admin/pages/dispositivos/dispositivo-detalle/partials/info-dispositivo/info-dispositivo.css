@@ -1,6 +1,10 @@
 /* ==========================================================================
-   INFO DISPOSITIVO - ESTILOS
+   INFO DISPOSITIVO - ESTILOS COMPLETOS Y RESPONSIVOS
    ========================================================================== */
+
+/* ============================================================
+   RESUMEN DEL DISPOSITIVO
+   ============================================================ */
 
 .resumen-dispositivo {
     display: grid;
@@ -19,6 +23,7 @@
     align-items: center;
     gap: 0.9rem;
     padding: 0.25rem 0;
+    transition: background 0.2s ease;
 }
 
 .resumen-item i {
@@ -27,12 +32,14 @@
     min-width: 32px;
     text-align: center;
     opacity: 0.85;
+    flex-shrink: 0;
 }
 
 .resumen-item div {
     display: flex;
     flex-direction: column;
     gap: 0.05rem;
+    min-width: 0;
 }
 
 .resumen-item small {
@@ -47,7 +54,12 @@
     font-size: 0.95rem;
     color: #0a1628;
     font-weight: 600;
+    word-break: break-word;
 }
+
+/* ============================================================
+   TARJETA DE DETALLE
+   ============================================================ */
 
 .detail-card {
     background: #ffffff;
@@ -61,6 +73,10 @@
 .detail-card:hover {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
 }
+
+/* ============================================================
+   FORMULARIO
+   ============================================================ */
 
 .form-grid {
     display: grid;
@@ -155,6 +171,10 @@
     color: #8a9aa8 !important;
 }
 
+/* ============================================================
+   SEARCH PATIENT CONTAINER
+   ============================================================ */
+
 .search-patient-container {
     position: relative;
     width: 100%;
@@ -169,6 +189,10 @@
     pointer-events: none;
     font-size: 1.1rem;
 }
+
+/* ============================================================
+   DROPDOWN LIST
+   ============================================================ */
 
 .dropdown-list {
     position: absolute;
@@ -275,6 +299,10 @@
     font-weight: 500;
 }
 
+/* ============================================================
+   PACIENTE VINCULADO BADGE
+   ============================================================ */
+
 .patient-badge-container {
     display: flex;
     flex-direction: column;
@@ -348,6 +376,10 @@
     font-weight: 500;
 }
 
+/* ============================================================
+   ACCIONES FOOTER
+   ============================================================ */
+
 .action-footer {
     display: flex;
     justify-content: flex-end;
@@ -356,6 +388,10 @@
     padding-top: 1.75rem;
     border-top: 2px solid #e9edf2;
 }
+
+/* ============================================================
+   BOTONES
+   ============================================================ */
 
 .btn-save {
     padding: 0.65rem 2rem;
@@ -415,6 +451,10 @@
     cursor: not-allowed;
 }
 
+/* ============================================================
+   SPINNER Y ANIMACIONES
+   ============================================================ */
+
 .spinner-save {
     width: 18px;
     height: 18px;
@@ -444,16 +484,54 @@
     }
 }
 
-/* Responsive */
-@media (max-width: 768px) {
+/* ============================================================
+   RESPONSIVIDAD - TABLETS (max-width: 1024px)
+   ============================================================ */
+
+@media (max-width: 1024px) {
+    .detail-card {
+        padding: 2rem 1.5rem 1.5rem;
+    }
+
     .resumen-dispositivo {
-        grid-template-columns: 1fr;
-        gap: 0.75rem;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.8rem;
         padding: 1rem 1.25rem;
     }
 
+    .resumen-item strong {
+        font-size: 0.9rem;
+    }
+
+    .form-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+    }
+
+    .full-width-group {
+        grid-column: 1 / -1;
+    }
+}
+
+/* ============================================================
+   RESPONSIVIDAD - MÓVILES (max-width: 768px)
+   ============================================================ */
+
+@media (max-width: 768px) {
+
+    /* ============================================================
+       RESUMEN - 1 COLUMNA
+       ============================================================ */
+    .resumen-dispositivo {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+        padding: 0.8rem 1rem;
+        border-radius: 12px;
+        margin-bottom: 1.25rem;
+    }
+
     .resumen-item {
-        padding: 0.5rem 0;
+        padding: 0.6rem 0;
         border-bottom: 1px solid #e9edf2;
     }
 
@@ -461,32 +539,66 @@
         border-bottom: none;
     }
 
+    .resumen-item:hover {
+        background: transparent;
+    }
+
+    .resumen-item i {
+        font-size: 1.3rem;
+        min-width: 28px;
+    }
+
+    .resumen-item strong {
+        font-size: 0.9rem;
+    }
+
+    .resumen-item small {
+        font-size: 0.55rem;
+        letter-spacing: 0.4px;
+    }
+
+    /* ============================================================
+       DETAIL CARD
+       ============================================================ */
     .detail-card {
         padding: 1.25rem;
         border-radius: 16px;
     }
 
+    /* ============================================================
+       FORM GRID - 1 COLUMNA
+       ============================================================ */
     .form-grid {
         grid-template-columns: 1fr;
         gap: 1.25rem;
+        margin-bottom: 1.25rem;
     }
 
     .full-width-group {
         grid-column: span 1;
     }
 
-    .action-footer {
-        flex-direction: column-reverse;
-        gap: 0.75rem;
-        margin-top: 1.75rem;
-        padding-top: 1.25rem;
+    /* ============================================================
+       FORM CONTROLS
+       ============================================================ */
+    .form-control-premium {
+        font-size: 0.9rem;
+        padding: 0.65rem 0.9rem;
+        border-radius: 8px;
     }
 
-    .action-footer button {
-        width: 100%;
-        justify-content: center;
+    .form-group label {
+        font-size: 0.65rem;
     }
 
+    .form-text.text-muted {
+        font-size: 0.65rem;
+        padding: 0.2rem 0.4rem;
+    }
+
+    /* ============================================================
+       DROPDOWN
+       ============================================================ */
     .dropdown-list {
         max-height: 260px;
         border-radius: 10px;
@@ -498,27 +610,129 @@
         font-size: 0.85rem;
         gap: 0.5rem;
     }
+
+    .dropdown-item i {
+        font-size: 0.85rem;
+    }
+
+    .dropdown-item .badge-paciente {
+        font-size: 0.55rem;
+        padding: 0.1rem 0.5rem;
+    }
+
+    .dropdown-more {
+        font-size: 0.7rem;
+        padding: 0.4rem 0.7rem;
+    }
+
+    .dropdown-empty {
+        font-size: 0.78rem;
+        padding: 0.8rem;
+    }
+
+    /* ============================================================
+       PACIENTE BADGE
+       ============================================================ */
+    .patient-badge-container {
+        padding: 0.6rem 0.8rem;
+        border-radius: 10px;
+    }
+
+    .patient-name {
+        font-size: 0.85rem;
+    }
+
+    .icon-patient {
+        font-size: 1rem;
+    }
+
+    .btn-desasignar {
+        font-size: 0.9rem;
+    }
+
+    .ubicacion-paciente {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.6rem;
+    }
+
+    /* ============================================================
+       ACCIONES FOOTER - BOTONES A ANCHO COMPLETO
+       ============================================================ */
+    .action-footer {
+        flex-direction: column-reverse;
+        gap: 0.75rem;
+        margin-top: 1.75rem;
+        padding-top: 1.25rem;
+    }
+
+    .action-footer button {
+        width: 100%;
+        justify-content: center;
+        padding: 0.7rem 1.5rem;
+    }
+
+    /* ============================================================
+       BOTONES
+       ============================================================ */
+    .btn-save {
+        font-size: 0.85rem;
+        padding: 0.7rem 1.5rem;
+    }
+
+    .btn-cancel-premium {
+        font-size: 0.85rem;
+        padding: 0.7rem 1.5rem;
+    }
 }
 
+/* ============================================================
+   RESPONSIVIDAD - MÓVILES PEQUEÑOS (max-width: 480px)
+   ============================================================ */
+
 @media (max-width: 480px) {
+
+    /* ============================================================
+       DETAIL CARD
+       ============================================================ */
     .detail-card {
         padding: 1rem;
         border-radius: 14px;
     }
 
+    /* ============================================================
+       FORM CONTROLS
+       ============================================================ */
     .form-control-premium {
-        font-size: 0.9rem;
-        padding: 0.6rem 0.8rem;
-    }
-
-    .btn-save,
-    .btn-cancel-premium {
         font-size: 0.85rem;
-        padding: 0.6rem 1.2rem;
+        padding: 0.55rem 0.8rem;
+        border-radius: 8px;
     }
 
+    .form-grid {
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .form-group {
+        gap: 0.3rem;
+    }
+
+    .form-text.text-muted {
+        font-size: 0.6rem;
+        padding: 0.15rem 0.4rem;
+    }
+
+    /* ============================================================
+       RESUMEN
+       ============================================================ */
     .resumen-dispositivo {
-        padding: 0.75rem 1rem;
+        padding: 0.6rem 0.8rem;
+        gap: 0.3rem;
+    }
+
+    .resumen-item {
+        padding: 0.4rem 0;
+        gap: 0.6rem;
     }
 
     .resumen-item strong {
@@ -526,34 +740,49 @@
     }
 
     .resumen-item i {
-        font-size: 1.2rem;
-        min-width: 28px;
+        font-size: 1.1rem;
+        min-width: 24px;
     }
 
-    .patient-badge-container {
-        padding: 0.5rem 0.7rem;
+    .resumen-item small {
+        font-size: 0.5rem;
+        letter-spacing: 0.3px;
     }
 
-    .patient-name {
-        font-size: 0.8rem;
+    /* ============================================================
+       BOTONES
+       ============================================================ */
+    .btn-save {
+        font-size: 0.82rem;
+        padding: 0.6rem 1.2rem;
     }
 
-    .icon-patient {
-        font-size: 0.9rem;
+    .btn-cancel-premium {
+        font-size: 0.82rem;
+        padding: 0.6rem 1.2rem;
     }
 
-    .btn-desasignar {
-        font-size: 0.8rem;
+    /* ============================================================
+       ACCIONES FOOTER
+       ============================================================ */
+    .action-footer {
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        gap: 0.6rem;
     }
 
-    .ubicacion-paciente {
-        font-size: 0.7rem;
-        padding: 0.15rem 0.6rem;
+    .action-footer button {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.82rem;
     }
 
+    /* ============================================================
+       DROPDOWN
+       ============================================================ */
     .dropdown-list {
         max-height: 200px;
         border-radius: 8px;
+        top: calc(100% + 3px);
     }
 
     .dropdown-item {
@@ -569,5 +798,303 @@
     .dropdown-item .badge-paciente {
         font-size: 0.5rem;
         padding: 0.08rem 0.45rem;
+    }
+
+    .dropdown-more {
+        font-size: 0.65rem;
+        padding: 0.3rem 0.6rem;
+        gap: 0.3rem;
+    }
+
+    .dropdown-empty {
+        font-size: 0.7rem;
+        padding: 0.6rem;
+        gap: 0.3rem;
+    }
+
+    .dropdown-empty i {
+        font-size: 1rem;
+    }
+
+    /* ============================================================
+       PACIENTE BADGE
+       ============================================================ */
+    .patient-badge-container {
+        padding: 0.4rem 0.6rem;
+        border-radius: 8px;
+        gap: 0.3rem;
+    }
+
+    .patient-info {
+        gap: 0.4rem;
+    }
+
+    .patient-name {
+        font-size: 0.8rem;
+    }
+
+    .icon-patient {
+        font-size: 0.8rem;
+    }
+
+    .btn-desasignar {
+        font-size: 0.8rem;
+        padding: 0.1rem 0.3rem;
+    }
+
+    .ubicacion-paciente {
+        font-size: 0.65rem;
+        padding: 0.15rem 0.5rem;
+        gap: 0.3rem;
+    }
+}
+
+/* ============================================================
+   RESPONSIVIDAD - ORIENTACIÓN HORIZONTAL EN MÓVILES
+   ============================================================ */
+
+@media (max-width: 768px) and (orientation: landscape) {
+    .detail-card {
+        padding: 1.5rem;
+    }
+
+    .resumen-dispositivo {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.6rem;
+        padding: 0.7rem 1rem;
+    }
+
+    .resumen-item {
+        border-bottom: 1px solid #e9edf2;
+        padding: 0.4rem 0;
+    }
+
+    .resumen-item:nth-last-child(-n+2) {
+        border-bottom: none;
+    }
+
+    .resumen-item:hover {
+        background: transparent;
+    }
+
+    .form-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    .full-width-group {
+        grid-column: 1 / -1;
+    }
+
+    .action-footer {
+        flex-direction: row;
+        justify-content: flex-end;
+        gap: 0.75rem;
+    }
+
+    .action-footer button {
+        width: auto;
+        padding: 0.5rem 1.2rem;
+    }
+
+    .dropdown-list {
+        max-height: 220px;
+    }
+
+    .patient-badge-container {
+        padding: 0.5rem 0.7rem;
+    }
+}
+
+/* ============================================================
+   RESPONSIVIDAD - PANTALLAS GRANDES (min-width: 1400px)
+   ============================================================ */
+
+@media (min-width: 1400px) {
+    .detail-card {
+        padding: 3rem 3rem 2.5rem;
+        border-radius: 24px;
+    }
+
+    .resumen-dispositivo {
+        padding: 1.5rem 2rem;
+        border-radius: 18px;
+    }
+
+    .resumen-item {
+        gap: 1.2rem;
+    }
+
+    .resumen-item i {
+        font-size: 1.7rem;
+        min-width: 38px;
+    }
+
+    .resumen-item strong {
+        font-size: 1.05rem;
+    }
+
+    .form-grid {
+        gap: 2rem;
+    }
+
+    .form-control-premium {
+        font-size: 1rem;
+        padding: 0.8rem 1.2rem;
+    }
+
+    .btn-save {
+        padding: 0.8rem 2.5rem;
+        font-size: 1rem;
+    }
+
+    .btn-cancel-premium {
+        padding: 0.8rem 2rem;
+        font-size: 1rem;
+    }
+}
+
+/* ============================================================
+   UTILITARIOS RESPONSIVE ADICIONALES
+   ============================================================ */
+
+/* Ocultar en móvil */
+.hide-mobile {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .hide-mobile {
+        display: none !important;
+    }
+}
+
+/* Mostrar solo en móvil */
+.show-mobile {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .show-mobile {
+        display: block !important;
+    }
+
+    .show-mobile-inline {
+        display: inline-block !important;
+    }
+
+    .show-mobile-flex {
+        display: flex !important;
+    }
+}
+
+/* Texto truncado en móvil */
+@media (max-width: 768px) {
+    .text-truncate-mobile {
+        max-width: 120px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .text-truncate-mobile-sm {
+        max-width: 80px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+/* Ajustes de espaciado en móvil */
+@media (max-width: 768px) {
+    .gap-2 {
+        gap: 0.5rem !important;
+    }
+
+    .gap-3 {
+        gap: 0.75rem !important;
+    }
+
+    .gap-4 {
+        gap: 1rem !important;
+    }
+
+    .mb-2 {
+        margin-bottom: 0.5rem !important;
+    }
+
+    .mb-3 {
+        margin-bottom: 0.75rem !important;
+    }
+
+    .mb-4 {
+        margin-bottom: 1rem !important;
+    }
+
+    .p-2 {
+        padding: 0.5rem !important;
+    }
+
+    .p-3 {
+        padding: 0.75rem !important;
+    }
+
+    .p-4 {
+        padding: 1rem !important;
+    }
+
+    .mt-2 {
+        margin-top: 0.5rem !important;
+    }
+
+    .mt-3 {
+        margin-top: 0.75rem !important;
+    }
+
+    .mt-4 {
+        margin-top: 1rem !important;
+    }
+}
+
+/* Eliminar hover en móvil para mejor experiencia táctil */
+@media (max-width: 768px) {
+    .detail-card:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    }
+
+    .resumen-item:hover {
+        background: transparent;
+    }
+
+    .dropdown-item:hover {
+        background: #ffffff;
+    }
+
+    .btn-save:hover:not(:disabled) {
+        background: linear-gradient(135deg, #b0001e, #8a0016);
+        box-shadow: 0 4px 12px rgba(176, 0, 30, 0.25);
+        transform: none;
+    }
+
+    .btn-cancel-premium:hover:not(:disabled) {
+        background: #ffffff;
+        color: #4a5a6e;
+        border-color: #dce1e8;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        transform: none;
+    }
+
+    .patient-badge-container:hover {
+        border-color: #e2e7ee;
+    }
+
+    .btn-desasignar:hover {
+        background: none;
+        transform: none;
+        color: #ef4444;
+    }
+
+    .form-control-premium:hover {
+        border-color: #e2e7ee;
     }
 }

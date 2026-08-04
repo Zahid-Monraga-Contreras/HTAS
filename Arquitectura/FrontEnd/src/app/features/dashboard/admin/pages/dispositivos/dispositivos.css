@@ -1,6 +1,11 @@
 /* ==========================================================================
-   1. CONTENEDOR PRINCIPAL Y DISEÑO BASE
+   ESTILOS PRINCIPALES DEL CONTENIDO - VERSIÓN COMPLETA Y RESPONSIVA
    ========================================================================== */
+
+/* ============================================================
+   1. CONTENEDOR PRINCIPAL Y DISEÑO BASE
+   ============================================================ */
+
 .main-content {
     margin-left: 250px;
     padding: 90px 40px 40px;
@@ -11,17 +16,20 @@
 
 .main-content.menu-collapsed {
     margin-left: 70px;
+    padding-left: 30px;
 }
 
-/* ==========================================================================
+/* ============================================================
    2. ENCABEZADO Y CONTROLES (BÚSQUEDA Y BOTONES)
-   ========================================================================== */
+   ============================================================ */
+
 .header-section {
     margin-bottom: 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 30px;
+    flex-wrap: wrap;
 }
 
 .title-page {
@@ -42,9 +50,13 @@
     display: flex;
     align-items: center;
     gap: 16px;
+    flex-wrap: wrap;
 }
 
-/* Buscador estilo Pill */
+/* ============================================================
+   BUSCADOR ESTILO PILL
+   ============================================================ */
+
 .search-box-pill {
     position: relative;
     background: #ffffff;
@@ -79,7 +91,14 @@
     color: #1e293b;
 }
 
-/* Grupo de Botones de Acción Superior */
+.search-box-pill input::placeholder {
+    color: #94a3b8;
+}
+
+/* ============================================================
+   GRUPO DE BOTONES DE ACCIÓN SUPERIOR
+   ============================================================ */
+
 .action-buttons-group {
     display: flex;
     gap: 10px;
@@ -107,6 +126,7 @@
     cursor: pointer;
     border: none;
     transition: all 0.2s ease;
+    white-space: nowrap;
 }
 
 .btn-action:disabled {
@@ -114,11 +134,10 @@
     cursor: not-allowed;
 }
 
-/* ==========================================================================
+/* ============================================================
    3. BOTONES POR ROL
-   ========================================================================== */
+   ============================================================ */
 
-/* Botón MEDIR - Paciente y Acompañante */
 .btn-measure-premium {
     background: #dcfce7;
     color: #15803d;
@@ -131,7 +150,6 @@
     box-shadow: 0 4px 12px rgba(21, 128, 61, 0.2);
 }
 
-/* Botón EDITAR - Admin y Médico */
 .btn-edit-premium {
     background: #eff6ff;
     color: #2563eb;
@@ -144,7 +162,6 @@
     box-shadow: 0 4px 12px rgba(37, 99, 219, 0.2);
 }
 
-/* Botón ELIMINAR - Admin y Médico */
 .btn-delete-premium {
     background: #fef2f2;
     color: #dc2626;
@@ -157,7 +174,6 @@
     box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
 }
 
-/* Botón Crear/Guardar Estándar */
 .btn-save {
     background: #b0001e;
     color: white;
@@ -167,20 +183,27 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 8px;
     font-size: 0.9rem;
 }
 
-.btn-save:hover {
+.btn-save:hover:not(:disabled) {
     background: #8e0018;
     transform: translateY(-1px);
 }
 
-/* ==========================================================================
+.btn-save:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* ============================================================
    4. TABLA DE DISPOSITIVOS PREMIUM
-   ========================================================================== */
+   ============================================================ */
+
 .table-card {
     background: white;
     border-radius: 16px;
@@ -188,6 +211,20 @@
     border: 1px solid #e2e8f0;
     overflow: hidden;
 }
+
+/* ============================================================
+   WRAPPER PARA SCROLL HORIZONTAL
+   ============================================================ */
+
+.table-responsive-wrapper {
+    width: 100%;
+    overflow-x: visible;
+    overflow-y: visible;
+}
+
+/* ============================================================
+   CUSTOM TABLE
+   ============================================================ */
 
 .custom-table {
     width: 100%;
@@ -205,6 +242,7 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
     border-bottom: 1px solid #e2e8f0;
+    white-space: nowrap;
 }
 
 .user-row {
@@ -230,7 +268,10 @@
     font-size: 0.9rem;
 }
 
-/* Detalles del Dispositivo (Celda Principal) */
+/* ============================================================
+   DETALLES DEL DISPOSITIVO (CELDA PRINCIPAL)
+   ============================================================ */
+
 .name-cell-premium {
     display: flex;
     align-items: center;
@@ -253,12 +294,15 @@
 .user-info-stack {
     display: flex;
     flex-direction: column;
+    min-width: 0;
 }
 
 .user-name-main {
     font-weight: 600;
     color: #0f172a;
     font-size: 0.95rem;
+    word-break: break-word;
+    line-height: 1.3;
 }
 
 .text-muted {
@@ -276,7 +320,10 @@
     font-size: 0.82rem;
 }
 
-/* Chips de Estado */
+/* ============================================================
+   CHIPS DE ESTADO
+   ============================================================ */
+
 .status-pill-container {
     display: flex;
 }
@@ -291,6 +338,7 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
+    white-space: nowrap;
 }
 
 .status-chip.active-chip {
@@ -303,7 +351,10 @@
     color: #b91c1c;
 }
 
-/* Empty State */
+/* ============================================================
+   EMPTY STATE
+   ============================================================ */
+
 .empty-state {
     text-align: center;
     padding: 4rem !important;
@@ -322,9 +373,10 @@
     font-size: 0.95rem;
 }
 
-/* ==========================================================================
+/* ============================================================
    5. BARRA DE PAGINACIÓN
-   ========================================================================== */
+   ============================================================ */
+
 .pagination-bar {
     padding: 16px 24px;
     display: flex;
@@ -334,6 +386,8 @@
     border-top: 1px solid #e2e8f0;
     color: #64748b;
     font-size: 0.88rem;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .nav-arrows {
@@ -375,9 +429,10 @@
     border-radius: 6px;
 }
 
-/* ==========================================================================
+/* ============================================================
    6. MODALES (REGISTRO / EDICIÓN / ELIMINACIÓN)
-   ========================================================================== */
+   ============================================================ */
+
 .modal-overlay {
     backdrop-filter: blur(4px);
     background: rgba(15, 23, 42, 0.4);
@@ -390,9 +445,9 @@
     justify-content: center;
     align-items: center;
     z-index: 2000;
+    padding: 20px;
 }
 
-/* Tarjeta unificada del Modal */
 .modal-premium-card {
     background: white;
     border-radius: 16px;
@@ -440,7 +495,19 @@
     flex: 1;
 }
 
-/* Rediseño del Grid: 2 Columnas balanceadas para Dispositivos */
+.modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
 .form-grid-modal {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -448,7 +515,6 @@
     margin-bottom: 1.25rem;
 }
 
-/* Elementos que ocupan toda la fila */
 .full-width-modal {
     grid-column: span 2;
     margin-bottom: 0.25rem;
@@ -466,7 +532,6 @@
     color: #475569;
 }
 
-/* Inputs y Selects */
 .form-control-premium {
     padding: 0.65rem 1rem;
     border: 1px solid #cbd5e1;
@@ -486,7 +551,15 @@
     box-shadow: 0 0 0 3px rgba(176, 0, 30, 0.1);
 }
 
-/* Footer de los modales */
+select.form-control-premium {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a5a6e' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+    cursor: pointer;
+}
+
 .modal-footer-premium {
     display: flex;
     justify-content: flex-end;
@@ -522,7 +595,7 @@
     font-weight: 600;
     font-size: 0.88rem;
     cursor: pointer;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 0.5rem;
     transition: all 0.2s;
@@ -539,7 +612,10 @@
     cursor: not-allowed;
 }
 
-/* MODAL DE ELIMINACIÓN (DANGER) */
+/* ============================================================
+   MODAL DE ELIMINACIÓN (DANGER)
+   ============================================================ */
+
 .modal-content {
     background: white;
     padding: 30px;
@@ -575,6 +651,7 @@
     display: flex;
     gap: 10px;
     justify-content: center;
+    flex-wrap: wrap;
 }
 
 .btn-danger-confirm {
@@ -585,15 +662,20 @@
     border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 6px;
     transition: all 0.2s;
     font-size: 0.88rem;
 }
 
-.btn-danger-confirm:hover {
+.btn-danger-confirm:hover:not(:disabled) {
     background: #b91c1c;
+}
+
+.btn-danger-confirm:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 .btn-outline-cancel {
@@ -608,13 +690,19 @@
     font-size: 0.88rem;
 }
 
-.btn-outline-cancel:hover {
+.btn-outline-cancel:hover:not(:disabled) {
     background: #f1f5f9;
 }
 
-/* ==========================================================================
+.btn-outline-cancel:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ============================================================
    7. TOAST NOTIFICACIONES PREMIUM
-   ========================================================================== */
+   ============================================================ */
+
 .toast-premium-container {
     position: fixed;
     top: 25px;
@@ -632,14 +720,17 @@
 
 .toast-premium-container.success {
     background: #10b981;
+    border-left: 4px solid #047857;
 }
 
 .toast-premium-container.error {
     background: #ef4444;
+    border-left: 4px solid #b91c1c;
 }
 
 .toast-premium-container.warning {
     background: #f59e0b;
+    border-left: 4px solid #b45309;
 }
 
 .toast-content {
@@ -657,9 +748,10 @@
     font-size: 0.9rem;
 }
 
-/* ==========================================================================
+/* ============================================================
    8. ANIMACIONES
-   ========================================================================== */
+   ============================================================ */
+
 .spinner-save {
     width: 16px;
     height: 16px;
@@ -699,9 +791,10 @@
     }
 }
 
-/* ==========================================================================
+/* ============================================================
    9. DROPDOWN DE BÚSQUEDA (PACIENTES)
-   ========================================================================== */
+   ============================================================ */
+
 .custom-dropdown-list {
     position: absolute;
     top: 100%;
@@ -717,6 +810,23 @@
     overflow-x: hidden;
     max-height: 250px;
     padding-right: 4px;
+}
+
+.custom-dropdown-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-dropdown-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-dropdown-list::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.custom-dropdown-list::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
 }
 
 .custom-dropdown-item {
@@ -738,27 +848,10 @@
     font-weight: 500;
 }
 
-/* Scrollbar del dropdown */
-.custom-dropdown-list::-webkit-scrollbar {
-    width: 6px;
-}
-
-.custom-dropdown-list::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.custom-dropdown-list::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 10px;
-}
-
-.custom-dropdown-list::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
-}
-
-/* ==========================================================================
+/* ============================================================
    10. PACIENTE VINCULADO BADGE
-   ========================================================================== */
+   ============================================================ */
+
 .patient-badge-container {
     display: flex;
     flex-direction: column;
@@ -819,14 +912,19 @@
     color: #dc2626;
 }
 
-/* ==========================================================================
-   11. RESPONSIVE
-   ========================================================================== */
+/* ============================================================
+   11. RESPONSIVIDAD - TABLETS (max-width: 1200px)
+   ============================================================ */
+
 @media (max-width: 1200px) {
     .search-box-pill {
         width: 250px;
     }
 }
+
+/* ============================================================
+   12. RESPONSIVIDAD - TABLETS (max-width: 992px)
+   ============================================================ */
 
 @media (max-width: 992px) {
     .form-grid-modal {
@@ -842,36 +940,84 @@
     }
 }
 
+/* ============================================================
+   13. RESPONSIVIDAD - MÓVILES (max-width: 768px) - CORREGIDO
+   ============================================================ */
+
 @media (max-width: 768px) {
     .main-content {
         margin-left: 0;
-        padding: 80px 20px 20px;
+        padding: 80px 15px 20px;
     }
 
+    .main-content.menu-collapsed {
+        margin-left: 0;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    /* ============================================================
+       HEADER - ORDEN: Buscador → Nuevo → Acciones
+       ============================================================ */
     .header-section {
         flex-direction: column;
         align-items: flex-start;
         gap: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .title-page {
+        font-size: 1.4rem;
+        margin-top: 2px;
+    }
+
+    .subtitle-page {
+        font-size: 0.85rem;
     }
 
     .header-controls {
         width: 100%;
-        flex-direction: column-reverse;
+        flex-direction: column;
         align-items: stretch;
         gap: 12px;
     }
 
+    /* Buscador - Primero */
     .search-box-pill {
         width: 100%;
+        max-width: 100%;
+        border-radius: 12px;
+        padding: 2px 2px 2px 15px;
+        order: 1;
     }
 
     .search-box-pill:focus-within {
         width: 100%;
     }
 
+    .search-box-pill input {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+    }
+
+    /* Botón Nuevo - Segundo */
+    .btn-save {
+        width: 100%;
+        justify-content: center;
+        padding: 10px 20px;
+        font-size: 0.85rem;
+        order: 2;
+    }
+
+    /* Botones de Acción - Tercero */
     .action-buttons-group {
         justify-content: stretch;
         width: 100%;
+        order: 3;
+    }
+
+    .action-buttons-group.visible {
+        transform: translateX(0);
     }
 
     .action-buttons-group button {
@@ -882,23 +1028,140 @@
         font-size: 0.78rem;
     }
 
-    .btn-save {
-        width: 100%;
-        justify-content: center;
+    /* ============================================================
+       TABLA CON SCROLL HORIZONTAL EN MÓVIL - ACTIVADO
+       ============================================================ */
+    .table-card {
+        border-radius: 12px;
+        overflow: hidden;
     }
 
+    .table-responsive-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table-responsive-wrapper::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .table-responsive-wrapper::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 3px;
+    }
+
+    .table-responsive-wrapper::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+    }
+
+    .custom-table {
+        min-width: 650px;
+        font-size: 0.8rem;
+    }
+
+    .custom-table th {
+        padding: 12px 16px;
+        font-size: 0.65rem;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+    }
+
+    .user-row td {
+        padding: 12px 16px;
+        font-size: 0.82rem;
+    }
+
+    .user-name-main {
+        font-size: 0.85rem;
+    }
+
+    .avatar-icon-circle {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+    }
+
+    .mono-text {
+        font-size: 0.7rem;
+        padding: 1px 4px;
+    }
+
+    .status-chip {
+        font-size: 0.7rem;
+        padding: 3px 8px;
+    }
+
+    /* ============================================================
+       PAGINACIÓN
+       ============================================================ */
+    .pagination-bar {
+        flex-direction: column;
+        gap: 10px;
+        padding: 12px 16px;
+        font-size: 0.8rem;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .nav-arrows {
+        gap: 8px;
+    }
+
+    .nav-arrows button {
+        width: 34px;
+        height: 34px;
+        font-size: 0.8rem;
+    }
+
+    .page-num {
+        font-size: 0.8rem;
+        padding: 4px 10px;
+    }
+
+    /* ============================================================
+       EMPTY STATE
+       ============================================================ */
+    .empty-state {
+        padding: 2.5rem 1rem !important;
+    }
+
+    .empty-state i {
+        font-size: 2.2rem;
+    }
+
+    .empty-state p {
+        font-size: 0.85rem;
+    }
+
+    /* ============================================================
+       MODAL
+       ============================================================ */
     .modal-premium-card {
         width: 95%;
         max-width: 100%;
         border-radius: 12px;
+        max-height: 95vh;
+    }
+
+    .modal-header {
+        padding: 1rem 1.25rem;
+    }
+
+    .modal-header h3 {
+        font-size: 1.1rem;
     }
 
     .modal-body {
         padding: 1.25rem;
     }
 
-    .modal-header {
-        padding: 1rem 1.25rem;
+    .form-grid-modal {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .full-width-modal {
+        grid-column: span 1;
     }
 
     .modal-footer-premium {
@@ -911,63 +1174,142 @@
         justify-content: center;
     }
 
-    .custom-table th {
-        padding: 12px 16px;
-        font-size: 0.65rem;
+    .form-control-premium {
+        font-size: 0.85rem;
+        padding: 0.55rem 0.8rem;
     }
 
-    .user-row td {
-        padding: 12px 16px;
+    .btn-cancel-premium {
         font-size: 0.82rem;
+        padding: 8px 16px;
+        width: 100%;
+        justify-content: center;
     }
 
-    .pagination-bar {
-        flex-direction: column;
+    .btn-save-appointment {
+        font-size: 0.82rem;
+        padding: 8px 16px;
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* ============================================================
+       MODAL DANGER
+       ============================================================ */
+    .modal-content {
+        padding: 25px 20px;
+        max-width: 95%;
+        border-radius: 14px;
+    }
+
+    .modal-danger h3 {
+        font-size: 1.15rem;
+    }
+
+    .warning-icon-circle {
+        width: 48px;
+        height: 48px;
+        font-size: 1.3rem;
+    }
+
+    .modal-footer-danger {
+        flex-direction: column-reverse;
         gap: 10px;
-        padding: 12px 16px;
+    }
+
+    .modal-footer-danger button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .btn-danger-confirm {
+        font-size: 0.82rem;
+        padding: 8px 16px;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .btn-outline-cancel {
+        font-size: 0.82rem;
+        padding: 8px 16px;
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* ============================================================
+       TOAST
+       ============================================================ */
+    .toast-premium-container {
+        top: 15px;
+        right: 15px;
+        left: 15px;
+        max-width: none;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+    }
+
+    .toast-message {
         font-size: 0.8rem;
     }
 
-    .nav-arrows {
-        gap: 8px;
+    .icon-toast {
+        font-size: 1rem;
     }
 
-    .name-cell-premium {
-        gap: 8px;
+    /* ============================================================
+       DROPDOWN
+       ============================================================ */
+    .custom-dropdown-list {
+        max-height: 200px;
     }
 
-    .avatar-icon-circle {
-        width: 32px;
-        height: 32px;
-        font-size: 0.9rem;
-    }
-
-    .user-name-main {
-        font-size: 0.85rem;
-    }
-
-    .status-chip {
-        font-size: 0.7rem;
-        padding: 3px 8px;
-    }
-
-    .mono-text {
-        font-size: 0.7rem;
-        padding: 1px 4px;
+    .custom-dropdown-item {
+        padding: 10px 14px;
+        font-size: 0.82rem;
     }
 }
 
+/* ============================================================
+   14. RESPONSIVIDAD - MÓVILES PEQUEÑOS (max-width: 480px)
+   ============================================================ */
+
 @media (max-width: 480px) {
+    .main-content {
+        padding: 75px 10px 15px;
+    }
+
     .title-page {
-        font-size: 1.4rem;
+        font-size: 1.2rem;
     }
 
     .subtitle-page {
-        font-size: 0.8rem;
+        font-size: 0.78rem;
     }
 
     .header-controls {
         gap: 8px;
+    }
+
+    .search-box-pill {
+        padding: 0px 0px 0px 12px;
+    }
+
+    .search-box-pill input {
+        font-size: 0.8rem;
+        padding: 8px 10px;
+    }
+
+    .search-box-pill i {
+        font-size: 0.8rem;
+    }
+
+    .btn-save {
+        font-size: 0.8rem;
+        padding: 8px 16px;
+    }
+
+    .btn-save i {
+        font-size: 0.8rem;
     }
 
     .action-buttons-group button {
@@ -984,47 +1326,8 @@
         font-size: 0.65rem;
     }
 
-    .btn-save {
-        font-size: 0.8rem;
-        padding: 8px 16px;
-    }
-
-    .btn-save i {
-        font-size: 0.8rem;
-    }
-
-    .search-box-pill {
-        padding: 0px 0px 0px 14px;
-    }
-
-    .search-box-pill input {
-        font-size: 0.8rem;
-        padding: 8px 10px;
-    }
-
-    .search-box-pill i {
-        font-size: 0.8rem;
-    }
-
-    .modal-premium-card {
-        max-height: calc(100vh - 20px);
-        border-radius: 10px;
-    }
-
-    .modal-header h3 {
-        font-size: 1.05rem;
-    }
-
-    .form-group label {
-        font-size: 0.75rem;
-    }
-
-    .form-control-premium {
-        font-size: 0.82rem;
-        padding: 0.5rem 0.8rem;
-    }
-
     .custom-table {
+        min-width: 550px;
         font-size: 0.7rem;
     }
 
@@ -1042,6 +1345,12 @@
         font-size: 0.78rem;
     }
 
+    .avatar-icon-circle {
+        width: 28px;
+        height: 28px;
+        font-size: 0.8rem;
+    }
+
     .mono-text {
         font-size: 0.65rem;
     }
@@ -1053,6 +1362,7 @@
 
     .pagination-bar {
         font-size: 0.7rem;
+        padding: 10px 12px;
     }
 
     .page-num {
@@ -1061,9 +1371,52 @@
     }
 
     .nav-arrows button {
-        width: 28px;
-        height: 28px;
+        width: 30px;
+        height: 30px;
         font-size: 0.7rem;
+    }
+
+    .empty-state {
+        padding: 1.5rem 0.5rem !important;
+    }
+
+    .empty-state i {
+        font-size: 1.8rem;
+    }
+
+    .empty-state p {
+        font-size: 0.78rem;
+    }
+
+    .modal-premium-card {
+        max-height: calc(100vh - 20px);
+        border-radius: 10px;
+        width: 98%;
+    }
+
+    .modal-header {
+        padding: 0.8rem 1rem;
+    }
+
+    .modal-header h3 {
+        font-size: 1rem;
+    }
+
+    .modal-body {
+        padding: 1rem;
+    }
+
+    .form-group label {
+        font-size: 0.75rem;
+    }
+
+    .form-control-premium {
+        font-size: 0.82rem;
+        padding: 0.5rem 0.7rem;
+    }
+
+    .modal-footer-premium {
+        padding: 0.75rem 1rem;
     }
 
     .modal-footer-premium button {
@@ -1071,41 +1424,348 @@
         padding: 8px 16px;
     }
 
-    .btn-danger-confirm,
-    .btn-outline-cancel {
-        font-size: 0.8rem;
-        padding: 8px 16px;
+    .btn-cancel-premium {
+        font-size: 0.78rem;
+        padding: 6px 14px;
     }
 
-    .warning-icon-circle {
-        width: 44px;
-        height: 44px;
-        font-size: 1.2rem;
+    .btn-save-appointment {
+        font-size: 0.78rem;
+        padding: 6px 14px;
     }
 
     .modal-content {
-        padding: 20px;
-        max-width: 95%;
+        padding: 18px 15px;
+        border-radius: 12px;
     }
 
     .modal-danger h3 {
+        font-size: 1rem;
+    }
+
+    .warning-icon-circle {
+        width: 40px;
+        height: 40px;
         font-size: 1.1rem;
     }
 
+    .btn-danger-confirm {
+        font-size: 0.78rem;
+        padding: 8px 16px;
+    }
+
+    .btn-outline-cancel {
+        font-size: 0.78rem;
+        padding: 8px 16px;
+    }
+
     .toast-premium-container {
-        top: 15px;
-        right: 15px;
-        left: 15px;
-        max-width: none;
-        border-radius: 10px;
-        padding: 0.75rem 1rem;
+        padding: 0.6rem 0.8rem;
+        border-radius: 8px;
     }
 
     .toast-message {
-        font-size: 0.8rem;
+        font-size: 0.75rem;
     }
 
     .icon-toast {
-        font-size: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .custom-dropdown-item {
+        padding: 8px 12px;
+        font-size: 0.78rem;
+    }
+}
+
+/* ============================================================
+   15. RESPONSIVIDAD - ORIENTACIÓN HORIZONTAL EN MÓVILES
+   ============================================================ */
+
+@media (max-width: 768px) and (orientation: landscape) {
+    .main-content {
+        padding: 70px 20px 15px;
+    }
+
+    .header-section {
+        flex-direction: row;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .header-controls {
+        flex-direction: row;
+        align-items: center;
+        width: auto;
+        gap: 10px;
+    }
+
+    .search-box-pill {
+        width: 200px;
+        max-width: 300px;
+    }
+
+    .btn-save {
+        width: auto;
+        padding: 6px 16px;
+        font-size: 0.8rem;
+    }
+
+    .action-buttons-group {
+        width: auto;
+    }
+
+    .action-buttons-group button {
+        padding: 6px 12px;
+        font-size: 0.75rem;
+    }
+
+    .custom-table {
+        min-width: 700px;
+    }
+
+    .pagination-bar {
+        flex-direction: row;
+        gap: 15px;
+    }
+
+    .modal-premium-card {
+        max-width: 600px;
+    }
+
+    .modal-footer-premium {
+        flex-direction: row;
+        gap: 0.75rem;
+    }
+
+    .modal-footer-premium button {
+        width: auto;
+    }
+
+    .form-grid-modal {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem 1rem;
+    }
+
+    .full-width-modal {
+        grid-column: span 2;
+    }
+
+    .modal-footer-danger {
+        flex-direction: row;
+    }
+
+    .modal-footer-danger button {
+        width: auto;
+    }
+
+    .modal-content {
+        width: auto;
+        max-width: 500px;
+    }
+}
+
+/* ============================================================
+   16. RESPONSIVIDAD - PANTALLAS GRANDES (min-width: 1400px)
+   ============================================================ */
+
+@media (min-width: 1400px) {
+    .main-content {
+        padding: 90px 60px 50px;
+    }
+
+    .search-box-pill {
+        width: 380px;
+    }
+
+    .search-box-pill:focus-within {
+        width: 420px;
+    }
+
+    .title-page {
+        font-size: 2.1rem;
+    }
+
+    .custom-table th,
+    .user-row td {
+        padding: 20px 30px;
+    }
+
+    .modal-premium-card {
+        max-width: 620px;
+    }
+
+    .modal-header {
+        padding: 1.5rem 2.5rem;
+    }
+
+    .modal-body {
+        padding: 2rem 2.5rem;
+    }
+
+    .modal-footer-premium {
+        padding: 1.5rem 2.5rem;
+    }
+}
+
+/* ============================================================
+   17. UTILITARIOS RESPONSIVE ADICIONALES
+   ============================================================ */
+
+/* Ocultar en móvil */
+.hide-mobile {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .hide-mobile {
+        display: none !important;
+    }
+}
+
+/* Mostrar solo en móvil */
+.show-mobile {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .show-mobile {
+        display: block !important;
+    }
+
+    .show-mobile-inline {
+        display: inline-block !important;
+    }
+
+    .show-mobile-flex {
+        display: flex !important;
+    }
+}
+
+/* Ajustes de espaciado en móvil */
+@media (max-width: 768px) {
+    .gap-2 {
+        gap: 0.5rem !important;
+    }
+
+    .gap-3 {
+        gap: 0.75rem !important;
+    }
+
+    .gap-4 {
+        gap: 1rem !important;
+    }
+
+    .mb-2 {
+        margin-bottom: 0.5rem !important;
+    }
+
+    .mb-3 {
+        margin-bottom: 0.75rem !important;
+    }
+
+    .mb-4 {
+        margin-bottom: 1rem !important;
+    }
+
+    .p-2 {
+        padding: 0.5rem !important;
+    }
+
+    .p-3 {
+        padding: 0.75rem !important;
+    }
+
+    .p-4 {
+        padding: 1rem !important;
+    }
+
+    .mt-2 {
+        margin-top: 0.5rem !important;
+    }
+
+    .mt-3 {
+        margin-top: 0.75rem !important;
+    }
+
+    .mt-4 {
+        margin-top: 1rem !important;
+    }
+}
+
+/* Eliminar hover en móvil para mejor experiencia táctil */
+@media (max-width: 768px) {
+    .user-row:hover {
+        background: white;
+    }
+
+    .user-row.selected {
+        background: #f1f5f9;
+    }
+
+    .btn-measure-premium:hover:not(:disabled) {
+        background: #dcfce7;
+        color: #15803d;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .btn-edit-premium:hover:not(:disabled) {
+        background: #eff6ff;
+        color: #2563eb;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .btn-delete-premium:hover:not(:disabled) {
+        background: #fef2f2;
+        color: #dc2626;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .btn-save:hover:not(:disabled) {
+        background: #b0001e;
+        transform: none;
+    }
+
+    .nav-arrows button:hover:not(:disabled) {
+        background: white;
+        border-color: #e2e8f0;
+        color: #64748b;
+    }
+
+    .btn-save-appointment:hover:not(:disabled) {
+        background: #b0001e;
+        box-shadow: 0 2px 6px rgba(176, 0, 30, 0.2);
+    }
+
+    .btn-cancel-premium:hover {
+        background: white;
+        color: #475569;
+    }
+
+    .btn-danger-confirm:hover:not(:disabled) {
+        background: #dc2626;
+    }
+
+    .btn-outline-cancel:hover:not(:disabled) {
+        background: white;
+        color: #64748b;
+    }
+
+    .custom-dropdown-item:hover {
+        background: transparent;
+        color: #334155;
+    }
+
+    .patient-badge-container:hover {
+        border-color: #e2e7ee;
+    }
+
+    .btn-desasignar:hover {
+        background: none;
+        transform: none;
+        color: #ef4444;
     }
 }

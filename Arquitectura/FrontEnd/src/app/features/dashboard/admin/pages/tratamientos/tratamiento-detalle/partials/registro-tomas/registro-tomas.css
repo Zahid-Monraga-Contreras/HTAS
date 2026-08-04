@@ -1,8 +1,10 @@
 /* ==========================================================================
-   REGISTRO-TOMAS - ESTILOS COMPLETOS
+   REGISTRO-TOMAS - ESTILOS COMPLETOS Y RESPONSIVOS
    ========================================================================== */
 
-/* TOAST */
+/* ==========================================================================
+   1. TOAST NOTIFICACIONES
+   ========================================================================== */
 .toast-premium-container {
     position: fixed;
     top: 30px;
@@ -17,6 +19,7 @@
     animation: slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     color: #ffffff;
     backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .toast-premium-container.success {
@@ -38,16 +41,19 @@
     display: flex;
     align-items: center;
     gap: 0.8rem;
+    width: 100%;
 }
 
 .icon-toast {
     font-size: 1.4rem;
+    flex-shrink: 0;
 }
 
 .toast-message {
     font-weight: 600;
     font-size: 0.95rem;
     line-height: 1.4;
+    word-break: break-word;
 }
 
 @keyframes slideInRight {
@@ -62,7 +68,9 @@
     }
 }
 
-/* RESUMEN */
+/* ==========================================================================
+   2. RESUMEN DEL TRATAMIENTO
+   ========================================================================== */
 .resumen-tratamiento-historial {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -88,12 +96,14 @@
     min-width: 32px;
     text-align: center;
     opacity: 0.85;
+    flex-shrink: 0;
 }
 
 .resumen-item div {
     display: flex;
     flex-direction: column;
     gap: 0.05rem;
+    min-width: 0;
 }
 
 .resumen-item small {
@@ -108,9 +118,12 @@
     font-size: 0.95rem;
     color: #0a1628;
     font-weight: 600;
+    word-break: break-word;
 }
 
-/* ESTADÍSTICAS */
+/* ==========================================================================
+   3. ESTADÍSTICAS
+   ========================================================================== */
 .estadisticas-section {
     margin-top: 1.75rem;
     padding-top: 1.75rem;
@@ -132,6 +145,7 @@
 .section-title i {
     color: #b0001e;
     font-size: 1.15rem;
+    flex-shrink: 0;
 }
 
 .section-divider {
@@ -207,12 +221,28 @@
     color: #8b5cf6;
 }
 
-/* BOTÓN GENERAR TOMAS */
+/* ==========================================================================
+   4. BOTONES DE ACCIÓN
+   ========================================================================== */
 .tomas-actions {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 1rem;
     gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.tomas-actions-left {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.tomas-actions-right {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
 }
 
 .btn-generar-tomas {
@@ -229,6 +259,8 @@
     gap: 0.6rem;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+    min-height: 44px;
+    white-space: nowrap;
 }
 
 .btn-generar-tomas:hover:not(:disabled) {
@@ -244,6 +276,37 @@
     box-shadow: none !important;
 }
 
+.btn-eliminar-todas {
+    padding: 0.55rem 1.5rem;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+    min-height: 44px;
+    white-space: nowrap;
+}
+
+.btn-eliminar-todas:hover:not(:disabled) {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(239, 68, 68, 0.35);
+}
+
+.btn-eliminar-todas:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
 .spinner-save {
     width: 18px;
     height: 18px;
@@ -251,6 +314,7 @@
     border-radius: 50%;
     border-top-color: #ffffff;
     animation: spin 0.8s linear infinite;
+    flex-shrink: 0;
 }
 
 @keyframes spin {
@@ -259,7 +323,9 @@
     }
 }
 
-/* TOMAS */
+/* ==========================================================================
+   5. LISTA DE TOMAS
+   ========================================================================== */
 .tomas-section-full {
     margin-top: 1.5rem;
 }
@@ -269,6 +335,7 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.25rem 0;
+    flex-wrap: wrap;
 }
 
 .tomas-header .section-title {
@@ -284,6 +351,12 @@
     font-weight: 700;
     margin-left: 0.5rem;
     box-shadow: 0 2px 6px rgba(176, 0, 30, 0.2);
+    white-space: nowrap;
+}
+
+.badge-tomas.badge-activas {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #ffffff;
 }
 
 .tomas-lista-full {
@@ -343,17 +416,26 @@
     border-left: 4px solid #f97316;
 }
 
+.toma-item-full.toma-eliminada {
+    border-left: 4px solid #6c757d;
+    opacity: 0.7;
+    background: #f8f9fa;
+}
+
 .toma-info-full {
     display: flex;
     align-items: center;
     gap: 1.5rem;
     flex-wrap: wrap;
+    flex: 1;
+    min-width: 0;
 }
 
 .toma-fecha-hora {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    flex-wrap: wrap;
 }
 
 .toma-fecha-hora .toma-fecha {
@@ -369,6 +451,7 @@
     background: #f1f4f8;
     padding: 0.1rem 0.6rem;
     border-radius: 12px;
+    white-space: nowrap;
 }
 
 .toma-estado-badge {
@@ -380,6 +463,17 @@
     font-size: 0.75rem;
     font-weight: 700;
     color: #ffffff;
+    white-space: nowrap;
+}
+
+.toma-estado-eliminada {
+    font-size: 0.75rem;
+    color: #6c757d;
+    font-weight: 600;
+    padding: 0.15rem 0.7rem;
+    border-radius: 30px;
+    background: #e9ecef;
+    white-space: nowrap;
 }
 
 .toma-actions-full {
@@ -395,9 +489,23 @@
     align-items: center;
 }
 
+.toma-notas-full {
+    font-size: 0.75rem;
+    color: #6b7a8a;
+    background: #f1f4f8;
+    padding: 0.15rem 0.7rem;
+    border-radius: 30px;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Botones de acción de tomas */
 .btn-toma-completar,
 .btn-toma-omitir,
-.btn-toma-retrasar {
+.btn-toma-retrasar,
+.btn-toma-eliminar {
     width: 28px;
     height: 28px;
     border: none;
@@ -408,6 +516,8 @@
     justify-content: center;
     transition: all 0.2s ease;
     font-size: 0.9rem;
+    flex-shrink: 0;
+    min-width: 28px;
 }
 
 .btn-toma-completar {
@@ -443,14 +553,18 @@
     transform: scale(1.1);
 }
 
-.toma-notas-full {
-    font-size: 0.75rem;
-    color: #6b7a8a;
-    background: #f1f4f8;
-    padding: 0.15rem 0.7rem;
-    border-radius: 30px;
+.btn-toma-eliminar {
+    background: #fee2e2;
+    color: #991b1b;
 }
 
+.btn-toma-eliminar:hover {
+    background: #ef4444;
+    color: #ffffff;
+    transform: scale(1.1);
+}
+
+/* Estado vacío */
 .tomas-vacio {
     text-align: center;
     padding: 2rem 1rem;
@@ -476,7 +590,9 @@
     color: #8a9aa8;
 }
 
-/* BOTONES */
+/* ==========================================================================
+   6. BOTONES GENERALES
+   ========================================================================== */
 .btn-cancel-premium {
     padding: 0.65rem 1.5rem;
     background: #ffffff;
@@ -491,6 +607,9 @@
     gap: 0.6rem;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    min-height: 44px;
+    text-decoration: none;
+    white-space: nowrap;
 }
 
 .btn-cancel-premium:hover:not(:disabled) {
@@ -501,6 +620,17 @@
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
 }
 
+.btn-cancel-premium:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.btn-cancel-premium i {
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
 .action-footer {
     display: flex;
     justify-content: flex-end;
@@ -508,9 +638,12 @@
     margin-top: 2.5rem;
     padding-top: 1.75rem;
     border-top: 2px solid #e9edf2;
+    flex-wrap: wrap;
 }
 
-/* MODAL */
+/* ==========================================================================
+   7. MODALES
+   ========================================================================== */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -524,6 +657,7 @@
     align-items: center;
     justify-content: center;
     animation: modalFadeIn 0.3s ease;
+    padding: 20px;
 }
 
 @keyframes modalFadeIn {
@@ -546,6 +680,12 @@
     width: 90%;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     animation: modalSlideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-danger-large .modal-container {
+    max-width: 550px;
 }
 
 @keyframes modalSlideUp {
@@ -565,6 +705,11 @@
     align-items: center;
     gap: 0.75rem;
     margin-bottom: 1rem;
+}
+
+.modal-header-danger .modal-icon-danger {
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    color: #dc2626;
 }
 
 .modal-icon {
@@ -598,12 +743,48 @@
     line-height: 1.5;
 }
 
+.modal-advertencia {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: #fef3c7;
+    border-radius: 10px;
+    color: #92400e;
+    margin: 1rem 0;
+}
+
+.modal-advertencia i {
+    font-size: 1.2rem;
+    color: #d97706;
+    flex-shrink: 0;
+}
+
+.modal-detalle-eliminacion {
+    background: #f8fafc;
+    padding: 1rem;
+    border-radius: 10px;
+    border: 1px solid #e9edf2;
+    margin-top: 0.5rem;
+}
+
+.modal-detalle-eliminacion p {
+    margin: 0.3rem 0;
+    font-size: 0.9rem;
+    color: #4a5a6e;
+}
+
 .modal-footer {
     display: flex;
     justify-content: flex-end;
     gap: 0.75rem;
     padding-top: 1rem;
     border-top: 1px solid #e9edf2;
+    flex-wrap: wrap;
+}
+
+.modal-footer-danger {
+    border-top: 2px solid #fee2e2;
 }
 
 .modal-btn {
@@ -617,6 +798,7 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    min-height: 44px;
 }
 
 .modal-btn-cancel {
@@ -640,176 +822,6 @@
     box-shadow: 0 8px 24px rgba(176, 0, 30, 0.35);
 }
 
-.modal-btn-confirm i {
-    font-size: 1rem;
-}
-
-/* RESPONSIVIDAD */
-@media (max-width: 768px) {
-    .resumen-tratamiento-historial {
-        grid-template-columns: 1fr;
-        gap: 0.75rem;
-        padding: 1rem 1.25rem;
-    }
-
-    .resumen-item {
-        padding: 0.5rem 0;
-        border-bottom: 1px solid #e9edf2;
-    }
-
-    .resumen-item:last-child {
-        border-bottom: none;
-    }
-
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .toma-item-full {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-        padding: 0.7rem 1rem;
-    }
-
-    .toma-actions-full {
-        width: 100%;
-        justify-content: flex-start;
-        flex-wrap: wrap;
-    }
-
-    .toma-info-full {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.4rem;
-    }
-
-    .toma-fecha-hora {
-        flex-wrap: wrap;
-    }
-
-    .action-footer {
-        flex-direction: column-reverse;
-        gap: 0.75rem;
-        margin-top: 1.75rem;
-        padding-top: 1.25rem;
-    }
-
-    .action-footer button {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .toast-premium-container {
-        top: 15px;
-        right: 15px;
-        left: 15px;
-        max-width: none;
-        border-radius: 12px;
-    }
-
-    .toma-actions-buttons .btn-toma-completar,
-    .toma-actions-buttons .btn-toma-omitir,
-    .toma-actions-buttons .btn-toma-retrasar {
-        width: 24px;
-        height: 24px;
-        font-size: 0.75rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .stat-box {
-        padding: 0.9rem;
-    }
-
-    .stat-value {
-        font-size: 1.35rem;
-    }
-
-    .resumen-item strong {
-        font-size: 0.85rem;
-    }
-
-    .resumen-item i {
-        font-size: 1.2rem;
-        min-width: 28px;
-    }
-
-    .toma-fecha {
-        font-size: 0.8rem;
-    }
-
-    .toma-hora {
-        font-size: 0.7rem;
-    }
-
-    .toma-estado-badge {
-        font-size: 0.65rem;
-        padding: 0.15rem 0.6rem;
-    }
-
-    .modal-container {
-        padding: 1.5rem;
-    }
-
-    .modal-footer {
-        flex-direction: column-reverse;
-    }
-
-    .modal-btn {
-        width: 100%;
-        justify-content: center;
-    }
-}
-
-/* Botón de eliminar toma */
-.btn-toma-eliminar {
-    width: 28px;
-    height: 28px;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    font-size: 0.9rem;
-    background: #fee2e2;
-    color: #991b1b;
-}
-
-.btn-toma-eliminar:hover {
-    background: #ef4444;
-    color: #ffffff;
-    transform: scale(1.1);
-}
-
-/* Estilos para tomas eliminadas */
-.toma-item-full.toma-eliminada {
-    border-left: 4px solid #6c757d;
-    opacity: 0.7;
-    background: #f8f9fa;
-}
-
-.toma-estado-eliminada {
-    font-size: 0.75rem;
-    color: #6c757d;
-    font-weight: 600;
-    padding: 0.15rem 0.7rem;
-    border-radius: 30px;
-    background: #e9ecef;
-}
-
-/* Modal de peligro */
-.modal-header-danger .modal-icon-danger {
-    background: linear-gradient(135deg, #fee2e2, #fecaca);
-    color: #dc2626;
-}
-
 .modal-btn-danger {
     background: linear-gradient(135deg, #ef4444, #dc2626);
     color: #ffffff;
@@ -821,116 +833,980 @@
     box-shadow: 0 8px 24px rgba(239, 68, 68, 0.35);
 }
 
-/* Estilos para el contenedor de acciones */
-.tomas-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-    gap: 0.75rem;
-    flex-wrap: wrap;
+.modal-btn-confirm i,
+.modal-btn-danger i,
+.modal-btn-cancel i {
+    font-size: 1rem;
+    flex-shrink: 0;
 }
 
-.tomas-actions-left {
-    display: flex;
-    gap: 0.75rem;
+/* ==========================================================================
+   8. RESPONSIVIDAD - TABLETS (max-width: 1024px)
+   ========================================================================== */
+@media (max-width: 1024px) {
+    .resumen-tratamiento-historial {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+        padding: 1rem 1.25rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .toma-item-full {
+        padding: 0.8rem 1rem;
+    }
+
+    .toast-premium-container {
+        max-width: 380px;
+        padding: 0.9rem 1.2rem;
+    }
 }
 
-.tomas-actions-right {
-    display: flex;
-    gap: 0.75rem;
-}
-
-/* Botón Eliminar Todas */
-.btn-eliminar-todas {
-    padding: 0.55rem 1.5rem;
-    background: linear-gradient(135deg, #ef4444, #dc2626);
-    color: #ffffff;
-    border: none;
-    border-radius: 10px;
-    font-weight: 700;
-    font-size: 0.85rem;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6rem;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
-}
-
-.btn-eliminar-todas:hover:not(:disabled) {
-    background: linear-gradient(135deg, #dc2626, #b91c1c);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(239, 68, 68, 0.35);
-}
-
-.btn-eliminar-todas:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
-    transform: none !important;
-    box-shadow: none !important;
-}
-
-/* Badges de tomas */
-.badge-tomas.badge-activas {
-    background: linear-gradient(135deg, #10b981, #059669);
-    color: #ffffff;
-}
-
-/* Modal de peligro grande */
-.modal-danger-large .modal-container {
-    max-width: 550px;
-}
-
-.modal-advertencia {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem 1rem;
-    background: #fef3c7;
-    border-radius: 10px;
-    color: #92400e;
-    margin: 1rem 0;
-}
-
-.modal-advertencia i {
-    font-size: 1.2rem;
-    color: #d97706;
-}
-
-.modal-detalle-eliminacion {
-    background: #f8fafc;
-    padding: 1rem;
-    border-radius: 10px;
-    border: 1px solid #e9edf2;
-    margin-top: 0.5rem;
-}
-
-.modal-detalle-eliminacion p {
-    margin: 0.3rem 0;
-    font-size: 0.9rem;
-    color: #4a5a6e;
-}
-
-.modal-footer-danger {
-    border-top: 2px solid #fee2e2;
-}
-
-/* Responsive */
+/* ==========================================================================
+   9. RESPONSIVIDAD - MÓVILES (max-width: 768px)
+   ========================================================================== */
 @media (max-width: 768px) {
+
+    /* Resumen */
+    .resumen-tratamiento-historial {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        border-radius: 12px;
+        margin-bottom: 1.25rem;
+    }
+
+    .resumen-item {
+        padding: 0.4rem 0;
+        border-bottom: 1px solid #f1f4f8;
+    }
+
+    .resumen-item:last-child {
+        border-bottom: none;
+    }
+
+    .resumen-item i {
+        font-size: 1.2rem;
+        min-width: 28px;
+    }
+
+    .resumen-item strong {
+        font-size: 0.85rem;
+    }
+
+    .resumen-item small {
+        font-size: 0.55rem;
+    }
+
+    /* Estadísticas */
+    .estadisticas-section {
+        margin-top: 1.25rem;
+        padding-top: 1.25rem;
+    }
+
+    .section-title {
+        font-size: 0.95rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+
+    .stat-box {
+        padding: 0.9rem 0.75rem;
+        border-radius: 12px;
+    }
+
+    .stat-box small {
+        font-size: 0.6rem;
+    }
+
+    .stat-value {
+        font-size: 1.35rem;
+    }
+
+    /* Acciones de tomas */
     .tomas-actions {
         flex-direction: column;
         align-items: stretch;
+        gap: 0.5rem;
     }
 
     .tomas-actions-left,
     .tomas-actions-right {
         width: 100%;
+        flex-direction: column;
     }
 
     .tomas-actions-left button,
     .tomas-actions-right button {
         width: 100%;
         justify-content: center;
+        padding: 0.6rem 1rem;
+        font-size: 0.8rem;
+        min-height: 40px;
+    }
+
+    .tomas-section-full {
+        margin-top: 1rem;
+    }
+
+    .tomas-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+
+    .tomas-lista-full {
+        border-radius: 12px;
+    }
+
+    /* Items de tomas */
+    .toma-item-full {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+        padding: 0.7rem 0.9rem;
+        border-left-width: 3px;
+    }
+
+    .toma-info-full {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+        width: 100%;
+    }
+
+    .toma-fecha-hora {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+
+    .toma-fecha-hora .toma-fecha {
+        font-size: 0.85rem;
+    }
+
+    .toma-fecha-hora .toma-hora {
+        font-size: 0.75rem;
+        padding: 0.05rem 0.5rem;
+    }
+
+    .toma-estado-badge {
+        font-size: 0.65rem;
+        padding: 0.15rem 0.6rem;
+        align-self: flex-start;
+    }
+
+    .toma-actions-full {
+        width: 100%;
+        justify-content: space-between;
+        gap: 0.5rem;
+    }
+
+    .toma-actions-buttons {
+        gap: 0.2rem;
+    }
+
+    .btn-toma-completar,
+    .btn-toma-omitir,
+    .btn-toma-retrasar,
+    .btn-toma-eliminar {
+        width: 32px;
+        height: 32px;
+        font-size: 0.85rem;
+        min-width: 32px;
+    }
+
+    .toma-notas-full {
+        font-size: 0.7rem;
+        padding: 0.1rem 0.5rem;
+        max-width: 100%;
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    /* Toast */
+    .toast-premium-container {
+        top: 15px;
+        right: 15px;
+        left: 15px;
+        max-width: none;
+        border-radius: 12px;
+        padding: 0.85rem 1rem;
+    }
+
+    .icon-toast {
+        font-size: 1.2rem;
+    }
+
+    .toast-message {
+        font-size: 0.85rem;
+    }
+
+    /* Footer */
+    .action-footer {
+        flex-direction: column-reverse;
+        gap: 0.75rem;
+        margin-top: 1.75rem;
+        padding-top: 1.25rem;
+    }
+
+    .action-footer button {
+        width: 100%;
+        justify-content: center;
+        min-height: 40px;
+    }
+
+    /* Modales */
+    .modal-container {
+        padding: 1.5rem;
+        border-radius: 16px;
+        max-width: 100%;
+        width: 95%;
+        max-height: 85vh;
+    }
+
+    .modal-danger-large .modal-container {
+        max-width: 100%;
+    }
+
+    .modal-title {
+        font-size: 1rem;
+    }
+
+    .modal-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 1.2rem;
+    }
+
+    .modal-body {
+        padding: 0.25rem 0 1rem 0;
+    }
+
+    .modal-mensaje {
+        font-size: 0.85rem;
+    }
+
+    .modal-footer {
+        flex-direction: column-reverse;
+        gap: 0.5rem;
+        padding-top: 0.75rem;
+    }
+
+    .modal-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 0.5rem 1.2rem;
+        font-size: 0.8rem;
+        min-height: 40px;
+        border-radius: 8px;
+    }
+
+    .modal-advertencia {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+        flex-wrap: wrap;
+    }
+
+    .modal-advertencia i {
+        font-size: 1rem;
+    }
+
+    .modal-detalle-eliminacion {
+        padding: 0.75rem;
+    }
+
+    .modal-detalle-eliminacion p {
+        font-size: 0.8rem;
+        margin: 0.2rem 0;
+    }
+
+    .badge-tomas {
+        font-size: 0.6rem;
+        padding: 0.1rem 0.6rem;
+        margin-left: 0.25rem;
+    }
+
+    .tomas-vacio {
+        padding: 1.5rem 0.75rem;
+    }
+
+    .tomas-vacio i {
+        font-size: 2rem;
+    }
+
+    .tomas-vacio p {
+        font-size: 0.9rem;
+    }
+
+    .tomas-vacio span {
+        font-size: 0.75rem;
+    }
+
+    .section-divider {
+        margin: 1.25rem 0;
+    }
+
+    .btn-cancel-premium {
+        padding: 0.5rem 1.2rem;
+        font-size: 0.85rem;
+        min-height: 40px;
+        border-radius: 8px;
+    }
+}
+
+/* ==========================================================================
+   10. RESPONSIVIDAD - MÓVILES PEQUEÑOS (max-width: 480px)
+   ========================================================================== */
+@media (max-width: 480px) {
+    .resumen-tratamiento-historial {
+        grid-template-columns: 1fr;
+        gap: 0.25rem;
+        padding: 0.6rem 0.75rem;
+    }
+
+    .resumen-item {
+        padding: 0.3rem 0;
+    }
+
+    .resumen-item i {
+        font-size: 1rem;
+        min-width: 24px;
+    }
+
+    .resumen-item strong {
+        font-size: 0.8rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+    }
+
+    .stat-box {
+        padding: 0.7rem 0.5rem;
+        border-radius: 10px;
+    }
+
+    .stat-value {
+        font-size: 1.15rem;
+    }
+
+    .stat-box small {
+        font-size: 0.55rem;
+    }
+
+    .section-title {
+        font-size: 0.85rem;
+        gap: 0.4rem;
+    }
+
+    .section-title i {
+        font-size: 0.95rem;
+    }
+
+    .toma-item-full {
+        padding: 0.5rem 0.6rem;
+    }
+
+    .toma-fecha-hora .toma-fecha {
+        font-size: 0.75rem;
+    }
+
+    .toma-fecha-hora .toma-hora {
+        font-size: 0.65rem;
+    }
+
+    .toma-estado-badge {
+        font-size: 0.55rem;
+        padding: 0.1rem 0.4rem;
+    }
+
+    .btn-toma-completar,
+    .btn-toma-omitir,
+    .btn-toma-retrasar,
+    .btn-toma-eliminar {
+        width: 28px;
+        height: 28px;
+        font-size: 0.75rem;
+        min-width: 28px;
+    }
+
+    .modal-container {
+        padding: 1rem;
+        border-radius: 14px;
+        width: 98%;
+    }
+
+    .modal-title {
+        font-size: 0.9rem;
+    }
+
+    .modal-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+    }
+
+    .modal-mensaje {
+        font-size: 0.8rem;
+    }
+
+    .modal-btn {
+        font-size: 0.75rem;
+        padding: 0.4rem 1rem;
+        min-height: 36px;
+    }
+
+    .tomas-actions-left button,
+    .tomas-actions-right button {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.8rem;
+        min-height: 36px;
+        border-radius: 8px;
+    }
+
+    .btn-generar-tomas,
+    .btn-eliminar-todas {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.8rem;
+        min-height: 36px;
+        border-radius: 8px;
+    }
+
+    .btn-cancel-premium {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.8rem;
+        min-height: 36px;
+        border-radius: 7px;
+    }
+
+    .toast-premium-container {
+        padding: 0.6rem 0.8rem;
+        border-radius: 10px;
+        top: 10px;
+        right: 10px;
+        left: 10px;
+    }
+
+    .icon-toast {
+        font-size: 1rem;
+    }
+
+    .toast-message {
+        font-size: 0.75rem;
+    }
+
+    .tomas-vacio i {
+        font-size: 1.75rem;
+    }
+
+    .tomas-vacio p {
+        font-size: 0.8rem;
+    }
+
+    .tomas-vacio span {
+        font-size: 0.7rem;
+    }
+
+    .action-footer {
+        margin-top: 1.25rem;
+        padding-top: 1rem;
+    }
+}
+
+/* ==========================================================================
+   11. RESPONSIVIDAD - ORIENTACIÓN HORIZONTAL EN MÓVILES
+   ========================================================================== */
+@media (max-width: 820px) and (orientation: landscape) {
+    .resumen-tratamiento-historial {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.5rem;
+    }
+
+    .stat-box {
+        padding: 0.6rem 0.5rem;
+    }
+
+    .stat-value {
+        font-size: 1.1rem;
+    }
+
+    .toma-item-full {
+        padding: 0.5rem 0.75rem;
+    }
+
+    .toma-info-full {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .toma-actions-full {
+        width: auto;
+    }
+
+    .tomas-actions {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .tomas-actions-left,
+    .tomas-actions-right {
+        width: auto;
+        flex-direction: row;
+    }
+
+    .tomas-actions-left button,
+    .tomas-actions-right button {
+        width: auto;
+        min-height: 32px;
+        padding: 0.4rem 1rem;
+        font-size: 0.75rem;
+    }
+
+    .modal-container {
+        max-width: 500px;
+        padding: 1.5rem;
+    }
+
+    .modal-footer {
+        flex-direction: row;
+    }
+
+    .modal-btn {
+        width: auto;
+        min-height: 36px;
+        padding: 0.4rem 1.2rem;
+    }
+
+    .toast-premium-container {
+        max-width: 350px;
+        top: 15px;
+        right: 15px;
+        left: auto;
+    }
+
+    .action-footer {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .action-footer button {
+        width: auto;
+        min-height: 36px;
+        padding: 0.4rem 1.2rem;
+    }
+}
+
+/* ==========================================================================
+   12. RESPONSIVIDAD - PANTALLAS GRANDES (min-width: 1400px)
+   ========================================================================== */
+@media (min-width: 1400px) {
+    .resumen-tratamiento-historial {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+        padding: 1.5rem 2rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+    }
+
+    .stat-box {
+        padding: 1.5rem;
+    }
+
+    .stat-value {
+        font-size: 1.8rem;
+    }
+
+    .toma-item-full {
+        padding: 1.1rem 2rem;
+    }
+
+    .toast-premium-container {
+        max-width: 480px;
+        padding: 1.2rem 1.8rem;
+        border-radius: 16px;
+        top: 40px;
+        right: 40px;
+    }
+
+    .modal-container {
+        padding: 2.5rem;
+        max-width: 500px;
+    }
+
+    .modal-danger-large .modal-container {
+        max-width: 600px;
+    }
+}
+
+/* ==========================================================================
+   13. UTILIDADES RESPONSIVAS
+   ========================================================================== */
+/* Clases de visibilidad */
+.hide-mobile {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .hide-mobile {
+        display: none !important;
+    }
+}
+
+.show-mobile {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .show-mobile {
+        display: block !important;
+    }
+
+    .show-mobile-inline {
+        display: inline-block !important;
+    }
+
+    .show-mobile-flex {
+        display: flex !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .hide-small-mobile {
+        display: none !important;
+    }
+
+    .show-small-mobile {
+        display: block !important;
+    }
+}
+
+/* Espaciado responsivo */
+@media (max-width: 768px) {
+    .gap-2 {
+        gap: 0.5rem !important;
+    }
+
+    .gap-3 {
+        gap: 0.75rem !important;
+    }
+
+    .gap-4 {
+        gap: 1rem !important;
+    }
+
+    .mb-2 {
+        margin-bottom: 0.5rem !important;
+    }
+
+    .mb-3 {
+        margin-bottom: 0.75rem !important;
+    }
+
+    .mb-4 {
+        margin-bottom: 1rem !important;
+    }
+
+    .p-2 {
+        padding: 0.5rem !important;
+    }
+
+    .p-3 {
+        padding: 0.75rem !important;
+    }
+
+    .p-4 {
+        padding: 1rem !important;
+    }
+
+    .mt-2 {
+        margin-top: 0.5rem !important;
+    }
+
+    .mt-3 {
+        margin-top: 0.75rem !important;
+    }
+
+    .mt-4 {
+        margin-top: 1rem !important;
+    }
+
+    .w-100-mobile {
+        width: 100% !important;
+    }
+
+    .text-center-mobile {
+        text-align: center !important;
+    }
+
+    .flex-column-mobile {
+        flex-direction: column !important;
+    }
+
+    .align-stretch-mobile {
+        align-items: stretch !important;
+    }
+}
+
+/* ==========================================================================
+   14. ACCESIBILIDAD Y MEJORAS DE INTERACCIÓN
+   ========================================================================== */
+html {
+    scroll-behavior: smooth;
+}
+
+::selection {
+    background: rgba(176, 0, 30, 0.15);
+    color: #b0001e;
+}
+
+/* Focus visible para accesibilidad */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+a:focus-visible {
+    outline: 2px solid #b0001e;
+    outline-offset: 2px;
+}
+
+/* Touch target improvements */
+@media (max-width: 768px) {
+
+    button,
+    .tab-btn,
+    .btn-cancel-premium,
+    .btn-generar-tomas,
+    .btn-eliminar-todas,
+    .btn-toma-completar,
+    .btn-toma-omitir,
+    .btn-toma-retrasar,
+    .btn-toma-eliminar,
+    .modal-btn {
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Mejora de feedback táctil */
+    .btn-generar-tomas:active:not(:disabled),
+    .btn-eliminar-todas:active:not(:disabled),
+    .btn-cancel-premium:active:not(:disabled) {
+        transform: scale(0.96);
+    }
+
+    .btn-toma-completar:active,
+    .btn-toma-omitir:active,
+    .btn-toma-retrasar:active,
+    .btn-toma-eliminar:active {
+        transform: scale(0.9);
+    }
+
+    .modal-btn-confirm:active:not(:disabled),
+    .modal-btn-danger:active:not(:disabled),
+    .modal-btn-cancel:active:not(:disabled) {
+        transform: scale(0.96);
+    }
+}
+
+/* Eliminar hover en móvil para mejor experiencia táctil */
+@media (max-width: 768px) {
+    .btn-cancel-premium:hover:not(:disabled) {
+        background: #ffffff;
+        color: #4a5a6e;
+        transform: none;
+        border-color: #dce1e8;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+
+    .btn-generar-tomas:hover:not(:disabled) {
+        background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        transform: none;
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+    }
+
+    .btn-eliminar-todas:hover:not(:disabled) {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        transform: none;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+    }
+
+    .btn-toma-completar:hover {
+        background: #d1fae5;
+        color: #065f46;
+        transform: none;
+    }
+
+    .btn-toma-omitir:hover {
+        background: #fee2e2;
+        color: #991b1b;
+        transform: none;
+    }
+
+    .btn-toma-retrasar:hover {
+        background: #fef3c7;
+        color: #92400e;
+        transform: none;
+    }
+
+    .btn-toma-eliminar:hover {
+        background: #fee2e2;
+        color: #991b1b;
+        transform: none;
+    }
+
+    .stat-box:hover {
+        transform: none;
+        border-color: #e9edf2;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+
+    .toma-item-full:hover {
+        background: #ffffff;
+    }
+
+    .modal-btn-confirm:hover {
+        transform: none;
+        box-shadow: 0 4px 12px rgba(176, 0, 30, 0.25);
+    }
+
+    .modal-btn-danger:hover {
+        transform: none;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+    }
+
+    .modal-btn-cancel:hover {
+        background: #f1f4f8;
+        transform: none;
+    }
+}
+
+/* ==========================================================================
+   15. ANIMACIONES Y TRANSICIONES SUAVES PARA MÓVIL
+   ========================================================================== */
+@media (max-width: 768px) {
+    .tomas-lista-full {
+        animation-duration: 0.2s;
+    }
+
+    .toast-premium-container {
+        animation-duration: 0.35s;
+    }
+
+    .modal-container {
+        animation-duration: 0.25s;
+    }
+
+    .resumen-tratamiento-historial,
+    .stats-grid,
+    .toma-item-full {
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+}
+
+/* ==========================================================================
+   16. SOPORTE PARA DARK MODE (Opcional)
+   ========================================================================== */
+@media (prefers-color-scheme: dark) {
+    /* Puedes agregar estilos para modo oscuro aquí si lo deseas */
+    /* Ejemplo:
+    .resumen-tratamiento-historial {
+        background: #1a1a2e;
+        border-color: #2d2d44;
+    }
+    .stat-box {
+        background: #1a1a2e;
+        border-color: #2d2d44;
+    }
+    .tomas-lista-full {
+        background: #1a1a2e;
+        border-color: #2d2d44;
+    }
+    .toma-item-full {
+        border-bottom-color: #2d2d44;
+    }
+    .toma-item-full:hover {
+        background: #22223a;
+    }
+    */
+}
+
+/* ==========================================================================
+   17. SOPORTE PARA SCROLLBAR PERSONALIZADA
+   ========================================================================== */
+.tomas-lista-full::-webkit-scrollbar,
+.modal-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.tomas-lista-full::-webkit-scrollbar-track,
+.modal-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.tomas-lista-full::-webkit-scrollbar-thumb,
+.modal-container::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+.tomas-lista-full::-webkit-scrollbar-thumb:hover,
+.modal-container::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+@media (max-width: 768px) {
+    .tomas-lista-full::-webkit-scrollbar {
+        height: 4px;
+    }
+}
+
+/* ==========================================================================
+   18. ESTILOS PARA TOOLTIPS EN MÓVIL
+   ========================================================================== */
+@media (max-width: 768px) {
+    [data-tooltip] {
+        position: relative;
+    }
+
+    [data-tooltip]:before {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%) scale(0.8);
+        background: #1a2938;
+        color: #ffffff;
+        padding: 0.3rem 0.6rem;
+        border-radius: 6px;
+        font-size: 0.7rem;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.2s ease;
+        z-index: 1000;
+        font-weight: 500;
+    }
+
+    [data-tooltip]:hover:before {
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
     }
 }

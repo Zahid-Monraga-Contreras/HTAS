@@ -1,3 +1,11 @@
+/* ==========================================================================
+   ESTILOS PRINCIPALES DEL DASHBOARD - VERSIÓN COMPLETA Y RESPONSIVA
+   ========================================================================== */
+
+/* ============================================================
+   CONTENEDOR PRINCIPAL
+   ============================================================ */
+
 .main-container {
     margin-left: 250px;
     padding-top: 60px;
@@ -9,6 +17,10 @@
 .main-container.menu-collapsed {
     margin-left: 80px;
 }
+
+/* ============================================================
+   CONTENIDO DEL DASHBOARD
+   ============================================================ */
 
 .dashboard-content {
     padding: 40px;
@@ -26,7 +38,10 @@
     font-weight: 600;
 }
 
-/* Tarjetas Estadísticas */
+/* ============================================================
+   TARJETAS ESTADÍSTICAS
+   ============================================================ */
+
 .stat-card {
     background: white;
     padding: 24px;
@@ -66,6 +81,46 @@
     font-weight: 500;
 }
 
+/* ============================================================
+   COLORES DE ROLES PARA TARJETAS ESTADÍSTICAS
+   ============================================================ */
+
+.stat-value.text-htas-red {
+    color: #b0001e !important;
+}
+
+.stat-value.text-htas-paciente {
+    color: #6d28d9 !important;
+}
+
+.stat-value.text-htas-medico {
+    color: #0369a1 !important;
+}
+
+.stat-value.text-htas-acompanante {
+    color: #15803d !important;
+}
+
+.stat-card.border-paciente {
+    border-top: 4px solid #6d28d9 !important;
+}
+
+.stat-card.border-medico {
+    border-top: 4px solid #0369a1 !important;
+}
+
+.stat-card.border-acompanante {
+    border-top: 4px solid #15803d !important;
+}
+
+.stat-card.border-htas {
+    border-top: 4px solid #b0001e !important;
+}
+
+/* ============================================================
+   PANELES Y TARJETAS
+   ============================================================ */
+
 .panel-title {
     font-size: 1.1rem;
     font-weight: 700;
@@ -78,7 +133,43 @@
     background: #ffffff;
 }
 
-/* Sección Control de Medicamentos */
+/* ============================================================
+   BOTONES "IR A..."
+   ============================================================ */
+
+.btn-link-htas {
+    color: #8B0015;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.3s ease;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: rgba(139, 0, 21, 0.06);
+}
+
+.btn-link-htas:hover {
+    color: #b0001e;
+    background: rgba(139, 0, 21, 0.12);
+    transform: translateX(3px);
+}
+
+.btn-link-htas i {
+    font-size: 14px;
+    transition: transform 0.3s ease;
+}
+
+.btn-link-htas:hover i {
+    transform: translateX(4px);
+}
+
+/* ============================================================
+   LISTAS DE MEDICAMENTOS Y CITAS
+   ============================================================ */
+
 .meds-list-scroll,
 .citas-list-scroll {
     max-height: 360px;
@@ -86,7 +177,10 @@
     padding-right: 5px;
 }
 
-/* Scrollbar estética */
+/* ============================================================
+   SCROLLBAR PERSONALIZADA
+   ============================================================ */
+
 ::-webkit-scrollbar {
     width: 6px;
 }
@@ -103,95 +197,16 @@
 
 .progress-bar {
     background-color: #b0001e;
-    /* Color institucional */
 }
 
-/* Contenedor de Citas */
-.cita-card-item {
-    background-color: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-left: 4px solid #64748b;
-    /* Por defecto */
-    transition: background-color 0.2s ease;
-}
+/* ============================================================
+   TARJETAS DE CITAS
+   ============================================================ */
 
-.cita-card-item:hover {
-    background-color: #f1f5f9;
-}
-
-.cita-doctor {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: #334155;
-}
-
-.cita-fecha {
-    font-size: 0.8rem;
-}
-
-/* Insignias de Estado (Badges) */
-.badge {
-    padding: 6px 10px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: capitalize;
-}
-
-.badge-success {
-    background-color: #d1fae5;
-    color: #065f46;
-}
-
-.badge-warning {
-    background-color: #fef3c7;
-    color: #92400e;
-}
-
-.badge-danger {
-    background-color: #fee2e2;
-    color: #991b1b;
-}
-
-.badge-info {
-    background-color: #e0f2fe;
-    color: #0369a1;
-}
-
-/* Loading state spinner */
-.spinner-loading {
-    width: 40px;
-    height: 40px;
-    border: 3px solid #e2e8f0;
-    border-radius: 50%;
-    border-top-color: #b0001e;
-    animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-@media (max-width: 768px) {
-    .main-container {
-        margin-left: 0;
-        padding: 15px;
-        padding-top: 80px;
-    }
-
-    .dashboard-content {
-        padding: 0;
-    }
-}
-
-/* Estructuras de las Citas Dinámicas */
 .cita-card-item {
     background-color: #ffffff;
     border: 1px solid #e2e8f0;
     border-left: 4px solid #94a3b8;
-    /* Por defecto */
     transition: all 0.2s ease-in-out;
 }
 
@@ -200,7 +215,7 @@
     transform: translateX(2px);
 }
 
-/* Indicadores de borde según estado del Backend */
+/* Indicadores de borde según estado */
 .cita-card-item.programada,
 .cita-card-item.confirmada,
 .cita-card-item.activa {
@@ -241,99 +256,14 @@
     display: inline-block;
 }
 
-/* El resto de tus estilos generales de menú y grid se mantienen idénticos */
-.main-container {
-    margin-left: 250px;
-    padding-top: 60px;
-    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    min-height: 100vh;
-    background-color: #fcfdfe;
-}
-
-.main-container.menu-collapsed {
-    margin-left: 80px;
-}
-
-.dashboard-content {
-    padding: 40px;
-}
-
-.content-header {
-    margin-bottom: 35px;
-}
-
-.text-slate {
-    color: #1e293b;
-}
-
-.font-semibold {
-    font-weight: 600;
-}
-
-.stat-card {
-    background: white;
-    padding: 24px;
-    border-radius: 16px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    height: 100%;
-    border: 1px solid #f1f5f9;
-    transition: transform 0.2s ease;
-}
-
-.stat-card:hover {
-    transform: translateY(-2px);
-}
-
-.border-htas {
-    border-top: 4px solid #b0001e;
-}
-
-.stat-title {
-    font-size: 0.8rem;
-    color: #64748b;
-    font-weight: 700;
-    text-transform: uppercase;
-}
-
-.stat-value {
-    font-size: 1.85rem;
-    font-weight: 800;
-    margin: 12px 0 6px 0;
-    color: #0f172a;
-}
-
-.stat-meta {
-    font-size: 0.75rem;
-    color: #94a3b8;
-}
-
-.panel-title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #1e293b;
-}
-
-.rounded-card {
-    border-radius: 16px;
-    border: 1px solid #f1f5f9;
-    background: #ffffff;
-}
-
-.meds-list-scroll,
-.citas-list-scroll {
-    max-height: 360px;
-    overflow-y: auto;
-    padding-right: 5px;
-}
-
-.progress-bar {
-    background-color: #b0001e;
-}
+/* ============================================================
+   BADGES (INSIGNIAS)
+   ============================================================ */
 
 .badge {
-    padding: 4px 8px;
+    padding: 6px 10px;
     border-radius: 20px;
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 600;
     text-transform: capitalize;
 }
@@ -358,6 +288,10 @@
     color: #0369a1;
 }
 
+/* ============================================================
+   LOADING SPINNER
+   ============================================================ */
+
 .spinner-loading {
     width: 40px;
     height: 40px;
@@ -373,21 +307,10 @@
     }
 }
 
-@media (max-width: 768px) {
-    .main-container {
-        margin-left: 0;
-        padding: 15px;
-        padding-top: 80px;
-    }
+/* ============================================================
+   CHART.JS WRAPPER
+   ============================================================ */
 
-    .dashboard-content {
-        padding: 0;
-    }
-}
-
-/* ==========================================================================
-   AGREGADO EXCLUSIVO PARA RENDERIZADO DE CONTENEDORES CANVAS (CHART.JS)
-   ========================================================================== */
 .chart-wrapper {
     width: 100%;
     display: block;
@@ -395,94 +318,382 @@
 }
 
 /* ============================================================
-   ESTILOS PARA LOS BOTONES "IR A ..."
+   RESPONSIVE - TABLETS Y PANTALLAS PEQUEÑAS (max-width: 1024px)
    ============================================================ */
 
-.btn-link-htas {
-    color: #8B0015;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 13px;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    transition: all 0.3s ease;
-    padding: 4px 12px;
-    border-radius: 20px;
-    background: rgba(139, 0, 21, 0.06);
+@media (max-width: 1024px) {
+    .main-container {
+        margin-left: 80px;
+    }
+
+    .main-container.menu-collapsed {
+        margin-left: 0;
+    }
+
+    .dashboard-content {
+        padding: 30px 20px;
+    }
+
+    .stat-value {
+        font-size: 1.6rem;
+    }
+
+    .panel-title {
+        font-size: 1rem;
+    }
+
+    .cita-motivo {
+        font-size: 0.9rem;
+    }
 }
 
-.btn-link-htas:hover {
-    color: #b0001e;
-    background: rgba(139, 0, 21, 0.12);
-    transform: translateX(3px);
-}
+/* ============================================================
+   RESPONSIVE - MÓVILES Y PANTALLAS MUY PEQUEÑAS (max-width: 768px)
+   ============================================================ */
 
-.btn-link-htas i {
-    font-size: 14px;
-    transition: transform 0.3s ease;
-}
-
-.btn-link-htas:hover i {
-    transform: translateX(4px);
-}
-
-/* Ajuste para los títulos con botón */
-.panel-title {
-    font-weight: 700;
-    color: #1e293b;
-    font-size: 1.1rem;
-}
-
-/* Responsive para los botones */
 @media (max-width: 768px) {
-    .btn-link-htas {
-        font-size: 12px;
-        padding: 3px 10px;
+    .main-container {
+        margin-left: 0;
+        padding-top: 70px;
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .main-container.menu-collapsed {
+        margin-left: 0;
+    }
+
+    .dashboard-content {
+        padding: 15px 12px;
+    }
+
+    .content-header {
+        margin-bottom: 20px;
+    }
+
+    .content-header h1 {
+        font-size: 1.5rem !important;
+    }
+
+    .content-header .text-muted {
+        font-size: 0.85rem;
+    }
+
+    /* Tarjetas estadísticas en móvil */
+    .stat-card {
+        padding: 16px;
+        margin-bottom: 10px;
+    }
+
+    .stat-value {
+        font-size: 1.4rem;
+        margin: 8px 0 4px 0;
+    }
+
+    .stat-title {
+        font-size: 0.7rem;
+    }
+
+    .stat-meta {
+        font-size: 0.65rem;
+    }
+
+    /* Grid de estadísticas - 2 columnas en móvil */
+    .row.g-4 {
+        --bs-gutter-y: 0.75rem;
+        --bs-gutter-x: 0.75rem;
+    }
+
+    .row.g-4>* {
+        padding: 0 0.375rem;
+    }
+
+    /* Paneles y tarjetas */
+    .rounded-card {
+        padding: 16px !important;
+        margin-bottom: 15px;
     }
 
     .panel-title {
         font-size: 0.95rem;
     }
+
+    .btn-link-htas {
+        font-size: 11px;
+        padding: 3px 10px;
+    }
+
+    .btn-link-htas i {
+        font-size: 12px;
+    }
+
+    /* Listas de citas y medicamentos */
+    .meds-list-scroll,
+    .citas-list-scroll {
+        max-height: 280px;
+    }
+
+    .cita-card-item {
+        padding: 12px !important;
+    }
+
+    .cita-motivo {
+        font-size: 0.85rem;
+    }
+
+    .cita-paciente {
+        font-size: 0.8rem;
+    }
+
+    .cita-fecha {
+        font-size: 0.7rem;
+    }
+
+    .modalidad-tag {
+        font-size: 0.6rem;
+    }
+
+    .badge {
+        font-size: 0.65rem;
+        padding: 4px 8px;
+    }
+
+    .extra-small {
+        font-size: 0.65rem;
+    }
+
+    /* Spinner */
+    .spinner-loading {
+        width: 30px;
+        height: 30px;
+        border-width: 2px;
+    }
 }
 
 /* ============================================================
-   COLORES DE ROLES PARA TARJETAS ESTADÍSTICAS
+   RESPONSIVE - MÓVILES PEQUEÑOS (max-width: 480px)
    ============================================================ */
 
-/* Color para el total de usuarios - Rojo institucional */
-.stat-value.text-htas-red {
-    color: #b0001e !important;
+@media (max-width: 480px) {
+    .dashboard-content {
+        padding: 10px 8px;
+    }
+
+    .content-header h1 {
+        font-size: 1.2rem !important;
+    }
+
+    .content-header .text-muted {
+        font-size: 0.75rem;
+    }
+
+    /* Tarjetas estadísticas - 1 columna en móviles muy pequeños */
+    .row.g-4>* {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    .stat-card {
+        padding: 14px;
+    }
+
+    .stat-value {
+        font-size: 1.2rem;
+    }
+
+    .stat-title {
+        font-size: 0.65rem;
+    }
+
+    .rounded-card {
+        padding: 12px !important;
+    }
+
+    .panel-title {
+        font-size: 0.85rem;
+    }
+
+    .meds-list-scroll,
+    .citas-list-scroll {
+        max-height: 220px;
+    }
+
+    .cita-card-item {
+        padding: 10px !important;
+        flex-wrap: wrap;
+    }
+
+    .cita-motivo {
+        font-size: 0.8rem;
+        width: 100%;
+    }
+
+    .cita-paciente {
+        font-size: 0.75rem;
+    }
+
+    .cita-fecha {
+        font-size: 0.65rem;
+    }
+
+    .badge {
+        font-size: 0.6rem;
+        padding: 3px 6px;
+    }
+
+    .btn-link-htas {
+        font-size: 10px;
+        padding: 2px 8px;
+    }
+
+    .btn-link-htas i {
+        font-size: 10px;
+    }
+
+    .extra-small {
+        font-size: 0.6rem;
+    }
+
+    .modalidad-tag {
+        font-size: 0.55rem;
+        padding: 1px 4px;
+    }
+
+    .content-header .d-flex {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 8px;
+    }
 }
 
-/* Color para Pacientes - Morado */
-.stat-value.text-htas-paciente {
-    color: #6d28d9 !important;
+/* ============================================================
+   RESPONSIVE - ORIENTACIÓN HORIZONTAL EN MÓVILES
+   ============================================================ */
+
+@media (max-width: 768px) and (orientation: landscape) {
+    .dashboard-content {
+        padding: 15px 20px;
+    }
+
+    .stat-card {
+        padding: 12px;
+    }
+
+    .stat-value {
+        font-size: 1.2rem;
+        margin: 4px 0;
+    }
+
+    .meds-list-scroll,
+    .citas-list-scroll {
+        max-height: 200px;
+    }
+
+    .row.g-4>* {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
 }
 
-/* Color para Médicos - Azul */
-.stat-value.text-htas-medico {
-    color: #0369a1 !important;
+/* ============================================================
+   RESPONSIVE - TABLETS (768px - 1024px)
+   ============================================================ */
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .dashboard-content {
+        padding: 25px;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+    }
+
+    .row.g-4>* {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+
+    .meds-list-scroll,
+    .citas-list-scroll {
+        max-height: 300px;
+    }
 }
 
-/* Color para Acompañantes - Verde */
-.stat-value.text-htas-acompanante {
-    color: #15803d !important;
+/* ============================================================
+   UTILITARIOS ADICIONALES PARA RESPONSIVE
+   ============================================================ */
+
+/* Ocultar en móvil */
+.d-none-mobile {
+    display: block;
 }
 
-/* Opcional: agregar un pequeño indicador de color en el borde de la tarjeta */
-.stat-card.border-paciente {
-    border-top: 4px solid #6d28d9 !important;
+@media (max-width: 768px) {
+    .d-none-mobile {
+        display: none !important;
+    }
 }
 
-.stat-card.border-medico {
-    border-top: 4px solid #0369a1 !important;
+/* Mostrar solo en móvil */
+.d-block-mobile {
+    display: none;
 }
 
-.stat-card.border-acompanante {
-    border-top: 4px solid #15803d !important;
+@media (max-width: 768px) {
+    .d-block-mobile {
+        display: block !important;
+    }
 }
 
-.stat-card.border-htas {
-    border-top: 4px solid #b0001e !important;
+/* Ajuste de texto en móvil */
+@media (max-width: 768px) {
+    .text-truncate-mobile {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 150px;
+    }
+}
+
+/* Espaciado reducido en móvil */
+@media (max-width: 768px) {
+    .gap-3 {
+        gap: 0.75rem !important;
+    }
+
+    .mb-3 {
+        margin-bottom: 0.75rem !important;
+    }
+
+    .mb-4 {
+        margin-bottom: 1rem !important;
+    }
+
+    .p-3 {
+        padding: 0.75rem !important;
+    }
+
+    .p-4 {
+        padding: 1rem !important;
+    }
+}
+
+/* Ajuste para el hover en móvil (quitar efectos) */
+@media (max-width: 768px) {
+    .stat-card:hover {
+        transform: none;
+    }
+
+    .cita-card-item:hover {
+        transform: none;
+        background-color: #ffffff;
+    }
+
+    .btn-link-htas:hover {
+        transform: none;
+    }
+
+    .btn-link-htas:hover i {
+        transform: none;
+    }
 }

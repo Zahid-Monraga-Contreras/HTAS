@@ -60,63 +60,66 @@
         </div>
 
         <div class="table-card">
-            <table class="custom-table">
-                <thead>
-                    <tr>
-                        <th>Nombre Comercial</th>
-                        <th>Sustancia Activa</th>
-                        <th>Presentación</th>
-                        <th>Concentración</th>
-                        <th>Laboratorio</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @for (m of medicamentosPaginados; track m.idmedicamento ?? $index) {
-                    <tr class="user-row" (click)="seleccionarMedicamento(m)"
-                        [class.selected]="medicamentoSeleccionado && (medicamentoSeleccionado.idmedicamento === m.idmedicamento)">
-                        <td>
-                            <div class="name-cell-premium">
-                                <div class="avatar-icon-circle">
-                                    <i class="bi bi-capsule-pill"></i>
+            <!-- AGREGADO: Wrapper para scroll horizontal -->
+            <div class="table-responsive-wrapper">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre Comercial</th>
+                            <th>Sustancia Activa</th>
+                            <th>Presentación</th>
+                            <th>Concentración</th>
+                            <th>Laboratorio</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (m of medicamentosPaginados; track m.idmedicamento ?? $index) {
+                        <tr class="user-row" (click)="seleccionarMedicamento(m)"
+                            [class.selected]="medicamentoSeleccionado && (medicamentoSeleccionado.idmedicamento === m.idmedicamento)">
+                            <td>
+                                <div class="name-cell-premium">
+                                    <div class="avatar-icon-circle">
+                                        <i class="bi bi-capsule-pill"></i>
+                                    </div>
+                                    <div class="user-info-stack">
+                                        <span class="user-name-main">{{ m.nombrecomercial }}</span>
+                                    </div>
                                 </div>
-                                <div class="user-info-stack">
-                                    <span class="user-name-main">{{ m.nombrecomercial }}</span>
+                            </td>
+                            <td>
+                                <div class="text-cell-truncate">{{ m.sustanciaactiva || 'No definida' }}</div>
+                            </td>
+                            <td>
+                                <div class="date-cell">
+                                    <i class="bi bi-box-seam me-2 text-muted"></i>
+                                    {{ m.presentacion || 'No definida' }}
                                 </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="text-cell-truncate">{{ m.sustanciaactiva || 'No definida' }}</div>
-                        </td>
-                        <td>
-                            <div class="date-cell">
-                                <i class="bi bi-box-seam me-2 text-muted"></i>
-                                {{ m.presentacion || 'No definida' }}
-                            </div>
-                        </td>
-                        <td>
-                            <div class="date-cell">
-                                <i class="bi bi-prescription2 me-2 text-muted"></i>
-                                {{ m.concentracion || 'No definida' }}
-                            </div>
-                        </td>
-                        <td>
-                            <div class="date-cell">
-                                <i class="bi bi-building me-2 text-muted"></i>
-                                {{ m.laboratorio || 'No definido' }}
-                            </div>
-                        </td>
-                    </tr>
-                    }
-                    @if (medicamentosPaginados.length === 0) {
-                    <tr>
-                        <td colspan="5" class="empty-state">
-                            <i class="bi bi-capsule-pill"></i>
-                            <p>No se encontraron medicamentos registrados.</p>
-                        </td>
-                    </tr>
-                    }
-                </tbody>
-            </table>
+                            </td>
+                            <td>
+                                <div class="date-cell">
+                                    <i class="bi bi-prescription2 me-2 text-muted"></i>
+                                    {{ m.concentracion || 'No definida' }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="date-cell">
+                                    <i class="bi bi-building me-2 text-muted"></i>
+                                    {{ m.laboratorio || 'No definido' }}
+                                </div>
+                            </td>
+                        </tr>
+                        }
+                        @if (medicamentosPaginados.length === 0) {
+                        <tr>
+                            <td colspan="5" class="empty-state">
+                                <i class="bi bi-capsule-pill"></i>
+                                <p>No se encontraron medicamentos registrados.</p>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
 
             <div class="pagination-bar">
                 <span>Mostrando {{ medicamentosPaginados.length }} de {{ medicamentosFiltrados.length }}

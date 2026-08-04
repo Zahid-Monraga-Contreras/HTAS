@@ -1,5 +1,5 @@
 /* ==========================================================================
-   ESTILOS DE LA PESTAÑA DE HISTORIAL DEL PACIENTE
+   ESTILOS DE LA PESTAÑA DE HISTORIAL DEL PACIENTE - VERSIÓN COMPLETA Y RESPONSIVA
    ========================================================================== */
 
 .detail-card {
@@ -99,6 +99,7 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.25rem 0;
+    flex-wrap: wrap;
 }
 
 .visitas-header .section-title,
@@ -175,6 +176,7 @@
     align-items: center;
     gap: 0.6rem;
     flex: 1;
+    min-width: 0;
 }
 
 .visita-info i,
@@ -182,6 +184,7 @@
     color: #b0001e;
     font-size: 1.1rem;
     opacity: 0.8;
+    flex-shrink: 0;
 }
 
 .visita-fecha-hora,
@@ -189,6 +192,7 @@
     font-weight: 600;
     color: #0a1628;
     font-size: 0.9rem;
+    white-space: nowrap;
 }
 
 .visita-detalle,
@@ -197,12 +201,19 @@
     align-items: center;
     gap: 0.8rem;
     flex-wrap: wrap;
+    flex: 1;
+    min-width: 0;
 }
 
 .visita-motivo,
 .cita-motivo {
     font-size: 0.85rem;
     color: #4a5a6e;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* ==========================================================================
@@ -221,6 +232,8 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.3px;
+    display: inline-block;
+    white-space: nowrap;
 }
 
 .badge-completada {
@@ -339,6 +352,8 @@
     justify-content: space-between;
     align-items: center;
     padding: 0.5rem 0;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
 .historial-header .section-title {
@@ -402,6 +417,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.05rem;
+    min-width: 0;
 }
 
 .historial-detalle strong {
@@ -421,6 +437,7 @@
     align-items: center;
     gap: 0.4rem;
     white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .historial-usuario i {
@@ -466,24 +483,85 @@
 }
 
 /* ==========================================================================
-   RESPONSIVIDAD
+   RESPONSIVE - TABLETS GRANDES (max-width: 1200px)
    ========================================================================== */
 @media (max-width: 1200px) {
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: 0.9rem;
+    }
+
+    .stat-box {
+        padding: 1rem 0.8rem;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
     }
 }
 
+/* ==========================================================================
+   RESPONSIVE - TABLETS (max-width: 992px)
+   ========================================================================== */
 @media (max-width: 992px) {
+    .detail-card {
+        padding: 2rem 1.5rem 1.5rem;
+    }
+
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: 0.8rem;
+    }
+
+    .stat-box {
+        padding: 0.9rem 0.7rem;
+    }
+
+    .stat-value {
+        font-size: 1.4rem;
+    }
+
+    .stat-value.fecha {
+        font-size: 0.85rem;
+    }
+
+    .visita-item,
+    .cita-item {
+        padding: 0.7rem 1rem;
+        gap: 0.5rem;
+    }
+
+    .historial-item {
+        padding: 0.7rem 1rem;
+        gap: 1rem;
+    }
+
+    .historial-fecha {
+        min-width: 120px;
+        font-size: 0.75rem;
     }
 }
 
+/* ==========================================================================
+   RESPONSIVE - MÓVILES (max-width: 768px)
+   ========================================================================== */
 @media (max-width: 768px) {
     .detail-card {
         padding: 1.25rem;
         border-radius: 16px;
+    }
+
+    /* ============================================================
+       ESTADÍSTICAS
+       ============================================================ */
+    .section-title {
+        font-size: 0.95rem;
+        margin-bottom: 0.8rem;
+        padding-bottom: 0.4rem;
+    }
+
+    .section-title i {
+        font-size: 1rem;
     }
 
     .stats-grid {
@@ -492,100 +570,590 @@
     }
 
     .stat-box {
-        padding: 0.9rem 0.75rem;
+        padding: 0.8rem 0.6rem;
+        border-radius: 12px;
+    }
+
+    .stat-box small {
+        font-size: 0.6rem;
+        letter-spacing: 0.3px;
     }
 
     .stat-value {
-        font-size: 1.35rem;
+        font-size: 1.3rem;
     }
 
     .stat-value.fecha {
         font-size: 0.8rem;
     }
 
-    .historial-item {
-        flex-direction: column;
-        align-items: flex-start;
+    /* ============================================================
+       VISITAS / CITAS
+       ============================================================ */
+    .visitas-section,
+    .citas-section {
+        margin-top: 1.25rem;
+    }
+
+    .visitas-header,
+    .citas-header {
         gap: 0.3rem;
-        padding: 0.7rem 1rem;
     }
 
-    .historial-fecha {
-        min-width: auto;
+    .badge-visitas,
+    .badge-citas {
+        font-size: 0.55rem;
+        padding: 0.1rem 0.6rem;
+        margin-left: 0.3rem;
     }
 
-    .historial-usuario {
-        align-self: flex-start;
-    }
-
-    .historial-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
+    .visitas-lista,
+    .citas-lista {
+        border-radius: 12px;
+        margin-top: 0.75rem;
     }
 
     .visita-item,
     .cita-item {
         flex-direction: column;
         align-items: flex-start;
-        padding: 0.75rem 1rem;
+        padding: 0.7rem 0.9rem;
+        gap: 0.4rem;
+    }
+
+    .visita-info,
+    .cita-info {
+        width: 100%;
+        gap: 0.5rem;
+    }
+
+    .visita-info i,
+    .cita-info i {
+        font-size: 0.95rem;
+    }
+
+    .visita-fecha-hora,
+    .cita-fecha-hora {
+        font-size: 0.82rem;
     }
 
     .visita-detalle,
     .cita-detalle {
         width: 100%;
         justify-content: flex-start;
+        flex-wrap: wrap;
+        gap: 0.5rem;
     }
 
-    .visita-info,
-    .cita-info {
-        width: 100%;
+    .visita-motivo,
+    .cita-motivo {
+        font-size: 0.78rem;
+        white-space: normal;
+        word-break: break-word;
     }
 
-    .section-title {
-        font-size: 0.95rem;
+    .visita-indicador,
+    .cita-indicador {
+        min-width: 14px;
+    }
+
+    .visita-estado-dot,
+    .cita-estado-dot {
+        width: 8px;
+        height: 8px;
+    }
+
+    /* Badges de estados en móvil */
+    .badge-completada,
+    .badge-programada,
+    .badge-confirmada,
+    .badge-cancelada,
+    .badge-no-asistio,
+    .badge-pendiente,
+    .badge-realizada {
+        font-size: 0.55rem;
+        padding: 0.15rem 0.6rem;
+    }
+
+    /* ============================================================
+       HISTORIAL
+       ============================================================ */
+    .historial-section {
+        margin-top: 1.25rem;
+    }
+
+    .section-divider {
+        margin: 1.25rem 0;
+    }
+
+    .historial-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+    }
+
+    .historial-count {
+        font-size: 0.7rem;
+        padding: 0.15rem 0.7rem;
+    }
+
+    .historial-lista {
+        max-height: 280px;
+        border-radius: 12px;
+        margin-top: 0.75rem;
+    }
+
+    .historial-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+        padding: 0.6rem 0.9rem;
+    }
+
+    .historial-fecha {
+        min-width: auto;
+        font-size: 0.7rem;
+        gap: 0.3rem;
+    }
+
+    .historial-fecha i {
+        font-size: 0.7rem;
+    }
+
+    .historial-detalle strong {
+        font-size: 0.82rem;
+    }
+
+    .historial-detalle span {
+        font-size: 0.72rem;
+    }
+
+    .historial-usuario {
+        font-size: 0.7rem;
+        align-self: flex-start;
+    }
+
+    .historial-usuario i {
+        font-size: 0.7rem;
+    }
+
+    /* ============================================================
+       VACÍO
+       ============================================================ */
+    .visitas-vacio,
+    .citas-vacio {
+        padding: 2rem 0.8rem;
+    }
+
+    .visitas-vacio i,
+    .citas-vacio i {
+        font-size: 2.2rem;
+    }
+
+    .visitas-vacio p,
+    .citas-vacio p {
+        font-size: 0.9rem;
+    }
+
+    .visitas-vacio span,
+    .citas-vacio span {
+        font-size: 0.78rem;
+    }
+
+    /* ============================================================
+       SCROLLBAR
+       ============================================================ */
+    .historial-lista::-webkit-scrollbar {
+        width: 4px;
     }
 }
 
+/* ==========================================================================
+   RESPONSIVE - MÓVILES PEQUEÑOS (max-width: 480px)
+   ========================================================================== */
 @media (max-width: 480px) {
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .stat-box {
-        padding: 0.75rem;
-    }
-
-    .stat-value {
-        font-size: 1.2rem;
-    }
-
     .detail-card {
         padding: 1rem;
         border-radius: 12px;
     }
 
+    /* ============================================================
+       ESTADÍSTICAS
+       ============================================================ */
+    .section-title {
+        font-size: 0.85rem;
+        gap: 0.4rem;
+    }
+
+    .section-title i {
+        font-size: 0.9rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+    }
+
+    .stat-box {
+        padding: 0.6rem 0.4rem;
+        border-radius: 10px;
+    }
+
+    .stat-box small {
+        font-size: 0.55rem;
+        letter-spacing: 0.2px;
+        margin-bottom: 0.2rem;
+    }
+
+    .stat-value {
+        font-size: 1.1rem;
+    }
+
+    .stat-value.fecha {
+        font-size: 0.7rem;
+    }
+
+    /* ============================================================
+       VISITAS / CITAS
+       ============================================================ */
+    .visitas-section,
+    .citas-section {
+        margin-top: 1rem;
+    }
+
     .visita-item,
     .cita-item {
-        padding: 0.6rem 0.8rem;
+        padding: 0.5rem 0.7rem;
+        gap: 0.3rem;
+    }
+
+    .visita-info i,
+    .cita-info i {
+        font-size: 0.85rem;
     }
 
     .visita-fecha-hora,
     .cita-fecha-hora {
-        font-size: 0.8rem;
+        font-size: 0.75rem;
     }
 
     .visita-motivo,
     .cita-motivo {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
     }
 
     .badge-completada,
     .badge-programada,
     .badge-confirmada,
     .badge-cancelada,
-    .badge-no-asistio {
+    .badge-no-asistio,
+    .badge-pendiente,
+    .badge-realizada {
+        font-size: 0.5rem;
+        padding: 0.1rem 0.5rem;
+    }
+
+    .visita-indicador,
+    .cita-indicador {
+        min-width: 12px;
+    }
+
+    .visita-estado-dot,
+    .cita-estado-dot {
+        width: 7px;
+        height: 7px;
+    }
+
+    /* ============================================================
+       HISTORIAL
+       ============================================================ */
+    .historial-section {
+        margin-top: 1rem;
+    }
+
+    .section-divider {
+        margin: 1rem 0;
+    }
+
+    .historial-lista {
+        max-height: 220px;
+        border-radius: 10px;
+    }
+
+    .historial-item {
+        padding: 0.5rem 0.7rem;
+        gap: 0.2rem;
+    }
+
+    .historial-fecha {
+        font-size: 0.65rem;
+    }
+
+    .historial-detalle strong {
+        font-size: 0.75rem;
+    }
+
+    .historial-detalle span {
+        font-size: 0.65rem;
+    }
+
+    .historial-usuario {
+        font-size: 0.65rem;
+    }
+
+    /* ============================================================
+       VACÍO
+       ============================================================ */
+    .visitas-vacio,
+    .citas-vacio {
+        padding: 1.5rem 0.5rem;
+    }
+
+    .visitas-vacio i,
+    .citas-vacio i {
+        font-size: 1.8rem;
+    }
+
+    .visitas-vacio p,
+    .citas-vacio p {
+        font-size: 0.8rem;
+    }
+
+    .visitas-vacio span,
+    .citas-vacio span {
+        font-size: 0.7rem;
+    }
+}
+
+/* ==========================================================================
+   RESPONSIVE - ORIENTACIÓN HORIZONTAL EN MÓVILES
+   ========================================================================== */
+@media (max-width: 768px) and (orientation: landscape) {
+    .detail-card {
+        padding: 1.5rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.6rem;
+    }
+
+    .stat-box {
+        padding: 0.6rem 0.4rem;
+    }
+
+    .stat-value {
+        font-size: 1.2rem;
+    }
+
+    .stat-box small {
         font-size: 0.55rem;
-        padding: 0.15rem 0.6rem;
+    }
+
+    .visita-item,
+    .cita-item {
+        flex-direction: row;
+        align-items: center;
+        padding: 0.5rem 0.8rem;
+        gap: 0.6rem;
+    }
+
+    .visita-info,
+    .cita-info {
+        width: auto;
+    }
+
+    .visita-detalle,
+    .cita-detalle {
+        width: auto;
+        flex: 1;
+    }
+
+    .visita-motivo,
+    .cita-motivo {
+        white-space: nowrap;
+    }
+
+    .historial-item {
+        flex-direction: row;
+        align-items: center;
+        padding: 0.5rem 0.8rem;
+        gap: 0.8rem;
+    }
+
+    .historial-fecha {
+        min-width: 100px;
+    }
+
+    .historial-usuario {
+        align-self: center;
+    }
+
+    .historial-lista {
+        max-height: 200px;
+    }
+}
+
+/* ==========================================================================
+   RESPONSIVE - PANTALLAS GRANDES (min-width: 1400px)
+   ========================================================================== */
+@media (min-width: 1400px) {
+    .detail-card {
+        padding: 3rem 3rem 2.5rem;
+        border-radius: 24px;
+    }
+
+    .stats-grid {
+        gap: 1.25rem;
+    }
+
+    .stat-box {
+        padding: 1.5rem 1.2rem;
+        border-radius: 16px;
+    }
+
+    .stat-box small {
+        font-size: 0.75rem;
+    }
+
+    .stat-value {
+        font-size: 1.8rem;
+    }
+
+    .section-title {
+        font-size: 1.15rem;
+    }
+
+    .visita-item,
+    .cita-item {
+        padding: 1rem 1.5rem;
+    }
+
+    .historial-item {
+        padding: 1rem 1.5rem;
+    }
+}
+
+/* ==========================================================================
+   UTILITARIOS RESPONSIVE ADICIONALES
+   ========================================================================== */
+
+/* Ocultar en móvil */
+.hide-mobile {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .hide-mobile {
+        display: none !important;
+    }
+}
+
+/* Mostrar solo en móvil */
+.show-mobile {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .show-mobile {
+        display: block !important;
+    }
+
+    .show-mobile-inline {
+        display: inline-block !important;
+    }
+
+    .show-mobile-flex {
+        display: flex !important;
+    }
+}
+
+/* Texto truncado en móvil */
+@media (max-width: 768px) {
+    .text-truncate-mobile {
+        max-width: 120px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .text-truncate-mobile-sm {
+        max-width: 80px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+/* Ajustes de espaciado en móvil */
+@media (max-width: 768px) {
+    .gap-2 {
+        gap: 0.5rem !important;
+    }
+
+    .gap-3 {
+        gap: 0.75rem !important;
+    }
+
+    .gap-4 {
+        gap: 1rem !important;
+    }
+
+    .mb-2 {
+        margin-bottom: 0.5rem !important;
+    }
+
+    .mb-3 {
+        margin-bottom: 0.75rem !important;
+    }
+
+    .mb-4 {
+        margin-bottom: 1rem !important;
+    }
+
+    .p-2 {
+        padding: 0.5rem !important;
+    }
+
+    .p-3 {
+        padding: 0.75rem !important;
+    }
+
+    .p-4 {
+        padding: 1rem !important;
+    }
+
+    .mt-2 {
+        margin-top: 0.5rem !important;
+    }
+
+    .mt-3 {
+        margin-top: 0.75rem !important;
+    }
+
+    .mt-4 {
+        margin-top: 1rem !important;
+    }
+}
+
+/* Eliminar hover en móvil para mejor experiencia táctil */
+@media (max-width: 768px) {
+    .stat-box:hover {
+        transform: none;
+        border-color: #e9edf2;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+
+    .detail-card:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    }
+
+    .visita-item:hover,
+    .cita-item:hover {
+        background: transparent;
+    }
+
+    .historial-item:hover {
+        background: transparent;
     }
 }

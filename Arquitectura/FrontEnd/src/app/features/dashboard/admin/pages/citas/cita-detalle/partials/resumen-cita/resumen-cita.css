@@ -1,10 +1,14 @@
 /* ==========================================================================
-   ESTILOS DE LA PESTAÑA DE RESUMEN DE CITA
+   ESTILOS DE LA PESTAÑA DE RESUMEN DE CITA - VERSIÓN COMPLETA Y RESPONSIVA
    ========================================================================== */
 
 .tab-panel {
     animation: fadeIn 0.35s ease;
 }
+
+/* ============================================================
+   TOOLBAR
+   ============================================================ */
 
 .resumen-toolbar {
     display: flex;
@@ -54,6 +58,10 @@
     font-size: 1.1rem;
 }
 
+/* ============================================================
+   RESUMEN HOJA
+   ============================================================ */
+
 .resumen-wrapper {
     display: flex;
     justify-content: center;
@@ -82,7 +90,10 @@
     border-radius: 6px 6px 0 0;
 }
 
-/* MEMBRETE */
+/* ============================================================
+   MEMBRETE
+   ============================================================ */
+
 .resumen-membrete {
     display: flex;
     align-items: center;
@@ -150,6 +161,10 @@
     font-weight: 800;
 }
 
+/* ============================================================
+   LÍNEA DECORATIVA
+   ============================================================ */
+
 .resumen-linea-doble {
     height: 3px;
     background: repeating-linear-gradient(90deg, #0a1628 0, #0a1628 6px, transparent 6px, transparent 10px);
@@ -157,7 +172,10 @@
     margin-bottom: 2rem;
 }
 
-/* ENCABEZADO */
+/* ============================================================
+   ENCABEZADO
+   ============================================================ */
+
 .resumen-encabezado {
     display: flex;
     align-items: center;
@@ -226,7 +244,10 @@
     white-space: nowrap;
 }
 
-/* SECCIONES */
+/* ============================================================
+   SECCIONES
+   ============================================================ */
+
 .resumen-seccion {
     margin-bottom: 1.9rem;
 }
@@ -249,6 +270,10 @@
     color: #b0001e;
     font-size: 1rem;
 }
+
+/* ============================================================
+   GRID
+   ============================================================ */
 
 .resumen-grid {
     display: grid;
@@ -291,7 +316,10 @@
     border-left: 3px solid #b0001e;
 }
 
-/* TABLA */
+/* ============================================================
+   TABLA
+   ============================================================ */
+
 .resumen-tabla {
     width: 100%;
     border-collapse: collapse;
@@ -327,7 +355,10 @@
     font-style: italic;
 }
 
-/* PIE */
+/* ============================================================
+   PIE
+   ============================================================ */
+
 .resumen-pie {
     display: flex;
     justify-content: space-between;
@@ -372,7 +403,10 @@
     font-size: 1rem;
 }
 
-/* IMPRESIÓN */
+/* ============================================================
+   IMPRESIÓN
+   ============================================================ */
+
 @media print {
 
     app-menu,
@@ -425,7 +459,10 @@
     margin: 0.8cm 1cm !important;
 }
 
-/* ANIMACIONES */
+/* ============================================================
+   ANIMACIONES
+   ============================================================ */
+
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -438,22 +475,98 @@
     }
 }
 
-/* RESPONSIVIDAD */
-@media (max-width: 768px) {
+/* ============================================================
+   RESPONSIVE - TABLETS (max-width: 992px)
+   ============================================================ */
+
+@media (max-width: 992px) {
     .resumen-hoja {
-        padding: 2rem 1.5rem;
+        padding: 2.5rem 2rem 2rem;
     }
 
     .resumen-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
     }
 
-    .resumen-grid .full-width {
-        grid-column: 1;
+    .resumen-encabezado {
+        padding: 1rem 1.25rem;
+        gap: 1rem;
     }
 
+    .resumen-nombre-bloque h2 {
+        font-size: 1.2rem;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE - MÓVILES (max-width: 768px)
+   ============================================================ */
+
+@media (max-width: 768px) {
+
+    /* ============================================================
+       TOOLBAR
+       ============================================================ */
+    .resumen-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+
+    .resumen-toolbar p {
+        font-size: 0.8rem;
+        justify-content: center;
+    }
+
+    .btn-download-resumen {
+        justify-content: center;
+        padding: 0.6rem 1rem;
+        font-size: 0.8rem;
+    }
+
+    .btn-download-resumen:hover {
+        transform: none;
+    }
+
+    /* ============================================================
+       HOJA
+       ============================================================ */
+    .resumen-hoja {
+        padding: 1.5rem 1.2rem 1.2rem;
+        border-radius: 4px;
+    }
+
+    .resumen-hoja::before {
+        height: 5px;
+    }
+
+    /* ============================================================
+       MEMBRETE
+       ============================================================ */
     .resumen-membrete {
         flex-wrap: wrap;
+        gap: 0.8rem;
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .membrete-logo {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+    }
+
+    .membrete-logo i {
+        font-size: 1.3rem;
+    }
+
+    .membrete-texto h1 {
+        font-size: 1.2rem;
+    }
+
+    .membrete-texto p {
+        font-size: 0.7rem;
     }
 
     .membrete-folio {
@@ -461,32 +574,527 @@
         width: 100%;
     }
 
+    .membrete-folio strong {
+        font-size: 1rem;
+    }
+
+    /* ============================================================
+       LÍNEA DECORATIVA
+       ============================================================ */
+    .resumen-linea-doble {
+        margin-bottom: 1.25rem;
+    }
+
+    /* ============================================================
+       ENCABEZADO
+       ============================================================ */
     .resumen-encabezado {
         flex-wrap: wrap;
         gap: 0.75rem;
+        padding: 0.9rem 1rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .resumen-avatar {
+        width: 56px;
+        height: 56px;
+    }
+
+    .resumen-avatar i {
+        font-size: 1.6rem;
+    }
+
+    .resumen-nombre-bloque {
+        align-items: center;
+    }
+
+    .resumen-nombre-bloque h2 {
+        font-size: 1.2rem;
+    }
+
+    .resumen-subetiqueta {
+        font-size: 0.78rem;
     }
 
     .resumen-estado {
         width: 100%;
         text-align: center;
+        font-size: 0.7rem;
+        padding: 0.3rem 1rem;
     }
 
-    .resumen-toolbar {
+    /* ============================================================
+       GRID
+       ============================================================ */
+    .resumen-grid {
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+    }
+
+    .resumen-grid .full-width {
+        grid-column: 1;
+    }
+
+    .resumen-campo {
+        padding: 0.4rem 0;
+        border-bottom: 1px solid #f5f7fa;
+    }
+
+    .resumen-campo:last-child {
+        border-bottom: none;
+    }
+
+    .resumen-campo span {
+        font-size: 0.6rem;
+    }
+
+    .resumen-campo strong {
+        font-size: 0.9rem;
+    }
+
+    .resumen-texto {
+        font-size: 0.85rem;
+        padding: 0.6rem 0.8rem;
+    }
+
+    /* ============================================================
+       SECCIONES
+       ============================================================ */
+    .resumen-seccion {
+        margin-bottom: 1.25rem;
+    }
+
+    .resumen-titulo-seccion {
+        font-size: 0.85rem;
+        margin-bottom: 0.8rem;
+        padding-bottom: 0.4rem;
+    }
+
+    .resumen-titulo-seccion i {
+        font-size: 0.9rem;
+    }
+
+    /* ============================================================
+       TABLA
+       ============================================================ */
+    .resumen-tabla {
+        font-size: 0.78rem;
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .resumen-tabla thead th {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.6rem;
+    }
+
+    .resumen-tabla tbody td {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.75rem;
+    }
+
+    /* ============================================================
+       PIE
+       ============================================================ */
+    .resumen-pie {
         flex-direction: column;
-        align-items: stretch;
+        align-items: center;
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 1.25rem;
+        gap: 1.2rem;
     }
 
-    .btn-download-resumen {
-        justify-content: center;
+    .resumen-firma {
+        min-width: 180px;
+        width: 100%;
+    }
+
+    .resumen-sello {
+        font-size: 0.7rem;
     }
 }
 
+/* ============================================================
+   RESPONSIVE - MÓVILES PEQUEÑOS (max-width: 480px)
+   ============================================================ */
+
 @media (max-width: 480px) {
+
+    /* ============================================================
+       HOJA
+       ============================================================ */
     .resumen-hoja {
-        padding: 1.5rem 1rem;
+        padding: 1rem 0.8rem 0.8rem;
+        border-radius: 4px;
+    }
+
+    /* ============================================================
+       TOOLBAR
+       ============================================================ */
+    .resumen-toolbar p {
+        font-size: 0.7rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .btn-download-resumen {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.8rem;
+    }
+
+    .btn-download-resumen i {
+        font-size: 0.9rem;
+    }
+
+    /* ============================================================
+       MEMBRETE
+       ============================================================ */
+    .membrete-logo {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+    }
+
+    .membrete-logo i {
+        font-size: 1.1rem;
+    }
+
+    .membrete-texto h1 {
+        font-size: 1rem;
+    }
+
+    .membrete-texto p {
+        font-size: 0.6rem;
+    }
+
+    .membrete-folio small {
+        font-size: 0.55rem;
+    }
+
+    .membrete-folio strong {
+        font-size: 0.85rem;
+    }
+
+    /* ============================================================
+       ENCABEZADO
+       ============================================================ */
+    .resumen-encabezado {
+        padding: 0.7rem 0.8rem;
+        gap: 0.5rem;
+    }
+
+    .resumen-avatar {
+        width: 48px;
+        height: 48px;
+    }
+
+    .resumen-avatar i {
+        font-size: 1.3rem;
     }
 
     .resumen-nombre-bloque h2 {
-        font-size: 1.1rem;
+        font-size: 1rem;
+    }
+
+    .resumen-subetiqueta {
+        font-size: 0.7rem;
+    }
+
+    .resumen-etiqueta {
+        font-size: 0.55rem;
+    }
+
+    .resumen-estado {
+        font-size: 0.65rem;
+        padding: 0.25rem 0.8rem;
+    }
+
+    /* ============================================================
+       GRID
+       ============================================================ */
+    .resumen-grid {
+        gap: 0.5rem;
+    }
+
+    .resumen-campo {
+        padding: 0.3rem 0;
+    }
+
+    .resumen-campo strong {
+        font-size: 0.82rem;
+    }
+
+    .resumen-texto {
+        font-size: 0.78rem;
+        padding: 0.5rem 0.6rem;
+    }
+
+    /* ============================================================
+       SECCIONES
+       ============================================================ */
+    .resumen-seccion {
+        margin-bottom: 1rem;
+    }
+
+    .resumen-titulo-seccion {
+        font-size: 0.75rem;
+        gap: 0.4rem;
+    }
+
+    .resumen-titulo-seccion i {
+        font-size: 0.8rem;
+    }
+
+    /* ============================================================
+       TABLA
+       ============================================================ */
+    .resumen-tabla {
+        font-size: 0.7rem;
+    }
+
+    .resumen-tabla thead th {
+        padding: 0.3rem 0.4rem;
+        font-size: 0.55rem;
+    }
+
+    .resumen-tabla tbody td {
+        padding: 0.3rem 0.4rem;
+        font-size: 0.68rem;
+    }
+
+    /* ============================================================
+       PIE
+       ============================================================ */
+    .resumen-pie {
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        gap: 0.8rem;
+    }
+
+    .resumen-firma {
+        min-width: 140px;
+    }
+
+    .resumen-firma span {
+        font-size: 0.65rem;
+    }
+
+    .resumen-sello {
+        font-size: 0.65rem;
+    }
+
+    .resumen-sello i {
+        font-size: 0.8rem;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE - ORIENTACIÓN HORIZONTAL EN MÓVILES
+   ============================================================ */
+
+@media (max-width: 768px) and (orientation: landscape) {
+    .resumen-hoja {
+        padding: 1.5rem 2rem;
+    }
+
+    .resumen-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.8rem 1.2rem;
+    }
+
+    .resumen-grid .full-width {
+        grid-column: 1 / -1;
+    }
+
+    .resumen-encabezado {
+        flex-direction: row;
+        text-align: left;
+        padding: 0.8rem 1rem;
+    }
+
+    .resumen-nombre-bloque {
+        align-items: flex-start;
+    }
+
+    .resumen-estado {
+        width: auto;
+        text-align: center;
+    }
+
+    .resumen-toolbar {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .resumen-toolbar p {
+        justify-content: flex-start;
+    }
+
+    .btn-download-resumen {
+        width: auto;
+    }
+
+    .resumen-pie {
+        flex-direction: row;
+        text-align: left;
+        align-items: flex-end;
+    }
+
+    .resumen-firma {
+        width: auto;
+    }
+
+    .membrete-folio {
+        text-align: right;
+        width: auto;
+    }
+
+    .resumen-tabla {
+        display: table;
+        overflow-x: visible;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE - PANTALLAS GRANDES (min-width: 1400px)
+   ============================================================ */
+
+@media (min-width: 1400px) {
+    .resumen-hoja {
+        max-width: 950px;
+        padding: 4rem 4rem 3.5rem;
+        border-radius: 8px;
+    }
+
+    .resumen-grid {
+        gap: 1.5rem 2rem;
+    }
+
+    .resumen-nombre-bloque h2 {
+        font-size: 1.6rem;
+    }
+
+    .membrete-texto h1 {
+        font-size: 1.7rem;
+    }
+}
+
+/* ============================================================
+   UTILITARIOS RESPONSIVE ADICIONALES
+   ============================================================ */
+
+/* Ocultar en móvil */
+.hide-mobile {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .hide-mobile {
+        display: none !important;
+    }
+}
+
+/* Mostrar solo en móvil */
+.show-mobile {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .show-mobile {
+        display: block !important;
+    }
+
+    .show-mobile-inline {
+        display: inline-block !important;
+    }
+
+    .show-mobile-flex {
+        display: flex !important;
+    }
+}
+
+/* Texto truncado en móvil */
+@media (max-width: 768px) {
+    .text-truncate-mobile {
+        max-width: 120px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .text-truncate-mobile-sm {
+        max-width: 80px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+/* Ajustes de espaciado en móvil */
+@media (max-width: 768px) {
+    .gap-2 {
+        gap: 0.5rem !important;
+    }
+
+    .gap-3 {
+        gap: 0.75rem !important;
+    }
+
+    .gap-4 {
+        gap: 1rem !important;
+    }
+
+    .mb-2 {
+        margin-bottom: 0.5rem !important;
+    }
+
+    .mb-3 {
+        margin-bottom: 0.75rem !important;
+    }
+
+    .mb-4 {
+        margin-bottom: 1rem !important;
+    }
+
+    .p-2 {
+        padding: 0.5rem !important;
+    }
+
+    .p-3 {
+        padding: 0.75rem !important;
+    }
+
+    .p-4 {
+        padding: 1rem !important;
+    }
+
+    .mt-2 {
+        margin-top: 0.5rem !important;
+    }
+
+    .mt-3 {
+        margin-top: 0.75rem !important;
+    }
+
+    .mt-4 {
+        margin-top: 1rem !important;
+    }
+}
+
+/* Eliminar hover en móvil para mejor experiencia táctil */
+@media (max-width: 768px) {
+    .btn-download-resumen:hover {
+        background: linear-gradient(135deg, #0a1628, #1a2938);
+        box-shadow: 0 4px 12px rgba(10, 22, 40, 0.18);
+        transform: none;
+    }
+
+    .resumen-hoja:hover {
+        box-shadow: 0 20px 60px rgba(10, 22, 40, 0.1), 0 2px 8px rgba(10, 22, 40, 0.06);
     }
 }

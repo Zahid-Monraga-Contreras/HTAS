@@ -29,105 +29,108 @@
         </div>
 
         <div class="table-card">
-            <table class="custom-table">
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Correo</th>
-                        <th>Rol</th>
-                        <th>Dirección Clínica</th>
-                        <th>Especialidad</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @for (u of usuariosPaginados; track u.id) {
-                    <tr class="user-row" (click)="seleccionar(u)" [class.selected]="usuarioSeleccionado?.id === u.id"
-                        [class.expanded]="expandedId === u.id">
-                        <td>
-                            <div class="name-cell-premium">
-                                <button class="btn-expand-circle" (click)="toggleExpand(u.id, $event)">
-                                    <i class="bi bi-chevron-right" [class.rotated]="expandedId === u.id"></i>
-                                </button>
-                                <div class="user-info-stack">
-                                    <span class="user-name-main">{{u.NombreCompleto}}</span>
+            <!-- AGREGADO: Wrapper para scroll horizontal -->
+            <div class="table-responsive-wrapper">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Correo</th>
+                            <th>Rol</th>
+                            <th>Dirección Clínica</th>
+                            <th>Especialidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (u of usuariosPaginados; track u.id) {
+                        <tr class="user-row" (click)="seleccionar(u)"
+                            [class.selected]="usuarioSeleccionado?.id === u.id" [class.expanded]="expandedId === u.id">
+                            <td>
+                                <div class="name-cell-premium">
+                                    <button class="btn-expand-circle" (click)="toggleExpand(u.id, $event)">
+                                        <i class="bi bi-chevron-right" [class.rotated]="expandedId === u.id"></i>
+                                    </button>
+                                    <div class="user-info-stack">
+                                        <span class="user-name-main">{{u.NombreCompleto}}</span>
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="email-cell">
-                                <i class="bi bi-envelope-at me-2 text-muted"></i>
-                                {{u.correo || u.Correo}}
-                            </div>
-                        </td>
-                        <td>
-                            <span class="badge-premium" data-rol="Médico">
-                                <span class="dot-indicator"></span>
-                                {{u.rol || u.Rol || 'Médico'}}
-                            </span>
-                        </td>
-                        <td>
-                            <div class="address-cell">
-                                <i class="bi bi-geo-alt me-2 text-muted"></i>
-                                {{u.direccionClinica}}
-                            </div>
-                        </td>
-                        <td>
-                            <span class="badge-premium" data-rol="Médico">
-                                <span class="dot-indicator"></span>
-                                {{u.especialidad || 'General'}}
-                            </span>
-                        </td>
-                    </tr>
+                            </td>
+                            <td>
+                                <div class="email-cell">
+                                    <i class="bi bi-envelope-at me-2 text-muted"></i>
+                                    {{u.correo || u.Correo}}
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge-premium" data-rol="Médico">
+                                    <span class="dot-indicator"></span>
+                                    {{u.rol || u.Rol || 'Médico'}}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="address-cell">
+                                    <i class="bi bi-geo-alt me-2 text-muted"></i>
+                                    {{u.direccionClinica}}
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge-premium" data-rol="Médico">
+                                    <span class="dot-indicator"></span>
+                                    {{u.especialidad || 'General'}}
+                                </span>
+                            </td>
+                        </tr>
 
-                    @if (expandedId === u.id) {
-                    <tr class="detail-row">
-                        <td colspan="4">
-                            <div class="detail-content">
-                                <div class="detail-cards-grid">
-                                    <div class="detail-card-item">
-                                        <div class="detail-icon"><i class="bi bi-person-badge"></i></div>
-                                        <div class="detail-data">
-                                            <label>Nombre Completo</label>
-                                            <span class="uid-text-display">{{u.NombreCompleto}}</span>
+                        @if (expandedId === u.id) {
+                        <tr class="detail-row">
+                            <td colspan="5">
+                                <div class="detail-content">
+                                    <div class="detail-cards-grid">
+                                        <div class="detail-card-item">
+                                            <div class="detail-icon"><i class="bi bi-person-badge"></i></div>
+                                            <div class="detail-data">
+                                                <label>Nombre Completo</label>
+                                                <span class="uid-text-display">{{u.NombreCompleto}}</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="detail-card-item">
-                                        <div class="detail-icon"><i class="bi bi-telephone"></i></div>
-                                        <div class="detail-data">
-                                            <label>Teléfono de Contacto</label>
-                                            <span>{{u.telefono || 'Sin teléfono'}}</span>
+                                        <div class="detail-card-item">
+                                            <div class="detail-icon"><i class="bi bi-telephone"></i></div>
+                                            <div class="detail-data">
+                                                <label>Teléfono de Contacto</label>
+                                                <span>{{u.telefono || 'Sin teléfono'}}</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="detail-card-item">
-                                        <div class="detail-icon"><i class="bi bi-shield-lock"></i></div>
-                                        <div class="detail-data">
-                                            <label>Rol de Usuario</label>
-                                            <span>Médico</span>
+                                        <div class="detail-card-item">
+                                            <div class="detail-icon"><i class="bi bi-shield-lock"></i></div>
+                                            <div class="detail-data">
+                                                <label>Rol de Usuario</label>
+                                                <span>Médico</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="detail-card-item">
-                                        <div class="detail-icon"><i class="bi bi-card-heading"></i></div>
-                                        <div class="detail-data">
-                                            <label>Especialidad</label>
-                                            <span>{{u.especialidad || 'General'}}</span>
+                                        <div class="detail-card-item">
+                                            <div class="detail-icon"><i class="bi bi-card-heading"></i></div>
+                                            <div class="detail-data">
+                                                <label>Especialidad</label>
+                                                <span>{{u.especialidad || 'General'}}</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </td>
-                    </tr>
-                    }
-                    }
-                    @if (usuariosPaginados.length === 0) {
-                    <tr>
-                        <td colspan="5" class="empty-state">
-                            <i class="bi bi-people"></i>
-                            <p>No se encontraron médicos registrados.</p>
-                        </td>
-                    </tr>
-                    }
-                </tbody>
-            </table>
+                            </td>
+                        </tr>
+                        }
+                        }
+                        @if (usuariosPaginados.length === 0) {
+                        <tr>
+                            <td colspan="5" class="empty-state">
+                                <i class="bi bi-people"></i>
+                                <p>No se encontraron médicos registrados.</p>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
 
             <div class="pagination-bar">
                 <span>Mostrando {{usuariosPaginados.length}} de {{usuariosFiltrados.length}} médicos</span>

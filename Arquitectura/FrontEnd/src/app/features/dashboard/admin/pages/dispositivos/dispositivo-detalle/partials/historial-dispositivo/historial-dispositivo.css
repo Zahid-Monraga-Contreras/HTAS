@@ -1,6 +1,10 @@
 /* ==========================================================================
-   HISTORIAL DISPOSITIVO - ESTILOS
+   HISTORIAL DISPOSITIVO - ESTILOS COMPLETOS Y RESPONSIVOS
    ========================================================================== */
+
+/* ============================================================
+   TARJETA DE DETALLE
+   ============================================================ */
 
 .detail-card {
     background: #ffffff;
@@ -14,6 +18,10 @@
 .detail-card:hover {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
 }
+
+/* ============================================================
+   RESUMEN DEL DISPOSITIVO
+   ============================================================ */
 
 .resumen-dispositivo-historial {
     display: grid;
@@ -32,6 +40,7 @@
     align-items: center;
     gap: 0.9rem;
     padding: 0.25rem 0;
+    transition: background 0.2s ease;
 }
 
 .resumen-item i {
@@ -40,12 +49,14 @@
     min-width: 32px;
     text-align: center;
     opacity: 0.85;
+    flex-shrink: 0;
 }
 
 .resumen-item div {
     display: flex;
     flex-direction: column;
     gap: 0.05rem;
+    min-width: 0;
 }
 
 .resumen-item small {
@@ -60,7 +71,12 @@
     font-size: 0.95rem;
     color: #0a1628;
     font-weight: 600;
+    word-break: break-word;
 }
+
+/* ============================================================
+   ESTADÍSTICAS
+   ============================================================ */
 
 .estadisticas-section {
     margin-top: 0.5rem;
@@ -135,6 +151,10 @@
     margin: 1.75rem 0;
 }
 
+/* ============================================================
+   HISTORIAL
+   ============================================================ */
+
 .historial-section {
     margin-top: 0.5rem;
 }
@@ -144,6 +164,8 @@
     justify-content: space-between;
     align-items: center;
     padding: 0.5rem 0;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
 .historial-header .section-title {
@@ -211,11 +233,17 @@
     gap: 0.4rem;
 }
 
+.historial-fecha i {
+    font-size: 0.8rem;
+    color: #8a9aa8;
+}
+
 .historial-detalle {
     flex: 1;
     display: flex;
     flex-direction: column;
     gap: 0.05rem;
+    min-width: 0;
 }
 
 .historial-detalle strong {
@@ -235,6 +263,12 @@
     align-items: center;
     gap: 0.4rem;
     white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.historial-usuario i {
+    font-size: 0.8rem;
+    color: #8a9aa8;
 }
 
 .historial-vacio {
@@ -256,6 +290,15 @@
     color: #4a5a6e;
     margin: 0 0 0.25rem 0;
 }
+
+.historial-vacio span {
+    font-size: 0.85rem;
+    color: #8a9aa8;
+}
+
+/* ============================================================
+   ACCIONES FOOTER
+   ============================================================ */
 
 .action-footer {
     display: flex;
@@ -290,6 +333,16 @@
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
 }
 
+.btn-cancel-premium:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* ============================================================
+   ANIMACIONES
+   ============================================================ */
+
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -302,21 +355,76 @@
     }
 }
 
-/* Responsive */
+/* ============================================================
+   RESPONSIVIDAD - TABLETS (max-width: 1024px)
+   ============================================================ */
+
+@media (max-width: 1024px) {
+    .detail-card {
+        padding: 2rem 1.5rem 1.5rem;
+    }
+
+    .resumen-dispositivo-historial {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.8rem;
+        padding: 1rem 1.25rem;
+    }
+
+    .resumen-item strong {
+        font-size: 0.9rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.8rem;
+    }
+
+    .stat-box {
+        padding: 1rem 0.8rem;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+    }
+
+    .historial-item {
+        padding: 0.7rem 1rem;
+        gap: 1rem;
+    }
+
+    .historial-fecha {
+        min-width: 120px;
+        font-size: 0.75rem;
+    }
+}
+
+/* ============================================================
+   RESPONSIVIDAD - MÓVILES (max-width: 768px)
+   ============================================================ */
+
 @media (max-width: 768px) {
+
+    /* ============================================================
+       DETAIL CARD
+       ============================================================ */
     .detail-card {
         padding: 1.25rem;
         border-radius: 16px;
     }
 
+    /* ============================================================
+       RESUMEN - 1 COLUMNA
+       ============================================================ */
     .resumen-dispositivo-historial {
         grid-template-columns: 1fr;
-        gap: 0.75rem;
-        padding: 1rem 1.25rem;
+        gap: 0.5rem;
+        padding: 0.8rem 1rem;
+        border-radius: 12px;
+        margin-bottom: 1.25rem;
     }
 
     .resumen-item {
-        padding: 0.5rem 0;
+        padding: 0.6rem 0;
         border-bottom: 1px solid #e9edf2;
     }
 
@@ -324,9 +432,90 @@
         border-bottom: none;
     }
 
+    .resumen-item:hover {
+        background: transparent;
+    }
+
+    .resumen-item i {
+        font-size: 1.3rem;
+        min-width: 28px;
+    }
+
+    .resumen-item strong {
+        font-size: 0.9rem;
+    }
+
+    .resumen-item small {
+        font-size: 0.55rem;
+        letter-spacing: 0.4px;
+    }
+
+    /* ============================================================
+       ESTADÍSTICAS
+       ============================================================ */
+    .estadisticas-section {
+        margin-top: 0.25rem;
+    }
+
+    .section-title {
+        font-size: 0.95rem;
+        margin-bottom: 0.8rem;
+        padding-bottom: 0.4rem;
+    }
+
+    .section-title i {
+        font-size: 1rem;
+    }
+
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 0.75rem;
+    }
+
+    .stat-box {
+        padding: 0.8rem 0.6rem;
+        border-radius: 12px;
+    }
+
+    .stat-box small {
+        font-size: 0.6rem;
+        letter-spacing: 0.3px;
+    }
+
+    .stat-value {
+        font-size: 1.35rem;
+    }
+
+    .stat-value small {
+        font-size: 0.7rem;
+    }
+
+    .section-divider {
+        margin: 1.25rem 0;
+    }
+
+    /* ============================================================
+       HISTORIAL
+       ============================================================ */
+    .historial-section {
+        margin-top: 0.25rem;
+    }
+
+    .historial-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+    }
+
+    .historial-count {
+        font-size: 0.7rem;
+        padding: 0.15rem 0.7rem;
+    }
+
+    .historial-lista {
+        max-height: 300px;
+        border-radius: 12px;
+        margin-top: 0.75rem;
     }
 
     .historial-item {
@@ -339,19 +528,59 @@
     .historial-fecha {
         min-width: auto;
         font-size: 0.7rem;
+        gap: 0.3rem;
     }
 
-    .historial-usuario {
-        align-self: flex-start;
+    .historial-fecha i {
         font-size: 0.7rem;
     }
 
-    .historial-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
+    .historial-detalle strong {
+        font-size: 0.82rem;
     }
 
+    .historial-detalle span {
+        font-size: 0.72rem;
+    }
+
+    .historial-usuario {
+        font-size: 0.7rem;
+        align-self: flex-start;
+    }
+
+    .historial-usuario i {
+        font-size: 0.7rem;
+    }
+
+    /* ============================================================
+       VACÍO
+       ============================================================ */
+    .historial-vacio {
+        padding: 2rem 0.8rem;
+    }
+
+    .historial-vacio i {
+        font-size: 2.2rem;
+    }
+
+    .historial-vacio p {
+        font-size: 0.9rem;
+    }
+
+    .historial-vacio span {
+        font-size: 0.78rem;
+    }
+
+    /* ============================================================
+       SCROLLBAR
+       ============================================================ */
+    .historial-lista::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    /* ============================================================
+       ACCIONES FOOTER
+       ============================================================ */
     .action-footer {
         flex-direction: column-reverse;
         gap: 0.75rem;
@@ -362,29 +591,40 @@
     .action-footer button {
         width: 100%;
         justify-content: center;
+        padding: 0.7rem 1.5rem;
+    }
+
+    .btn-cancel-premium {
+        font-size: 0.85rem;
+        padding: 0.7rem 1.5rem;
     }
 }
 
+/* ============================================================
+   RESPONSIVIDAD - MÓVILES PEQUEÑOS (max-width: 480px)
+   ============================================================ */
+
 @media (max-width: 480px) {
+
+    /* ============================================================
+       DETAIL CARD
+       ============================================================ */
     .detail-card {
         padding: 1rem;
         border-radius: 14px;
     }
 
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .stat-box {
-        padding: 0.9rem;
-    }
-
-    .stat-value {
-        font-size: 1.35rem;
-    }
-
+    /* ============================================================
+       RESUMEN
+       ============================================================ */
     .resumen-dispositivo-historial {
-        padding: 0.75rem 1rem;
+        padding: 0.6rem 0.8rem;
+        gap: 0.3rem;
+    }
+
+    .resumen-item {
+        padding: 0.4rem 0;
+        gap: 0.6rem;
     }
 
     .resumen-item strong {
@@ -392,15 +632,396 @@
     }
 
     .resumen-item i {
+        font-size: 1.1rem;
+        min-width: 24px;
+    }
+
+    .resumen-item small {
+        font-size: 0.5rem;
+        letter-spacing: 0.3px;
+    }
+
+    /* ============================================================
+       ESTADÍSTICAS
+       ============================================================ */
+    .estadisticas-section {
+        margin-top: 0.2rem;
+    }
+
+    .section-title {
+        font-size: 0.85rem;
+        gap: 0.4rem;
+        margin-bottom: 0.6rem;
+        padding-bottom: 0.3rem;
+    }
+
+    .section-title i {
+        font-size: 0.9rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+    }
+
+    .stat-box {
+        padding: 0.6rem 0.4rem;
+        border-radius: 10px;
+    }
+
+    .stat-box small {
+        font-size: 0.55rem;
+        letter-spacing: 0.2px;
+        margin-bottom: 0.2rem;
+    }
+
+    .stat-value {
         font-size: 1.2rem;
-        min-width: 28px;
+    }
+
+    .stat-value small {
+        font-size: 0.6rem;
+    }
+
+    .section-divider {
+        margin: 1rem 0;
+    }
+
+    /* ============================================================
+       HISTORIAL
+       ============================================================ */
+    .historial-lista {
+        max-height: 250px;
+        border-radius: 10px;
     }
 
     .historial-item {
         padding: 0.5rem 0.7rem;
+        gap: 0.2rem;
+    }
+
+    .historial-fecha {
+        font-size: 0.65rem;
+    }
+
+    .historial-detalle strong {
+        font-size: 0.78rem;
+    }
+
+    .historial-detalle span {
+        font-size: 0.68rem;
+    }
+
+    .historial-usuario {
+        font-size: 0.65rem;
+    }
+
+    /* ============================================================
+       VACÍO
+       ============================================================ */
+    .historial-vacio {
+        padding: 1.5rem 0.5rem;
+    }
+
+    .historial-vacio i {
+        font-size: 1.8rem;
+    }
+
+    .historial-vacio p {
+        font-size: 0.8rem;
+    }
+
+    .historial-vacio span {
+        font-size: 0.7rem;
+    }
+
+    /* ============================================================
+       ACCIONES FOOTER
+       ============================================================ */
+    .action-footer {
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        gap: 0.6rem;
+    }
+
+    .action-footer button {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.82rem;
+    }
+
+    .btn-cancel-premium {
+        font-size: 0.82rem;
+        padding: 0.6rem 1.2rem;
+    }
+}
+
+/* ============================================================
+   RESPONSIVIDAD - ORIENTACIÓN HORIZONTAL EN MÓVILES
+   ============================================================ */
+
+@media (max-width: 768px) and (orientation: landscape) {
+    .detail-card {
+        padding: 1.5rem;
+    }
+
+    .resumen-dispositivo-historial {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.6rem;
+        padding: 0.7rem 1rem;
+    }
+
+    .resumen-item {
+        border-bottom: 1px solid #e9edf2;
+        padding: 0.4rem 0;
+    }
+
+    .resumen-item:nth-last-child(-n+2) {
+        border-bottom: none;
+    }
+
+    .resumen-item:hover {
+        background: transparent;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.6rem;
+    }
+
+    .stat-box {
+        padding: 0.6rem 0.4rem;
+    }
+
+    .stat-value {
+        font-size: 1.2rem;
+    }
+
+    .stat-box small {
+        font-size: 0.55rem;
+    }
+
+    .historial-item {
+        flex-direction: row;
+        align-items: center;
+        padding: 0.5rem 0.8rem;
+        gap: 0.8rem;
+    }
+
+    .historial-fecha {
+        min-width: 100px;
+    }
+
+    .historial-usuario {
+        align-self: center;
+    }
+
+    .historial-lista {
+        max-height: 220px;
+    }
+
+    .historial-header {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .action-footer {
+        flex-direction: row;
+        justify-content: flex-end;
+        gap: 0.75rem;
+    }
+
+    .action-footer button {
+        width: auto;
+        padding: 0.5rem 1.2rem;
+    }
+}
+
+/* ============================================================
+   RESPONSIVIDAD - PANTALLAS GRANDES (min-width: 1400px)
+   ============================================================ */
+
+@media (min-width: 1400px) {
+    .detail-card {
+        padding: 3rem 3rem 2.5rem;
+        border-radius: 24px;
+    }
+
+    .resumen-dispositivo-historial {
+        padding: 1.5rem 2rem;
+        border-radius: 18px;
+    }
+
+    .resumen-item {
+        gap: 1.2rem;
+    }
+
+    .resumen-item i {
+        font-size: 1.7rem;
+        min-width: 38px;
+    }
+
+    .resumen-item strong {
+        font-size: 1.05rem;
+    }
+
+    .stats-grid {
+        gap: 1.25rem;
+    }
+
+    .stat-box {
+        padding: 1.5rem 1.2rem;
+        border-radius: 16px;
+    }
+
+    .stat-box small {
+        font-size: 0.75rem;
+    }
+
+    .stat-value {
+        font-size: 1.8rem;
     }
 
     .section-title {
-        font-size: 0.95rem;
+        font-size: 1.15rem;
+    }
+
+    .historial-item {
+        padding: 1rem 1.5rem;
+    }
+
+    .btn-cancel-premium {
+        padding: 0.8rem 2.5rem;
+        font-size: 1rem;
+    }
+}
+
+/* ============================================================
+   UTILITARIOS RESPONSIVE ADICIONALES
+   ============================================================ */
+
+/* Ocultar en móvil */
+.hide-mobile {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .hide-mobile {
+        display: none !important;
+    }
+}
+
+/* Mostrar solo en móvil */
+.show-mobile {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .show-mobile {
+        display: block !important;
+    }
+
+    .show-mobile-inline {
+        display: inline-block !important;
+    }
+
+    .show-mobile-flex {
+        display: flex !important;
+    }
+}
+
+/* Texto truncado en móvil */
+@media (max-width: 768px) {
+    .text-truncate-mobile {
+        max-width: 120px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .text-truncate-mobile-sm {
+        max-width: 80px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+/* Ajustes de espaciado en móvil */
+@media (max-width: 768px) {
+    .gap-2 {
+        gap: 0.5rem !important;
+    }
+
+    .gap-3 {
+        gap: 0.75rem !important;
+    }
+
+    .gap-4 {
+        gap: 1rem !important;
+    }
+
+    .mb-2 {
+        margin-bottom: 0.5rem !important;
+    }
+
+    .mb-3 {
+        margin-bottom: 0.75rem !important;
+    }
+
+    .mb-4 {
+        margin-bottom: 1rem !important;
+    }
+
+    .p-2 {
+        padding: 0.5rem !important;
+    }
+
+    .p-3 {
+        padding: 0.75rem !important;
+    }
+
+    .p-4 {
+        padding: 1rem !important;
+    }
+
+    .mt-2 {
+        margin-top: 0.5rem !important;
+    }
+
+    .mt-3 {
+        margin-top: 0.75rem !important;
+    }
+
+    .mt-4 {
+        margin-top: 1rem !important;
+    }
+}
+
+/* Eliminar hover en móvil para mejor experiencia táctil */
+@media (max-width: 768px) {
+    .stat-box:hover {
+        transform: none;
+        border-color: #e9edf2;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+
+    .detail-card:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    }
+
+    .historial-item:hover {
+        background: transparent;
+    }
+
+    .resumen-item:hover {
+        background: transparent;
+    }
+
+    .btn-cancel-premium:hover:not(:disabled) {
+        background: #ffffff;
+        color: #4a5a6e;
+        border-color: #dce1e8;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        transform: none;
     }
 }

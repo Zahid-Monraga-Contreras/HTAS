@@ -5,7 +5,7 @@
 
         <div class="header-section">
             <div class="title-group">
-                <h2 class="title-page">Gestion de Citas Medicas</h2>
+                <h2 class="title-page">Gestión de Citas Médicas</h2>
                 <p class="subtitle-page">Administra, supervisa y actualiza el estado de las citas en el sistema.</p>
             </div>
 
@@ -41,118 +41,122 @@
         </div>
 
         <div class="table-card">
-            <table class="custom-table">
-                <thead>
-                    <tr>
-                        <th>Fecha y Hora</th>
-                        <th>Paciente</th>
-                        <th>Motivo</th>
-                        <th>Modalidad</th>
-                        <th>Estado</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @for (cita of citasPaginadas; track cita.idcita) {
-                    <tr class="user-row" (click)="seleccionarCita(cita)"
-                        [class.selected]="citaSeleccionada?.idcita === cita.idcita"
-                        [class.expanded]="expandedId === cita.idcita">
-                        <td>
-                            <div class="name-cell-premium">
-                                <button class="btn-expand-circle" (click)="toggleExpand(cita.idcita, $event)">
-                                    <i class="bi bi-chevron-right" [class.rotated]="expandedId === cita.idcita"></i>
-                                </button>
-                                <div class="user-info-stack">
-                                    <span class="user-name-main">{{cita.fechacita | date:'dd/MM/yyyy'}}</span>
-                                    <small class="text-muted">{{cita.horacita}}</small>
+            <!-- AGREGADO: Wrapper para scroll horizontal -->
+            <div class="table-responsive-wrapper">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha y Hora</th>
+                            <th>Paciente</th>
+                            <th>Motivo</th>
+                            <th>Modalidad</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (cita of citasPaginadas; track cita.idcita) {
+                        <tr class="user-row" (click)="seleccionarCita(cita)"
+                            [class.selected]="citaSeleccionada?.idcita === cita.idcita"
+                            [class.expanded]="expandedId === cita.idcita">
+                            <td>
+                                <div class="name-cell-premium">
+                                    <button class="btn-expand-circle" (click)="toggleExpand(cita.idcita, $event)">
+                                        <i class="bi bi-chevron-right" [class.rotated]="expandedId === cita.idcita"></i>
+                                    </button>
+                                    <div class="user-info-stack">
+                                        <span class="user-name-main">{{cita.fechacita | date:'dd/MM/yyyy'}}</span>
+                                        <small class="text-muted">{{cita.horacita}}</small>
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="email-cell">
-                                <i class="bi bi-person-circle me-2 text-muted"></i>
-                                {{ cita.nombrepaciente }} {{ cita.appaternopaciente }}
-                            </div>
-                        </td>
-                        <td>
-                            <div class="date-cell">
-                                <i class="bi bi-chat-left-text me-2 text-muted"></i>
-                                {{cita.motivo}}
-                            </div>
-                        </td>
-                        <td>
-                            <span class="badge-premium" [attr.data-rol]="cita.modalidad">
-                                <span class="dot-indicator"></span>
-                                {{cita.modalidad}}
-                            </span>
-                        </td>
-                        <td>
-                            <div class="status-pill-container">
-                                <span class="status-chip"
-                                    [class.active-chip]="cita.estado === 'Confirmada' || cita.estado === 'Completada'"
-                                    [class.pending-chip]="cita.estado === 'Programada'"
-                                    [class.danger-chip]="cita.estado === 'Cancelada'">
-                                    {{cita.estado}}
+                            </td>
+                            <td>
+                                <div class="email-cell">
+                                    <i class="bi bi-person-circle me-2 text-muted"></i>
+                                    {{ cita.nombrepaciente }} {{ cita.appaternopaciente }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="date-cell">
+                                    <i class="bi bi-chat-left-text me-2 text-muted"></i>
+                                    {{cita.motivo}}
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge-premium" [attr.data-rol]="cita.modalidad">
+                                    <span class="dot-indicator"></span>
+                                    {{cita.modalidad}}
                                 </span>
-                            </div>
-                        </td>
-                    </tr>
+                            </td>
+                            <td>
+                                <div class="status-pill-container">
+                                    <span class="status-chip"
+                                        [class.active-chip]="cita.estado === 'Confirmada' || cita.estado === 'Completada'"
+                                        [class.pending-chip]="cita.estado === 'Programada'"
+                                        [class.danger-chip]="cita.estado === 'Cancelada'">
+                                        {{cita.estado}}
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
 
-                    @if (expandedId === cita.idcita) {
-                    <tr class="detail-row">
-                        <td colspan="5">
-                            <div class="detail-content">
-                                <div class="detail-cards-grid">
-                                    <div class="detail-card-item">
-                                        <div class="detail-icon"><i class="bi bi-person-badge"></i></div>
-                                        <div class="detail-data">
-                                            <label>Paciente</label>
-                                            <span>{{ cita.nombrepaciente }} {{ cita.appaternopaciente }} {{
-                                                cita.apmaternopaciente }}</span>
+                        @if (expandedId === cita.idcita) {
+                        <tr class="detail-row">
+                            <td colspan="5">
+                                <div class="detail-content">
+                                    <div class="detail-cards-grid">
+                                        <div class="detail-card-item">
+                                            <div class="detail-icon"><i class="bi bi-person-badge"></i></div>
+                                            <div class="detail-data">
+                                                <label>Paciente</label>
+                                                <span>{{ cita.nombrepaciente }} {{ cita.appaternopaciente }} {{
+                                                    cita.apmaternopaciente }}</span>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div class="detail-card-item">
-                                        <div class="detail-icon"><i class="bi bi-calendar-event"></i></div>
-                                        <div class="detail-data">
-                                            <label>Fecha y Hora</label>
-                                            <span>{{ cita.fechacita | date:'dd/MM/yyyy' }} - {{ cita.horacita }}</span>
+                                        <div class="detail-card-item">
+                                            <div class="detail-icon"><i class="bi bi-calendar-event"></i></div>
+                                            <div class="detail-data">
+                                                <label>Fecha y Hora</label>
+                                                <span>{{ cita.fechacita | date:'dd/MM/yyyy' }} - {{ cita.horacita
+                                                    }}</span>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div class="detail-card-item">
-                                        <div class="detail-icon"><i class="bi bi-chat-dots"></i></div>
-                                        <div class="detail-data">
-                                            <label>Motivo de Consulta</label>
-                                            <span>{{ cita.sintomas || 'No especificado' }}</span>
+                                        <div class="detail-card-item">
+                                            <div class="detail-icon"><i class="bi bi-chat-dots"></i></div>
+                                            <div class="detail-data">
+                                                <label>Motivo de Consulta</label>
+                                                <span>{{ cita.sintomas || 'No especificado' }}</span>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div class="detail-card-item">
-                                        <div class="detail-icon"><i class="bi bi-display"></i></div>
-                                        <div class="detail-data">
-                                            <label>Modalidad de Atencion</label>
-                                            <span class="badge-premium" [attr.data-rol]="cita.modalidad">
-                                                <span class="dot-indicator"></span>
-                                                {{ cita.modalidad }}
-                                            </span>
+                                        <div class="detail-card-item">
+                                            <div class="detail-icon"><i class="bi bi-display"></i></div>
+                                            <div class="detail-data">
+                                                <label>Modalidad de Atención</label>
+                                                <span class="badge-premium" [attr.data-rol]="cita.modalidad">
+                                                    <span class="dot-indicator"></span>
+                                                    {{ cita.modalidad }}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </td>
-                    </tr>
-                    }
-                    }
-                    @if (citasPaginadas.length === 0) {
-                    <tr>
-                        <td colspan="5" class="empty-state">
-                            <i class="bi bi-calendar"></i>
-                            <p>No se encontraron citas programadas.</p>
-                        </td>
-                    </tr>
-                    }
-                </tbody>
-            </table>
+                            </td>
+                        </tr>
+                        }
+                        }
+                        @if (citasPaginadas.length === 0) {
+                        <tr>
+                            <td colspan="5" class="empty-state">
+                                <i class="bi bi-calendar"></i>
+                                <p>No se encontraron citas programadas.</p>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
 
             <div class="pagination-bar">
                 <span>Mostrando {{citasPaginadas.length}} de {{citasFiltradas.length}} citas</span>
@@ -218,13 +222,13 @@
             <div class="form-group full-width-modal">
                 <label>Motivo de la Consulta</label>
                 <input type="text" [(ngModel)]="nuevaCita.motivo"
-                    placeholder="Ej: Control de rutina, revision de presion arterial" class="form-control-premium">
+                    placeholder="Ej: Control de rutina, revisión de presión arterial" class="form-control-premium">
             </div>
 
             <div class="form-group full-width-modal">
-                <label>Sintomas actuales</label>
+                <label>Síntomas actuales</label>
                 <textarea [(ngModel)]="nuevaCita.sintomas" rows="3"
-                    placeholder="Escribe aqui tus malestares o sintomas actuales..."
+                    placeholder="Escribe aquí tus malestares o síntomas actuales..."
                     class="form-control-premium"></textarea>
             </div>
         </div>
@@ -254,14 +258,14 @@
             <i class="bi bi-exclamation-triangle-fill"></i>
         </div>
         <h3>¿Cancelar Cita?</h3>
-        <p class="text-muted">Esta accion notificara automaticamente al sistema.</p>
+        <p class="text-muted">Esta acción notificará automáticamente al sistema.</p>
         <div class="modal-footer-danger">
             <button class="btn-danger-confirm" (click)="confirmarEliminarCita()" [disabled]="isDeleting">
                 @if (isDeleting) {
                 <span class="spinner-save"></span>
                 <span>Cancelando...</span>
                 } @else {
-                <span>Si, Cancelar Cita</span>
+                <span>Sí, Cancelar Cita</span>
                 }
             </button>
             <button class="btn-outline-cancel" (click)="cerrarModal()" [disabled]="isDeleting">No, volver</button>
