@@ -7,12 +7,42 @@ const axios = require('axios');
 
 const app = express();
 
+// Middlewares
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Servir archivos estáticos
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
+// =============================================
+// RUTA PRINCIPAL (¡PONER AQUÍ, ANTES DE TODO!)
+// =============================================
+app.get('/', (req, res) => {
+    res.json({
+        mensaje: '✅ HTAS API funcionando en Vercel',
+        version: '1.0.0',
+        endpoints: {
+            estado: '/api/estado',
+            usuarios: '/api/usuarios',
+            login: '/api/auth/login',
+            python: '/api/algorithm/estado'
+        },
+        timestamp: new Date().toISOString()
+    });
+});
+
+// =============================================
+// RUTA DE ESTADO (también antes del proxy)
+// =============================================
+app.get('/api/estado', (req, res) => {
+    res.json({
+        success: true,
+        mensaje: 'Servidor HTAS funcionando',
+        entorno: process.env.NODE_ENV || 'production',
+        timestamp: new Date().toISOString()
+    });
+});
 
 // =============================================
 // REDIRIGIR A PYTHON PARA RUTAS DE ALGORITHM
@@ -44,12 +74,8 @@ app.use('/api/algorithm', async (req, res, next) => {
 });
 
 // =============================================
-// TUS RUTAS EXISTENTES - SOLO REFERENCIARLAS
+// TUS RUTAS EXISTENTES
 // =============================================
-// Como las rutas ya están en app.js, solo las importamos
-const appOriginal = require('../src/app');
-
-// Copiar todas las rutas de app.js
 app.use('/api/auth', require('../src/routes/auth.routes'));
 app.use('/api/usuarios', require('../src/routes/usuarios.routes'));
 app.use('/api/citas', require('../src/routes/citas.routes'));
@@ -63,28 +89,18 @@ app.use('/api/contacto', require('../src/routes/contacto.routes'));
 app.use('/api/googlefit', require('../src/routes/googlefit.routes'));
 app.use('/api/solicitudes', require('../src/routes/solicitudes.routes'));
 
-// Ruta principal
-app.get('/', (req, res) => {
-    res.json({
-        mensaje: 'HTAS API en Vercel',
-        version: '1.0.0',
-        servicios: {
-            nodejs: 'Activo',
-            python: 'Conectado'
-        }
-    });
-});
-
 // Manejo de errores
 app.use((req, res) => {
     res.status(404).json({ error: 'Ruta no encontrada' });
 });
 
 app.use((err, req, res, next) => {
-    console.error(err);
+    console.error('Error:', err.stack);
     res.status(500).json({ error: 'Error interno del servidor' });
 });
 
-// Exportar para Vercel
+// =============================================
+// EXPORTAR PARA VERCEL
+// =============================================
 module.exports = app;
 module.exports.handler = serverless(app);
