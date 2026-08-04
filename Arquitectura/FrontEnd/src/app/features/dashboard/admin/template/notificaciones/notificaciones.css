@@ -1,13 +1,13 @@
-/* ==========================================================================
-   Estilos base compartidos y paleta de colores integrada
-   ========================================================================== */
+/* ============================================ */
+/* LAYOUT PRINCIPAL */
+/* ============================================ */
 .main-content {
     margin-top: 60px;
     margin-left: 260px;
     padding: 40px;
     transition: all 0.3s ease;
     min-height: calc(100vh - 70px);
-    background-color: #f4f6f9;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e9edf5 100%);
 }
 
 .main-content.content-collapsed {
@@ -15,99 +15,200 @@
 }
 
 .profile-container {
-    max-width: 800px;
+    max-width: 1000px;
     margin: 0 auto;
 }
 
+/* ============================================ */
+/* HEADER */
+/* ============================================ */
+.section-header {
+    margin-bottom: 30px;
+    padding: 20px 0;
+    border-bottom: 2px solid rgba(176, 0, 30, 0.15);
+}
+
+.section-header h2 {
+    color: #1a2332;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 5px;
+    letter-spacing: -0.5px;
+}
+
+.section-header h2 i {
+    color: #b0001e;
+    margin-right: 10px;
+}
+
+.section-header p {
+    color: #6c757d;
+    margin: 0;
+    font-size: 15px;
+}
+
+/* ============================================ */
+/* DEBUG PANEL */
+/* ============================================ */
+.debug-panel {
+    background: white;
+    border: 1px solid #e1e8f0;
+    border-radius: 12px;
+    padding: 14px 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.debug-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 24px;
+    align-items: center;
+}
+
+.debug-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    padding: 4px 0;
+}
+
+.debug-label {
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.debug-label i {
+    font-size: 14px;
+    margin-right: 4px;
+    color: #6c757d;
+}
+
+.debug-value {
+    font-weight: 600;
+    color: #1a2332;
+}
+
+/* ============================================ */
+/* ROLE INDICATORS - TODOS ROJO */
+/* ============================================ */
+.role-indicator {
+    margin-bottom: 16px;
+}
+
+.role-tag {
+    padding: 7px 20px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+    letter-spacing: 0.3px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    background: linear-gradient(135deg, #b0001e, #d32f2f);
+}
+
+.role-tag i {
+    font-size: 16px;
+}
+
+/* ============================================ */
+/* PROFILE CARDS */
+/* ============================================ */
 .profile-card {
     background: white;
     border-radius: 16px;
-    padding: 30px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    border: 1px solid #e1e4e8;
+    padding: 28px 30px 30px 30px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e8edf4;
+    transition: all 0.3s ease;
+}
+
+.profile-card:hover {
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+    border-color: #d0d8e4;
+}
+
+.profile-card h3 {
+    font-size: 17px;
+    color: #1a2332;
+    margin-top: 0;
+    margin-bottom: 18px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.profile-card h3 i {
+    font-size: 20px;
+    color: #b0001e;
 }
 
 .mb-4 {
     margin-bottom: 24px;
 }
 
-/* ==========================================================================
-   Componentes Específicos de Notificaciones
-   ========================================================================== */
-.section-header {
-    margin-bottom: 30px;
-}
-
-.section-header h2 {
-    color: #2c3e50;
-    font-size: 26px;
-    font-weight: 700;
-    margin-bottom: 5px;
-}
-
-.section-header h2 i {
-    color: #b0001e;
-    /* Tu Color Rojo */
-}
-
-.section-header p {
-    color: #6c757d;
-    margin: 0;
-}
-
-.role-indicator {
-    margin-bottom: 15px;
-}
-
-.role-tag {
-    background: #b0001e;
-    /* Tu Color Rojo */
-    color: white;
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 13px;
-    text-transform: uppercase;
-    font-weight: bold;
-    display: inline-block;
-}
-
-.profile-card h3 {
-    font-size: 18px;
-    color: #2c3e50;
-    margin-top: 0;
-    margin-bottom: 20px;
-    font-weight: 600;
-}
-
 .text-primary-color {
     color: #b0001e !important;
 }
 
-/* Lista de ítems de notificación */
+/* ============================================ */
+/* WELCOME CARDS - TODOS CON BORDE ROJO */
+/* ============================================ */
+.welcome-card-admin,
+.welcome-card-doctor,
+.welcome-card-patient,
+.welcome-card-caregiver {
+    border-left: 5px solid #b0001e;
+    background: linear-gradient(135deg, #fff5f5, #fef0f0);
+}
+
+.welcome-card-admin h3,
+.welcome-card-doctor h3,
+.welcome-card-patient h3,
+.welcome-card-caregiver h3 {
+    margin-bottom: 4px;
+    font-size: 18px;
+}
+
+.layout-huge-icon {
+    font-size: 42px;
+    margin-right: 18px;
+    flex-shrink: 0;
+}
+
+/* ============================================ */
+/* NOTIFICATION LIST */
+/* ============================================ */
 .notification-list {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 10px;
 }
 
 .notification-item {
     display: flex;
     align-items: center;
     gap: 16px;
-    padding: 16px;
+    padding: 14px 18px;
     border-radius: 12px;
-    background-color: #fafbfc;
-    border: 1px solid #f0f2f5;
-    transition: transform 0.2s ease, background-color 0.2s ease;
+    background-color: #f8fafc;
+    border: 1px solid #edf2f7;
+    transition: all 0.25s ease;
+    cursor: default;
 }
 
 .notification-item:hover {
     transform: translateY(-2px);
-    background-color: #fcfdfe;
-    border-color: #e1e4e8;
+    background-color: #ffffff;
+    border-color: #dce3ed;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
 }
 
-/* Contenedor circular del icono */
 .notification-icon {
     width: 44px;
     height: 44px;
@@ -118,78 +219,184 @@
     color: white;
     font-size: 18px;
     flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    background: linear-gradient(135deg, #b0001e, #d32f2f);
+}
+
+/* Colores específicos para iconos - todos en tonos rojos */
+.notification-icon.bg-cita {
+    background: linear-gradient(135deg, #b0001e, #d32f2f);
+}
+
+.notification-icon.bg-tratamiento {
+    background: linear-gradient(135deg, #8b0000, #b0001e);
+}
+
+.notification-icon.bg-medicamento {
+    background: linear-gradient(135deg, #a0001e, #c0002e);
+}
+
+.notification-icon.bg-dispositivo {
+    background: linear-gradient(135deg, #c0001e, #e0002e);
+}
+
+.notification-icon.bg-usuario {
+    background: linear-gradient(135deg, #900018, #b0001e);
+}
+
+.notification-icon.bg-paciente {
+    background: linear-gradient(135deg, #b0001e, #cc0022);
+}
+
+.notification-icon.bg-alerta {
+    background: linear-gradient(135deg, #cc0018, #ee0022);
 }
 
 .notification-body {
     flex-grow: 1;
+    min-width: 0;
 }
 
 .notification-text {
     font-size: 14px;
-    color: #2c3e50;
+    color: #1a2332;
     margin: 0 0 4px 0;
-    line-height: 1.4;
+    line-height: 1.5;
+}
+
+.notification-text strong {
+    font-weight: 600;
+    color: #0d1b2a;
 }
 
 .notification-time {
     font-size: 12px;
-    color: #95a5a6;
+    color: #8895aa;
     display: flex;
     align-items: center;
     gap: 4px;
+    flex-wrap: wrap;
+}
+
+.notification-time i {
+    font-size: 13px;
 }
 
 .badge-tipo {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
     text-transform: uppercase;
-    color: #6c757d;
+    color: #b0001e;
     display: block;
     margin-bottom: 2px;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.6px;
 }
 
-/* Tarjeta especial para bienvenida de paciente */
-.welcome-card {
-    border-left: 5px solid #28a745;
-    /* Color Verde Éxito */
-    background: #f8fff9;
+/* ============================================ */
+/* BADGES - TODOS EN TONOS ROJOS */
+/* ============================================ */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.4;
 }
 
-.layout-huge-icon {
-    font-size: 40px;
-    margin-right: 20px;
-}
-
-/* Clases de colores dinámicos alineadas con la paleta corporativa */
-.bg-red {
+.badge-success {
     background-color: #b0001e;
+    color: white;
 }
 
-.bg-green {
-    background-color: #28a745;
+.badge-warning {
+    background-color: #cc0022;
+    color: white;
 }
 
-.bg-blue {
-    background-color: #007bff;
+.badge-danger {
+    background-color: #8b0000;
+    color: white;
 }
 
-.bg-purple {
-    background-color: #6f42c1;
+.badge-info {
+    background-color: #a0001e;
+    color: white;
 }
 
-.bg-orange {
-    background-color: #fd7e14;
+.badge-primary {
+    background-color: #b0001e;
+    color: white;
 }
 
-.bg-secondary {
+.badge-secondary {
     background-color: #6c757d;
+    color: white;
 }
 
-.text-success {
-    color: #28a745 !important;
+.badge-purple {
+    background-color: #b0001e;
+    color: white;
 }
 
+.badge-orange {
+    background-color: #b0001e;
+    color: white;
+}
+
+.badge-admin {
+    background-color: #b0001e;
+    color: white;
+}
+
+.badge-doctor {
+    background-color: #b0001e;
+    color: white;
+}
+
+.badge-patient {
+    background-color: #b0001e;
+    color: white;
+}
+
+.badge-caregiver {
+    background-color: #b0001e;
+    color: white;
+}
+
+/* ============================================ */
+/* ESTADOS DE CITAS - TONOS ROJOS */
+/* ============================================ */
+.badge-confirmada {
+    background-color: #b0001e;
+    color: white;
+}
+
+.badge-programada {
+    background-color: #a0001e;
+    color: white;
+}
+
+.badge-pendiente {
+    background-color: #cc0022;
+    color: white;
+}
+
+.badge-cancelada {
+    background-color: #6c757d;
+    color: white;
+}
+
+.badge-completada {
+    background-color: #198754;
+    color: white;
+}
+
+/* ============================================ */
+/* UTILITY */
+/* ============================================ */
 .d-flex {
     display: flex;
 }
@@ -202,14 +409,741 @@
     margin: 0;
 }
 
-/* Responsivo */
+.text-center {
+    text-align: center;
+}
+
+.text-muted {
+    color: #6c757d;
+}
+
+.text-success {
+    color: #b0001e !important;
+}
+
+.text-danger {
+    color: #8b0000 !important;
+}
+
+.py-3 {
+    padding-top: 16px;
+    padding-bottom: 16px;
+}
+
+.py-5 {
+    padding-top: 48px;
+    padding-bottom: 48px;
+}
+
+.mt-3 {
+    margin-top: 16px;
+}
+
+.me-3 {
+    margin-right: 16px;
+}
+
+/* ============================================ */
+/* ALERT */
+/* ============================================ */
+.alert {
+    padding: 16px 20px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    border: 1px solid transparent;
+}
+
+.alert-warning {
+    background-color: #fff0f0;
+    border-color: #f5c8c8;
+    color: #8b0000;
+}
+
+.alert-warning h4 {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+}
+
+.alert-warning h4 i {
+    margin-right: 8px;
+    color: #b0001e;
+}
+
+.alert-warning p {
+    margin: 0 0 4px 0;
+}
+
+/* ============================================ */
+/* SPINNER */
+/* ============================================ */
+.spinner-border {
+    display: inline-block;
+    width: 48px;
+    height: 48px;
+    border: 4px solid #b0001e;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spinner-border 0.75s linear infinite;
+}
+
+.spinner-border.text-danger {
+    border-color: #b0001e;
+    border-right-color: transparent;
+}
+
+@keyframes spinner-border {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+/* ============================================ */
+/* RESPONSIVE - TABLETS (max-width: 992px) */
+/* ============================================ */
+@media (max-width: 992px) {
+    .profile-container {
+        max-width: 100%;
+        padding: 0 8px;
+    }
+
+    .main-content {
+        padding: 30px 20px;
+    }
+
+    .section-header h2 {
+        font-size: 24px;
+    }
+
+    .profile-card {
+        padding: 24px 22px;
+    }
+}
+
+/* ============================================ */
+/* RESPONSIVE - MÓVILES (max-width: 768px) */
+/* ============================================ */
 @media (max-width: 768px) {
     .main-content {
         margin-left: 0 !important;
-        padding: 20px;
+        padding: 16px 12px;
+        margin-top: 75px;
+        min-height: calc(100vh - 85px);
+    }
+
+    .main-content.content-collapsed {
+        margin-left: 0 !important;
+    }
+
+    /* ============================================ */
+    /* PROFILE CONTAINER */
+    /* ============================================ */
+    .profile-container {
+        padding: 0;
+        max-width: 100%;
+    }
+
+    /* ============================================ */
+    /* SECTION HEADER */
+    /* ============================================ */
+    .section-header {
+        margin-bottom: 20px;
+        padding: 12px 0;
+    }
+
+    .section-header h2 {
+        font-size: 20px;
+    }
+
+    .section-header h2 i {
+        font-size: 18px;
+    }
+
+    .section-header p {
+        font-size: 13px;
+    }
+
+    /* ============================================ */
+    /* PROFILE CARD */
+    /* ============================================ */
+    .profile-card {
+        padding: 16px 14px;
+        border-radius: 12px;
+    }
+
+    .profile-card h3 {
+        font-size: 15px;
+        margin-bottom: 14px;
+    }
+
+    .profile-card h3 i {
+        font-size: 17px;
+    }
+
+    /* ============================================ */
+    /* WELCOME CARDS */
+    /* ============================================ */
+    .welcome-card-admin,
+    .welcome-card-doctor,
+    .welcome-card-patient,
+    .welcome-card-caregiver {
+        padding: 16px;
+        border-left-width: 4px;
+    }
+
+    .welcome-card-admin h3,
+    .welcome-card-doctor h3,
+    .welcome-card-patient h3,
+    .welcome-card-caregiver h3 {
+        font-size: 16px;
+    }
+
+    .layout-huge-icon {
+        font-size: 28px;
+        margin-right: 12px;
+    }
+
+    /* ============================================ */
+    /* NOTIFICATION ITEMS */
+    /* ============================================ */
+    .notification-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 12px 14px;
+        border-radius: 10px;
+    }
+
+    .notification-item:hover {
+        transform: none;
+        background-color: #f8fafc;
+        border-color: #edf2f7;
+        box-shadow: none;
+    }
+
+    .notification-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
+
+    .notification-text {
+        font-size: 13px;
+    }
+
+    .notification-time {
+        font-size: 11px;
+    }
+
+    .badge-tipo {
+        font-size: 9px;
+    }
+
+    /* ============================================ */
+    /* ROLE TAG */
+    /* ============================================ */
+    .role-tag {
+        font-size: 12px;
+        padding: 5px 14px;
+    }
+
+    .role-tag i {
+        font-size: 14px;
+    }
+
+    /* ============================================ */
+    /* DEBUG PANEL */
+    /* ============================================ */
+    .debug-panel {
+        padding: 10px 14px;
+        border-radius: 10px;
+        margin-bottom: 16px;
+    }
+
+    .debug-grid {
+        flex-direction: column;
+        gap: 4px;
+        align-items: flex-start;
+    }
+
+    .debug-item {
+        font-size: 12px;
+        padding: 2px 0;
+    }
+
+    .debug-label i {
+        font-size: 13px;
+    }
+
+    /* ============================================ */
+    /* BADGES */
+    /* ============================================ */
+    .badge {
+        font-size: 10px;
+        padding: 3px 10px;
+    }
+
+    /* ============================================ */
+    /* ALERT */
+    /* ============================================ */
+    .alert {
+        padding: 12px 16px;
+        border-radius: 10px;
+    }
+
+    .alert-warning h4 {
+        font-size: 14px;
+    }
+
+    .alert-warning p {
+        font-size: 13px;
+    }
+
+    /* ============================================ */
+    /* SPINNER */
+    /* ============================================ */
+    .spinner-border {
+        width: 36px;
+        height: 36px;
+        border-width: 3px;
+    }
+
+    /* ============================================ */
+    /* UTILITY RESPONSIVE */
+    /* ============================================ */
+    .mb-4 {
+        margin-bottom: 16px;
+    }
+
+    .py-3 {
+        padding-top: 12px;
+        padding-bottom: 12px;
+    }
+
+    .py-5 {
+        padding-top: 32px;
+        padding-bottom: 32px;
+    }
+
+    .mt-3 {
+        margin-top: 12px;
+    }
+
+    .me-3 {
+        margin-right: 12px;
+    }
+}
+
+/* ============================================ */
+/* RESPONSIVE - MÓVILES PEQUEÑOS (max-width: 480px) */
+/* ============================================ */
+@media (max-width: 480px) {
+    .main-content {
+        padding: 10px 8px;
+        margin-top: 70px;
+    }
+
+    /* ============================================ */
+    /* SECTION HEADER */
+    /* ============================================ */
+    .section-header h2 {
+        font-size: 17px;
+    }
+
+    .section-header h2 i {
+        font-size: 15px;
+    }
+
+    .section-header p {
+        font-size: 12px;
+    }
+
+    .section-header {
+        margin-bottom: 14px;
+        padding: 8px 0;
+    }
+
+    /* ============================================ */
+    /* PROFILE CARD */
+    /* ============================================ */
+    .profile-card {
+        padding: 12px 10px;
+        border-radius: 10px;
+    }
+
+    .profile-card h3 {
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+
+    .profile-card h3 i {
+        font-size: 15px;
+    }
+
+    /* ============================================ */
+    /* WELCOME CARDS */
+    /* ============================================ */
+    .welcome-card-admin,
+    .welcome-card-doctor,
+    .welcome-card-patient,
+    .welcome-card-caregiver {
+        padding: 14px 12px;
+    }
+
+    .welcome-card-admin h3,
+    .welcome-card-doctor h3,
+    .welcome-card-patient h3,
+    .welcome-card-caregiver h3 {
+        font-size: 14px;
+    }
+
+    .layout-huge-icon {
+        font-size: 22px;
+        margin-right: 10px;
+    }
+
+    /* ============================================ */
+    /* NOTIFICATION ITEMS */
+    /* ============================================ */
+    .notification-item {
+        padding: 10px 12px;
+        gap: 8px;
+    }
+
+    .notification-icon {
+        width: 30px;
+        height: 30px;
+        font-size: 12px;
+    }
+
+    .notification-text {
+        font-size: 12px;
+    }
+
+    .notification-time {
+        font-size: 10px;
+    }
+
+    .badge-tipo {
+        font-size: 8px;
+    }
+
+    /* ============================================ */
+    /* ROLE TAG */
+    /* ============================================ */
+    .role-tag {
+        font-size: 10px;
+        padding: 4px 12px;
+    }
+
+    .role-tag i {
+        font-size: 12px;
+    }
+
+    /* ============================================ */
+    /* DEBUG PANEL */
+    /* ============================================ */
+    .debug-panel {
+        padding: 8px 12px;
+        border-radius: 8px;
+        margin-bottom: 12px;
+    }
+
+    .debug-item {
+        font-size: 11px;
+    }
+
+    .debug-value {
+        font-size: 11px;
+    }
+
+    /* ============================================ */
+    /* BADGES */
+    /* ============================================ */
+    .badge {
+        font-size: 9px;
+        padding: 2px 8px;
+    }
+
+    /* ============================================ */
+    /* ALERT */
+    /* ============================================ */
+    .alert {
+        padding: 10px 14px;
+        border-radius: 8px;
+    }
+
+    .alert-warning h4 {
+        font-size: 13px;
+    }
+
+    .alert-warning p {
+        font-size: 12px;
+    }
+
+    /* ============================================ */
+    /* SPINNER */
+    /* ============================================ */
+    .spinner-border {
+        width: 28px;
+        height: 28px;
+        border-width: 3px;
+    }
+
+    /* ============================================ */
+    /* UTILITY RESPONSIVE */
+    /* ============================================ */
+    .mb-4 {
+        margin-bottom: 12px;
+    }
+
+    .py-3 {
+        padding-top: 8px;
+        padding-bottom: 8px;
+    }
+
+    .py-5 {
+        padding-top: 24px;
+        padding-bottom: 24px;
+    }
+
+    .mt-3 {
+        margin-top: 8px;
+    }
+
+    .me-3 {
+        margin-right: 8px;
+    }
+}
+
+/* ============================================ */
+/* RESPONSIVE - ORIENTACIÓN HORIZONTAL EN MÓVILES */
+/* ============================================ */
+@media (max-width: 768px) and (orientation: landscape) {
+    .main-content {
+        padding: 20px 30px;
+        margin-top: 65px;
+        min-height: calc(100vh - 75px);
+    }
+
+    .profile-container {
+        max-width: 90%;
+    }
+
+    .profile-card {
+        padding: 20px 24px;
     }
 
     .notification-item {
-        align-items: flex-start;
+        flex-direction: row;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 16px;
+    }
+
+    .notification-icon {
+        width: 34px;
+        height: 34px;
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+
+    .layout-huge-icon {
+        font-size: 30px;
+    }
+
+    .debug-grid {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 4px 16px;
+        align-items: center;
+    }
+
+    .section-header h2 {
+        font-size: 22px;
+    }
+}
+
+/* ============================================ */
+/* RESPONSIVE - PANTALLAS GRANDES (min-width: 1400px) */
+/* ============================================ */
+@media (min-width: 1400px) {
+    .main-content {
+        padding: 50px 60px;
+        margin-top: 70px;
+    }
+
+    .profile-container {
+        max-width: 1100px;
+    }
+
+    .profile-card {
+        padding: 35px 40px;
+        border-radius: 20px;
+    }
+
+    .section-header h2 {
+        font-size: 32px;
+    }
+
+    .section-header p {
+        font-size: 16px;
+    }
+
+    .layout-huge-icon {
+        font-size: 48px;
+    }
+
+    .welcome-card-admin h3,
+    .welcome-card-doctor h3,
+    .welcome-card-patient h3,
+    .welcome-card-caregiver h3 {
+        font-size: 20px;
+    }
+
+    .notification-item {
+        padding: 16px 22px;
+    }
+
+    .notification-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+
+    .notification-text {
+        font-size: 15px;
+    }
+
+    .role-tag {
+        font-size: 14px;
+        padding: 8px 24px;
+    }
+}
+
+/* ============================================ */
+/* UTILITARIOS RESPONSIVE ADICIONALES */
+/* ============================================ */
+
+/* Ocultar en móvil */
+.hide-mobile {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .hide-mobile {
+        display: none !important;
+    }
+}
+
+/* Mostrar solo en móvil */
+.show-mobile {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .show-mobile {
+        display: block !important;
+    }
+
+    .show-mobile-inline {
+        display: inline-block !important;
+    }
+
+    .show-mobile-flex {
+        display: flex !important;
+    }
+}
+
+/* Texto truncado en móvil */
+@media (max-width: 768px) {
+    .text-truncate-mobile {
+        max-width: 120px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .text-truncate-mobile-sm {
+        max-width: 80px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+/* Ajustes de espaciado en móvil */
+@media (max-width: 768px) {
+    .gap-2 {
+        gap: 0.5rem !important;
+    }
+
+    .gap-3 {
+        gap: 0.75rem !important;
+    }
+
+    .gap-4 {
+        gap: 1rem !important;
+    }
+
+    .mb-2 {
+        margin-bottom: 0.5rem !important;
+    }
+
+    .mb-3 {
+        margin-bottom: 0.75rem !important;
+    }
+
+    .mb-4 {
+        margin-bottom: 1rem !important;
+    }
+
+    .p-2 {
+        padding: 0.5rem !important;
+    }
+
+    .p-3 {
+        padding: 0.75rem !important;
+    }
+
+    .p-4 {
+        padding: 1rem !important;
+    }
+
+    .mt-2 {
+        margin-top: 0.5rem !important;
+    }
+
+    .mt-3 {
+        margin-top: 0.75rem !important;
+    }
+
+    .mt-4 {
+        margin-top: 1rem !important;
+    }
+}
+
+/* Eliminar hover en móvil para mejor experiencia táctil */
+@media (max-width: 768px) {
+    .profile-card:hover {
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+        border-color: #e8edf4;
+    }
+
+    .notification-item:hover {
+        transform: none;
+        background-color: #f8fafc;
+        border-color: #edf2f7;
+        box-shadow: none;
     }
 }
