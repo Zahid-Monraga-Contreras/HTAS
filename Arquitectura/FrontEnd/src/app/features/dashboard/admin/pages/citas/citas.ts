@@ -42,12 +42,34 @@ export class Citas implements OnInit, OnDestroy {
   isSaving = false;
   isDeleting = false;
 
+  // Variables para disponibilidad
+  horarioDisponible: boolean = true;
+  mensajeDisponibilidad: string = '';
+  horariosDisponibles: string[] = [];
+  mostrandoHorarios: boolean = false;
+  horarioSeleccionadoValido: boolean = true;
+  verificandoDisponibilidad: boolean = false;
+
+  // Variables para búsqueda de doctores y pacientes
+  loadingDoctores = false;
+  loadingPacientes = false;
+  doctores: any[] = [];
+  doctoresFiltrados: any[] = [];
+  pacientes: any[] = [];
+  pacientesFiltrados: any[] = [];
+  searchDoctorTerm: string = '';
+  searchPacienteTerm: string = '';
+
   nuevaCita: any = {
     fecha: '',
     hora: '',
     motivo: '',
     modalidad: 'Presencial',
-    sintomas: ''
+    sintomas: '',
+    idDoctor: null,
+    idPaciente: null,
+    nombreDoctor: '',
+    nombrePaciente: ''
   };
 
   private fpFechaInstance: any = null;
@@ -68,6 +90,8 @@ export class Citas implements OnInit, OnDestroy {
         console.log('Usuario cargado correctamente:', this.currentUser.correo);
         console.log('Rol del usuario:', this.currentUser.rol);
         await this.cargarCitas();
+        await this.cargarDoctores();
+        await this.cargarPacientes();
       } else {
         console.error('No se pudo obtener el usuario');
       }
@@ -142,8 +166,6 @@ export class Citas implements OnInit, OnDestroy {
     const rol = this.currentUser.rol.toLowerCase().trim()
       .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-    console.log('Rol normalizado:', rol);
-
     const esAdmin = rol === 'administrador' ||
       rol === 'admin' ||
       this.currentUser.rol?.toLowerCase().includes('admin') ||
@@ -153,12 +175,6 @@ export class Citas implements OnInit, OnDestroy {
     const esAcompanante = rol === 'acompanante';
 
     const tieneAccesoGlobal = esAdmin || esMedico || esAcompanante;
-
-    console.log('Resultado de verificacion:');
-    console.log('  - esAdmin:', esAdmin);
-    console.log('  - esMedico:', esMedico);
-    console.log('  - esAcompanante:', esAcompanante);
-    console.log('  - tieneAccesoGlobal:', tieneAccesoGlobal);
 
     let data: any[] = [];
 
@@ -224,6 +240,105 @@ export class Citas implements OnInit, OnDestroy {
     }
   }
 
+  // ==========================================
+  // CARGAR DOCTORES
+  // ==========================================
+  async cargarDoctores() {
+    this.loadingDoctores = true;
+    try {
+      const allUsers = await firstValueFrom(this.usersService.getUsuariosBackend());
+      if (Array.isArray(allUsers)) {
+        this.doctores = allUsers.filter(u =>
+          u.rol?.toLowerCase() === 'doctor' && u.activo !== false
+        );
+        this.doctoresFiltrados = [...this.doctores];
+        console.log('Doctores cargados:', this.doctores.length);
+      }
+    } catch (error) {
+      console.error('Error al cargar doctores:', error);
+    } finally {
+      this.loadingDoctores = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  // ==========================================
+  // CARGAR PACIENTES
+  // ==========================================
+  async cargarPacientes() {
+    this.loadingPacientes = true;
+    try {
+      const allUsers = await firstValueFrom(this.usersService.getUsuariosBackend());
+      if (Array.isArray(allUsers)) {
+        this.pacientes = allUsers.filter(u =>
+          u.rol?.toLowerCase() === 'paciente' && u.activo !== false
+        );
+        this.pacientesFiltrados = [...this.pacientes];
+        console.log('Pacientes cargados:', this.pacientes.length);
+      }
+    } catch (error) {
+      console.error('Error al cargar pacientes:', error);
+    } finally {
+      this.loadingPacientes = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  // ==========================================
+  // BUSCAR DOCTORES
+  // ==========================================
+  buscarDoctores() {
+    const term = this.searchDoctorTerm.toLowerCase().trim();
+    if (!term) {
+      this.doctoresFiltrados = [...this.doctores];
+      return;
+    }
+    this.doctoresFiltrados = this.doctores.filter(d =>
+      d.nombre?.toLowerCase().includes(term) ||
+      d.apPaterno?.toLowerCase().includes(term) ||
+      d.correo?.toLowerCase().includes(term) ||
+      d.especialidad?.toLowerCase().includes(term)
+    );
+  }
+
+  // ==========================================
+  // BUSCAR PACIENTES
+  // ==========================================
+  buscarPacientes() {
+    const term = this.searchPacienteTerm.toLowerCase().trim();
+    if (!term) {
+      this.pacientesFiltrados = [...this.pacientes];
+      return;
+    }
+    this.pacientesFiltrados = this.pacientes.filter(p =>
+      p.nombre?.toLowerCase().includes(term) ||
+      p.apPaterno?.toLowerCase().includes(term) ||
+      p.correo?.toLowerCase().includes(term)
+    );
+  }
+
+  // ==========================================
+  // SELECCIONAR DOCTOR
+  // ==========================================
+  seleccionarDoctor(doctor: any) {
+    this.nuevaCita.idDoctor = doctor.idusuario;
+    this.nuevaCita.nombreDoctor = `${doctor.nombre} ${doctor.apPaterno}`;
+    this.searchDoctorTerm = `${doctor.nombre} ${doctor.apPaterno}`;
+    this.doctoresFiltrados = [];
+    this.cdr.detectChanges();
+  }
+
+  // ==========================================
+  // SELECCIONAR PACIENTE
+  // ==========================================
+  seleccionarPaciente(paciente: any) {
+    this.nuevaCita.idPaciente = paciente.idusuario;
+    this.nuevaCita.nombrePaciente = `${paciente.nombre} ${paciente.apPaterno}`;
+    this.searchPacienteTerm = `${paciente.nombre} ${paciente.apPaterno}`;
+    this.pacientesFiltrados = [];
+    this.cdr.detectChanges();
+  }
+
   get citasFiltradas() {
     if (!this.searchTerm) return this.citasTodo;
     const term = this.searchTerm.toLowerCase();
@@ -256,6 +371,9 @@ export class Citas implements OnInit, OnDestroy {
     };
   }
 
+  // ==========================================
+  // ABRIR CREAR CITA CON VALIDACION
+  // ==========================================
   abrirCrearCita() {
     if (!this.canAdd) {
       return;
@@ -266,35 +384,218 @@ export class Citas implements OnInit, OnDestroy {
     const mes = String(hoy.getMonth() + 1).padStart(2, '0');
     const dia = String(hoy.getDate()).padStart(2, '0');
 
+    // Resetear variables
+    this.horarioDisponible = true;
+    this.mensajeDisponibilidad = '';
+    this.horariosDisponibles = [];
+    this.mostrandoHorarios = false;
+    this.horarioSeleccionadoValido = true;
+    this.verificandoDisponibilidad = false;
+    this.searchDoctorTerm = '';
+    this.searchPacienteTerm = '';
+    this.doctoresFiltrados = [];
+    this.pacientesFiltrados = [];
+
     this.nuevaCita = {
       fecha: anio + '-' + mes + '-' + dia,
       hora: '10:00',
       motivo: '',
       modalidad: 'Presencial',
-      sintomas: ''
+      sintomas: '',
+      idDoctor: null,
+      idPaciente: null,
+      nombreDoctor: '',
+      nombrePaciente: ''
     };
+
     this.mostrarModalCrear = true;
     this.cdr.detectChanges();
-    this.inicializarCalendario();
+    setTimeout(() => this.inicializarCalendario(), 100);
   }
 
+  // ==========================================
+  // VERIFICAR DISPONIBILIDAD
+  // ==========================================
+  private async verificarDisponibilidadEnTiempoReal() {
+    const fecha = this.nuevaCita.fecha;
+    const hora = this.nuevaCita.hora;
+
+    if (!fecha || !hora) {
+      this.horarioDisponible = true;
+      this.mensajeDisponibilidad = '';
+      this.horarioSeleccionadoValido = true;
+      return;
+    }
+
+    this.verificandoDisponibilidad = true;
+    this.cdr.detectChanges();
+
+    try {
+      const disponibilidad = await firstValueFrom(
+        this.usersService.verificarDisponibilidad(fecha, hora + ':00', this.currentUser?.correo)
+      );
+
+      this.horarioDisponible = disponibilidad.disponible;
+      this.mensajeDisponibilidad = disponibilidad.mensaje;
+
+      if (!disponibilidad.disponible) {
+        this.horarioSeleccionadoValido = false;
+
+        if (disponibilidad.detalles) {
+          const detalles = disponibilidad.detalles;
+          if (detalles.usuarioYaTieneCita) {
+            this.showToast('warning', 'Ya tiene cita', 'El paciente ya tiene una cita agendada para esta fecha y hora.');
+          } else if (detalles.horaLlena) {
+            this.showToast('warning', 'Horario completo', 'Este horario ya está completo (3 citas agendadas).');
+          } else if (detalles.limiteDiaAlcanzado) {
+            this.showToast('warning', 'Límite diario alcanzado', 'El paciente ya tiene 2 citas para este día.');
+          } else if (detalles.yaAgendado) {
+            this.showToast('warning', 'Horario ocupado', `Este horario ya está ocupado por ${detalles.correoExistente || 'otro usuario'}.`);
+          }
+        }
+      } else {
+        this.horarioSeleccionadoValido = true;
+        this.showToast('info', 'Horario disponible', 'El horario está disponible para agendar.');
+      }
+
+    } catch (error) {
+      console.error('Error verificando disponibilidad:', error);
+      this.showToast('warning', 'Error de verificación', 'No se pudo verificar la disponibilidad. Intenta nuevamente.');
+    } finally {
+      this.verificandoDisponibilidad = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  private async cargarHorariosDisponibles(fecha: string) {
+    if (!fecha) {
+      this.horariosDisponibles = [];
+      this.mostrandoHorarios = false;
+      return;
+    }
+
+    try {
+      const response = await firstValueFrom(
+        this.usersService.getHorariosDisponibles(fecha, this.currentUser?.correo)
+      );
+
+      if (response && response.success) {
+        this.horariosDisponibles = response.horariosDisponibles || [];
+        this.mostrandoHorarios = this.horariosDisponibles.length > 0;
+
+        if (this.horariosDisponibles.length === 1) {
+          const horaSugerida = this.horariosDisponibles[0];
+          this.seleccionarHorario(horaSugerida);
+          this.showToast('info', 'Horario sugerido', `Solo hay un horario disponible: ${this.formatearHora(horaSugerida)}`);
+        } else if (this.horariosDisponibles.length === 0) {
+          this.showToast('warning', 'Sin horarios', 'No hay horarios disponibles para esta fecha.');
+          this.mostrandoHorarios = false;
+        }
+      }
+
+      this.cdr.detectChanges();
+    } catch (error) {
+      console.error('Error cargando horarios disponibles:', error);
+      this.mostrandoHorarios = false;
+    }
+  }
+
+  seleccionarHorario(hora: string) {
+    this.nuevaCita.hora = hora;
+
+    if (this.fpHoraInstance) {
+      try {
+        const hoy = new Date();
+        const [h, m] = hora.split(':').map(Number);
+        hoy.setHours(h, m, 0, 0);
+        this.fpHoraInstance.setDate(hoy, false);
+      } catch (e) {
+        console.warn('Error actualizando flatpickr hora:', e);
+      }
+    }
+
+    this.verificarDisponibilidadEnTiempoReal();
+    this.cdr.detectChanges();
+  }
+
+  formatearHora(hora: string): string {
+    if (!hora) return 'S/H';
+    try {
+      const partes = hora.split(':');
+      if (partes.length >= 2) {
+        let h = parseInt(partes[0]);
+        const m = partes[1];
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        h = h % 12 || 12;
+        return `${h}:${m} ${ampm}`;
+      }
+      return hora;
+    } catch {
+      return hora;
+    }
+  }
+
+  // ==========================================
+  // GUARDAR NUEVA CITA CON VALIDACION
+  // ==========================================
   async guardarNuevaCita() {
     if (!this.canAdd) {
       return;
     }
 
     if (!this.nuevaCita.fecha || !this.nuevaCita.hora || !this.nuevaCita.motivo.trim()) {
+      this.showToast('warning', 'Formulario Incompleto', 'Por favor, completa todos los campos requeridos.');
+      return;
+    }
+
+    if (!this.nuevaCita.idDoctor) {
+      this.showToast('warning', 'Doctor requerido', 'Por favor, selecciona un doctor para la cita.');
+      return;
+    }
+
+    if (!this.nuevaCita.idPaciente) {
+      this.showToast('warning', 'Paciente requerido', 'Por favor, selecciona un paciente para la cita.');
+      return;
+    }
+
+    if (!this.horarioDisponible || !this.horarioSeleccionadoValido) {
+      this.showToast('warning', 'Horario no disponible', this.mensajeDisponibilidad || 'El horario seleccionado no está disponible.');
       return;
     }
 
     this.isSaving = true;
 
+    // Obtener datos completos del paciente seleccionado
+    const pacienteSeleccionado = this.pacientes.find(p => p.idusuario === this.nuevaCita.idPaciente);
+
+    // Verificar disponibilidad una última vez
+    try {
+      const disponibilidadFinal = await firstValueFrom(
+        this.usersService.verificarDisponibilidad(
+          this.nuevaCita.fecha,
+          this.nuevaCita.hora + ':00',
+          this.currentUser?.correo
+        )
+      );
+
+      if (!disponibilidadFinal.disponible) {
+        this.showToast('error', 'Horario ocupado', disponibilidadFinal.mensaje || 'El horario ya no está disponible.');
+        this.horarioDisponible = false;
+        this.horarioSeleccionadoValido = false;
+        this.isSaving = false;
+        this.cargarHorariosDisponibles(this.nuevaCita.fecha);
+        return;
+      }
+    } catch (error) {
+      console.error('Error verificando disponibilidad final:', error);
+    }
+
     const citaParaEnviar = {
-      nombrePaciente: this.currentUser.nombre || this.currentUser.NombreCompleto || 'Paciente',
-      apPaternoPaciente: this.currentUser.apPaterno || '',
-      apMaternoPaciente: this.currentUser.apMaterno || '',
-      telefonoPaciente: this.currentUser.telefono ? String(this.currentUser.telefono) : null,
-      correoPaciente: this.currentUser.correo,
+      nombrePaciente: pacienteSeleccionado?.nombre || 'Paciente',
+      apPaternoPaciente: pacienteSeleccionado?.apPaterno || '',
+      apMaternoPaciente: pacienteSeleccionado?.apMaterno || '',
+      telefonoPaciente: pacienteSeleccionado?.telefono ? String(pacienteSeleccionado.telefono) : null,
+      correoPaciente: pacienteSeleccionado?.correo || '',
       fechaCita: this.nuevaCita.fecha,
       horaCita: this.nuevaCita.hora.length === 5 ? this.nuevaCita.hora + ':00' : this.nuevaCita.hora,
       motivo: this.nuevaCita.motivo.trim(),
@@ -306,13 +607,26 @@ export class Citas implements OnInit, OnDestroy {
     try {
       await firstValueFrom(this.usersService.crearCita(citaParaEnviar));
       await this.cargarCitas();
+      this.showToast('success', 'Cita Agendada', 'La cita ha sido agendada exitosamente.');
       this.cerrarModal();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error al guardar cita:', error);
+      let mensajeError = 'Ocurrió un error al agendar la cita.';
+      if (error.error?.error) {
+        mensajeError = error.error.error;
+      }
+      this.showToast('error', 'Error al Agendar', mensajeError);
     } finally {
       this.isSaving = false;
       this.cdr.detectChanges();
     }
+  }
+
+  // ==========================================
+  // TOAST DE NOTIFICACION
+  // ==========================================
+  private showToast(type: 'success' | 'error' | 'warning' | 'info', title: string, message: string) {
+    console.log(`[${type.toUpperCase()}] ${title}: ${message}`);
   }
 
   abrirEditarCita() {
@@ -385,13 +699,22 @@ export class Citas implements OnInit, OnDestroy {
     this.mostrarModalCrear = false;
     this.mostrarModalEdit = false;
     this.mostrarModalDelete = false;
+    this.horariosDisponibles = [];
+    this.mostrandoHorarios = false;
+    this.doctoresFiltrados = [];
+    this.pacientesFiltrados = [];
   }
 
+  // ==========================================
+  // CALENDARIO CON VALIDACION
+  // ==========================================
   inicializarCalendario() {
     if (isPlatformBrowser(this.platformId)) {
       setTimeout(() => {
         const hoy = new Date();
         const fechaMaximaCita = new Date(hoy.getFullYear(), hoy.getMonth() + 2, hoy.getDate());
+
+        this.destruirCalendarios();
 
         this.fpFechaInstance = flatpickr("#fechaCitaInput", {
           locale: Spanish,
@@ -404,6 +727,8 @@ export class Citas implements OnInit, OnDestroy {
           disableMobile: true,
           onChange: (selectedDates: any, dateStr: string) => {
             this.nuevaCita.fecha = dateStr;
+            this.cargarHorariosDisponibles(dateStr);
+            this.verificarDisponibilidadEnTiempoReal();
             this.cdr.detectChanges();
           }
         });
@@ -420,10 +745,15 @@ export class Citas implements OnInit, OnDestroy {
           disableMobile: true,
           onChange: (selectedDates: any, dateStr: string) => {
             this.nuevaCita.hora = dateStr;
+            this.verificarDisponibilidadEnTiempoReal();
             this.cdr.detectChanges();
           }
         });
-      }, 50);
+
+        if (this.nuevaCita.fecha) {
+          this.cargarHorariosDisponibles(this.nuevaCita.fecha);
+        }
+      }, 100);
     }
   }
 
@@ -436,5 +766,13 @@ export class Citas implements OnInit, OnDestroy {
       this.fpHoraInstance.destroy();
       this.fpHoraInstance = null;
     }
+  }
+
+  // ==========================================
+  // AVATAR URL
+  // ==========================================
+  getAvatarUrl(nombre: string, apPaterno: string): string {
+    const name = `${nombre || ''} ${apPaterno || ''}`.trim();
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=b0001e&color=fff&bold=true`;
   }
 }

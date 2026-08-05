@@ -41,7 +41,6 @@
         </div>
 
         <div class="table-card">
-            <!-- AGREGADO: Wrapper para scroll horizontal -->
             <div class="table-responsive-wrapper">
                 <table class="custom-table">
                     <thead>
@@ -175,7 +174,7 @@
     </div>
 </main>
 
-<!-- MODAL: CREAR CITA -->
+<!-- MODAL: CREAR CITA CON VALIDACION Y BUSCADORES -->
 @if (mostrarModalCrear) {
 <div class="modal-overlay">
     <div class="modal-premium-card">
@@ -185,10 +184,75 @@
         </div>
 
         <div class="modal-body">
-            <p class="modal-patient-info">
-                <strong>Paciente asociado:</strong> {{ currentUser?.nombre }} {{ currentUser?.apPaterno }}
-            </p>
+            <!-- BUSCADOR DE DOCTOR -->
+            <div class="form-group">
+                <label>Buscar Doctor *</label>
+                <div class="search-user-wrapper">
+                    <div class="search-box">
+                        <i class="bi bi-search"></i>
+                        <input type="text" [(ngModel)]="searchDoctorTerm" (input)="buscarDoctores()"
+                            (focus)="!searchDoctorTerm && (doctoresFiltrados = [...doctores])"
+                            placeholder="Buscar doctor por nombre o especialidad..." class="search-input"
+                            [ngModelOptions]="{standalone: true}" />
+                        <i class="bi bi-person-badge" *ngIf="!searchDoctorTerm"
+                            style="color: #94a3b8; margin-right: 10px;"></i>
+                    </div>
+                    <div class="users-dropdown" *ngIf="doctoresFiltrados.length > 0 && searchDoctorTerm">
+                        <div *ngFor="let d of doctoresFiltrados" class="user-option" (click)="seleccionarDoctor(d)">
+                            <img [src]="getAvatarUrl(d.nombre, d.apPaterno)" alt="Avatar" class="option-avatar">
+                            <div class="option-info">
+                                <span class="option-nombre">{{ d.nombre }} {{ d.apPaterno }}</span>
+                                <span class="option-email">{{ d.especialidad || 'Médico General' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="user-seleccionado" *ngIf="nuevaCita.idDoctor">
+                        <i class="bi bi-check-circle-fill" style="color: #10b981;"></i>
+                        <span>Doctor seleccionado: <strong>{{ nuevaCita.nombreDoctor }}</strong></span>
+                        <button type="button" class="btn-cambiar"
+                            (click)="nuevaCita.idDoctor = null; nuevaCita.nombreDoctor = ''; searchDoctorTerm = '';">Cambiar</button>
+                    </div>
+                </div>
+                <small class="error-text" *ngIf="!nuevaCita.idDoctor && searchDoctorTerm">
+                    Debes seleccionar un doctor
+                </small>
+            </div>
 
+            <!-- BUSCADOR DE PACIENTE -->
+            <div class="form-group">
+                <label>Buscar Paciente *</label>
+                <div class="search-user-wrapper">
+                    <div class="search-box">
+                        <i class="bi bi-search"></i>
+                        <input type="text" [(ngModel)]="searchPacienteTerm" (input)="buscarPacientes()"
+                            (focus)="!searchPacienteTerm && (pacientesFiltrados = [...pacientes])"
+                            placeholder="Buscar paciente por nombre o correo..." class="search-input"
+                            [ngModelOptions]="{standalone: true}" />
+                        <i class="bi bi-person" *ngIf="!searchPacienteTerm"
+                            style="color: #94a3b8; margin-right: 10px;"></i>
+                    </div>
+                    <div class="users-dropdown" *ngIf="pacientesFiltrados.length > 0 && searchPacienteTerm">
+                        <div *ngFor="let p of pacientesFiltrados" class="user-option" (click)="seleccionarPaciente(p)">
+                            <img [src]="getAvatarUrl(p.nombre, p.apPaterno)" alt="Avatar" class="option-avatar">
+                            <div class="option-info">
+                                <span class="option-nombre">{{ p.nombre }} {{ p.apPaterno }}</span>
+                                <span class="option-email">{{ p.correo }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="user-seleccionado" *ngIf="nuevaCita.idPaciente">
+                        <i class="bi bi-check-circle-fill" style="color: #10b981;"></i>
+                        <span>Paciente seleccionado: <strong>{{ nuevaCita.nombrePaciente }}</strong></span>
+                        <button type="button" class="btn-cambiar"
+                            (click)="nuevaCita.idPaciente = null; nuevaCita.nombrePaciente = ''; searchPacienteTerm = '';">Cambiar</button>
+                    </div>
+                </div>
+                <small class="error-text" *ngIf="!nuevaCita.idPaciente && searchPacienteTerm">
+                    Debes seleccionar un paciente
+                </small>
+            </div>
+
+            <!-- FECHA Y HORA -->
             <div class="form-grid-modal">
                 <div class="form-group">
                     <label>Fecha de la Cita</label>
@@ -209,34 +273,70 @@
                         <i class="bi bi-clock icon-embed"></i>
                     </div>
                 </div>
+            </div>
 
-                <div class="form-group">
-                    <label>Modalidad</label>
-                    <select [(ngModel)]="nuevaCita.modalidad" class="form-control-premium">
-                        <option value="Presencial">Presencial</option>
-                        <option value="Virtual">Virtual</option>
-                    </select>
+            <!-- Indicador de disponibilidad -->
+            <div *ngIf="verificandoDisponibilidad" class="disponibilidad-loading">
+                <span class="spinner-small"></span> Verificando disponibilidad...
+            </div>
+
+            <div *ngIf="!verificandoDisponibilidad && nuevaCita.fecha && nuevaCita.hora">
+                <div *ngIf="horarioDisponible && horarioSeleccionadoValido" class="disponibilidad-disponible">
+                    <i class="bi bi-check-circle-fill"></i> Horario disponible
+                </div>
+                <div *ngIf="!horarioDisponible || !horarioSeleccionadoValido" class="disponibilidad-no-disponible">
+                    <i class="bi bi-x-circle-fill"></i> {{ mensajeDisponibilidad || 'Horario no disponible' }}
                 </div>
             </div>
 
+            <!-- Horarios disponibles sugeridos -->
+            <div *ngIf="mostrandoHorarios && horariosDisponibles.length > 0" class="horarios-sugeridos">
+                <label><i class="bi bi-clock-history"></i> Horarios disponibles para esta fecha:</label>
+                <div class="horarios-grid">
+                    <button *ngFor="let hora of horariosDisponibles" class="horario-btn"
+                        [class.selected]="nuevaCita.hora === hora" (click)="seleccionarHorario(hora)">
+                        {{ formatearHora(hora) }}
+                    </button>
+                </div>
+            </div>
+
+            <!-- MODALIDAD -->
+            <div class="form-group full-width-modal">
+                <label>Modalidad</label>
+                <select [(ngModel)]="nuevaCita.modalidad" class="form-control-premium">
+                    <option value="Presencial">Presencial</option>
+                    <option value="Virtual">Virtual</option>
+                </select>
+            </div>
+
+            <!-- MOTIVO -->
             <div class="form-group full-width-modal">
                 <label>Motivo de la Consulta</label>
                 <input type="text" [(ngModel)]="nuevaCita.motivo"
                     placeholder="Ej: Control de rutina, revisión de presión arterial" class="form-control-premium">
             </div>
 
+            <!-- SÍNTOMAS -->
             <div class="form-group full-width-modal">
                 <label>Síntomas actuales</label>
                 <textarea [(ngModel)]="nuevaCita.sintomas" rows="3"
                     placeholder="Escribe aquí tus malestares o síntomas actuales..."
                     class="form-control-premium"></textarea>
             </div>
+
+            <!-- Mensaje de error si horario no disponible -->
+            <div *ngIf="(!horarioDisponible || !horarioSeleccionadoValido) && nuevaCita.fecha && nuevaCita.hora"
+                class="error-mensaje">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                Selecciona un horario disponible para agendar
+            </div>
         </div>
 
         <div class="modal-footer-premium">
             <button type="button" class="btn-cancel-premium" (click)="cerrarModal()"
                 [disabled]="isSaving">Cancelar</button>
-            <button type="button" class="btn-save-appointment" (click)="guardarNuevaCita()" [disabled]="isSaving">
+            <button type="button" class="btn-save-appointment" (click)="guardarNuevaCita()"
+                [disabled]="isSaving || !horarioDisponible || !horarioSeleccionadoValido || verificandoDisponibilidad || !nuevaCita.idDoctor || !nuevaCita.idPaciente">
                 @if (isSaving) {
                 <span class="spinner-save"></span>
                 <span>Registrando...</span>

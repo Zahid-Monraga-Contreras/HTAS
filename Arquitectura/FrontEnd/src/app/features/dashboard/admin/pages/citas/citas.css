@@ -2000,3 +2000,482 @@
         border: 1px solid #e2e8f0;
     }
 }
+
+/* ============================================================
+   DISPONIBILIDAD EN TIEMPO REAL - ADMIN
+   ============================================================ */
+
+.disponibilidad-loading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #6c7a89;
+    font-size: 0.85rem;
+    margin: 8px 0 4px;
+    padding: 8px 12px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.disponibilidad-loading .spinner-small {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #e2e8f0;
+    border-top: 2px solid #b0001e;
+    border-radius: 50%;
+    animation: spin-save 1s linear infinite;
+    display: inline-block;
+}
+
+.disponibilidad-disponible {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #10b981;
+    font-size: 0.85rem;
+    margin: 8px 0 4px;
+    padding: 8px 12px;
+    background: #d1fae5;
+    border-radius: 8px;
+    border: 1px solid #10b981;
+}
+
+.disponibilidad-disponible i {
+    font-size: 1rem;
+}
+
+.disponibilidad-no-disponible {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #ef4444;
+    font-size: 0.85rem;
+    margin: 8px 0 4px;
+    padding: 8px 12px;
+    background: #fee2e2;
+    border-radius: 8px;
+    border: 1px solid #ef4444;
+}
+
+.disponibilidad-no-disponible i {
+    font-size: 1rem;
+}
+
+/* ============================================================
+   HORARIOS SUGERIDOS - ADMIN
+   ============================================================ */
+
+.horarios-sugeridos {
+    margin: 8px 0 16px 0;
+    padding: 12px 14px;
+    background: #f8fafc;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+}
+
+.horarios-sugeridos label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 8px;
+}
+
+.horarios-sugeridos label i {
+    color: #b0001e;
+    margin-right: 4px;
+}
+
+.horarios-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.horario-btn {
+    padding: 6px 14px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    background: white;
+    color: #64748b;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.horario-btn:hover {
+    border-color: #b0001e;
+    color: #b0001e;
+    background: #b0001e08;
+    transform: translateY(-1px);
+}
+
+.horario-btn:active {
+    transform: scale(0.95);
+}
+
+.horario-btn.selected {
+    border-color: #b0001e;
+    background: #b0001e;
+    color: white;
+}
+
+.horario-btn.selected:hover {
+    background: #8e0018;
+    border-color: #8e0018;
+}
+
+.horario-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ============================================================
+   ERROR EN MODAL - ADMIN
+   ============================================================ */
+
+.error-mensaje {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #ef4444;
+    font-size: 0.85rem;
+    margin-top: 12px;
+    padding: 8px 14px;
+    background: #fee2e2;
+    border-radius: 8px;
+    border: 1px solid #f5c6cb;
+}
+
+.error-mensaje i {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+/* ============================================================
+   RESPONSIVE PARA DISPONIBILIDAD
+   ============================================================ */
+
+@media (max-width: 768px) {
+    .horarios-sugeridos {
+        padding: 10px 12px;
+    }
+
+    .horarios-grid {
+        gap: 6px;
+    }
+
+    .horario-btn {
+        padding: 5px 12px;
+        font-size: 0.75rem;
+        border-radius: 6px;
+    }
+
+    .disponibilidad-loading,
+    .disponibilidad-disponible,
+    .disponibilidad-no-disponible {
+        font-size: 0.8rem;
+        padding: 6px 10px;
+    }
+
+    .error-mensaje {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .horarios-sugeridos {
+        padding: 8px 10px;
+    }
+
+    .horarios-sugeridos label {
+        font-size: 0.75rem;
+    }
+
+    .horarios-grid {
+        gap: 4px;
+    }
+
+    .horario-btn {
+        padding: 4px 10px;
+        font-size: 0.7rem;
+        border-radius: 4px;
+    }
+
+    .disponibilidad-loading,
+    .disponibilidad-disponible,
+    .disponibilidad-no-disponible {
+        font-size: 0.7rem;
+        padding: 4px 8px;
+        gap: 4px;
+    }
+
+    .disponibilidad-loading i,
+    .disponibilidad-disponible i,
+    .disponibilidad-no-disponible i {
+        font-size: 0.8rem;
+    }
+
+    .error-mensaje {
+        font-size: 0.7rem;
+        padding: 4px 10px;
+        gap: 4px;
+    }
+
+    .error-mensaje i {
+        font-size: 0.9rem;
+    }
+}
+
+/* ============================================================
+   BUSCADORES DE USUARIOS - ADMIN
+   ============================================================ */
+
+.search-user-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0 12px;
+    transition: all 0.2s ease;
+}
+
+.search-box:focus-within {
+    border-color: #b0001e;
+    box-shadow: 0 0 0 3px rgba(176, 0, 30, 0.1);
+    background: white;
+}
+
+.search-box i:first-child {
+    color: #94a3b8;
+    font-size: 0.9rem;
+    margin-right: 8px;
+}
+
+.search-box .search-input {
+    flex: 1;
+    padding: 10px 8px;
+    border: none;
+    outline: none;
+    font-size: 0.95rem;
+    color: #1e293b;
+    background: transparent;
+}
+
+.users-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 100;
+    border: 1px solid #e2e8f0;
+}
+
+.users-dropdown::-webkit-scrollbar {
+    width: 4px;
+}
+
+.users-dropdown::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.user-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.user-option:hover {
+    background: #f8fafc;
+}
+
+.user-option:last-child {
+    border-bottom: none;
+}
+
+.option-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.option-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.option-nombre {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.option-email {
+    display: block;
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+.user-seleccionado {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: #f0fdf4;
+    border: 1.5px solid #10b981;
+    border-radius: 8px;
+    margin-top: 6px;
+}
+
+.user-seleccionado i {
+    font-size: 1.1rem;
+}
+
+.user-seleccionado span {
+    flex: 1;
+    font-size: 0.9rem;
+    color: #1e293b;
+}
+
+.user-seleccionado strong {
+    color: #0f172a;
+}
+
+.btn-cambiar {
+    padding: 4px 12px;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    color: #64748b;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-cambiar:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+.error-text {
+    display: block;
+    font-size: 0.75rem;
+    color: #ef4444;
+    margin-top: 4px;
+}
+
+/* ============================================================
+   RESPONSIVE PARA BUSCADORES
+   ============================================================ */
+
+@media (max-width: 768px) {
+    .search-box .search-input {
+        font-size: 0.85rem;
+        padding: 8px 6px;
+    }
+
+    .user-option {
+        padding: 8px 12px;
+        gap: 8px;
+    }
+
+    .option-avatar {
+        width: 28px;
+        height: 28px;
+    }
+
+    .option-nombre {
+        font-size: 0.8rem;
+    }
+
+    .option-email {
+        font-size: 0.7rem;
+    }
+
+    .user-seleccionado {
+        padding: 8px 12px;
+        gap: 6px;
+    }
+
+    .user-seleccionado span {
+        font-size: 0.8rem;
+    }
+
+    .btn-cambiar {
+        font-size: 0.65rem;
+        padding: 3px 10px;
+    }
+
+    .users-dropdown {
+        max-height: 150px;
+    }
+}
+
+@media (max-width: 480px) {
+    .search-box .search-input {
+        font-size: 0.8rem;
+        padding: 6px 4px;
+    }
+
+    .user-option {
+        padding: 6px 10px;
+        gap: 6px;
+    }
+
+    .option-avatar {
+        width: 24px;
+        height: 24px;
+    }
+
+    .option-nombre {
+        font-size: 0.75rem;
+    }
+
+    .option-email {
+        font-size: 0.65rem;
+    }
+
+    .user-seleccionado {
+        padding: 6px 10px;
+        gap: 4px;
+    }
+
+    .user-seleccionado span {
+        font-size: 0.75rem;
+    }
+
+    .btn-cambiar {
+        font-size: 0.6rem;
+        padding: 2px 8px;
+    }
+
+    .users-dropdown {
+        max-height: 120px;
+    }
+
+    .error-text {
+        font-size: 0.65rem;
+    }
+}
