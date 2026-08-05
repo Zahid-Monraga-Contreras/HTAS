@@ -1,5 +1,5 @@
 /* ==========================================================================
-   NUEVA CITA - ESTILOS
+   NUEVA CITA - ESTILOS COMPLETOS CON DISPONIBILIDAD
    ========================================================================== */
 
 :host {
@@ -8,12 +8,16 @@
     --primary-light: #d42a4a;
     --primary-gradient: linear-gradient(135deg, #b0001e 0%, #d42a4a 100%);
     --success: #10b981;
+    --success-light: #d1fae5;
     --success-dark: #059669;
     --warning: #f59e0b;
+    --warning-light: #fef3c7;
     --warning-dark: #d97706;
     --danger: #ef4444;
+    --danger-light: #fee2e2;
     --danger-dark: #dc2626;
     --info: #3b82f6;
+    --info-light: #dbeafe;
     --gray-50: #f8fafc;
     --gray-100: #f1f5f9;
     --gray-200: #e2e8f0;
@@ -55,7 +59,6 @@
     margin: 0 auto;
     width: 100%;
     max-width: 100%;
-    /* Eliminamos el max-width fijo */
 }
 
 /* ==========================================================================
@@ -133,6 +136,19 @@
     max-height: 70px;
     overflow-y: auto;
     line-height: 1.4;
+}
+
+.textarea-fixed::-webkit-scrollbar {
+    width: 4px;
+}
+
+.textarea-fixed::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.textarea-fixed::-webkit-scrollbar-thumb {
+    background: var(--gray-300);
+    border-radius: 10px;
 }
 
 .form-row {
@@ -314,6 +330,156 @@
 .btn-cambiar:hover {
     background: var(--gray-50);
     border-color: var(--gray-300);
+}
+
+/* ==========================================================================
+   DISPONIBILIDAD EN TIEMPO REAL - DOCTOR
+   ========================================================================== */
+.disponibilidad-loading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--gray-500);
+    font-size: 0.85rem;
+    margin: 8px 0 4px;
+    padding: 8px 12px;
+    background: var(--gray-50);
+    border-radius: 8px;
+    border: 1px solid var(--gray-200);
+}
+
+.disponibilidad-loading .spinner-small {
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--gray-200);
+    border-top: 2px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+}
+
+.disponibilidad-disponible {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--success);
+    font-size: 0.85rem;
+    margin: 8px 0 4px;
+    padding: 8px 12px;
+    background: var(--success-light);
+    border-radius: 8px;
+    border: 1px solid var(--success);
+}
+
+.disponibilidad-disponible i {
+    font-size: 1rem;
+}
+
+.disponibilidad-no-disponible {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--danger);
+    font-size: 0.85rem;
+    margin: 8px 0 4px;
+    padding: 8px 12px;
+    background: var(--danger-light);
+    border-radius: 8px;
+    border: 1px solid var(--danger);
+}
+
+.disponibilidad-no-disponible i {
+    font-size: 1rem;
+}
+
+/* ==========================================================================
+   HORARIOS SUGERIDOS - DOCTOR
+   ========================================================================== */
+.horarios-sugeridos {
+    margin: 8px 0 16px 0;
+    padding: 12px 14px;
+    background: var(--gray-50);
+    border-radius: 10px;
+    border: 1px solid var(--gray-200);
+}
+
+.horarios-sugeridos label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 8px;
+}
+
+.horarios-sugeridos label i {
+    color: var(--primary);
+    margin-right: 4px;
+}
+
+.horarios-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.horario-btn {
+    padding: 6px 14px;
+    border: 2px solid var(--gray-200);
+    border-radius: 8px;
+    background: white;
+    color: var(--gray-600);
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.horario-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: #b0001e08;
+    transform: translateY(-1px);
+}
+
+.horario-btn:active {
+    transform: scale(0.95);
+}
+
+.horario-btn.selected {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: white;
+}
+
+.horario-btn.selected:hover {
+    background: var(--primary-dark);
+    border-color: var(--primary-dark);
+}
+
+.horario-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ==========================================================================
+   ERROR EN FORMULARIO - DOCTOR
+   ========================================================================== */
+.error-mensaje {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--danger);
+    font-size: 0.85rem;
+    margin-top: 12px;
+    padding: 8px 14px;
+    background: var(--danger-light);
+    border-radius: 8px;
+    border: 1px solid #f5c6cb;
+}
+
+.error-mensaje i {
+    font-size: 1.1rem;
+    flex-shrink: 0;
 }
 
 /* ==========================================================================
@@ -767,6 +933,41 @@
         min-height: 80px;
         max-height: 80px;
     }
+
+    /* Disponibilidad en pantallas grandes */
+    .disponibilidad-loading,
+    .disponibilidad-disponible,
+    .disponibilidad-no-disponible {
+        font-size: 0.9rem;
+        padding: 10px 16px;
+        margin: 10px 0 6px;
+    }
+
+    .horarios-sugeridos {
+        padding: 14px 18px;
+        margin: 10px 0 20px;
+    }
+
+    .horarios-sugeridos label {
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+    }
+
+    .horarios-grid {
+        gap: 10px;
+    }
+
+    .horario-btn {
+        padding: 8px 18px;
+        font-size: 0.9rem;
+        border-radius: 10px;
+    }
+
+    .error-mensaje {
+        font-size: 0.9rem;
+        padding: 10px 16px;
+        margin-top: 14px;
+    }
 }
 
 /* Tablets y pantallas medianas */
@@ -795,6 +996,15 @@
     .btn-cancelar {
         padding: 10px 22px;
     }
+
+    .horarios-grid {
+        gap: 8px;
+    }
+
+    .horario-btn {
+        padding: 6px 14px;
+        font-size: 0.8rem;
+    }
 }
 
 /* Moviles y pantallas pequenas */
@@ -818,6 +1028,32 @@
 
     .form-row {
         gap: 0;
+    }
+
+    .horarios-sugeridos {
+        padding: 10px 12px;
+    }
+
+    .horarios-grid {
+        gap: 6px;
+    }
+
+    .horario-btn {
+        padding: 5px 12px;
+        font-size: 0.75rem;
+        border-radius: 6px;
+    }
+
+    .disponibilidad-loading,
+    .disponibilidad-disponible,
+    .disponibilidad-no-disponible {
+        font-size: 0.8rem;
+        padding: 6px 10px;
+    }
+
+    .error-mensaje {
+        font-size: 0.8rem;
+        padding: 6px 12px;
     }
 }
 
@@ -970,7 +1206,6 @@
         font-size: 0.95rem;
     }
 
-    /* Toast */
     .toast-container {
         right: 10px;
         left: 10px;
@@ -1012,6 +1247,53 @@
     .textarea-fixed {
         min-height: 60px;
         max-height: 60px;
+    }
+
+    /* Horarios sugeridos en móviles pequeños */
+    .horarios-sugeridos {
+        padding: 8px 10px;
+        margin: 6px 0 12px;
+    }
+
+    .horarios-sugeridos label {
+        font-size: 0.75rem;
+        margin-bottom: 6px;
+    }
+
+    .horarios-grid {
+        gap: 4px;
+    }
+
+    .horario-btn {
+        padding: 4px 10px;
+        font-size: 0.7rem;
+        border-radius: 4px;
+    }
+
+    .disponibilidad-loading,
+    .disponibilidad-disponible,
+    .disponibilidad-no-disponible {
+        font-size: 0.7rem;
+        padding: 4px 8px;
+        gap: 4px;
+        margin: 4px 0 2px;
+    }
+
+    .disponibilidad-loading i,
+    .disponibilidad-disponible i,
+    .disponibilidad-no-disponible i {
+        font-size: 0.8rem;
+    }
+
+    .error-mensaje {
+        font-size: 0.7rem;
+        padding: 4px 10px;
+        gap: 4px;
+        margin-top: 8px;
+    }
+
+    .error-mensaje i {
+        font-size: 0.9rem;
     }
 }
 
@@ -1136,5 +1418,31 @@
     .textarea-fixed {
         min-height: 50px;
         max-height: 50px;
+    }
+
+    .horarios-sugeridos {
+        padding: 6px 8px;
+    }
+
+    .horarios-sugeridos label {
+        font-size: 0.7rem;
+    }
+
+    .horario-btn {
+        padding: 3px 8px;
+        font-size: 0.65rem;
+        border-radius: 4px;
+    }
+
+    .disponibilidad-loading,
+    .disponibilidad-disponible,
+    .disponibilidad-no-disponible {
+        font-size: 0.65rem;
+        padding: 3px 6px;
+    }
+
+    .error-mensaje {
+        font-size: 0.65rem;
+        padding: 4px 8px;
     }
 }

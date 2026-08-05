@@ -1,32 +1,29 @@
-# Backend/api/python/hipertension.py
 import os
 import sys
 import json
 import logging
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Dict, Any
 from datetime import datetime
+from mangum import Mangum  # Importante para Vercel
 
-# Agregar ruta de tu script Python
+# Configurar rutas
 ALGORITHM_PATH = os.path.join(os.path.dirname(__file__), '../../python/algorithm')
-sys.path.insert(0, ALGORITHM_PATH)
+if os.path.exists(ALGORITHM_PATH):
+    sys.path.insert(0, ALGORITHM_PATH)
+else:
+    # Ruta alternativa para Vercel
+    ALGORITHM_PATH = os.path.join(os.path.dirname(__file__), '../python/algorithm')
+    if os.path.exists(ALGORITHM_PATH):
+        sys.path.insert(0, ALGORITHM_PATH)
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("HTAS_VERCEL")
+logger = logging.getLogger("HTAS_VERCEL_PYTHON")
 
-# Importar tu app de FastAPI existente
-try:
-    from hipertension_analyzer import app as fastapi_app
-    logger.info("✅ FastAPI importado correctamente")
-except ImportError as e:
-    logger.error(f"❌ Error importando FastAPI: {e}")
-    # Crear app básica si falla
-    fastapi_app = FastAPI()
-
-# Usar tu app existente
-app = fastapi_app
+# Crear app FastAPI
+app = FastAPI(title="HTAS Python API", version="1.0.0")
 
 # Configurar CORS
 app.add_middleware(
@@ -37,38 +34,51 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Intentar importar tu analyzer
+try:
+    from hipertension_analyzer import app as analyzer_app
+    logger.info("✅ hipertension_analyzer importado correctamente")
+    # Si tu analyzer tiene endpoints, los fusionamos
+    for route in analyzer_app.routes:
+        app.router.routes.append(route)
+except ImportError as e:
+    logger.warning(f"⚠️ No se pudo importar hipertension_analyzer: {e}")
+    logger.info("Usando endpoints básicos")
+
 # =============================================
-# ENDPOINTS PARA ALGORITHM
+# ENDPOINTS
 # =============================================
+
+@app.get("/")
+async def root():
+    return {
+        "mensaje": "Python API funcionando en Vercel",
+        "version": "1.0.0",
+        "timestamp": datetime.now().isoformat()
+    }
 
 @app.get("/api/algorithm/estado")
 async def estado_sistema():
-    """Verificar estado del sistema Python"""
     return {
         "success": True,
         "estado": "Python API activa en Vercel",
-        "version": "3.3.0",
+        "version": "1.0.0",
         "timestamp": datetime.now().isoformat()
     }
 
 @app.get("/api/ia/salud-sistema")
 async def salud_sistema():
-    """Health check para FastAPI"""
     return {
         "estatus_servicio": "Operando en Linea",
         "motor_ia_activo": "Configurado",
         "persistencia_db": "Activa",
-        "version": "3.3.0"
+        "version": "1.0.0"
     }
 
 @app.post("/api/algorithm/analizar")
 async def analizar_paciente(data: Dict[str, Any]):
-    """Analizar paciente con un PDF"""
     try:
         logger.info(f"Analizando paciente: {data.get('idPaciente')}")
-        
-        # Aquí va tu lógica existente de hipertension_analyzer.py
-        # Por ahora, una respuesta de ejemplo
         return {
             "success": True,
             "mensaje": "Análisis completado",
@@ -80,15 +90,12 @@ async def analizar_paciente(data: Dict[str, Any]):
 
 @app.post("/api/algorithm/analizar-completo")
 async def analizar_completo(data: Dict[str, Any]):
-    """Analizar con dos PDFs (cédula + diagnóstico)"""
     try:
         logger.info("Recibiendo análisis completo")
         
-        # Validar datos requeridos
         if not data.get('cedula_pdf_base64') or not data.get('diagnostico_pdf_base64'):
             raise HTTPException(status_code=400, detail="Se requieren ambos PDFs")
         
-        # Aquí tu lógica existente
         return {
             "success": True,
             "mensaje": "Análisis completo finalizado",
@@ -109,9 +116,7 @@ async def analizar_completo(data: Dict[str, Any]):
 
 @app.get("/api/algorithm/ultimo-expediente/{idPaciente}")
 async def obtener_ultimo_expediente(idPaciente: int):
-    """Obtener último expediente del paciente"""
     try:
-        # Aquí tu lógica existente
         return {
             "success": True,
             "idPaciente": idPaciente,
@@ -127,25 +132,8 @@ async def obtener_ultimo_expediente(idPaciente: int):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/api/algorithm/pdf/{folio}")
-async def obtener_pdf(folio: int):
-    """Obtener PDF por folio"""
-    try:
-        # Aquí tu lógica existente
-        return {
-            "success": True,
-            "folio": folio,
-            "tiene_pdf_cedula": True,
-            "tiene_pdf_diagnostico": True,
-            "pdf_cedula_base64": None,
-            "pdf_diagnostico_base64": None
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
 @app.get("/api/algorithm/test")
 async def test_python():
-    """Endpoint de prueba para verificar que Python responde"""
     return {
         "success": True,
         "mensaje": "Python API funcionando correctamente",
@@ -154,8 +142,9 @@ async def test_python():
 
 @app.on_event("startup")
 async def startup_event():
-    """Inicializar servicios al arrancar"""
     logger.info("=" * 60)
-    logger.info("   INICIALIZANDO HTAS-MEXICO EN VERCEL")
+    logger.info("   INICIALIZANDO HTAS PYTHON EN VERCEL")
     logger.info("=" * 60)
-    logger.info("✅ Python API lista para recibir peticiones")
+
+# Handler para Vercel (Serverless)
+handler = Mangum(app)

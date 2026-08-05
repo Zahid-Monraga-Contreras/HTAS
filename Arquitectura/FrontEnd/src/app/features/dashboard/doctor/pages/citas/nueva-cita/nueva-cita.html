@@ -103,6 +103,32 @@
                 </div>
             </div>
 
+            <!-- Indicador de disponibilidad en tiempo real -->
+            <div *ngIf="verificandoDisponibilidad" class="disponibilidad-loading">
+                <span class="spinner-small"></span> Verificando disponibilidad...
+            </div>
+
+            <div
+                *ngIf="!verificandoDisponibilidad && citaForm.get('fechaCita')?.value && citaForm.get('horaCita')?.value">
+                <div *ngIf="horarioDisponible && horarioSeleccionadoValido" class="disponibilidad-disponible">
+                    <i class="bi bi-check-circle-fill"></i> Horario disponible
+                </div>
+                <div *ngIf="!horarioDisponible || !horarioSeleccionadoValido" class="disponibilidad-no-disponible">
+                    <i class="bi bi-x-circle-fill"></i> {{ mensajeDisponibilidad || 'Horario no disponible' }}
+                </div>
+            </div>
+
+            <!-- Horarios disponibles sugeridos -->
+            <div *ngIf="mostrandoHorarios && horariosDisponibles.length > 0" class="horarios-sugeridos">
+                <label><i class="bi bi-clock-history"></i> Horarios disponibles para esta fecha:</label>
+                <div class="horarios-grid">
+                    <button *ngFor="let hora of horariosDisponibles" class="horario-btn"
+                        [class.selected]="citaForm.get('horaCita')?.value === hora" (click)="seleccionarHorario(hora)">
+                        {{ formatearHora(hora) }}
+                    </button>
+                </div>
+            </div>
+
             <!-- Modalidad -->
             <div class="form-group">
                 <label for="modalidad">Modalidad</label>
@@ -122,11 +148,19 @@
             <!-- Botones -->
             <div class="form-actions">
                 <button type="button" class="btn-cancelar" (click)="cancelar()">Cancelar</button>
-                <button type="submit" class="btn-guardar" [disabled]="isLoading || citaForm.invalid">
+                <button type="submit" class="btn-guardar"
+                    [disabled]="isLoading || citaForm.invalid || !horarioDisponible || !horarioSeleccionadoValido || verificandoDisponibilidad">
                     <i class="bi bi-check-lg" *ngIf="!isLoading"></i>
                     <span class="spinner-small" *ngIf="isLoading"></span>
                     {{ isLoading ? 'Guardando...' : 'Agendar Cita' }}
                 </button>
+            </div>
+
+            <!-- Mensaje de error si horario no disponible -->
+            <div *ngIf="(!horarioDisponible || !horarioSeleccionadoValido) && citaForm.get('fechaCita')?.value && citaForm.get('horaCita')?.value"
+                class="error-mensaje">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                Selecciona un horario disponible para agendar
             </div>
         </form>
     </div>

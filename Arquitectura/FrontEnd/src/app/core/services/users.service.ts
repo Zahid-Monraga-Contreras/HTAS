@@ -89,6 +89,87 @@ export interface RegistroToma {
 }
 
 // ==========================================================================
+// INTERFACES PARA DISPONIBILIDAD DE CITAS (ACTUALIZADAS)
+// ==========================================================================
+export interface DisponibilidadResponse {
+  disponible: boolean;
+  mensaje: string;
+  detalles: {
+    totalCitasEnHora: number;
+    maximoPermitido: number;
+    horaLlena: boolean;
+    cuposDisponibles: number;
+    yaAgendado: boolean;
+    correoExistente?: string | null;
+    usuarioYaTieneCita?: boolean;
+    citasHoy?: number;
+    limiteDiaAlcanzado?: boolean;
+    maximoPorDia?: number;
+  };
+}
+
+export interface HorarioDisponible {
+  horacita: string;
+  total: number;
+  disponibilidad: string;
+  cupos: number;
+}
+
+export interface HorariosDisponiblesResponse {
+  success: boolean;
+  fecha: string;
+  horariosDisponibles: string[];
+  horariosCompletos: string[];
+  horariosUsuario: string[];
+  horariosOcupados?: {
+    [key: string]: {
+      ocupado: boolean;
+      por: string;
+    };
+  };
+  citasUsuario: any[];
+  totalDisponibles: number;
+  totalHorarios: number;
+  mensaje: string;
+}
+
+export interface CitasDisponiblesHoyResponse {
+  fecha: string;
+  horarios: HorarioDisponible[];
+  totalHorarios: number;
+  horariosDisponibles: number;
+}
+
+// ==========================================================================
+// INTERFACES PARA DISPONIBILIDAD MASIVA
+// ==========================================================================
+export interface DisponibilidadMasivaItem {
+  fecha: string;
+  hora: string;
+  email?: string;
+}
+
+export interface DisponibilidadMasivaResultado {
+  fecha: string;
+  hora: string;
+  email: string | null;
+  disponible: boolean;
+  mensaje: string;
+  detalles?: {
+    yaAgendado: boolean;
+    correoExistente: string | null;
+    horaLlena: boolean;
+    usuarioYaTieneCita: boolean;
+  };
+}
+
+export interface DisponibilidadMasivaResponse {
+  success: boolean;
+  total: number;
+  resultados: DisponibilidadMasivaResultado[];
+}
+
+// ==========================================================================
 // INTERFACES PARA EL ALGORITMO
 // ==========================================================================
 export interface AnalisisRequest {
@@ -185,6 +266,53 @@ export interface PdfResponse {
   tiene_pdf_diagnostico: boolean;
   pdf_cedula_base64: string | null;
   pdf_diagnostico_base64: string | null;
+}
+
+// ==========================================================================
+// INTERFACES PARA ADMINISTRACION (ACTUALIZADAS)
+// ==========================================================================
+export interface ResumenAdminResponse {
+  total: number;
+  programadas: number;
+  confirmadas: number;
+  completadas: number;
+  canceladas: number;
+  no_asistio: number;
+  proximas: number;
+  vencidas: number;
+  presenciales: number;
+  virtuales: number;
+}
+
+export interface CuposPorHoraResponse {
+  fecha: string;
+  horarios: Array<{
+    horacita: string;
+    total: number;
+    cupos_disponibles: number;
+    estados: string[];
+    correos: string[];
+  }>;
+  total_horarios: number;
+  horarios_disponibles: number;
+}
+
+// ==========================================================================
+// INTERFACES PARA HISTORIAL Y PROXIMAS CITAS
+// ==========================================================================
+export interface ProximasCitasResponse {
+  success: boolean;
+  citas: any[];
+  total: number;
+}
+
+export interface HistorialCitasResponse {
+  success: boolean;
+  citas: any[];
+  total: number;
+  limite: number;
+  offset: number;
+  totalPaginas: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -424,6 +552,116 @@ export class Users {
     usuario?: string;
   }): Observable<any> {
     return this.http.post(`${this.apiUrl}/citas/cita/historial`, data);
+  }
+
+  // ==========================================================================
+  // --- NUEVAS RUTAS PARA DISPONIBILIDAD DE CITAS ---
+  // ==========================================================================
+
+  /**
+   * Verifica si una fecha y hora específicas están disponibles
+   * @param fecha - Fecha en formato YYYY-MM-DD
+   * @param hora - Hora en formato HH:MM
+   * @param email - Email del usuario (opcional)
+   * @returns Observable con la respuesta de disponibilidad
+   */
+  verificarDisponibilidad(fecha: string, hora: string, email?: string): Observable<DisponibilidadResponse> {
+    const params: any = { fecha, hora };
+    if (email) {
+      params.email = email;
+    }
+    return this.http.get<DisponibilidadResponse>(
+      `${this.apiUrl}/citas/verificar-disponibilidad`,
+      { params }
+    );
+  }
+
+  /**
+   * Obtiene todos los horarios disponibles para una fecha específica
+   * @param fecha - Fecha en formato YYYY-MM-DD
+   * @param email - Email del usuario (opcional)
+   * @returns Observable con la lista de horarios disponibles
+   */
+  getHorariosDisponibles(fecha: string, email?: string): Observable<HorariosDisponiblesResponse> {
+    const params: any = { fecha };
+    if (email) {
+      params.email = email;
+    }
+    return this.http.get<HorariosDisponiblesResponse>(
+      `${this.apiUrl}/citas/horarios-disponibles`,
+      { params }
+    );
+  }
+
+  /**
+   * Obtiene los horarios con cupos disponibles para hoy
+   * @returns Observable con los horarios disponibles de hoy
+   */
+  getCitasDisponiblesHoy(): Observable<CitasDisponiblesHoyResponse> {
+    return this.http.get<CitasDisponiblesHoyResponse>(
+      `${this.apiUrl}/citas/disponibles/hoy`
+    );
+  }
+
+  /**
+   * Obtiene las próximas citas de un usuario (no canceladas)
+   * @param email - Email del usuario
+   * @returns Observable con las próximas citas
+   */
+  getProximasCitas(email: string): Observable<ProximasCitasResponse> {
+    return this.http.get<ProximasCitasResponse>(
+      `${this.apiUrl}/citas/consultas/proximas/${email}`
+    );
+  }
+
+  /**
+   * Obtiene el historial completo de citas de un usuario con paginación
+   * @param email - Email del usuario
+   * @param limite - Número de registros por página (default: 10)
+   * @param offset - Desplazamiento para la paginación (default: 0)
+   * @returns Observable con el historial de citas
+   */
+  getHistorialCompletoCitas(email: string, limite: number = 10, offset: number = 0): Observable<HistorialCitasResponse> {
+    return this.http.get<HistorialCitasResponse>(
+      `${this.apiUrl}/citas/consultas/historial/${email}?limite=${limite}&offset=${offset}`
+    );
+  }
+
+  /**
+   * Verifica disponibilidad para múltiples fechas y horarios a la vez
+   * @param citas - Array de objetos con fecha, hora y email
+   * @returns Observable con los resultados de disponibilidad
+   */
+  verificarDisponibilidadMasiva(citas: DisponibilidadMasivaItem[]): Observable<DisponibilidadMasivaResponse> {
+    return this.http.post<DisponibilidadMasivaResponse>(
+      `${this.apiUrl}/citas/consultas/disponibilidad-masiva`,
+      { citas }
+    );
+  }
+
+  // ==========================================================================
+  // --- RUTAS PARA ADMINISTRACION DE CITAS ---
+  // ==========================================================================
+
+  /**
+   * Obtiene un resumen general de todas las citas (solo administradores)
+   * @returns Observable con el resumen de citas
+   */
+  getResumenCitasAdmin(): Observable<ResumenAdminResponse> {
+    return this.http.get<ResumenAdminResponse>(
+      `${this.apiUrl}/citas/admin/resumen`
+    );
+  }
+
+  /**
+   * Obtiene la ocupación de citas por hora para una fecha específica (solo administradores)
+   * @param fecha - Fecha en formato YYYY-MM-DD
+   * @returns Observable con los cupos por hora
+   */
+  getCuposPorHora(fecha: string): Observable<CuposPorHoraResponse> {
+    return this.http.get<CuposPorHoraResponse>(
+      `${this.apiUrl}/citas/admin/cupos-por-hora/${fecha}`
+    );
   }
 
   // ==========================================================================
@@ -827,16 +1065,10 @@ export class Users {
   // --- ALGORITMO - ANALISIS DE HIPERTENSION ---
   // ==========================================================================
 
-  /**
-   * Verifica el estado del sistema de analisis
-   */
   verificarEstadoAlgoritmo(): Observable<EstadoResponse> {
     return this.http.get<EstadoResponse>(`${this.apiUrl}/algorithm/estado`);
   }
 
-  /**
-   * Analiza un paciente con un solo PDF (diagnostico)
-   */
   analizarConPDF(request: AnalisisRequest): Observable<AnalisisResponse> {
     const formData = new FormData();
 
@@ -862,9 +1094,6 @@ export class Users {
     );
   }
 
-  /**
-   * Analiza un paciente con dos PDFs (cedula + diagnostico)
-   */
   analizarConMultiplesPDFs(request: AnalisisCompletoRequest): Observable<AnalisisResponse> {
     const formData = new FormData();
 
@@ -891,18 +1120,12 @@ export class Users {
     );
   }
 
-  /**
-   * Obtiene el ultimo expediente de un paciente
-   */
   obtenerUltimoExpediente(idPaciente: number): Observable<UltimoExpedienteResponse> {
     return this.http.get<UltimoExpedienteResponse>(
       `${this.apiUrl}/algorithm/ultimo-expediente/${idPaciente}`
     );
   }
 
-  /**
-   * Obtiene el PDF de un expediente por su folio
-   */
   obtenerPDFExpediente(folio: number): Observable<Blob> {
     return this.http.get(
       `${this.apiUrl}/algorithm/pdf/${folio}`,

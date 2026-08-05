@@ -32,11 +32,19 @@ export class DoctorNuevaCita implements OnInit {
 
     isLoading = false;
     loadingPacientes = false;
+    verificandoDisponibilidad = false;
     userEmail: string = '';
     doctorId: number | null = null;
     pacientes: any[] = [];
     pacientesFiltrados: any[] = [];
     searchTerm: string = '';
+
+    // Variables para disponibilidad
+    horarioDisponible: boolean = true;
+    mensajeDisponibilidad: string = '';
+    horariosDisponibles: string[] = [];
+    mostrandoHorarios = false;
+    horarioSeleccionadoValido: boolean = true;
 
     citaForm: FormGroup;
     private fpFechaInstance: any = null;
@@ -152,7 +160,125 @@ export class DoctorNuevaCita implements OnInit {
         this.citaForm.patchValue({ idPaciente: paciente.idusuario });
         this.searchTerm = `${paciente.nombre} ${paciente.apPaterno}`;
         this.pacientesFiltrados = [];
+        // Resetear disponibilidad al cambiar paciente
+        this.horarioDisponible = true;
+        this.mensajeDisponibilidad = '';
+        this.horariosDisponibles = [];
+        this.mostrandoHorarios = false;
+        this.horarioSeleccionadoValido = true;
         this.cdr.detectChanges();
+    }
+
+    // ==========================================
+    // VALIDACION DE DISPONIBILIDAD
+    // ==========================================
+
+    private async verificarDisponibilidadEnTiempoReal() {
+        const fecha = this.citaForm.get('fechaCita')?.value;
+        const hora = this.citaForm.get('horaCita')?.value;
+
+        if (!fecha || !hora) {
+            this.horarioDisponible = true;
+            this.mensajeDisponibilidad = '';
+            this.horarioSeleccionadoValido = true;
+            return;
+        }
+
+        this.verificandoDisponibilidad = true;
+        this.cdr.detectChanges();
+
+        try {
+            const disponibilidad = await firstValueFrom(
+                this.usersService.verificarDisponibilidad(fecha, hora + ':00', this.userEmail)
+            );
+
+            this.horarioDisponible = disponibilidad.disponible;
+            this.mensajeDisponibilidad = disponibilidad.mensaje;
+
+            if (!disponibilidad.disponible) {
+                this.citaForm.setErrors({ horarioOcupado: true });
+                this.horarioSeleccionadoValido = false;
+
+                if (disponibilidad.detalles) {
+                    const detalles = disponibilidad.detalles;
+                    if (detalles.usuarioYaTieneCita) {
+                        this.showWarning('Ya tiene cita', 'El paciente ya tiene una cita agendada para esta fecha y hora.');
+                    } else if (detalles.horaLlena) {
+                        this.showWarning('Horario completo', 'Este horario ya está completo (3 citas agendadas).');
+                    } else if (detalles.limiteDiaAlcanzado) {
+                        this.showWarning('Límite diario alcanzado', 'El paciente ya tiene 2 citas para este día.');
+                    }
+                }
+            } else {
+                this.citaForm.setErrors(null);
+                this.horarioSeleccionadoValido = true;
+                this.showInfo('Horario disponible', 'El horario está disponible para agendar.');
+            }
+
+        } catch (error) {
+            console.error('Error verificando disponibilidad:', error);
+            this.showWarning('Error de verificación', 'No se pudo verificar la disponibilidad. Intenta nuevamente.');
+        } finally {
+            this.verificandoDisponibilidad = false;
+            this.cdr.detectChanges();
+        }
+    }
+
+    private async cargarHorariosDisponibles(fecha: string) {
+        if (!fecha) {
+            this.horariosDisponibles = [];
+            this.mostrandoHorarios = false;
+            return;
+        }
+
+        try {
+            const response = await firstValueFrom(
+                this.usersService.getHorariosDisponibles(fecha, this.userEmail)
+            );
+
+            if (response && response.success) {
+                this.horariosDisponibles = response.horariosDisponibles || [];
+                this.mostrandoHorarios = this.horariosDisponibles.length > 0;
+
+                if (this.horariosDisponibles.length === 1) {
+                    const horaSugerida = this.horariosDisponibles[0];
+                    this.citaForm.patchValue({ horaCita: horaSugerida });
+                    this.showInfo('Horario sugerido', `Solo hay un horario disponible: ${this.formatearHora(horaSugerida)}`);
+                    this.verificarDisponibilidadEnTiempoReal();
+                } else if (this.horariosDisponibles.length === 0) {
+                    this.showWarning('Sin horarios', 'No hay horarios disponibles para esta fecha.');
+                    this.mostrandoHorarios = false;
+                }
+            }
+
+            this.cdr.detectChanges();
+        } catch (error) {
+            console.error('Error cargando horarios disponibles:', error);
+            this.mostrandoHorarios = false;
+        }
+    }
+
+    seleccionarHorario(hora: string) {
+        this.citaForm.patchValue({ horaCita: hora });
+        this.verificarDisponibilidadEnTiempoReal();
+        this.cdr.detectChanges();
+    }
+
+    formatearHora(hora: string): string {
+        if (!hora) return 'S/H';
+        try {
+            const partes = hora.split(':');
+            if (partes.length >= 2) {
+                let h = parseInt(partes[0]);
+                const m = partes[1];
+                const ampm = h >= 12 ? 'PM' : 'AM';
+                h = h % 12 || 12;
+                return `${h}:${m} ${ampm}`;
+            }
+            return hora;
+        } catch {
+            return hora;
+        }
     }
 
     abrirCalendarios() {
@@ -183,6 +309,9 @@ export class DoctorNuevaCita implements OnInit {
                             if (dateStr) {
                                 this.citaForm.patchValue({ fechaCita: dateStr });
                                 this.citaForm.get('fechaCita')?.markAsTouched();
+                                // Verificar disponibilidad al cambiar fecha
+                                this.cargarHorariosDisponibles(dateStr);
+                                this.verificarDisponibilidadEnTiempoReal();
                                 this.cdr.detectChanges();
                             }
                         },
@@ -196,6 +325,8 @@ export class DoctorNuevaCita implements OnInit {
 
                     if (this.citaForm.get('fechaCita')?.value) {
                         this.fpFechaInstance.setDate(this.citaForm.get('fechaCita')?.value);
+                        // Cargar horarios para la fecha inicial
+                        this.cargarHorariosDisponibles(this.citaForm.get('fechaCita')?.value);
                     }
                 }
 
@@ -213,6 +344,8 @@ export class DoctorNuevaCita implements OnInit {
                             if (dateStr) {
                                 this.citaForm.patchValue({ horaCita: dateStr });
                                 this.citaForm.get('horaCita')?.markAsTouched();
+                                // Verificar disponibilidad al cambiar hora
+                                this.verificarDisponibilidadEnTiempoReal();
                                 this.cdr.detectChanges();
                             }
                         }
@@ -238,9 +371,21 @@ export class DoctorNuevaCita implements OnInit {
     }
 
     async agendarCita() {
+        // Verificar si el formulario es válido
         if (this.citaForm.invalid) {
             this.citaForm.markAllAsTouched();
             this.showWarning('Formulario Incompleto', 'Por favor, completa todos los campos requeridos.');
+            return;
+        }
+
+        // Verificar disponibilidad
+        if (!this.horarioDisponible) {
+            this.showWarning('Horario no disponible', this.mensajeDisponibilidad || 'El horario seleccionado no está disponible.');
+            return;
+        }
+
+        if (!this.horarioSeleccionadoValido) {
+            this.showWarning('Horario no válido', 'Por favor, selecciona un horario disponible.');
             return;
         }
 
@@ -250,6 +395,27 @@ export class DoctorNuevaCita implements OnInit {
         try {
             const formData = this.citaForm.value;
             const pacienteSeleccionado = this.pacientes.find(p => p.idusuario === formData.idPaciente);
+
+            // Verificar disponibilidad una última vez antes de agendar
+            const disponibilidadFinal = await firstValueFrom(
+                this.usersService.verificarDisponibilidad(
+                    formData.fechaCita,
+                    formData.horaCita + ':00',
+                    this.userEmail
+                )
+            );
+
+            if (!disponibilidadFinal.disponible) {
+                this.showError(
+                    'Horario ocupado',
+                    disponibilidadFinal.mensaje || 'El horario seleccionado ya no está disponible. Por favor, selecciona otro.'
+                );
+                this.horarioDisponible = false;
+                this.horarioSeleccionadoValido = false;
+                this.isLoading = false;
+                this.cargarHorariosDisponibles(formData.fechaCita);
+                return;
+            }
 
             const datosCita = {
                 nombrePaciente: pacienteSeleccionado?.nombre || 'Paciente',
@@ -275,12 +441,21 @@ export class DoctorNuevaCita implements OnInit {
 
             setTimeout(() => {
                 this.router.navigate(['/doctor/citas']);
-            }, 1000);
+            }, 1500);
 
         } catch (error: any) {
             let mensajeError = 'Ocurrio un error al agendar la cita.';
             if (error.error?.error) {
                 mensajeError = error.error.error;
+                // Si el error es por horario ocupado, actualizar estado
+                if (mensajeError.includes('horario no disponible') || mensajeError.includes('ya hay 3 citas')) {
+                    this.horarioDisponible = false;
+                    this.horarioSeleccionadoValido = false;
+                    const fecha = this.citaForm.get('fechaCita')?.value;
+                    if (fecha) {
+                        this.cargarHorariosDisponibles(fecha);
+                    }
+                }
             } else if (error.message) {
                 mensajeError = error.message;
             }
