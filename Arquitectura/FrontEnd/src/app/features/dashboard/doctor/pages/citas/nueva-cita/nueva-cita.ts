@@ -212,7 +212,6 @@ export class DoctorNuevaCita implements OnInit {
             } else {
                 this.citaForm.setErrors(null);
                 this.horarioSeleccionadoValido = true;
-                this.showInfo('Horario disponible', 'El horario está disponible para agendar.');
             }
 
         } catch (error) {
@@ -240,11 +239,11 @@ export class DoctorNuevaCita implements OnInit {
                 this.horariosDisponibles = response.horariosDisponibles || [];
                 this.mostrandoHorarios = this.horariosDisponibles.length > 0;
 
+                // Si solo hay un horario disponible, sugerirlo
                 if (this.horariosDisponibles.length === 1) {
                     const horaSugerida = this.horariosDisponibles[0];
-                    this.citaForm.patchValue({ horaCita: horaSugerida });
+                    this.seleccionarHorario(horaSugerida);
                     this.showInfo('Horario sugerido', `Solo hay un horario disponible: ${this.formatearHora(horaSugerida)}`);
-                    this.verificarDisponibilidadEnTiempoReal();
                 } else if (this.horariosDisponibles.length === 0) {
                     this.showWarning('Sin horarios', 'No hay horarios disponibles para esta fecha.');
                     this.mostrandoHorarios = false;
@@ -258,8 +257,31 @@ export class DoctorNuevaCita implements OnInit {
         }
     }
 
+    /**
+     * Selecciona un horario disponible de la lista y actualiza el input
+     * SOLO selecciona el horario, NO agenda la cita
+     */
     seleccionarHorario(hora: string) {
+        // Prevenir que el formulario se envíe
+        event?.preventDefault?.();
+
+        // Solo actualizar el formulario con la hora seleccionada
         this.citaForm.patchValue({ horaCita: hora });
+        this.citaForm.get('horaCita')?.markAsTouched();
+
+        // Actualizar el flatpickr manualmente para reflejar el cambio en el input
+        if (this.fpHoraInstance) {
+            try {
+                const hoy = new Date();
+                const [h, m] = hora.split(':').map(Number);
+                hoy.setHours(h, m, 0, 0);
+                this.fpHoraInstance.setDate(hoy, false);
+            } catch (e) {
+                console.warn('Error actualizando flatpickr hora:', e);
+            }
+        }
+
+        // Verificar disponibilidad automáticamente
         this.verificarDisponibilidadEnTiempoReal();
         this.cdr.detectChanges();
     }
@@ -309,7 +331,6 @@ export class DoctorNuevaCita implements OnInit {
                             if (dateStr) {
                                 this.citaForm.patchValue({ fechaCita: dateStr });
                                 this.citaForm.get('fechaCita')?.markAsTouched();
-                                // Verificar disponibilidad al cambiar fecha
                                 this.cargarHorariosDisponibles(dateStr);
                                 this.verificarDisponibilidadEnTiempoReal();
                                 this.cdr.detectChanges();
@@ -325,7 +346,6 @@ export class DoctorNuevaCita implements OnInit {
 
                     if (this.citaForm.get('fechaCita')?.value) {
                         this.fpFechaInstance.setDate(this.citaForm.get('fechaCita')?.value);
-                        // Cargar horarios para la fecha inicial
                         this.cargarHorariosDisponibles(this.citaForm.get('fechaCita')?.value);
                     }
                 }
@@ -344,7 +364,6 @@ export class DoctorNuevaCita implements OnInit {
                             if (dateStr) {
                                 this.citaForm.patchValue({ horaCita: dateStr });
                                 this.citaForm.get('horaCita')?.markAsTouched();
-                                // Verificar disponibilidad al cambiar hora
                                 this.verificarDisponibilidadEnTiempoReal();
                                 this.cdr.detectChanges();
                             }
@@ -427,9 +446,7 @@ export class DoctorNuevaCita implements OnInit {
                 horaCita: formData.horaCita + ':00',
                 motivo: formData.motivo || 'Consulta Medica',
                 modalidad: formData.modalidad || 'Presencial',
-                sintomas: formData.sintomas || '',
-                idUsuarioPaciente: formData.idPaciente,
-                idUsuarioDoctor: this.doctorId
+                sintomas: formData.sintomas || ''
             };
 
             await firstValueFrom(this.usersService.crearCita(datosCita));
@@ -447,7 +464,6 @@ export class DoctorNuevaCita implements OnInit {
             let mensajeError = 'Ocurrio un error al agendar la cita.';
             if (error.error?.error) {
                 mensajeError = error.error.error;
-                // Si el error es por horario ocupado, actualizar estado
                 if (mensajeError.includes('horario no disponible') || mensajeError.includes('ya hay 3 citas')) {
                     this.horarioDisponible = false;
                     this.horarioSeleccionadoValido = false;
