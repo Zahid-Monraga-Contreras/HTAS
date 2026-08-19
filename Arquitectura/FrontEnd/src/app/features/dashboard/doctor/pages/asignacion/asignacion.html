@@ -1,0 +1,309 @@
+<!-- ============================================ -->
+<!-- pages/doctor/asignacion/asignacion.html     -->
+<!-- ============================================ -->
+
+<app-doctor-menu></app-doctor-menu>
+
+<div class="asignacion-page">
+    <!-- HEADER -->
+    <header class="asignacion-header">
+        <div class="header-top">
+            <div class="header-info">
+                <h1>
+                    <i class="bi bi-person-plus"></i>
+                    Asignacion de Pacientes
+                </h1>
+                <p>Asigna pacientes a los doctores del sistema</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn-recargar" (click)="recargarDatos()" title="Recargar datos">
+                    <i class="bi bi-arrow-clockwise"></i>
+                </button>
+                <button class="btn-volver" (click)="volver()">
+                    <i class="bi bi-arrow-left"></i>
+                    <span>Volver</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- LOADING -->
+    <div *ngIf="cargandoDoctores || cargandoPacientes" class="loading-container">
+        <div class="spinner"></div>
+        <p>Cargando datos...</p>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div *ngIf="!cargandoDoctores && !cargandoPacientes" class="asignacion-content">
+
+        <!-- Mensaje de alerta -->
+        <div *ngIf="mensaje" class="alert" [ngClass]="mensajeClase" role="alert">
+            <i class="bi" [class]="
+                mensajeClase === 'alert-success' ? 'bi-check-circle-fill' :
+                mensajeClase === 'alert-danger' ? 'bi-x-circle-fill' :
+                mensajeClase === 'alert-warning' ? 'bi-exclamation-triangle-fill' :
+                'bi-info-circle-fill'
+            "></i>
+            {{ mensaje }}
+        </div>
+
+        <!-- Resumen de seleccion -->
+        <div *ngIf="doctorSeleccionado || pacientesSeleccionados.length > 0" class="resumen-seleccion">
+            <div class="resumen-item" *ngIf="doctorSeleccionado">
+                <span class="resumen-label">Doctor:</span>
+                <strong>{{ doctorSeleccionado.Nombre }} {{ doctorSeleccionado.ApPaterno }}</strong>
+                <span class="resumen-badge">{{ doctorSeleccionado.Especialidad || 'General' }}</span>
+                <span class="resumen-badge" style="background: #22c55e; color: white;">
+                    <i class="bi bi-people"></i>
+                    {{ doctorSeleccionado.TotalPacientesAsignados || 0 }} pacientes asignados
+                </span>
+            </div>
+            <div class="resumen-item" *ngIf="pacientesSeleccionados.length > 0">
+                <span class="resumen-label">Pacientes:</span>
+                <strong>{{ pacientesSeleccionados.length }} seleccionado(s)</strong>
+            </div>
+            <button class="btn-asignar-resumen" [disabled]="botonAsignarDeshabilitado" (click)="asignarPacientes()"
+                [title]="botonAsignarDeshabilitado ? 'Selecciona un doctor y pacientes sin asignar' : ''">
+                <span *ngIf="!asignando">
+                    <i class="bi bi-check2-all"></i>
+                    Asignar
+                </span>
+                <span *ngIf="asignando">
+                    <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+                    Asignando...
+                </span>
+            </button>
+        </div>
+
+        <!-- SELECTORES: DOCTORES Y PACIENTES -->
+        <div class="selectores-grid">
+
+            <!-- COLUMNA: DOCTORES -->
+            <div class="selector-card">
+                <div class="selector-header">
+                    <div class="selector-title">
+                        <i class="bi bi-person-badge"></i>
+                        <h2>Doctores</h2>
+                    </div>
+                    <span class="selector-count">{{ doctoresFiltrados.length }}</span>
+                </div>
+                <div class="selector-body">
+                    <div class="search-box">
+                        <i class="bi bi-search"></i>
+                        <input type="text" class="search-input" placeholder="Buscar doctor..."
+                            [(ngModel)]="busquedaDoctor" (input)="filtrarDoctores()">
+                        <button *ngIf="busquedaDoctor" class="search-clear"
+                            (click)="busquedaDoctor = ''; filtrarDoctores()">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+
+                    <div class="lista-doctores">
+                        <div *ngFor="let doctor of doctoresFiltrados" class="doctor-item"
+                            [class.selected]="doctorSeleccionado?.IdUsuario === doctor.IdUsuario"
+                            (click)="seleccionarDoctor(doctor)">
+                            <div class="doctor-avatar" [style.background]="obtenerColorDoctor(doctor)">
+                                {{ obtenerIniciales(doctor.Nombre, doctor.ApPaterno) }}
+                            </div>
+                            <div class="doctor-info">
+                                <div class="doctor-nombre">
+                                    {{ doctor.Nombre }} {{ doctor.ApPaterno }}
+                                    <span *ngIf="doctor.ApMaterno"> {{ doctor.ApMaterno }}</span>
+                                </div>
+                                <div class="doctor-especialidad">
+                                    <i class="bi bi-stethoscope"></i>
+                                    {{ doctor.Especialidad || 'Sin especialidad' }}
+                                </div>
+                                <div class="doctor-detalle">
+                                    <span class="doctor-cedula" *ngIf="doctor.Cedula">
+                                        <i class="bi bi-card-id"></i>
+                                        {{ doctor.Cedula }}
+                                    </span>
+                                    <span class="doctor-pacientes">
+                                        <i class="bi bi-people"></i>
+                                        {{ doctor.TotalPacientesAsignados || 0 }} pacientes
+                                    </span>
+                                </div>
+                                <div class="doctor-correo" *ngIf="doctor.Correo">
+                                    <i class="bi bi-envelope"></i>
+                                    {{ doctor.Correo }}
+                                </div>
+                            </div>
+                            <div class="doctor-select" *ngIf="doctorSeleccionado?.IdUsuario === doctor.IdUsuario">
+                                <i class="bi bi-check-circle-fill"></i>
+                            </div>
+                        </div>
+
+                        <div *ngIf="doctoresFiltrados.length === 0" class="empty-message">
+                            <i class="bi bi-person-x"></i>
+                            <p>No se encontraron doctores</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLUMNA: PACIENTES -->
+            <div class="selector-card">
+                <div class="selector-header">
+                    <div class="selector-title">
+                        <i class="bi bi-people"></i>
+                        <h2>Pacientes</h2>
+                    </div>
+                    <span class="selector-count">{{ pacientesFiltrados.length }}</span>
+                </div>
+                <div class="selector-body">
+                    <div class="search-box">
+                        <i class="bi bi-search"></i>
+                        <input type="text" class="search-input" placeholder="Buscar paciente..."
+                            [(ngModel)]="busquedaPaciente" (input)="filtrarPacientes()">
+                        <button *ngIf="busquedaPaciente" class="search-clear"
+                            (click)="busquedaPaciente = ''; filtrarPacientes()">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+
+                    <!-- CHECKBOX: Ocultar asignados -->
+                    <div class="filtro-asignados">
+                        <label class="switch-label">
+                            <input type="checkbox" class="switch-input" [(ngModel)]="ocultarAsignados"
+                                (change)="filtrarPacientes()">
+                            <span class="switch-slider"></span>
+                            <span class="switch-text">
+                                <i class="bi bi-eye-slash"></i>
+                                Ocultar asignados
+                            </span>
+                        </label>
+                    </div>
+
+                    <div class="lista-pacientes">
+                        <div *ngFor="let paciente of pacientesFiltrados" class="paciente-item"
+                            [class.selected]="pacientesSeleccionados.includes(paciente.IdUsuario)"
+                            [class.asignado]="paciente.AsignacionActiva"
+                            [class.asignado-otro]="estaAsignadoAOtroDoctor(paciente)"
+                            [class.asignado-este]="estaAsignadoAlDoctorSeleccionado(paciente)"
+                            (click)="togglePaciente(paciente)">
+                            <div class="paciente-avatar" [class.asignado-avatar]="paciente.AsignacionActiva">
+                                {{ obtenerIniciales(paciente.Nombre, paciente.ApPaterno) }}
+                            </div>
+                            <div class="paciente-info">
+                                <div class="paciente-nombre">
+                                    {{ paciente.Nombre }} {{ paciente.ApPaterno }}
+                                    <span *ngIf="paciente.ApMaterno"> {{ paciente.ApMaterno }}</span>
+                                    <span class="paciente-badge" *ngIf="paciente.AsignacionActiva">
+                                        <i class="bi bi-person-check"></i>
+                                        Asignado
+                                    </span>
+                                    <span class="paciente-badge asignado-este-badge"
+                                        *ngIf="estaAsignadoAlDoctorSeleccionado(paciente)">
+                                        <i class="bi bi-check-circle-fill"></i>
+                                        Mi paciente
+                                    </span>
+                                    <span class="paciente-badge asignado-otro-badge"
+                                        *ngIf="estaAsignadoAOtroDoctor(paciente)">
+                                        <i class="bi bi-x-circle-fill"></i>
+                                        Otro doctor
+                                    </span>
+                                </div>
+                                <div class="paciente-correo">
+                                    <i class="bi bi-envelope"></i>
+                                    {{ paciente.Correo }}
+                                </div>
+                                <div class="paciente-detalle">
+                                    <span class="paciente-nss" *ngIf="paciente.NSS">
+                                        <i class="bi bi-card-id"></i>
+                                        {{ paciente.NSS }}
+                                    </span>
+                                    <span class="paciente-tipo" *ngIf="paciente.TipoSangre">
+                                        <i class="bi bi-droplet"></i>
+                                        {{ paciente.TipoSangre }}
+                                    </span>
+                                    <span class="paciente-doctor" *ngIf="paciente.NombreDoctorAsignado">
+                                        <i class="bi bi-person-badge"></i>
+                                        Dr. {{ paciente.NombreDoctorAsignado }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="paciente-select" *ngIf="pacientesSeleccionados.includes(paciente.IdUsuario)">
+                                <i class="bi bi-check-circle-fill"></i>
+                            </div>
+                            <div class="paciente-asignado-icon"
+                                *ngIf="paciente.AsignacionActiva && !pacientesSeleccionados.includes(paciente.IdUsuario)">
+                                <i class="bi bi-lock-fill" title="Paciente ya asignado"></i>
+                            </div>
+                        </div>
+
+                        <div *ngIf="pacientesFiltrados.length === 0" class="empty-message">
+                            <i class="bi bi-people-x"></i>
+                            <p>No se encontraron pacientes</p>
+                            <small *ngIf="!ocultarAsignados">Activa "Ocultar asignados" para filtrarlos</small>
+                            <small *ngIf="doctorSeleccionado && !ocultarAsignados">Los pacientes asignados a este doctor
+                                aparecen primero</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTONES DE ACCION -->
+        <div class="acciones-footer">
+            <button class="btn-limpiar" (click)="limpiarSeleccion()" [disabled]="asignando">
+                <i class="bi bi-arrow-counterclockwise"></i>
+                Limpiar seleccion
+            </button>
+            <button class="btn-ver-pacientes" (click)="verPacientesAsignados()"
+                [disabled]="!doctorSeleccionado || asignando">
+                <i class="bi bi-eye"></i>
+                Ver mis pacientes
+            </button>
+        </div>
+
+        <!-- RESULTADOS DE ASIGNACION -->
+        <div *ngIf="resultadosAsignacion.length > 0" class="resultados-section">
+            <div class="resultados-header">
+                <h3><i class="bi bi-list-check"></i> Resultados de la asignacion</h3>
+                <span class="resultados-count">
+                    {{ totalExitosos }} exitosos / {{ totalFallidos }} fallidos
+                </span>
+            </div>
+            <div class="resultados-list">
+                <div *ngFor="let resultado of resultadosAsignacion" class="resultado-item">
+                    <div class="resultado-info">
+                        <strong>{{ resultado.Nombre }} {{ resultado.ApPaterno }}</strong>
+                        <small>{{ resultado.Correo }}</small>
+                    </div>
+                    <span class="resultado-badge" [class.exitoso]="resultado.exitoso"
+                        [class.fallido]="!resultado.exitoso">
+                        <i class="bi" [class.bi-check-circle]="resultado.exitoso"
+                            [class.bi-x-circle]="!resultado.exitoso"></i>
+                        {{ resultado.exitoso ? 'Asignado' : 'Fallo' }}
+                    </span>
+                    <small *ngIf="!resultado.exitoso" class="resultado-error">{{ resultado.mensaje }}</small>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- TOAST NOTIFICATIONS -->
+<div class="toast-container" *ngIf="notifications.length > 0">
+    <div *ngFor="let notif of notifications; let i = index" class="toast-notification toast-{{ notif.type }}"
+        [class.toast-exit]="i > 0" [attr.data-id]="notif.id">
+        <div class="toast-icon">
+            <i class="bi" [class]="
+                notif.type === 'success' ? 'bi-check-circle-fill' :
+                notif.type === 'error' ? 'bi-x-circle-fill' :
+                notif.type === 'warning' ? 'bi-exclamation-triangle-fill' :
+                'bi-info-circle-fill'
+            "></i>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title">{{ notif.title }}</div>
+            <div class="toast-message">{{ notif.message }}</div>
+        </div>
+        <button class="toast-close" (click)="removeToast(notif.id)">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        <div class="toast-progress" [style.animation-duration]="(notif.duration || 5000) + 'ms'"></div>
+    </div>
+</div>

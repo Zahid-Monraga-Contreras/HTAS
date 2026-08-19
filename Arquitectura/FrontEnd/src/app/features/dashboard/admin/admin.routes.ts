@@ -21,6 +21,7 @@ import { Configuracion } from './pages/configuracion/configuracion';
 import { Solicitudes } from './pages/solicitudes/solicitudes';
 import { authGuard } from '../../../core/guards/auth.guard';
 import { roleGuard } from '../../../core/guards/role.guard';
+import { AdminAsignacion } from './pages/asignacion/asignacion';
 
 export const ADMIN_ROUTES: Routes = [
     {
@@ -49,6 +50,7 @@ export const ADMIN_ROUTES: Routes = [
             { path: 'notificaciones', component: Notificaciones },
             { path: 'configuracion', component: Configuracion },
             { path: 'solicitudes', component: Solicitudes },
+            { path: 'asignacion', component: AdminAsignacion },
         ]
     }
 ];

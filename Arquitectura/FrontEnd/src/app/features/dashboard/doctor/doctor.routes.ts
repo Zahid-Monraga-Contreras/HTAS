@@ -25,6 +25,7 @@ import { DoctorDispositivoDetalle } from './pages/dispositivos/dispositivo-detal
 import { DoctorNuevoDispositivo } from './pages/dispositivos/nuevo-dispositivo/nuevo-dispositivo';
 import { DoctorAnalisis } from './pages/analisis/analisis';
 import { DoctorAnalisisDetalle } from './pages/analisis/analisis-detalle/analisis-detalle';
+import { DoctorAsignacion } from './pages/asignacion/asignacion';
 
 export const DOCTOR_ROUTES: Routes = [
     {
@@ -68,6 +69,9 @@ export const DOCTOR_ROUTES: Routes = [
             // Analisis
             { path: 'analisis', component: DoctorAnalisis },
             { path: 'analisis/detalle/:id/:folio', component: DoctorAnalisisDetalle },
+
+            // Asignacion
+            { path: 'asignacion', component: DoctorAsignacion },
         ]
     }
 ];

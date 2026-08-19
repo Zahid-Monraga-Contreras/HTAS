@@ -1132,4 +1132,93 @@ export class Users {
       { responseType: 'blob' }
     );
   }
+
+  // ============================================ 
+  // MÉTODOS PARA ASIGNACIONES
+  // ============================================ 
+
+  // Obtener todas las asignaciones 
+  getAllAsignaciones(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/asignaciones/asignaciones`);
+  }
+
+  // Obtener asignación por ID 
+  getAsignacionById(id: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/asignaciones/asignacion/${id}`);
+  }
+
+  // Obtener estadísticas de asignaciones 
+  getEstadisticasAsignaciones(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/asignaciones/estadisticas`);
+  }
+
+  // Obtener todos los doctores (con conteo de pacientes) 
+  getDoctoresCompletos(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/asignaciones/doctores`);
+  }
+
+  // Obtener doctor por ID 
+  getDoctorCompleto(id: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/asignaciones/doctor/${id}`);
+  }
+
+  // Obtener pacientes de un doctor específico 
+  getPacientesDeDoctor(idDoctor: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/asignaciones/doctor/${idDoctor}/pacientes`);
+  }
+
+  // Obtener pacientes asignados a un doctor con detalles 
+  getPacientesAsignadosDetalle(idDoctor: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/asignaciones/doctor/${idDoctor}/pacientes-detalle`);
+  }
+
+  // Obtener todos los pacientes 
+  getTodosLosPacientes(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/asignaciones/pacientes`);
+  }
+
+  // Obtener pacientes sin asignar 
+  getPacientesSinAsignarCompleto(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/asignaciones/pacientes/sin-asignar`);
+  }
+
+  // Obtener doctor de un paciente específico 
+  getDoctorDePaciente(idPaciente: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/asignaciones/paciente/${idPaciente}/doctor`);
+  }
+
+  // Verificar si paciente tiene doctor asignado 
+  verificarPacienteAsignadoCompleto(idPaciente: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/asignaciones/paciente/${idPaciente}/verificar`);
+  }
+
+  // Asignar paciente a doctor 
+  asignarPacienteADoctor(data: {
+    idPaciente: number;
+    idDoctor: number;
+    asignadoPor?: number;
+    notas?: string;
+  }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/asignaciones/asignar`, data);
+  }
+
+  // Asignar múltiples pacientes a un doctor 
+  asignarMultiplesPacientesADoctor(data: {
+    idDoctor: number;
+    pacientesIds: number[];
+    asignadoPor?: number;
+    notas?: string;
+  }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/asignaciones/asignar-multiples`, data);
+  }
+
+  // Desasignar paciente de doctor 
+  desasignarPacienteDeDoctor(idPaciente: number, idDoctor: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/asignaciones/desasignar`, { idPaciente, idDoctor });
+  }
+
+  // Desasignar todos los pacientes de un doctor 
+  desasignarTodosPacientesDeDoctor(idDoctor: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/asignaciones/doctor/${idDoctor}/desasignar-todos`);
+  }
 }

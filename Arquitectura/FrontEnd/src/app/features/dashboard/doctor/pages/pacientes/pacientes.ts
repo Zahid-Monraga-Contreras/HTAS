@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, ChangeDetectorRef, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { RouterModule, Router } from '@angular/router'; // ✅ Agregar Router
+import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DoctorMenu } from "../../template/menu/menu";
 import { firstValueFrom } from 'rxjs';

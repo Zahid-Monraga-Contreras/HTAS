@@ -112,6 +112,12 @@ export class Menu implements OnInit, OnDestroy {
           icon: 'bi-list-check',
           label: 'Solicitudes',
           queryParams: { canAdd: false, canEdit: true, canDelete: true }
+        },
+        {
+          route: '/admin/asignacion',
+          icon: 'bi-person-plus',
+          label: 'Asignación',
+          queryParams: { canAdd: false, canEdit: true, canDelete: false }
         }
       ]
     },

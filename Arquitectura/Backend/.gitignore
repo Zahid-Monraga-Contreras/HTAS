@@ -5,6 +5,7 @@ node_modules/
 # Archivos de prueba y credenciales
 test-admin-secure.js
 create-admin.js
+seed-data.js
 *.credentials.json
 .dev-admin-credentials.json
 admin-credentials.json

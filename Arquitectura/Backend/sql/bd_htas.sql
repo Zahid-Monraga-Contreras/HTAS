@@ -141,6 +141,8 @@ CREATE TABLE ACOMPANANTES (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+SELECT * FROM ACOMPANANTES;
+
 -- Alter para permitir NULL en FechaAsignacion
 ALTER TABLE ACOMPANANTES ALTER COLUMN FechaAsignacion DROP NOT NULL;
 
@@ -194,6 +196,8 @@ CREATE TABLE ADMINISTRADORES (
     AreaResponsabilidad VARCHAR(50) DEFAULT 'General', -- Ej: 'Sistemas', 'Atención Médica', 'Auditoría'
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+SELECT * FROM ADMINISTRADORES;
 
 -- ============================================
 -- 6. TABLA: SESIONES (Soporte Multisesión)
@@ -811,6 +815,118 @@ CREATE TABLE ASIGNACIONES_PACIENTES (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(IdAcompanante, IdPaciente)
 );
+
+-- ============================================  
+-- TABLA: ASIGNACIONES_DOCTOR_PACIENTE  
+-- ============================================  
+CREATE  TABLE  ASIGNACIONES_DOCTOR_PACIENTE  (  
+    IdAsignacion  SERIAL  PRIMARY  KEY ,  
+    IdDoctor  INT  NOT  NULL  REFERENCES  DOCTORES ( IdUsuario )  ON  DELETE  CASCADE ,  
+    IdPaciente  INT  NOT  NULL  REFERENCES  PACIENTES ( IdUsuario )  ON  DELETE  CASCADE ,  
+    FechaAsignacion  TIMESTAMP  DEFAULT  CURRENT_TIMESTAMP ,  
+    Activo  BOOLEAN  DEFAULT  TRUE , 
+    AsignadoPor  INT  REFERENCES  USUARIOS ( IdUsuario )  ON  DELETE  SET  NULL ,  -- Quién asignó (admin o doctor) 
+    Notas  TEXT ,  -- Notas adicionales sobre la asignación 
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(IdDoctor, IdPaciente)
+);
+
+-- ============================================
+-- CREAR LA FUNCIÓN asignar_paciente_doctor
+-- ============================================
+CREATE OR REPLACE FUNCTION asignar_paciente_doctor(
+    p_id_paciente INT,
+    p_id_doctor INT,
+    p_asignado_por INT DEFAULT NULL,
+    p_notas TEXT DEFAULT NULL
+)
+RETURNS TABLE(
+    success BOOLEAN,
+    mensaje TEXT,
+    id_asignacion INT
+) AS $$
+DECLARE
+    v_id_asignacion INT;
+    v_paciente_existe BOOLEAN;
+    v_doctor_existe BOOLEAN;
+    v_ya_asignado BOOLEAN;
+BEGIN
+    -- Verificar que el paciente existe
+    SELECT EXISTS(SELECT 1 FROM PACIENTES WHERE IdUsuario = p_id_paciente) INTO v_paciente_existe;
+    IF NOT v_paciente_existe THEN
+        RETURN QUERY SELECT FALSE, 'El paciente no existe'::TEXT, NULL::INT;
+        RETURN;
+    END IF;
+    
+    -- Verificar que el doctor existe
+    SELECT EXISTS(SELECT 1 FROM DOCTORES WHERE IdUsuario = p_id_doctor) INTO v_doctor_existe;
+    IF NOT v_doctor_existe THEN
+        RETURN QUERY SELECT FALSE, 'El doctor no existe'::TEXT, NULL::INT;
+        RETURN;
+    END IF;
+    
+    -- Verificar si ya está asignado activamente
+    SELECT EXISTS(
+        SELECT 1 FROM ASIGNACIONES_DOCTOR_PACIENTE 
+        WHERE IdPaciente = p_id_paciente AND IdDoctor = p_id_doctor AND Activo = TRUE
+    ) INTO v_ya_asignado;
+    
+    IF v_ya_asignado THEN
+        RETURN QUERY SELECT FALSE, 'El paciente ya está asignado a este doctor'::TEXT, NULL::INT;
+        RETURN;
+    END IF;
+    
+    -- Insertar asignación
+    INSERT INTO ASIGNACIONES_DOCTOR_PACIENTE (IdPaciente, IdDoctor, AsignadoPor, Notas)
+    VALUES (p_id_paciente, p_id_doctor, p_asignado_por, p_notas)
+    RETURNING IdAsignacion INTO v_id_asignacion;
+    
+    RETURN QUERY SELECT TRUE, 'Paciente asignado exitosamente'::TEXT, v_id_asignacion;
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT * FROM ASIGNACIONES_DOCTOR_PACIENTE WHERE Activo = TRUE;
+
+-- ============================================
+-- 1. VER CUÁNTOS REGISTROS HAY
+-- ============================================
+SELECT COUNT(*) AS TotalRegistros FROM ASIGNACIONES_DOCTOR_PACIENTE;
+
+-- ============================================
+-- 2. VER QUÉ DATOS ESTÁN ASIGNADOS
+-- ============================================
+SELECT 
+    a.IdAsignacion,
+    a.IdPaciente,
+    u.Nombre AS Paciente,
+    a.IdDoctor,
+    ud.Nombre AS Doctor,
+    a.Activo,
+    a.FechaAsignacion
+FROM ASIGNACIONES_DOCTOR_PACIENTE a
+INNER JOIN USUARIOS u ON a.IdPaciente = u.IdUsuario
+INNER JOIN USUARIOS ud ON a.IdDoctor = ud.IdUsuario;
+
+-- ============================================
+-- 3. ELIMINAR TODOS LOS REGISTROS (borrado físico)
+-- ============================================
+DELETE FROM ASIGNACIONES_DOCTOR_PACIENTE;
+
+-- ============================================
+-- 4. VERIFICAR QUE QUEDÓ VACÍA
+-- ============================================
+SELECT COUNT(*) AS TotalRegistros FROM ASIGNACIONES_DOCTOR_PACIENTE;
+
+-- ============================================
+-- 5. ELIMINAR LA FUNCIÓN (opcional)
+-- ============================================
+DROP FUNCTION IF EXISTS asignar_paciente_doctor(INT, INT, INT, TEXT);
+
+-- ============================================
+-- 6. VERIFICAR QUE LA FUNCIÓN SE ELIMINÓ
+-- ============================================
+SELECT proname FROM pg_proc WHERE proname = 'asignar_paciente_doctor';
 
 -- ============================================
 -- TRIGGERS PARA updated_at

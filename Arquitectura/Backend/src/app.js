@@ -17,6 +17,7 @@ const contactoRoutes = require('./routes/contacto.routes');
 const googlefitRoutes = require('./routes/googlefit.routes');
 const algorithmRoutes = require('./routes/algorithm.routes');
 const solicitudesRoutes = require('./routes/solicitudes.routes');
+const asignacionesRoutes = require('./routes/asignaciones.routes');
 
 const app = express();
 
@@ -41,6 +42,7 @@ app.use('/api/contacto', contactoRoutes);
 app.use('/api/googlefit', googlefitRoutes);
 app.use('/api/algorithm', algorithmRoutes);
 app.use('/api/solicitudes', solicitudesRoutes);
+app.use('/api/asignaciones', asignacionesRoutes);
 
 // Ruta de prueba para verificar que el servidor funciona
 app.get('/', (req, res) => {
@@ -75,6 +77,23 @@ app.get('/', (req, res) => {
                 'PUT /api/solicitudes/aprobar/:idSolicitud': 'Aprobar solicitud (solo admin)',
                 'PUT /api/solicitudes/rechazar/:idSolicitud': 'Rechazar solicitud (solo admin)',
                 'DELETE /api/solicitudes/asignacion/:idAsignacion': 'Eliminar asignación (solo admin)'
+            },
+            asignaciones: {
+                'GET /api/asignaciones/asignaciones': 'Obtener todas las asignaciones',
+                'GET /api/asignaciones/asignacion/:id': 'Obtener una asignación por ID',
+                'GET /api/asignaciones/estadisticas': 'Estadísticas de asignaciones',
+                'GET /api/asignaciones/doctores': 'Obtener todos los doctores (con conteo de pacientes)',
+                'GET /api/asignaciones/doctor/:id': 'Obtener doctor por ID (con detalles)',
+                'GET /api/asignaciones/doctor/:idDoctor/pacientes': 'Obtener pacientes de un doctor específico',
+                'GET /api/asignaciones/doctor/:idDoctor/pacientes-detalle': 'Obtener pacientes asignados a un doctor (con detalles completos)',
+                'DELETE /api/asignaciones/doctor/:idDoctor/desasignar-todos': 'Desasignar todos los pacientes de un doctor',
+                'GET /api/asignaciones/pacientes': 'Obtener todos los pacientes (con información de asignación)',
+                'GET /api/asignaciones/pacientes/sin-asignar': 'Obtener pacientes sin asignar',
+                'GET /api/asignaciones/paciente/:idPaciente/doctor': 'Obtener doctor de un paciente específico',
+                'GET /api/asignaciones/paciente/:idPaciente/verificar': 'Verificar si paciente tiene doctor asignado',
+                'POST /api/asignaciones/asignar': 'Asignar paciente a doctor',
+                'POST /api/asignaciones/asignar-multiples': 'Asignar múltiples pacientes a un doctor',
+                'POST /api/asignaciones/desasignar': 'Desasignar paciente de doctor'
             }
         }
     });

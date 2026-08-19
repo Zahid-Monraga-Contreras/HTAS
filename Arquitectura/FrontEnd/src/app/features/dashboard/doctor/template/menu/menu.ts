@@ -20,6 +20,7 @@ export class DoctorMenu {
     menuItems = [
         { path: '/doctor/inicio', icon: 'bi-house-door', label: 'Inicio' },
         { path: '/doctor/pacientes', icon: 'bi-people', label: 'Pacientes' },
+        { path: '/doctor/asignacion', icon: 'bi-person-plus', label: 'Asignación' },
         { path: '/doctor/citas', icon: 'bi-calendar-check', label: 'Citas' },
         { path: '/doctor/tratamientos', icon: 'bi-heart-pulse', label: 'Tratamientos' },
         { path: '/doctor/medicamentos', icon: 'bi-capsule', label: 'Medicamentos' },
