@@ -20,7 +20,6 @@ export interface Usuario {
   telefono?: string;
   genero?: 'Masculino' | 'Femenino' | 'Otro' | 'No especificado';
   rol: 'Paciente' | 'Doctor' | 'Acompanante' | 'Admin';
-
   fechaNacimiento?: string;
   curp?: string;
   domicilio?: string;
@@ -28,7 +27,6 @@ export interface Usuario {
   localidad?: string;
   municipio?: string;
   estado?: string;
-
   pinVerificacion?: string;
   pinVerificado?: boolean;
   intentosFallidos?: number;
@@ -89,7 +87,7 @@ export interface RegistroToma {
 }
 
 // ==========================================================================
-// INTERFACES PARA DISPONIBILIDAD DE CITAS (ACTUALIZADAS)
+// INTERFACES PARA DISPONIBILIDAD DE CITAS
 // ==========================================================================
 export interface DisponibilidadResponse {
   disponible: boolean;
@@ -170,7 +168,7 @@ export interface DisponibilidadMasivaResponse {
 }
 
 // ==========================================================================
-// INTERFACES PARA EL ALGORITMO
+// INTERFACES PARA EL ALGORITMO - ACTUALIZADAS
 // ==========================================================================
 export interface AnalisisRequest {
   edad: number;
@@ -227,6 +225,7 @@ export interface EstadoResponse {
     pythonPath: string;
   };
   servidor: string;
+  timestamp?: string;
 }
 
 export interface UltimoExpedienteResponse {
@@ -251,25 +250,53 @@ export interface UltimoExpedienteResponse {
     tiene_pdf_diagnostico: boolean;
     pdf_cedula_base64: string | null;
     pdf_diagnostico_base64: string | null;
-  };
+  } | null;
 }
 
 export interface PdfResponse {
-  folio: number;
-  fecha_consulta: string;
-  cedula_medico: string;
-  edad: number;
-  sistolica: number;
-  diastolica: number;
-  nivel_riesgo: string;
-  tiene_pdf_cedula: boolean;
-  tiene_pdf_diagnostico: boolean;
-  pdf_cedula_base64: string | null;
-  pdf_diagnostico_base64: string | null;
+  success: boolean;
+  data: {
+    folio: number;
+    fecha_consulta: string;
+    cedula_medico: string;
+    edad: number;
+    sistolica: number;
+    diastolica: number;
+    nivel_riesgo: string;
+    tiene_pdf_cedula: boolean;
+    tiene_pdf_diagnostico: boolean;
+    pdf_cedula_base64: string | null;
+    pdf_diagnostico_base64: string | null;
+  };
+}
+
+export interface UltimoAnalisisResponse {
+  success: boolean;
+  data: {
+    folio: number;
+    fecha_consulta: string;
+    cedula_medico: string;
+    edad: number;
+    sistolica: number;
+    diastolica: number;
+    presion_pdf_sistolica: number;
+    presion_pdf_diastolica: number;
+    prediccion_crisis: number;
+    probabilidad_porcentual: number;
+    nivel_riesgo: string;
+    motor_utilizado: string;
+    pdf_cedula_valido: boolean;
+    pdf_diagnostico_valido: boolean;
+    tiene_pdf_cedula: boolean;
+    tiene_pdf_diagnostico: boolean;
+    pdf_cedula_base64: string | null;
+    pdf_diagnostico_base64: string | null;
+  } | null;
+  mensaje?: string;
 }
 
 // ==========================================================================
-// INTERFACES PARA ADMINISTRACION (ACTUALIZADAS)
+// INTERFACES PARA ADMINISTRACION
 // ==========================================================================
 export interface ResumenAdminResponse {
   total: number;
@@ -297,9 +324,6 @@ export interface CuposPorHoraResponse {
   horarios_disponibles: number;
 }
 
-// ==========================================================================
-// INTERFACES PARA HISTORIAL Y PROXIMAS CITAS
-// ==========================================================================
 export interface ProximasCitasResponse {
   success: boolean;
   citas: any[];
@@ -555,16 +579,8 @@ export class Users {
   }
 
   // ==========================================================================
-  // --- NUEVAS RUTAS PARA DISPONIBILIDAD DE CITAS ---
+  // --- DISPONIBILIDAD DE CITAS ---
   // ==========================================================================
-
-  /**
-   * Verifica si una fecha y hora específicas están disponibles
-   * @param fecha - Fecha en formato YYYY-MM-DD
-   * @param hora - Hora en formato HH:MM
-   * @param email - Email del usuario (opcional)
-   * @returns Observable con la respuesta de disponibilidad
-   */
   verificarDisponibilidad(fecha: string, hora: string, email?: string): Observable<DisponibilidadResponse> {
     const params: any = { fecha, hora };
     if (email) {
@@ -576,12 +592,6 @@ export class Users {
     );
   }
 
-  /**
-   * Obtiene todos los horarios disponibles para una fecha específica
-   * @param fecha - Fecha en formato YYYY-MM-DD
-   * @param email - Email del usuario (opcional)
-   * @returns Observable con la lista de horarios disponibles
-   */
   getHorariosDisponibles(fecha: string, email?: string): Observable<HorariosDisponiblesResponse> {
     const params: any = { fecha };
     if (email) {
@@ -593,45 +603,24 @@ export class Users {
     );
   }
 
-  /**
-   * Obtiene los horarios con cupos disponibles para hoy
-   * @returns Observable con los horarios disponibles de hoy
-   */
   getCitasDisponiblesHoy(): Observable<CitasDisponiblesHoyResponse> {
     return this.http.get<CitasDisponiblesHoyResponse>(
       `${this.apiUrl}/citas/disponibles/hoy`
     );
   }
 
-  /**
-   * Obtiene las próximas citas de un usuario (no canceladas)
-   * @param email - Email del usuario
-   * @returns Observable con las próximas citas
-   */
   getProximasCitas(email: string): Observable<ProximasCitasResponse> {
     return this.http.get<ProximasCitasResponse>(
       `${this.apiUrl}/citas/consultas/proximas/${email}`
     );
   }
 
-  /**
-   * Obtiene el historial completo de citas de un usuario con paginación
-   * @param email - Email del usuario
-   * @param limite - Número de registros por página (default: 10)
-   * @param offset - Desplazamiento para la paginación (default: 0)
-   * @returns Observable con el historial de citas
-   */
   getHistorialCompletoCitas(email: string, limite: number = 10, offset: number = 0): Observable<HistorialCitasResponse> {
     return this.http.get<HistorialCitasResponse>(
       `${this.apiUrl}/citas/consultas/historial/${email}?limite=${limite}&offset=${offset}`
     );
   }
 
-  /**
-   * Verifica disponibilidad para múltiples fechas y horarios a la vez
-   * @param citas - Array de objetos con fecha, hora y email
-   * @returns Observable con los resultados de disponibilidad
-   */
   verificarDisponibilidadMasiva(citas: DisponibilidadMasivaItem[]): Observable<DisponibilidadMasivaResponse> {
     return this.http.post<DisponibilidadMasivaResponse>(
       `${this.apiUrl}/citas/consultas/disponibilidad-masiva`,
@@ -640,24 +629,14 @@ export class Users {
   }
 
   // ==========================================================================
-  // --- RUTAS PARA ADMINISTRACION DE CITAS ---
+  // --- ADMINISTRACION DE CITAS ---
   // ==========================================================================
-
-  /**
-   * Obtiene un resumen general de todas las citas (solo administradores)
-   * @returns Observable con el resumen de citas
-   */
   getResumenCitasAdmin(): Observable<ResumenAdminResponse> {
     return this.http.get<ResumenAdminResponse>(
       `${this.apiUrl}/citas/admin/resumen`
     );
   }
 
-  /**
-   * Obtiene la ocupación de citas por hora para una fecha específica (solo administradores)
-   * @param fecha - Fecha en formato YYYY-MM-DD
-   * @returns Observable con los cupos por hora
-   */
   getCuposPorHora(fecha: string): Observable<CuposPorHoraResponse> {
     return this.http.get<CuposPorHoraResponse>(
       `${this.apiUrl}/citas/admin/cupos-por-hora/${fecha}`
@@ -802,7 +781,6 @@ export class Users {
   // ==========================================================================
   // --- GESTION DE TOMAS ---
   // ==========================================================================
-
   getTomasByTratamiento(idTratamiento: number | string): Observable<RegistroToma[]> {
     return this.http.get<RegistroToma[]>(`${this.apiUrl}/tomas/tratamiento/${idTratamiento}`);
   }
@@ -938,7 +916,6 @@ export class Users {
   // ==========================================================================
   // --- GESTION DE MEDICIONES ---
   // ==========================================================================
-
   registrarMedicion(datos: MedicionData): Observable<any> {
     const payload = {
       idPaciente: datos.idPaciente,
@@ -1024,7 +1001,6 @@ export class Users {
   // ==========================================================================
   // --- GESTION DE SOLICITUDES DE ASIGNACION ---
   // ==========================================================================
-
   solicitarAsignacionPaciente(idAcompanante: number, data: {
     correoPaciente: string;
     parentesco: string;
@@ -1062,13 +1038,19 @@ export class Users {
   }
 
   // ==========================================================================
-  // --- ALGORITMO - ANALISIS DE HIPERTENSION ---
+  // ALGORITMO - ANALISIS DE HIPERTENSION - ACTUALIZADO
   // ==========================================================================
 
+  /**
+   * Verifica el estado del algoritmo (si el script Python está disponible)
+   */
   verificarEstadoAlgoritmo(): Observable<EstadoResponse> {
     return this.http.get<EstadoResponse>(`${this.apiUrl}/algorithm/estado`);
   }
 
+  /**
+   * Analiza un paciente con un solo PDF (diagnóstico)
+   */
   analizarConPDF(request: AnalisisRequest): Observable<AnalisisResponse> {
     const formData = new FormData();
 
@@ -1094,6 +1076,9 @@ export class Users {
     );
   }
 
+  /**
+   * Analiza un paciente con dos PDFs (cédula + diagnóstico)
+   */
   analizarConMultiplesPDFs(request: AnalisisCompletoRequest): Observable<AnalisisResponse> {
     const formData = new FormData();
 
@@ -1120,12 +1105,57 @@ export class Users {
     );
   }
 
+  /**
+   * Obtiene el último expediente de un paciente
+   */
   obtenerUltimoExpediente(idPaciente: number): Observable<UltimoExpedienteResponse> {
     return this.http.get<UltimoExpedienteResponse>(
       `${this.apiUrl}/algorithm/ultimo-expediente/${idPaciente}`
+    ).pipe(
+      map((response: any) => {
+        // Si la respuesta tiene success: false pero data: null, devolver como éxito con data null
+        if (response && response.success === false && response.data === null) {
+          return {
+            success: true,
+            data: null
+          } as UltimoExpedienteResponse;
+        }
+        // Si la respuesta tiene data: null pero success: true
+        if (response && response.success === true && response.data === null) {
+          return response as UltimoExpedienteResponse;
+        }
+        // Si la respuesta tiene data con valores
+        if (response && response.success === true && response.data) {
+          return response as UltimoExpedienteResponse;
+        }
+        // Si la respuesta es directamente los datos (sin wrapper)
+        if (response && response.folio) {
+          return {
+            success: true,
+            data: response
+          } as UltimoExpedienteResponse;
+        }
+        // Si no hay datos
+        return {
+          success: true,
+          data: null
+        } as UltimoExpedienteResponse;
+      })
     );
   }
 
+  /**
+   * Obtiene el PDF de un expediente en formato Base64 (sin descargar)
+   */
+  obtenerPDFBase64(folio: number): Observable<PdfResponse> {
+    return this.http.get<PdfResponse>(
+      `${this.apiUrl}/algorithm/pdf-base64/${folio}`
+    );
+  }
+
+  /**
+   * Obtiene el PDF de un expediente como archivo (descarga directa)
+   */
   obtenerPDFExpediente(folio: number): Observable<Blob> {
     return this.http.get(
       `${this.apiUrl}/algorithm/pdf/${folio}`,
@@ -1133,66 +1163,107 @@ export class Users {
     );
   }
 
-  // ============================================ 
-  // MÉTODOS PARA ASIGNACIONES
-  // ============================================ 
+  /**
+   * Obtiene el último análisis de un médico por su cédula
+   */
+  obtenerUltimoAnalisis(cedulaMedico: string): Observable<UltimoAnalisisResponse> {
+    return this.http.get<UltimoAnalisisResponse>(
+      `${this.apiUrl}/algorithm/ultimo-analisis/${cedulaMedico}`
+    ).pipe(
+      map((response: any) => {
+        // Si la respuesta tiene success: false pero data: null
+        if (response && response.success === false && response.data === null) {
+          return {
+            success: true,
+            data: null,
+            mensaje: response.mensaje || 'No hay analisis para esta cedula'
+          } as UltimoAnalisisResponse;
+        }
+        // Si la respuesta tiene data: null pero success: true
+        if (response && response.success === true && response.data === null) {
+          return {
+            ...response,
+            mensaje: response.mensaje || 'No hay analisis para esta cedula'
+          } as UltimoAnalisisResponse;
+        }
+        // Si la respuesta tiene data con valores
+        if (response && response.success === true && response.data) {
+          return response as UltimoAnalisisResponse;
+        }
+        // Si la respuesta es directamente los datos
+        if (response && response.folio) {
+          return {
+            success: true,
+            data: response
+          } as UltimoAnalisisResponse;
+        }
+        // Si no hay datos
+        return {
+          success: true,
+          data: null,
+          mensaje: 'No hay analisis para esta cedula'
+        } as UltimoAnalisisResponse;
+      })
+    );
+  }
 
-  // Obtener todas las asignaciones 
+  /**
+   * Ejecuta una acción personalizada en Python (utilidad/depuración)
+   */
+  ejecutarAccionPersonalizada(accion: string, payload?: any): Observable<any> {
+    return this.http.post(
+      `${this.apiUrl}/algorithm/accion-personalizada`,
+      { accion, ...payload }
+    );
+  }
+
+  // ==========================================================================
+  // ASIGNACIONES
+  // ==========================================================================
   getAllAsignaciones(): Observable<any> {
     return this.http.get(`${this.apiUrl}/asignaciones/asignaciones`);
   }
 
-  // Obtener asignación por ID 
   getAsignacionById(id: number): Observable<any> {
     return this.http.get(`${this.apiUrl}/asignaciones/asignacion/${id}`);
   }
 
-  // Obtener estadísticas de asignaciones 
   getEstadisticasAsignaciones(): Observable<any> {
     return this.http.get(`${this.apiUrl}/asignaciones/estadisticas`);
   }
 
-  // Obtener todos los doctores (con conteo de pacientes) 
   getDoctoresCompletos(): Observable<any> {
     return this.http.get(`${this.apiUrl}/asignaciones/doctores`);
   }
 
-  // Obtener doctor por ID 
   getDoctorCompleto(id: number): Observable<any> {
     return this.http.get(`${this.apiUrl}/asignaciones/doctor/${id}`);
   }
 
-  // Obtener pacientes de un doctor específico 
   getPacientesDeDoctor(idDoctor: number): Observable<any> {
     return this.http.get(`${this.apiUrl}/asignaciones/doctor/${idDoctor}/pacientes`);
   }
 
-  // Obtener pacientes asignados a un doctor con detalles 
   getPacientesAsignadosDetalle(idDoctor: number): Observable<any> {
     return this.http.get(`${this.apiUrl}/asignaciones/doctor/${idDoctor}/pacientes-detalle`);
   }
 
-  // Obtener todos los pacientes 
   getTodosLosPacientes(): Observable<any> {
     return this.http.get(`${this.apiUrl}/asignaciones/pacientes`);
   }
 
-  // Obtener pacientes sin asignar 
   getPacientesSinAsignarCompleto(): Observable<any> {
     return this.http.get(`${this.apiUrl}/asignaciones/pacientes/sin-asignar`);
   }
 
-  // Obtener doctor de un paciente específico 
   getDoctorDePaciente(idPaciente: number): Observable<any> {
     return this.http.get(`${this.apiUrl}/asignaciones/paciente/${idPaciente}/doctor`);
   }
 
-  // Verificar si paciente tiene doctor asignado 
   verificarPacienteAsignadoCompleto(idPaciente: number): Observable<any> {
     return this.http.get(`${this.apiUrl}/asignaciones/paciente/${idPaciente}/verificar`);
   }
 
-  // Asignar paciente a doctor 
   asignarPacienteADoctor(data: {
     idPaciente: number;
     idDoctor: number;
@@ -1202,7 +1273,6 @@ export class Users {
     return this.http.post(`${this.apiUrl}/asignaciones/asignar`, data);
   }
 
-  // Asignar múltiples pacientes a un doctor 
   asignarMultiplesPacientesADoctor(data: {
     idDoctor: number;
     pacientesIds: number[];
@@ -1212,12 +1282,10 @@ export class Users {
     return this.http.post(`${this.apiUrl}/asignaciones/asignar-multiples`, data);
   }
 
-  // Desasignar paciente de doctor 
   desasignarPacienteDeDoctor(idPaciente: number, idDoctor: number): Observable<any> {
     return this.http.post(`${this.apiUrl}/asignaciones/desasignar`, { idPaciente, idDoctor });
   }
 
-  // Desasignar todos los pacientes de un doctor 
   desasignarTodosPacientesDeDoctor(idDoctor: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/asignaciones/doctor/${idDoctor}/desasignar-todos`);
   }

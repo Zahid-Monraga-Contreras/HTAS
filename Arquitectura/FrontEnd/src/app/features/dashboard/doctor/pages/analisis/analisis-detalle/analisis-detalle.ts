@@ -92,7 +92,6 @@ export class DoctorAnalisisDetalle implements OnInit {
         this.route.params.subscribe(params => {
             console.log('[AnalisisDetalle] Parametros de la URL:', params);
 
-            // ✅ CORREGIDO: Asegurar que se obtiene el ID correcto
             const idParam = params['id'];
             this.pacienteId = idParam ? parseInt(idParam) : null;
             this.folio = params['folio'] ? parseInt(params['folio']) : null;
@@ -168,7 +167,7 @@ export class DoctorAnalisisDetalle implements OnInit {
     }
 
     // ============================================================
-    // CARGAR DATOS DEL PACIENTE - CORREGIDO
+    // CARGAR DATOS DEL PACIENTE
     // ============================================================
     async cargarDatosPaciente() {
         try {
@@ -179,13 +178,11 @@ export class DoctorAnalisisDetalle implements OnInit {
 
             console.log('[AnalisisDetalle] Cargando datos del paciente con ID:', this.pacienteId);
 
-            // ✅ USAR getUsuarioById con el ID del paciente
             const usuario = await firstValueFrom(this.usersService.getUsuarioById(this.pacienteId));
 
             console.log('[AnalisisDetalle] Respuesta del servidor:', usuario);
 
             if (usuario) {
-                // ✅ Asignar los datos del PACIENTE
                 this.patientName = usuario.nombre || 'Paciente';
                 this.patientFullName = `${usuario.nombre || ''} ${usuario.apPaterno || ''} ${usuario.apMaterno || ''}`.trim() || 'Paciente';
                 this.patientEmail = usuario.correo || '';
@@ -211,7 +208,7 @@ export class DoctorAnalisisDetalle implements OnInit {
     }
 
     // ============================================================
-    // EXPEDIENTE ACTUAL
+    // EXPEDIENTE ACTUAL - CORREGIDO
     // ============================================================
     async cargarExpedienteActual() {
         try {
@@ -223,6 +220,7 @@ export class DoctorAnalisisDetalle implements OnInit {
 
             console.log('[AnalisisDetalle] Expediente:', response);
 
+            // Verificar que la respuesta sea exitosa y tenga datos
             if (response && response.success && response.data) {
                 const data = response.data;
 
@@ -245,24 +243,65 @@ export class DoctorAnalisisDetalle implements OnInit {
                 if (this.pdfExistenteBase64) {
                     this.archivoExistenteNombre = `Expediente Folio #${this.folio || data.folio || 'sin folio'}`;
                 }
+            } else {
+                // Si no hay datos, establecer valores por defecto
+                console.log('[AnalisisDetalle] No se encontró expediente para este paciente');
+                this.resultadoAnalisis = {
+                    folio_expediente_db: this.folio || 0,
+                    cedula_pdf_valida: false,
+                    diagnostico_pdf_valido: false,
+                    prediccion_crisis: 0,
+                    probabilidad_porcentual: 0,
+                    nivel_riesgo_clinico: 'No disponible',
+                    protocolo_sugerido: 'No hay protocolo disponible. Realiza un análisis para este paciente.',
+                    motor_inferencia_usado: 'No disponible',
+                    sistolica_usada: 0,
+                    diastolica_usada: 0,
+                    valores_usados: 'No disponible',
+                    fecha_consulta: new Date().toISOString()
+                };
+                this.pdfExistenteBase64 = null;
+                this.archivoExistenteNombre = '';
             }
         } catch (error) {
             console.error('[AnalisisDetalle] Error cargando expediente:', error);
+            // No mostrar error al usuario, solo establecer valores por defecto
+            this.resultadoAnalisis = {
+                folio_expediente_db: this.folio || 0,
+                cedula_pdf_valida: false,
+                diagnostico_pdf_valido: false,
+                prediccion_crisis: 0,
+                probabilidad_porcentual: 0,
+                nivel_riesgo_clinico: 'No disponible',
+                protocolo_sugerido: 'No hay protocolo disponible. Realiza un análisis para este paciente.',
+                motor_inferencia_usado: 'No disponible',
+                sistolica_usada: 0,
+                diastolica_usada: 0,
+                valores_usados: 'No disponible',
+                fecha_consulta: new Date().toISOString()
+            };
+            this.pdfExistenteBase64 = null;
+            this.archivoExistenteNombre = '';
         }
     }
 
     // ============================================================
-    // HISTORIAL DE ANALISIS
+    // HISTORIAL DE ANALISIS - CORREGIDO
     // ============================================================
     async cargarHistorialAnalisis() {
         this.cargandoHistorial = true;
         try {
-            if (!this.pacienteId) return;
+            if (!this.pacienteId) {
+                this.historialAnalisis = [];
+                this.cargandoHistorial = false;
+                return;
+            }
 
             const response = await firstValueFrom(
                 this.usersService.obtenerUltimoExpediente(this.pacienteId)
             );
 
+            // Verificar que la respuesta sea exitosa y tenga datos
             if (response && response.success && response.data) {
                 const data = response.data;
 
@@ -279,9 +318,13 @@ export class DoctorAnalisisDetalle implements OnInit {
 
                 this.historialAnalisis = [historialItem];
                 console.log('[AnalisisDetalle] Historial cargado:', this.historialAnalisis.length);
+            } else {
+                this.historialAnalisis = [];
+                console.log('[AnalisisDetalle] No hay historial para este paciente');
             }
         } catch (error) {
             console.error('[AnalisisDetalle] Error cargando historial:', error);
+            this.historialAnalisis = [];
         } finally {
             this.cargandoHistorial = false;
             this.cdr.detectChanges();

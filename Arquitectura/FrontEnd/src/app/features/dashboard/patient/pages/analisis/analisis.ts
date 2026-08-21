@@ -3,7 +3,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { PatientMenu } from "../../template/menu/menu";
-import { Users } from '../../../../../core/services/users.service';
+import { Users, UltimoExpedienteResponse, AnalisisResponse } from '../../../../../core/services/users.service';
 import { Auth } from '@angular/fire/auth';
 import { firstValueFrom } from 'rxjs';
 import jsPDF from 'jspdf';
@@ -130,6 +130,7 @@ export class PatientAnalisis implements OnInit {
 
             await this.verificarEstadoSistema();
 
+            // CARGAR EXPEDIENTE EXISTENTE
             if (this.patientId) {
                 await this.cargarExpedienteExistente();
             }
@@ -195,10 +196,10 @@ export class PatientAnalisis implements OnInit {
 
     getToastTitle(tipo: string): string {
         switch (tipo) {
-            case 'success': return 'Éxito';
+            case 'success': return 'Exito';
             case 'error': return 'Error';
             case 'warning': return 'Advertencia';
-            default: return 'Información';
+            default: return 'Informacion';
         }
     }
 
@@ -302,71 +303,114 @@ export class PatientAnalisis implements OnInit {
         }
     }
 
+    // ============================================================
+    // CARGAR EXPEDIENTE EXISTENTE - ACTUALIZADO
+    // ============================================================
     async cargarExpedienteExistente() {
-        if (!this.patientId) return;
+        if (!this.patientId) {
+            console.log('[HTAS] No hay patientId para cargar expediente');
+            this.tieneArchivosExistentes = false;
+            return;
+        }
 
         this.isCargandoArchivos = true;
         try {
-            const response = await firstValueFrom(this.usersService.obtenerUltimoExpediente(this.patientId));
+            console.log('[HTAS] Cargando expediente para patientId:', this.patientId);
 
-            if (response.success && response.data) {
-                this.expedienteExistente = response.data;
-                this.tieneArchivosExistentes = true;
-                this.folioExpediente = response.data.folio || null;
+            const response = await firstValueFrom(
+                this.usersService.obtenerUltimoExpediente(this.patientId)
+            );
 
-                console.log('[HTAS] Expediente cargado:', response.data);
+            console.log('[HTAS] Respuesta de obtenerUltimoExpediente:', response);
 
-                const pdfBase64 = response.data.pdf_diagnostico_base64 || null;
+            // Verificar que la respuesta sea exitosa y tenga datos
+            if (response && response.success && response.data) {
+                const data = response.data;
 
-                if (pdfBase64) {
-                    this.pdfExistenteBase64 = pdfBase64;
-                    this.archivoExistenteNombre = `Expediente Folio #${this.folioExpediente || 'sin folio'}`;
-                    this.mostrarToast(`Expediente encontrado (Folio #${this.folioExpediente || 'sin folio'})`, 'info', 3000);
-                } else {
-                    this.archivoExistenteNombre = `Expediente Folio #${this.folioExpediente || 'sin folio'}`;
-                    if (this.folioExpediente) {
-                        this.mostrarToast(`Expediente encontrado (Folio #${this.folioExpediente}). Haz clic en "Ver PDF" para cargarlo.`, 'info', 5000);
+                // Verificar que el folio sea válido
+                if (data.folio && data.folio > 0) {
+                    console.log('[HTAS] Expediente encontrado con folio:', data.folio);
+
+                    this.expedienteExistente = data;
+                    this.tieneArchivosExistentes = true;
+                    this.folioExpediente = data.folio;
+
+                    // Guardar el PDF si existe
+                    if (data.pdf_diagnostico_base64) {
+                        this.pdfExistenteBase64 = data.pdf_diagnostico_base64;
+                        this.archivoExistenteNombre = `Expediente Folio #${data.folio}`;
+                        console.log('[HTAS] PDF encontrado en la respuesta');
+                    } else {
+                        // Intentar obtener el PDF del sistema de archivos
+                        this.pdfExistenteBase64 = null;
+                        this.archivoExistenteNombre = `Expediente Folio #${data.folio}`;
+                        console.log('[HTAS] PDF no encontrado en la respuesta, pero el expediente existe');
                     }
+
+                    // Guardar el resultado del análisis
+                    if (data.nivel_riesgo) {
+                        this.resultadoAnalisis = {
+                            folio_expediente_db: data.folio,
+                            cedula_pdf_valida: data.tiene_pdf_cedula || false,
+                            diagnostico_pdf_valido: data.tiene_pdf_diagnostico || false,
+                            prediccion_crisis: data.prediccion_crisis || 0,
+                            probabilidad_porcentual: data.probabilidad_porcentual || 0,
+                            nivel_riesgo_clinico: data.nivel_riesgo || 'No disponible',
+                            protocolo_sugerido: this.obtenerProtocoloPorNivel(data.nivel_riesgo),
+                            motor_inferencia_usado: data.motor_utilizado || 'No disponible',
+                            sistolica_usada: data.presion_pdf_sistolica || data.sistolica || 0,
+                            diastolica_usada: data.presion_pdf_diastolica || data.diastolica || 0,
+                            valores_usados: data.presion_pdf_sistolica ? 'pdf' : 'payload',
+                            fecha_consulta: data.fecha_consulta || new Date().toISOString()
+                        };
+
+                        this.metrics.ultimoRiesgo = data.nivel_riesgo;
+                        this.metrics.ultimaFecha = data.fecha_consulta || new Date().toISOString();
+
+                        // Agregar al historial
+                        const historialItem: AnalisisHistorial = {
+                            folio_expediente_db: data.folio,
+                            fecha_analisis: data.fecha_consulta || new Date().toISOString(),
+                            nivel_riesgo_clinico: data.nivel_riesgo || 'No disponible',
+                            sistolica_usada: data.presion_pdf_sistolica || data.sistolica || 0,
+                            diastolica_usada: data.presion_pdf_diastolica || data.diastolica || 0,
+                            probabilidad_porcentual: data.probabilidad_porcentual || 0,
+                            prediccion_crisis: data.prediccion_crisis || 0,
+                            motor_inferencia_usado: data.motor_utilizado || 'No disponible'
+                        };
+                        this.historialAnalisis = [historialItem];
+                        this.metrics.totalAnalisis = this.historialAnalisis.length;
+                    }
+
+                    this.mostrarToast(`Expediente encontrado (Folio #${data.folio})`, 'success', 3000);
+                } else {
+                    console.log('[HTAS] No hay expediente válido para este paciente');
+                    this.limpiarExpediente();
                 }
-
-                if (response.data.nivel_riesgo) {
-                    this.resultadoAnalisis = {
-                        folio_expediente_db: this.folioExpediente || 0,
-                        cedula_pdf_valida: response.data.tiene_pdf_cedula || false,
-                        diagnostico_pdf_valido: response.data.tiene_pdf_diagnostico || false,
-                        prediccion_crisis: response.data.prediccion_crisis || 0,
-                        probabilidad_porcentual: response.data.probabilidad_porcentual || 0,
-                        nivel_riesgo_clinico: response.data.nivel_riesgo || 'No disponible',
-                        protocolo_sugerido: this.obtenerProtocoloPorNivel(response.data.nivel_riesgo),
-                        motor_inferencia_usado: response.data.motor_utilizado || 'No disponible',
-                        sistolica_usada: response.data.presion_pdf_sistolica || response.data.sistolica || 0,
-                        diastolica_usada: response.data.presion_pdf_diastolica || response.data.diastolica || 0,
-                        valores_usados: response.data.presion_pdf_sistolica ? 'pdf' : 'payload'
-                    };
-
-                    this.metrics.ultimoRiesgo = response.data.nivel_riesgo;
-                    this.metrics.ultimaFecha = response.data.fecha_consulta || new Date().toISOString();
-
-                    const historialItem: AnalisisHistorial = {
-                        folio_expediente_db: this.folioExpediente || 0,
-                        fecha_analisis: response.data.fecha_consulta || new Date().toISOString(),
-                        nivel_riesgo_clinico: response.data.nivel_riesgo || 'No disponible',
-                        sistolica_usada: response.data.presion_pdf_sistolica || response.data.sistolica || 0,
-                        diastolica_usada: response.data.presion_pdf_diastolica || response.data.diastolica || 0,
-                        probabilidad_porcentual: response.data.probabilidad_porcentual || 0,
-                        prediccion_crisis: response.data.prediccion_crisis || 0,
-                        motor_inferencia_usado: response.data.motor_utilizado || 'No disponible'
-                    };
-                    this.historialAnalisis.unshift(historialItem);
-                    this.metrics.totalAnalisis = this.historialAnalisis.length;
-                }
-                this.cdr.detectChanges();
+            } else {
+                console.log('[HTAS] No se encontró expediente para este paciente');
+                this.limpiarExpediente();
             }
+
+            this.cdr.detectChanges();
+
         } catch (error) {
             console.error('[HTAS] Error cargando expediente:', error);
+            this.limpiarExpediente();
         } finally {
             this.isCargandoArchivos = false;
+            this.cdr.detectChanges();
         }
+    }
+
+    private limpiarExpediente() {
+        this.tieneArchivosExistentes = false;
+        this.expedienteExistente = null;
+        this.folioExpediente = null;
+        this.pdfExistenteBase64 = null;
+        this.resultadoAnalisis = null;
+        this.historialAnalisis = [];
+        this.metrics.totalAnalisis = 0;
     }
 
     obtenerProtocoloPorNivel(nivel: string): string {
@@ -437,6 +481,7 @@ export class PatientAnalisis implements OnInit {
             this.analisisArchivo = file;
             this.analisisArchivoNombre = file.name;
             this.mostrarToast('PDF cargado correctamente.', 'success', 3000);
+            this.cdr.detectChanges();
         } else {
             this.mostrarToast('Solo se permiten archivos PDF.', 'error', 3000);
             this.analisisArchivo = null;
@@ -475,6 +520,7 @@ export class PatientAnalisis implements OnInit {
                 this.analisisArchivo = file;
                 this.analisisArchivoNombre = file.name;
                 this.mostrarToast('PDF cargado correctamente.', 'success', 3000);
+                this.cdr.detectChanges();
             } else {
                 this.mostrarToast('Solo se permiten archivos PDF.', 'error', 3000);
             }
@@ -623,6 +669,9 @@ export class PatientAnalisis implements OnInit {
             return;
         }
 
+        console.log('[HTAS] Enviando análisis con patientId:', this.patientId);
+        console.log('[HTAS] Edad:', edadFinal);
+
         const archivoActual = this.analisisArchivo;
 
         const request = {
@@ -637,13 +686,17 @@ export class PatientAnalisis implements OnInit {
         };
 
         this.usersService.analizarConPDF(request).subscribe({
-            next: (response) => {
+            next: (response: AnalisisResponse) => {
                 this.isAnalizando = false;
-                if (response.success && response.data) {
-                    this.resultadoAnalisis = response.data;
-                    this.tieneArchivosExistentes = true;
-                    this.folioExpediente = response.data.folio_expediente_db || null;
+                console.log('[HTAS] Respuesta del servidor:', response);
 
+                if (response.success && response.data) {
+                    const data = response.data;
+                    this.resultadoAnalisis = data;
+                    this.tieneArchivosExistentes = true;
+                    this.folioExpediente = data.folio_expediente_db || null;
+
+                    // Guardar el PDF del análisis
                     const reader = new FileReader();
                     reader.onload = (e) => {
                         const base64 = (e.target?.result as string).split(',')[1];
@@ -657,30 +710,44 @@ export class PatientAnalisis implements OnInit {
                     };
                     reader.readAsDataURL(archivoActual);
 
+                    // Agregar al historial
                     const historialItem: AnalisisHistorial = {
-                        folio_expediente_db: response.data.folio_expediente_db || 0,
+                        folio_expediente_db: data.folio_expediente_db || 0,
                         fecha_analisis: new Date().toISOString(),
-                        nivel_riesgo_clinico: response.data.nivel_riesgo_clinico,
-                        sistolica_usada: response.data.sistolica_usada || 0,
-                        diastolica_usada: response.data.diastolica_usada || 0,
-                        probabilidad_porcentual: response.data.probabilidad_porcentual,
-                        prediccion_crisis: response.data.prediccion_crisis,
-                        motor_inferencia_usado: response.data.motor_inferencia_usado
+                        nivel_riesgo_clinico: data.nivel_riesgo_clinico,
+                        sistolica_usada: data.sistolica_usada || 0,
+                        diastolica_usada: data.diastolica_usada || 0,
+                        probabilidad_porcentual: data.probabilidad_porcentual,
+                        prediccion_crisis: data.prediccion_crisis,
+                        motor_inferencia_usado: data.motor_inferencia_usado
                     };
                     this.historialAnalisis.unshift(historialItem);
                     this.metrics.totalAnalisis = this.historialAnalisis.length;
-                    this.metrics.ultimoRiesgo = response.data.nivel_riesgo_clinico;
+                    this.metrics.ultimoRiesgo = data.nivel_riesgo_clinico;
                     this.metrics.ultimaFecha = new Date().toISOString();
 
                     this.mostrarToast(`Analisis completado exitosamente. Folio #${this.folioExpediente || 'sin folio'}`, 'success', 5000);
                     this.cdr.detectChanges();
+
+                    // Cargar el expediente actualizado
+                    if (this.patientId) {
+                        this.cargarExpedienteExistente();
+                    }
                 } else {
-                    this.mostrarToast('Error en el analisis.', 'error', 4000);
+                    this.mostrarToast(response?.mensaje || 'Error en el analisis.', 'error', 4000);
                 }
             },
             error: (error) => {
                 this.isAnalizando = false;
-                this.mostrarToast(error.error?.error || 'Error al analizar el paciente.', 'error', 5000);
+                console.error('[HTAS] Error en el análisis:', error);
+
+                let mensajeError = 'Error al analizar el paciente.';
+                if (error.error?.error) {
+                    mensajeError = error.error.error;
+                } else if (error.message) {
+                    mensajeError = error.message;
+                }
+                this.mostrarToast(mensajeError, 'error', 5000);
                 this.cdr.detectChanges();
             }
         });

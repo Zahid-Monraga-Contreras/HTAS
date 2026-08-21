@@ -230,22 +230,6 @@
         </section>
         }
 
-        <!-- ========================================== -->
-        <!-- EMPTY STATE -->
-        <!-- ========================================== -->
-        @if (!tieneArchivosExistentes && !isLoading) {
-        <section class="empty-section">
-            <div class="empty-state">
-                <i class="bi bi-file-earmark-pdf"></i>
-                <h3>No tienes analisis registrados</h3>
-                <p>Sube tu expediente medico en PDF para realizar un analisis de hipertension</p>
-                <button class="btn-primary" (click)="abrirSelectorArchivo()">
-                    <i class="bi bi-cloud-upload"></i> Subir Expediente
-                </button>
-            </div>
-        </section>
-        }
-
     </div>
 </div>
 

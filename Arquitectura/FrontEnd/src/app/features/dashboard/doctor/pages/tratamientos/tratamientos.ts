@@ -33,6 +33,14 @@ export class DoctorTratamientos implements OnInit {
     private platformId = inject(PLATFORM_ID);
 
     isLoading = true;
+    doctorId: number | null = null;
+    doctorName: string = '';
+    doctorFullName: string = '';
+
+    // Lista de pacientes asignados al doctor
+    pacientesAsignadosIds: number[] = [];
+    pacientesAsignados: any[] = [];
+
     tratamientos: any[] = [];
     tratamientosFiltrados: any[] = [];
     filterEstado: string = 'todos';
@@ -164,10 +172,29 @@ export class DoctorTratamientos implements OnInit {
     async cargarDatos() {
         this.isLoading = true;
         try {
-            // Cargar pacientes primero para tener el mapa de nombres
+            const storedUser = localStorage.getItem('user_htas');
+            if (storedUser) {
+                const userData = JSON.parse(storedUser);
+                this.doctorName = userData.nombre || 'Doctor';
+                this.doctorFullName = userData.nombreCompleto || userData.nombre || 'Doctor';
+                this.doctorId = userData.idusuario || userData.uid || null;
+            }
+
+            if (!this.doctorId) {
+                this.showError('Error', 'No se pudo identificar al doctor.');
+                this.isLoading = false;
+                return;
+            }
+
+            // 1. Cargar pacientes asignados al doctor
+            await this.cargarPacientesAsignados();
+
+            // 2. Cargar mapa de pacientes
             await this.cargarPacientes();
-            // Luego cargar tratamientos
+
+            // 3. Cargar tratamientos SOLO de pacientes asignados
             await this.cargarTratamientos();
+
         } catch (error) {
             console.error('Error al cargar datos:', error);
             this.showError('Error', 'No se pudieron cargar los tratamientos.');
@@ -177,6 +204,132 @@ export class DoctorTratamientos implements OnInit {
         }
     }
 
+    // ============================================================
+    // CARGAR PACIENTES ASIGNADOS AL DOCTOR
+    // ============================================================
+    private async cargarPacientesAsignados() {
+        if (!this.doctorId) return;
+
+        try {
+            console.log('[Tratamientos] Cargando pacientes asignados al doctor:', this.doctorId);
+
+            let response = null;
+            let pacientesData: any[] = [];
+
+            // Intentar getPacientesDeDoctor
+            try {
+                response = await firstValueFrom(
+                    this.usersService.getPacientesDeDoctor(this.doctorId)
+                );
+                console.log('[Tratamientos] Respuesta getPacientesDeDoctor:', response);
+            } catch (err) {
+                console.warn('[Tratamientos] getPacientesDeDoctor falló:', err);
+            }
+
+            // Extraer datos de la respuesta
+            if (response) {
+                if (response.success !== undefined && response.data !== undefined) {
+                    pacientesData = response.data || [];
+                } else if (response.data !== undefined) {
+                    pacientesData = response.data || [];
+                } else if (Array.isArray(response)) {
+                    pacientesData = response;
+                } else if (typeof response === 'object') {
+                    for (const key in response) {
+                        if (Array.isArray(response[key]) && response[key].length > 0) {
+                            pacientesData = response[key];
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // Si no hay datos, usar getTodosLosPacientes y filtrar
+            if (!pacientesData || pacientesData.length === 0) {
+                console.log('[Tratamientos] Usando fallback con getTodosLosPacientes...');
+                try {
+                    const allPacientesResponse = await firstValueFrom(
+                        this.usersService.getTodosLosPacientes()
+                    );
+
+                    let allPacientes: any[] = [];
+
+                    if (allPacientesResponse) {
+                        if (allPacientesResponse.data !== undefined) {
+                            allPacientes = allPacientesResponse.data || [];
+                        } else if (Array.isArray(allPacientesResponse)) {
+                            allPacientes = allPacientesResponse;
+                        } else if (typeof allPacientesResponse === 'object') {
+                            for (const key in allPacientesResponse) {
+                                if (Array.isArray(allPacientesResponse[key])) {
+                                    allPacientes = allPacientesResponse[key];
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    const doctorIdNum = Number(this.doctorId);
+
+                    // Filtrar pacientes asignados a este doctor
+                    pacientesData = allPacientes.filter((p: any) => {
+                        const posiblesPropiedades = [
+                            'DoctorAsignado', 'doctorasignado', 'IdDoctorAsignado', 'iddoctorasignado',
+                            'IdDoctor', 'iddoctor', 'DoctorId', 'doctorId', 'doctor_id'
+                        ];
+
+                        let doctorIdEncontrado = null;
+
+                        for (const prop of posiblesPropiedades) {
+                            if (p[prop] !== undefined && p[prop] !== null) {
+                                doctorIdEncontrado = p[prop];
+                                break;
+                            }
+                        }
+
+                        const asignado = p.AsignacionActiva === true || p.asignacionactiva === true;
+
+                        if (doctorIdEncontrado !== null && doctorIdEncontrado !== undefined) {
+                            const idNum = Number(doctorIdEncontrado);
+                            return idNum === doctorIdNum && asignado;
+                        }
+                        return false;
+                    });
+
+                    console.log('[Tratamientos] Pacientes filtrados por asignación:', pacientesData.length);
+
+                } catch (err) {
+                    console.warn('[Tratamientos] Falló la carga alternativa:', err);
+                }
+            }
+
+            // Almacenar pacientes asignados
+            this.pacientesAsignados = pacientesData;
+
+            // Extraer IDs de pacientes (en todos los formatos posibles)
+            this.pacientesAsignadosIds = pacientesData
+                .map((p: any) => {
+                    const id = p.id_usuario || p.IdUsuario || p.idusuario || p.id || p.IdPaciente || p.idpaciente || p.pacienteId;
+                    return typeof id === 'string' ? parseInt(id, 10) : id;
+                })
+                .filter((id: number) => id > 0);
+
+            console.log('[Tratamientos] IDs de pacientes asignados:', this.pacientesAsignadosIds);
+
+            if (this.pacientesAsignadosIds.length === 0) {
+                console.log('[Tratamientos] No se encontraron pacientes asignados para este doctor');
+            }
+
+        } catch (error: any) {
+            console.error('[Tratamientos] Error cargando pacientes asignados:', error);
+            this.pacientesAsignadosIds = [];
+            this.pacientesAsignados = [];
+        }
+    }
+
+    // ============================================================
+    // CARGAR MAPA DE PACIENTES
+    // ============================================================
     private async cargarPacientes() {
         try {
             const usuarios = await firstValueFrom(this.usersService.getUsuariosBackend());
@@ -195,21 +348,56 @@ export class DoctorTratamientos implements OnInit {
                     }
                 });
 
-                console.log('Pacientes cargados:', this.pacientesMap.size);
+                console.log('[Tratamientos] Pacientes cargados en mapa:', this.pacientesMap.size);
             }
         } catch (error) {
             console.error('Error al cargar pacientes:', error);
         }
     }
 
+    // ============================================================
+    // CARGAR TRATAMIENTOS SOLO DE PACIENTES ASIGNADOS
+    // ============================================================
     private async cargarTratamientos() {
         try {
+            // Si no hay pacientes asignados, no mostrar tratamientos
+            if (this.pacientesAsignadosIds.length === 0) {
+                console.log('[Tratamientos] No hay pacientes asignados, no se muestran tratamientos');
+                this.tratamientos = [];
+                this.calcularEstadisticas();
+                this.aplicarFiltro('todos');
+                return;
+            }
+
             const data = await firstValueFrom(this.usersService.getTratamientos());
 
             if (Array.isArray(data)) {
-                this.tratamientos = data.map(t => {
+                console.log('[Tratamientos] Total de tratamientos obtenidos:', data.length);
+
+                // FILTRAR: Solo tratamientos de pacientes asignados al doctor
+                const tratamientosFiltrados = data.filter(t => {
                     // Obtener el ID del paciente del tratamiento
-                    const pacienteId = t.idpaciente || t.IdPaciente || t.idPaciente;
+                    const pacienteId = t.idpaciente || t.IdPaciente || t.idPaciente || t.pacienteId;
+                    const pacienteIdNum = typeof pacienteId === 'string' ? parseInt(pacienteId, 10) : pacienteId;
+
+                    // Verificar si este paciente está en la lista de asignados
+                    const estaAsignado = pacienteIdNum > 0 && this.pacientesAsignadosIds.some(id => id === pacienteIdNum);
+
+                    if (!estaAsignado) {
+                        console.log(`[Tratamientos] ❌ Tratamiento NO asignado - Paciente ID: ${pacienteIdNum}`);
+                    } else {
+                        console.log(`[Tratamientos] ✅ Tratamiento asignado - Paciente ID: ${pacienteIdNum}`);
+                    }
+
+                    return estaAsignado;
+                });
+
+                console.log('[Tratamientos] Tratamientos filtrados para este doctor:', tratamientosFiltrados.length);
+
+                // Procesar los tratamientos filtrados
+                this.tratamientos = tratamientosFiltrados.map(t => {
+                    // Obtener el ID del paciente del tratamiento
+                    const pacienteId = t.idpaciente || t.IdPaciente || t.idPaciente || t.pacienteId;
 
                     // Buscar el paciente en el mapa
                     let nombreCompleto = 'Paciente';
@@ -355,5 +543,9 @@ export class DoctorTratamientos implements OnInit {
 
     irANuevo() {
         this.router.navigate(['/doctor/tratamientos/nuevo']);
+    }
+
+    recargarDatos() {
+        this.cargarDatos();
     }
 }

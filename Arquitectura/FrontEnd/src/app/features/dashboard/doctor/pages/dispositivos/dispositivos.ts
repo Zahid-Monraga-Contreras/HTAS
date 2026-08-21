@@ -37,6 +37,10 @@ export class DoctorDispositivos implements OnInit {
     doctorFullName: string = '';
     doctorId: number | null = null;
 
+    // Lista de pacientes asignados al doctor
+    pacientesAsignadosIds: number[] = [];
+    pacientesAsignados: any[] = [];
+
     dispositivos: any[] = [];
     dispositivosFiltrados: any[] = [];
     filterEstado: string = 'todos';
@@ -120,7 +124,18 @@ export class DoctorDispositivos implements OnInit {
                 this.doctorId = userData.idusuario || userData.uid || null;
             }
 
+            if (!this.doctorId) {
+                this.showError('Error', 'No se pudo identificar al doctor.');
+                this.isLoading = false;
+                return;
+            }
+
+            // 1. Cargar pacientes asignados al doctor
+            await this.cargarPacientesAsignados();
+
+            // 2. Cargar dispositivos SOLO de pacientes asignados
             await this.cargarDispositivos();
+
         } catch (error) {
             console.error('Error al cargar datos:', error);
             this.showError('Error', 'No se pudieron cargar los dispositivos.');
@@ -130,22 +145,200 @@ export class DoctorDispositivos implements OnInit {
         }
     }
 
+    // ============================================================
+    // CARGAR PACIENTES ASIGNADOS AL DOCTOR
+    // ============================================================
+    private async cargarPacientesAsignados() {
+        if (!this.doctorId) return;
+
+        try {
+            console.log('[Dispositivos] Cargando pacientes asignados al doctor:', this.doctorId);
+
+            let response = null;
+            let pacientesData: any[] = [];
+
+            // Intentar getPacientesDeDoctor
+            try {
+                response = await firstValueFrom(
+                    this.usersService.getPacientesDeDoctor(this.doctorId)
+                );
+                console.log('[Dispositivos] Respuesta getPacientesDeDoctor:', response);
+            } catch (err) {
+                console.warn('[Dispositivos] getPacientesDeDoctor falló:', err);
+            }
+
+            // Extraer datos de la respuesta
+            if (response) {
+                if (response.success !== undefined && response.data !== undefined) {
+                    pacientesData = response.data || [];
+                } else if (response.data !== undefined) {
+                    pacientesData = response.data || [];
+                } else if (Array.isArray(response)) {
+                    pacientesData = response;
+                } else if (typeof response === 'object') {
+                    for (const key in response) {
+                        if (Array.isArray(response[key]) && response[key].length > 0) {
+                            pacientesData = response[key];
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // Si no hay datos, usar getTodosLosPacientes y filtrar
+            if (!pacientesData || pacientesData.length === 0) {
+                console.log('[Dispositivos] Usando fallback con getTodosLosPacientes...');
+                try {
+                    const allPacientesResponse = await firstValueFrom(
+                        this.usersService.getTodosLosPacientes()
+                    );
+
+                    let allPacientes: any[] = [];
+
+                    if (allPacientesResponse) {
+                        if (allPacientesResponse.data !== undefined) {
+                            allPacientes = allPacientesResponse.data || [];
+                        } else if (Array.isArray(allPacientesResponse)) {
+                            allPacientes = allPacientesResponse;
+                        } else if (typeof allPacientesResponse === 'object') {
+                            for (const key in allPacientesResponse) {
+                                if (Array.isArray(allPacientesResponse[key])) {
+                                    allPacientes = allPacientesResponse[key];
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    const doctorIdNum = Number(this.doctorId);
+
+                    // Filtrar pacientes asignados a este doctor
+                    pacientesData = allPacientes.filter((p: any) => {
+                        const posiblesPropiedades = [
+                            'DoctorAsignado', 'doctorasignado', 'IdDoctorAsignado', 'iddoctorasignado',
+                            'IdDoctor', 'iddoctor', 'DoctorId', 'doctorId', 'doctor_id'
+                        ];
+
+                        let doctorIdEncontrado = null;
+
+                        for (const prop of posiblesPropiedades) {
+                            if (p[prop] !== undefined && p[prop] !== null) {
+                                doctorIdEncontrado = p[prop];
+                                break;
+                            }
+                        }
+
+                        const asignado = p.AsignacionActiva === true || p.asignacionactiva === true;
+
+                        if (doctorIdEncontrado !== null && doctorIdEncontrado !== undefined) {
+                            const idNum = Number(doctorIdEncontrado);
+                            return idNum === doctorIdNum && asignado;
+                        }
+                        return false;
+                    });
+
+                    console.log('[Dispositivos] Pacientes filtrados por asignación:', pacientesData.length);
+
+                } catch (err) {
+                    console.warn('[Dispositivos] Falló la carga alternativa:', err);
+                }
+            }
+
+            // Almacenar pacientes asignados
+            this.pacientesAsignados = pacientesData;
+
+            // Extraer IDs de pacientes (en todos los formatos posibles)
+            this.pacientesAsignadosIds = pacientesData
+                .map((p: any) => {
+                    const id = p.id_usuario || p.IdUsuario || p.idusuario || p.id || p.IdPaciente || p.idpaciente || p.pacienteId;
+                    return typeof id === 'string' ? parseInt(id, 10) : id;
+                })
+                .filter((id: number) => id > 0);
+
+            console.log('[Dispositivos] IDs de pacientes asignados:', this.pacientesAsignadosIds);
+
+            if (this.pacientesAsignadosIds.length === 0) {
+                console.log('[Dispositivos] No se encontraron pacientes asignados para este doctor');
+            }
+
+        } catch (error: any) {
+            console.error('[Dispositivos] Error cargando pacientes asignados:', error);
+            this.pacientesAsignadosIds = [];
+            this.pacientesAsignados = [];
+        }
+    }
+
+    // ============================================================
+    // CARGAR DISPOSITIVOS SOLO DE PACIENTES ASIGNADOS
+    // ============================================================
     private async cargarDispositivos() {
         try {
+            // Si no hay pacientes asignados, no mostrar dispositivos
+            if (this.pacientesAsignadosIds.length === 0) {
+                console.log('[Dispositivos] No hay pacientes asignados, no se muestran dispositivos');
+                this.dispositivos = [];
+                this.calcularEstadisticas();
+                this.aplicarFiltro('todos');
+                return;
+            }
+
             const data = await firstValueFrom(this.usersService.getDispositivos());
 
             if (Array.isArray(data)) {
-                this.dispositivos = data.map(d => ({
-                    ...d,
-                    iddispositivo: d.iddispositivo || d.IdDispositivo || d.id,
-                    nombre: d.nombre || 'Dispositivo sin nombre',
-                    direccionmac: d.direccionmac || d.direccionMac || 'No especificada',
-                    idpacienteasociado: d.idpacienteasociado || d.idPacienteAsociado,
-                    activo: d.activo !== false,
-                    ultimasincronizacion: d.ultimasincronizacion || null,
-                    nombrepaciente: this.obtenerNombrePaciente(d),
-                    appaternopaciente: d.appaternopaciente || ''
-                }));
+                console.log('[Dispositivos] Total de dispositivos obtenidos:', data.length);
+
+                // FILTRAR: Solo dispositivos de pacientes asignados al doctor
+                const dispositivosFiltrados = data.filter(d => {
+                    const pacienteId = d.idpacienteasociado || d.idPacienteAsociado || d.pacienteId;
+                    const pacienteIdNum = typeof pacienteId === 'string' ? parseInt(pacienteId, 10) : pacienteId;
+
+                    // Si no tiene paciente asignado, no se muestra (solo dispositivos asignados)
+                    if (!pacienteIdNum || pacienteIdNum === 0) {
+                        return false;
+                    }
+
+                    // Verificar si este paciente está en la lista de asignados
+                    const estaAsignado = this.pacientesAsignadosIds.some(id => id === pacienteIdNum);
+
+                    if (!estaAsignado) {
+                        console.log(`[Dispositivos] ❌ Dispositivo NO asignado - Paciente ID: ${pacienteIdNum}`);
+                    } else {
+                        console.log(`[Dispositivos] ✅ Dispositivo asignado - Paciente ID: ${pacienteIdNum}`);
+                    }
+
+                    return estaAsignado;
+                });
+
+                console.log('[Dispositivos] Dispositivos filtrados para este doctor:', dispositivosFiltrados.length);
+
+                // Procesar los dispositivos filtrados
+                this.dispositivos = dispositivosFiltrados.map(d => {
+                    // Buscar el nombre del paciente en la lista de asignados
+                    const paciente = this.pacientesAsignados.find(p => {
+                        const id = p.id_usuario || p.IdUsuario || p.idusuario || p.id || p.IdPaciente || p.idpaciente || p.pacienteId;
+                        const pacienteId = d.idpacienteasociado || d.idPacienteAsociado || d.pacienteId;
+                        return id === pacienteId;
+                    });
+
+                    let nombrePaciente = 'Sin asignar';
+                    if (paciente) {
+                        const nombre = paciente.nombre || paciente.Nombre || '';
+                        const apPaterno = paciente.apellido_paterno || paciente.apPaterno || paciente.ApPaterno || '';
+                        const apMaterno = paciente.apellido_materno || paciente.apMaterno || paciente.ApMaterno || '';
+                        nombrePaciente = `${nombre} ${apPaterno} ${apMaterno}`.trim() || 'Paciente';
+                    }
+
+                    return {
+                        ...d,
+                        iddispositivo: d.iddispositivo || d.IdDispositivo || d.id,
+                        nombre: d.nombre || 'Dispositivo sin nombre',
+                        direccionmac: d.direccionmac || d.direccionMac || 'No especificada',
+                        idpacienteasociado: d.idpacienteasociado || d.idPacienteAsociado || d.pacienteId,
+                        activo: d.activo !== false,
+                        ultimasincronizacion: d.ultimasincronizacion || null,
+                        nombrepaciente: nombrePaciente
+                    };
+                });
 
                 this.calcularEstadisticas();
                 this.aplicarFiltro('todos');
@@ -158,21 +351,12 @@ export class DoctorDispositivos implements OnInit {
         }
     }
 
-    private obtenerNombrePaciente(dispositivo: any): string {
-        const nombre = dispositivo.nombrepaciente || dispositivo.nombrePaciente || '';
-        const apPaterno = dispositivo.appaternopaciente || dispositivo.apPaternoPaciente || '';
-        const apMaterno = dispositivo.apmaternopaciente || dispositivo.apMaternoPaciente || '';
-
-        if (nombre || apPaterno || apMaterno) {
-            return `${nombre} ${apPaterno} ${apMaterno}`.trim();
-        }
-        return 'Sin asignar';
-    }
-
     private calcularEstadisticas() {
         this.estadisticas.total = this.dispositivos.length;
         this.estadisticas.activos = this.dispositivos.filter(d => d.activo === true).length;
         this.estadisticas.inactivos = this.dispositivos.filter(d => d.activo === false).length;
+
+        // Dispositivos sin asignar (siempre serán 0 porque filtramos)
         this.estadisticas.sinAsignar = this.dispositivos.filter(d => !d.idpacienteasociado).length;
 
         const pacientesSet = new Set();
@@ -352,5 +536,9 @@ export class DoctorDispositivos implements OnInit {
 
     irANuevo() {
         this.router.navigate(['/doctor/dispositivos/nuevo']);
+    }
+
+    recargarDatos() {
+        this.cargarDatos();
     }
 }

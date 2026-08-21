@@ -2,7 +2,7 @@
 // admin/pages/asignacion/asignacion.ts
 // ============================================
 
-import { Component, OnInit, inject, ChangeDetectorRef, PLATFORM_ID, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, PLATFORM_ID, AfterViewInit, ViewChild } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -56,7 +56,6 @@ export class AdminAsignacion implements OnInit, AfterViewInit {
     mensajeClase = '';
     resultadosAsignacion: any[] = [];
 
-    // Para el colapso del menú
     isCollapsed = false;
 
     get totalExitosos(): number {
@@ -93,7 +92,6 @@ export class AdminAsignacion implements OnInit, AfterViewInit {
     }
 
     ngAfterViewInit(): void {
-        // Verificar el estado del menú cada 300ms
         this.intervalId = setInterval(() => {
             this.verificarEstadoMenu();
         }, 300);
@@ -107,7 +105,6 @@ export class AdminAsignacion implements OnInit, AfterViewInit {
                 this.cdr.detectChanges();
             }
         } else {
-            // Fallback: buscar el elemento en el DOM
             const menuElement = document.querySelector('app-menu');
             if (menuElement) {
                 const hasClass = menuElement.classList.contains('collapsed');
@@ -137,7 +134,6 @@ export class AdminAsignacion implements OnInit, AfterViewInit {
         this.cargandoDoctores = true;
         try {
             const response = await firstValueFrom(this.usersService.getDoctoresCompletos());
-            console.log('Respuesta doctores:', response);
 
             if (response.success && response.data) {
                 this.doctores = response.data.map((d: any) => ({
@@ -159,7 +155,6 @@ export class AdminAsignacion implements OnInit, AfterViewInit {
                 this.mostrarToast('error', 'Error', response?.error || 'Error al cargar doctores');
             }
         } catch (error: any) {
-            console.error('Error cargando doctores:', error);
             this.mostrarToast('error', 'Error', error.message || 'Error al cargar doctores');
         } finally {
             this.cargandoDoctores = false;
@@ -171,7 +166,6 @@ export class AdminAsignacion implements OnInit, AfterViewInit {
         this.cargandoPacientes = true;
         try {
             const response = await firstValueFrom(this.usersService.getTodosLosPacientes());
-            console.log('Respuesta pacientes:', response);
 
             if (response && response.data) {
                 const datos = response.data;
@@ -212,7 +206,6 @@ export class AdminAsignacion implements OnInit, AfterViewInit {
                     }
                 }
 
-                console.log('Pacientes mapeados:', this.pacientes);
                 this.filtrarPacientes();
 
                 if (this.pacientes.length === 0) {
@@ -238,13 +231,11 @@ export class AdminAsignacion implements OnInit, AfterViewInit {
                         ApPaternoDoctorAsignado: null
                     }));
                     this.filtrarPacientes();
-                    console.log('Pacientes desde respuesta directa:', this.pacientes);
                 } else {
                     this.mostrarToast('error', 'Error', 'No se pudieron cargar los pacientes');
                 }
             }
         } catch (error: any) {
-            console.error('Error cargando pacientes:', error);
             this.mostrarToast('error', 'Error', error.message || 'Error al cargar pacientes');
         } finally {
             this.cargandoPacientes = false;
@@ -389,8 +380,6 @@ export class AdminAsignacion implements OnInit, AfterViewInit {
                 })
             );
 
-            console.log('Respuesta asignación:', response);
-
             if (response.success) {
                 this.resultadosAsignacion = response.resultados.map((r: any) => {
                     const paciente = pacientesSeleccionadosData.find(p => p.IdUsuario === r.idPaciente);
@@ -409,8 +398,7 @@ export class AdminAsignacion implements OnInit, AfterViewInit {
                         response.exitosos + ' exitosos, ' + response.fallidos + ' fallidos');
                 }
 
-                await this.cargarPacientes();
-
+                // Limpiar selección inmediatamente
                 const exitososIds = response.resultados
                     .filter((r: any) => r.success)
                     .map((r: any) => r.idPaciente);
@@ -423,16 +411,32 @@ export class AdminAsignacion implements OnInit, AfterViewInit {
                     this.pacientesSeleccionados = [];
                 }
 
-                this.filtrarPacientes();
+                // Recargar pacientes
+                await this.cargarPacientes();
+
+                // Asegurar que el botón se deshabilita correctamente
+                this.asignando = false;
+                this.cdr.detectChanges();
+
+                // Si no hay pacientes seleccionados, resetear el estado
+                if (this.pacientesSeleccionados.length === 0) {
+                    // Si todos fueron asignados exitosamente, se puede limpiar la selección
+                }
             } else {
                 this.mostrarToast('error', 'Error', response.error || 'Error al asignar pacientes');
+                this.asignando = false;
+                this.cdr.detectChanges();
             }
         } catch (error: any) {
-            console.error('Error asignando pacientes:', error);
             this.mostrarToast('error', 'Error', error.message || 'Error al asignar pacientes');
-        } finally {
             this.asignando = false;
             this.cdr.detectChanges();
+        } finally {
+            // Asegurar que el estado de asignando se desactive siempre
+            if (this.asignando) {
+                this.asignando = false;
+                this.cdr.detectChanges();
+            }
         }
     }
 

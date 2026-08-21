@@ -929,6 +929,50 @@ DROP FUNCTION IF EXISTS asignar_paciente_doctor(INT, INT, INT, TEXT);
 SELECT proname FROM pg_proc WHERE proname = 'asignar_paciente_doctor';
 
 -- ============================================
+-- FUNCIÓN PARA OBTENER PACIENTES DE UN DOCTOR
+-- ============================================
+CREATE OR REPLACE FUNCTION obtener_pacientes_doctor(p_id_doctor INT)
+RETURNS TABLE(
+    id_usuario INT,
+    nombre VARCHAR,
+    apellido_paterno VARCHAR,
+    apellido_materno VARCHAR,
+    correo VARCHAR,
+    telefono BIGINT,
+    nss VARCHAR,
+    tipo_sangre VARCHAR,
+    peso NUMERIC,
+    altura NUMERIC,
+    fecha_asignacion TIMESTAMP,
+    activo BOOLEAN
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        u.IdUsuario,
+        u.Nombre,
+        u.ApPaterno,
+        u.ApMaterno,
+        u.Correo,
+        u.Telefono,
+        p.NSS,
+        p.TipoSangre,
+        p.Peso,
+        p.Altura,
+        a.FechaAsignacion,
+        a.Activo
+    FROM ASIGNACIONES_DOCTOR_PACIENTE a
+    INNER JOIN PACIENTES p ON a.IdPaciente = p.IdUsuario
+    INNER JOIN USUARIOS u ON p.IdUsuario = u.IdUsuario
+    WHERE a.IdDoctor = p_id_doctor 
+      AND a.Activo = TRUE
+      AND u.Activo = TRUE 
+      AND u.deleted_at IS NULL
+    ORDER BY u.Nombre ASC, u.ApPaterno ASC;
+END;
+$$ LANGUAGE plpgsql;
+
+-- ============================================
 -- TRIGGERS PARA updated_at
 -- ============================================
 CREATE TRIGGER update_solicitudes_asignacion_updated_at 
@@ -1002,36 +1046,32 @@ WHERE a.Activo = true AND ua.deleted_at IS NULL AND up.deleted_at IS NULL;
 -- ============================================
 -- 13. TABLA: EXPEDIENTES_HTAS (Análisis de Hipertensión)
 -- ============================================
-CREATE TABLE EXPEDIENTES_HTAS (
-    IdExpediente SERIAL PRIMARY KEY,
-    IdPaciente INT NOT NULL REFERENCES PACIENTES(IdUsuario) ON DELETE CASCADE,
-    IdDoctor INT REFERENCES DOCTORES(IdUsuario) ON DELETE SET NULL,
-    
-    -- Datos del análisis
-    Edad INT NOT NULL,
-    Sistolica INT NOT NULL,
-    Diastolica INT NOT NULL,
-    PresionPDFSistolica INT,
-    PresionPDFDiastolica INT,
-    TomaMedicamento INT NOT NULL DEFAULT 0,
-    PrediccionCrisis INT NOT NULL,
-    ProbabilidadPorcentual DECIMAL(5,2) NOT NULL,
-    NivelRiesgo TEXT NOT NULL,
-    MotorInferenciaUsado TEXT NOT NULL,
-    
-    -- Validación de PDFs
-    PDFCedulaValido BOOLEAN DEFAULT FALSE,
-    PDFDiagnosticoValido BOOLEAN DEFAULT FALSE,
-    ValoresExtraidosPDF TEXT,
-    
-    -- Rutas de almacenamiento de PDFs
-    RutaPDFCedula TEXT,
-    RutaPDFDiagnostico TEXT,
-    
-    -- Auditoría
-    FechaConsulta TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+-- Eliminar la tabla si existe
+DROP TABLE IF EXISTS expedientes_htas CASCADE;
+
+-- Crear la tabla con los nombres que usa Python
+CREATE  TABLE  expedientes_htas  ( 
+    idexpediente  SERIAL  PRIMARY  KEY , 
+    idpaciente  INTEGER  NOT  NULL , 
+    iddoctor  INTEGER , 
+    fecha_consulta  TIMESTAMP  DEFAULT  CURRENT_TIMESTAMP , 
+    edad  INTEGER  NOT  NULL , 
+    sistolica  INTEGER  NOT  NULL , 
+    diastolica  INTEGER  NOT  NULL , 
+    presion_pdf_sistolica  INTEGER , 
+    presion_pdf_diastolica  INTEGER , 
+    toma_medicamento  INTEGER  NOT  NULL  DEFAULT  0 , 
+    prediccion_crisis  INTEGER  NOT  NULL , 
+    probabilidad_porcentual  REAL  NOT  NULL , 
+    nivel_riesgo  TEXT  NOT  NULL , 
+    motor_utilizado  TEXT  NOT  NULL , 
+    pdf_cedula_valido  INTEGER  DEFAULT  0 ,       -- ← CAMBIADO a INTEGER 
+    pdf_diagnostico_valido  INTEGER  DEFAULT  0 ,  -- ← CAMBIADO a INTEGER 
+    valores_extraidos_pdf  TEXT , 
+    ruta_pdf_cedula  TEXT , 
+    ruta_pdf_diagnostico  TEXT , 
+    created_at  TIMESTAMP  DEFAULT  CURRENT_TIMESTAMP , 
+    updated_at  TIMESTAMP  DEFAULT  CURRENT_TIMESTAMP 
 );
 
 -- Índices para mejorar rendimiento

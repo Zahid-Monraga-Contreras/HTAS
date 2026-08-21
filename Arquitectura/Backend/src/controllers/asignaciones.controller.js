@@ -159,7 +159,7 @@ const asignacionesController = {
     },
 
     // ============================================
-    // 5. OBTENER PACIENTES DE UN DOCTOR ESPECÍFICO
+    // 5. OBTENER PACIENTES DE UN DOCTOR ESPECÍFICO (CORREGIDO - USA LA FUNCIÓN)
     // ============================================
     getPacientesByDoctor: async (req, res) => {
         const { idDoctor } = req.params;
@@ -177,10 +177,13 @@ const asignacionesController = {
                 });
             }
 
+            // Usar la función obtener_pacientes_doctor
             const result = await db.query(
                 `SELECT * FROM obtener_pacientes_doctor($1)`,
                 [idDoctor]
             );
+
+            console.log(`Pacientes encontrados para doctor ${idDoctor}:`, result.rows.length);
 
             res.json({
                 success: true,
@@ -192,7 +195,8 @@ const asignacionesController = {
             console.error("Error al obtener pacientes del doctor:", error);
             res.status(500).json({
                 success: false,
-                error: "Error al obtener pacientes del doctor"
+                error: "Error al obtener pacientes del doctor",
+                details: error.message
             });
         }
     },
@@ -315,7 +319,6 @@ const asignacionesController = {
                     u.Telefono,
                     u.Genero,
                     u.FechaNacimiento,
-                    calcular_edad(u.FechaNacimiento) AS Edad,
                     p.NSS,
                     p.TipoSangre,
                     p.Peso,
@@ -392,7 +395,6 @@ const asignacionesController = {
             notas
         } = req.body;
 
-        // Validaciones
         if (!idPaciente || !idDoctor) {
             return res.status(400).json({
                 success: false,
@@ -401,7 +403,6 @@ const asignacionesController = {
         }
 
         try {
-            // Usar la función de PostgreSQL para la asignación
             const result = await db.query(
                 `SELECT * FROM asignar_paciente_doctor($1, $2, $3, $4)`,
                 [idPaciente, idDoctor, asignadoPor || null, notas || null]
@@ -417,7 +418,6 @@ const asignacionesController = {
                 });
             }
 
-            // Obtener la asignación completa recién creada
             const asignacionCompleta = await db.query(
                 `SELECT * FROM VW_ASIGNACIONES_DOCTOR_PACIENTE 
                  WHERE IdAsignacion = $1`,
@@ -527,7 +527,6 @@ const asignacionesController = {
         }
 
         try {
-            // Verificar que la asignación existe y está activa
             const checkResult = await db.query(
                 `SELECT IdAsignacion, IdDoctor, IdPaciente 
                  FROM ASIGNACIONES_DOCTOR_PACIENTE 
@@ -542,7 +541,6 @@ const asignacionesController = {
                 });
             }
 
-            // Desasignar (borrado lógico)
             const result = await db.query(
                 `UPDATE ASIGNACIONES_DOCTOR_PACIENTE 
                  SET Activo = FALSE, 

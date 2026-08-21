@@ -2,7 +2,7 @@
 <!-- admin/pages/asignacion/asignacion.html        -->
 <!-- ============================================ -->
 
-<!-- MENÚ DE ADMINISTRACIÓN -->
+<!-- MENU DE ADMINISTRACION -->
 <app-menu #sidebar></app-menu>
 
 <div class="asignacion-page" [class.menu-collapsed]="isCollapsed">
@@ -12,7 +12,7 @@
             <div class="header-info">
                 <h1>
                     <i class="bi bi-person-plus"></i>
-                    Asignación de Pacientes
+                    Asignacion de Pacientes
                 </h1>
                 <p>Asigna pacientes a los doctores del sistema</p>
             </div>
@@ -44,11 +44,12 @@
             {{ mensaje }}
         </div>
 
-        <!-- Resumen de selección -->
+        <!-- Resumen de seleccion -->
         <div *ngIf="doctorSeleccionado || pacientesSeleccionados.length > 0" class="resumen-seleccion">
             <div class="resumen-item" *ngIf="doctorSeleccionado">
                 <span class="resumen-label">Doctor:</span>
-                <strong>{{ doctorSeleccionado.Nombre }} {{ doctorSeleccionado.ApPaterno }}</strong>
+                <strong>{{ doctorSeleccionado.Nombre }} {{ doctorSeleccionado.ApPaterno }} {{
+                    doctorSeleccionado.ApMaterno }}</strong>
                 <span class="resumen-badge">{{ doctorSeleccionado.Especialidad || 'General' }}</span>
                 <span class="resumen-badge" style="background: #22c55e; color: white;">
                     <i class="bi bi-people"></i>
@@ -217,6 +218,8 @@
                                     <span class="paciente-doctor" *ngIf="paciente.NombreDoctorAsignado">
                                         <i class="bi bi-person-badge"></i>
                                         Dr. {{ paciente.NombreDoctorAsignado }}
+                                        <span *ngIf="paciente.ApPaternoDoctorAsignado"> {{
+                                            paciente.ApPaternoDoctorAsignado }}</span>
                                     </span>
                                 </div>
                             </div>
@@ -241,11 +244,11 @@
             </div>
         </div>
 
-        <!-- BOTONES DE ACCIÓN -->
+        <!-- BOTONES DE ACCION -->
         <div class="acciones-footer">
             <button class="btn-limpiar" (click)="limpiarSeleccion()" [disabled]="asignando">
                 <i class="bi bi-arrow-counterclockwise"></i>
-                Limpiar selección
+                Limpiar seleccion
             </button>
             <button class="btn-ver-pacientes" (click)="verPacientesAsignados()"
                 [disabled]="!doctorSeleccionado || asignando">
@@ -254,10 +257,10 @@
             </button>
         </div>
 
-        <!-- RESULTADOS DE ASIGNACIÓN -->
+        <!-- RESULTADOS DE ASIGNACION -->
         <div *ngIf="resultadosAsignacion.length > 0" class="resultados-section">
             <div class="resultados-header">
-                <h3><i class="bi bi-list-check"></i> Resultados de la asignación</h3>
+                <h3><i class="bi bi-list-check"></i> Resultados de la asignacion</h3>
                 <span class="resultados-count">
                     {{ totalExitosos }} exitosos / {{ totalFallidos }} fallidos
                 </span>

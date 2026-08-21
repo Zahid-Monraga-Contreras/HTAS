@@ -349,19 +349,24 @@
 .search-box {
     position: relative;
     margin-bottom: 12px;
+    width: 100%;
 }
 
-.search-box i {
+/* Solo el ícono de lupa (hijo DIRECTO de .search-box), NO el ícono dentro de .search-clear */
+.search-box>i {
     position: absolute;
     left: 12px;
     top: 50%;
     transform: translateY(-50%);
     color: var(--gray-400);
+    pointer-events: none;
 }
 
 .search-input {
+    box-sizing: border-box;
     width: 100%;
-    padding: 10px 12px 10px 40px;
+    /* padding-right ampliado para dejar espacio a la X y que no se encime ni se salga */
+    padding: 10px 36px 10px 40px;
     border: 1.5px solid var(--gray-200);
     border-radius: var(--border-radius-sm);
     font-size: 0.85rem;
@@ -378,7 +383,7 @@
 
 .search-clear {
     position: absolute;
-    right: 10px;
+    right: 12px;
     top: 50%;
     transform: translateY(-50%);
     background: none;
@@ -386,11 +391,27 @@
     color: var(--gray-400);
     cursor: pointer;
     padding: 4px;
+    width: 22px;
+    height: 22px;
     font-size: 0.8rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
 }
 
 .search-clear:hover {
     color: var(--gray-600);
+}
+
+/* El ícono bi-x-lg dentro del botón debe quedar estático, centrado por el flex del botón */
+.search-clear i {
+    position: static;
+    transform: none;
+    left: auto;
+    top: auto;
+    pointer-events: none;
 }
 
 /* ============================================ */
@@ -1054,6 +1075,69 @@
     animation: progressBar linear forwards;
 }
 
+/* ============================================ */
+/* BOTÓN DESASIGNAR - ESTILOS COMPLETOS */
+/* ============================================ */
+
+.btn-desasignar {
+    padding: 10px 24px;
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);
+}
+
+.btn-desasignar:hover:not(:disabled) {
+    background: #dc2626;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
+}
+
+.btn-desasignar:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-desasignar i {
+    font-size: 1rem;
+}
+
+/* Spinner dentro del botón */
+.btn-desasignar .spinner-border {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 0.15em solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spinner-border 0.75s linear infinite;
+}
+
+.btn-desasignar .spinner-border-sm {
+    width: 0.9rem;
+    height: 0.9rem;
+    border-width: 0.15em;
+}
+
+.btn-desasignar .me-1 {
+    margin-right: 0.25rem;
+}
+
+@keyframes spinner-border {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 @keyframes progressBar {
     from {
         width: 100%;
@@ -1246,7 +1330,7 @@
 
     .search-input {
         font-size: 0.75rem;
-        padding: 8px 12px 8px 36px;
+        padding: 8px 32px 8px 36px;
     }
 
     .switch-label {

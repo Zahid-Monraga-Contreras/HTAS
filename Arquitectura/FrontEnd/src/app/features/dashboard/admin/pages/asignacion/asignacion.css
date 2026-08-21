@@ -43,7 +43,7 @@
 }
 
 /* ============================================ */
-/* PAGINA PRINCIPAL - CON POSITION RELATIVE */
+/* PAGINA PRINCIPAL */
 /* ============================================ */
 .asignacion-page {
     min-height: 100vh;
@@ -56,7 +56,6 @@
     transition: margin-left 0.3s ease, width 0.3s ease;
 }
 
-/* Estado colapsado - usando clase directa en el body o en el host */
 .asignacion-page.menu-collapsed {
     margin-left: 70px;
     width: calc(100% - 70px);
@@ -352,11 +351,12 @@
 }
 
 /* ============================================ */
-/* SEARCH BOX */
+/* SEARCH BOX - CORREGIDO */
 /* ============================================ */
 .search-box {
     position: relative;
     margin-bottom: 12px;
+    width: 100%;
 }
 
 .search-box i {
@@ -365,16 +365,19 @@
     top: 50%;
     transform: translateY(-50%);
     color: var(--gray-400);
+    z-index: 1;
+    pointer-events: none;
 }
 
 .search-input {
     width: 100%;
-    padding: 10px 12px 10px 40px;
+    padding: 10px 40px 10px 40px;
     border: 1.5px solid var(--gray-200);
     border-radius: var(--border-radius-sm);
     font-size: 0.85rem;
     transition: var(--transition);
     background: var(--gray-50);
+    box-sizing: border-box;
 }
 
 .search-input:focus {
@@ -393,12 +396,28 @@
     border: none;
     color: var(--gray-400);
     cursor: pointer;
-    padding: 4px;
+    padding: 4px 6px;
     font-size: 0.8rem;
+    transition: var(--transition);
+    z-index: 2;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
 }
 
 .search-clear:hover {
     color: var(--gray-600);
+    background: var(--gray-200);
+}
+
+.search-clear i {
+    position: static;
+    transform: none;
+    color: inherit;
+    font-size: 0.7rem;
 }
 
 /* ============================================ */
@@ -579,7 +598,7 @@
 }
 
 /* ============================================ */
-/* PACIENTE ITEM - ESTADOS DE ASIGNACIÓN */
+/* PACIENTE ITEM */
 /* ============================================ */
 .paciente-item {
     display: flex;
@@ -903,7 +922,7 @@
 }
 
 /* ============================================ */
-/* TOAST NOTIFICATIONS - ESTILO PREMIUM */
+/* TOAST NOTIFICATIONS */
 /* ============================================ */
 .toast-container {
     position: fixed;
@@ -961,7 +980,6 @@
     }
 }
 
-/* Tipos de toast */
 .toast-success {
     background: linear-gradient(135deg, #10b981, #059669);
     border-left: 4px solid #047857;
@@ -982,7 +1000,6 @@
     border-left: 4px solid #1d4ed8;
 }
 
-/* Iconos */
 .toast-icon {
     flex-shrink: 0;
     width: 32px;
@@ -993,7 +1010,6 @@
     font-size: 1.4rem;
 }
 
-/* Contenido */
 .toast-content {
     flex: 1;
     min-width: 0;
@@ -1011,7 +1027,6 @@
     line-height: 1.4;
 }
 
-/* Botón cerrar */
 .toast-close {
     flex-shrink: 0;
     background: none;
@@ -1028,7 +1043,6 @@
     transform: rotate(90deg);
 }
 
-/* Barra de progreso */
 .toast-progress {
     position: absolute;
     bottom: 0;
@@ -1049,10 +1063,37 @@
 }
 
 /* ============================================ */
+/* SPINNER */
+/* ============================================ */
+.spinner-border {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 0.15em solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spinner-border 0.75s linear infinite;
+}
+
+.spinner-border-sm {
+    width: 0.9rem;
+    height: 0.9rem;
+    border-width: 0.15em;
+}
+
+.me-1 {
+    margin-right: 0.25rem;
+}
+
+@keyframes spinner-border {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ============================================ */
 /* RESPONSIVE */
 /* ============================================ */
-
-/* Pantallas grandes */
 @media screen and (min-width: 1025px) {
     .asignacion-page {
         padding: 24px 32px 100px 32px;
@@ -1080,7 +1121,6 @@
     }
 }
 
-/* Tablets */
 @media screen and (max-width: 1024px) and (min-width: 769px) {
     .asignacion-page {
         padding: 20px 24px 90px 24px;
@@ -1103,7 +1143,6 @@
     }
 }
 
-/* Móviles */
 @media screen and (max-width: 768px) {
     .asignacion-page {
         padding: 16px 16px 85px 16px;
@@ -1153,6 +1192,7 @@
 
     .btn-asignar-resumen {
         justify-content: center;
+        width: 100%;
     }
 
     .acciones-footer {
@@ -1214,17 +1254,8 @@
     .toast-notification {
         padding: 12px 14px;
     }
-
-    .toast-title {
-        font-size: 0.85rem;
-    }
-
-    .toast-message {
-        font-size: 0.8rem;
-    }
 }
 
-/* Móviles pequeños */
 @media screen and (max-width: 480px) {
     .asignacion-page {
         padding: 12px 12px 80px 12px;
@@ -1273,7 +1304,7 @@
 
     .search-input {
         font-size: 0.75rem;
-        padding: 8px 12px 8px 36px;
+        padding: 8px 36px 8px 36px;
     }
 
     .switch-label {
@@ -1356,7 +1387,6 @@
     }
 }
 
-/* Menos de 360px */
 @media screen and (max-width: 360px) {
     .asignacion-page {
         padding: 10px 10px 75px 10px;
