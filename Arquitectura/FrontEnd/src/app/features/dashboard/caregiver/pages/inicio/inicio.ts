@@ -61,8 +61,8 @@ export class CaregiverInicio implements OnInit {
                 try {
                     const userData = JSON.parse(storedUser);
                     this.caregiverId = userData.idusuario || userData.uid || null;
-                    this.caregiverName = userData.nombre || 'Acompanante';
-                    this.caregiverFullName = userData.nombreCompleto || userData.nombre || 'Acompanante';
+                    this.caregiverName = userData.nombre || 'Acompañante';
+                    this.caregiverFullName = userData.nombreCompleto || userData.nombre || 'Acompañante';
                     this.caregiverCorreo = userData.correo || '';
                     this.userEmail = userData.correo || '';
                 } catch (e) {
@@ -73,7 +73,7 @@ export class CaregiverInicio implements OnInit {
             if (this.caregiverId) {
                 await this.cargarDatos();
             } else {
-                console.error('No se pudo obtener el ID del acompanante');
+                console.error('No se pudo obtener el ID del acompañante');
             }
 
         } catch (error) {

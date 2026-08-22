@@ -48,26 +48,26 @@
                 <div class="visita-item">
                     <div class="visita-indicador">
                         <span class="visita-estado-dot" [ngClass]="{
-                            'estado-completada': v.estado === 'Completada',
-                            'estado-programada': v.estado === 'Programada',
-                            'estado-confirmada': v.estado === 'Confirmada',
-                            'estado-cancelada': v.estado === 'Cancelada',
-                            'estado-no-asistio': v.estado === 'No Asistió'
+                            'estado-completada': v.estado === 'Completada' || v.estado === 'completada',
+                            'estado-programada': v.estado === 'Programada' || v.estado === 'programada',
+                            'estado-confirmada': v.estado === 'Confirmada' || v.estado === 'confirmada',
+                            'estado-cancelada': v.estado === 'Cancelada' || v.estado === 'cancelada',
+                            'estado-no-asistio': v.estado === 'No Asistió' || v.estado === 'no asistió'
                         }"></span>
                     </div>
                     <div class="visita-info">
                         <i class="bi bi-calendar-check"></i>
-                        <span class="visita-fecha-hora">{{ formatearFechaYHora(v.fechavisita, v.horavisita) }}</span>
+                        <span class="visita-fecha-hora">{{ formatearFecha(v.fechavisita) }}</span>
                     </div>
                     <div class="visita-detalle">
                         <span class="visita-motivo">{{ v.motivo || 'Sin motivo' }}</span>
-                        @if (v.estado === 'Completada') {
+                        @if (v.estado === 'Completada' || v.estado === 'completada') {
                         <span class="badge-completada">Completada</span>
-                        } @else if (v.estado === 'Programada') {
+                        } @else if (v.estado === 'Programada' || v.estado === 'programada') {
                         <span class="badge-programada">Programada</span>
-                        } @else if (v.estado === 'Confirmada') {
+                        } @else if (v.estado === 'Confirmada' || v.estado === 'confirmada') {
                         <span class="badge-confirmada">Confirmada</span>
-                        } @else if (v.estado === 'Cancelada') {
+                        } @else if (v.estado === 'Cancelada' || v.estado === 'cancelada') {
                         <span class="badge-cancelada">Cancelada</span>
                         } @else {
                         <span class="badge-no-asistio">No Asistió</span>
@@ -105,7 +105,7 @@
                 <div class="historial-item">
                     <div class="historial-fecha">
                         <i class="bi bi-clock"></i>
-                        {{ item.fecha }}
+                        {{ formatearFecha(item.fecha) }}
                     </div>
                     <div class="historial-detalle">
                         <strong>{{ item.accion }}</strong>

@@ -8,7 +8,6 @@ import { Users } from '../../../../../../core/services/users.service';
 import { firstValueFrom } from 'rxjs';
 import { Menu } from "../../../template/menu/menu";
 
-// Importar los componentes de partials
 import { InfoAcompanante } from './partials/info-acompanante/info-acompanante';
 import { HistorialAcompanante, HistorialItem } from './partials/historial-acompanante/historial-acompanante';
 import { ExpedienteAcompanante } from './partials/expediente-acompanante/expediente-acompanante';
@@ -41,7 +40,6 @@ export class AcompananteDetalle implements OnInit, OnDestroy {
   tipoToast: 'success' | 'error' | 'warning' = 'success';
   private toastTimeout: any = null;
 
-  // Usar HistorialItem en lugar de HistorialAcompanante
   historialCambios: HistorialItem[] = [];
   visitasAcompanante: any[] = [];
 
@@ -56,8 +54,9 @@ export class AcompananteDetalle implements OnInit, OnDestroy {
 
   acompananteId: number | null = null;
   fechaGeneracion = '';
+  pacientesAsignadosIds: number[] = [];
+  pacientesAsignadosEmails: string[] = [];
 
-  // Métodos que estaban en InfoAcompanante y ahora están aquí
   getEstadoAcompanante(): { texto: string; clase: string; icono: string } {
     if (!this.usuarioSeleccionado) {
       return { texto: 'Sin datos', clase: 'estado-sin-datos', icono: 'bi-question-circle' };
@@ -160,8 +159,7 @@ export class AcompananteDetalle implements OnInit, OnDestroy {
   }
 
   descargarExpedientePDF() {
-    // Método descargarExpedientePDF - ya lo tienes en el código original
-    // Lo dejamos aquí para que no dé error
+    // Método descargarExpedientePDF
   }
 
   ngOnInit() {
@@ -199,14 +197,12 @@ export class AcompananteDetalle implements OnInit, OnDestroy {
     if (this.toastTimeout) clearTimeout(this.toastTimeout);
   }
 
-  // --- CONTROL DE PESTAÑAS ---
   cambiarTab(tab: TabAcompanante) {
     if (this.activeTab === tab) return;
     this.activeTab = tab;
     this.cdr.detectChanges();
   }
 
-  // --- CARGAR DATOS ---
   async cargarDatosCompletosAcompanante() {
     if (!this.acompananteId) return;
 
@@ -224,7 +220,7 @@ export class AcompananteDetalle implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       }
     } catch (error) {
-      console.warn('Usando datos del state para el acompañante');
+      // Error silencioso
     }
   }
 
@@ -251,33 +247,272 @@ export class AcompananteDetalle implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  async cargarDatosReales() {
-    if (!this.usuarioSeleccionado?.correo) return;
+  private async cargarPacientesAsignados() {
+    if (!this.acompananteId) {
+      return;
+    }
 
     try {
-      this.visitasAcompanante = [
-        {
-          id: 1,
-          fechavisita: '2026-07-10',
-          horavisita: '10:30',
-          motivo: 'Visita de seguimiento',
-          estado: 'Completada'
-        },
-        {
-          id: 2,
-          fechavisita: '2026-07-20',
-          horavisita: '15:00',
-          motivo: 'Revisión de documentación',
-          estado: 'Programada'
-        }
-      ];
+      let pacientesData: any[] = [];
+      let response: any = null;
 
-      this.calcularEstadisticas(this.visitasAcompanante);
-      this.generarHistorialDesdeVisitas(this.visitasAcompanante);
+      try {
+        response = await firstValueFrom(
+          this.usersService.getPacientesAsignados(this.acompananteId)
+        );
+      } catch (err) {
+        // Error silencioso
+      }
+
+      if (response) {
+        if (response.success !== undefined && response.data !== undefined) {
+          pacientesData = response.data || [];
+        } else if (response.data !== undefined) {
+          pacientesData = response.data || [];
+        } else if (Array.isArray(response)) {
+          pacientesData = response;
+        } else if (typeof response === 'object') {
+          for (const key in response) {
+            if (Array.isArray(response[key]) && response[key].length > 0) {
+              pacientesData = response[key];
+              break;
+            }
+          }
+        }
+      }
+
+      this.pacientesAsignadosIds = pacientesData
+        .map((p: any) => {
+          const id = p.id_usuario || p.IdUsuario || p.idusuario || p.id || p.IdPaciente || p.idpaciente || p.pacienteId;
+          return typeof id === 'string' ? parseInt(id, 10) : id;
+        })
+        .filter((id: number) => id > 0);
+
+      this.pacientesAsignadosEmails = pacientesData
+        .map((p: any) => p.correo || p.Correo || p.email || p.Email || '')
+        .filter((email: string) => email && email.length > 0);
+
+    } catch (error: any) {
+      this.pacientesAsignadosIds = [];
+      this.pacientesAsignadosEmails = [];
+    }
+  }
+
+  formatearFecha(fecha: string): string {
+    if (!fecha) return 'Fecha no disponible';
+    try {
+      const d = new Date(fecha);
+      if (isNaN(d.getTime())) return fecha;
+
+      const hoy = new Date();
+      const diff = hoy.getTime() - d.getTime();
+      const minutos = Math.floor(diff / 60000);
+      const horas = Math.floor(diff / 3600000);
+      const dias = Math.floor(diff / 86400000);
+
+      if (minutos < 1) return 'Hace unos segundos';
+      if (minutos < 60) return `Hace ${minutos} minuto${minutos > 1 ? 's' : ''}`;
+      if (horas < 24) return `Hace ${horas} hora${horas > 1 ? 's' : ''}`;
+      if (dias < 7) return `Hace ${dias} día${dias > 1 ? 's' : ''}`;
+
+      return d.toLocaleDateString('es-MX', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch {
+      return fecha;
+    }
+  }
+
+  async cargarDatosReales() {
+    if (!this.acompananteId) return;
+
+    try {
+      await this.cargarPacientesAsignados();
+
+      const [citas, usuarios] = await Promise.all([
+        firstValueFrom(this.usersService.getAllCitas()).catch(() => []),
+        firstValueFrom(this.usersService.getUsuariosBackend()).catch(() => [])
+      ]);
+
+      const citasFiltradas = Array.isArray(citas)
+        ? citas.filter((c: any) => {
+          const posiblesIds = [
+            c.idpaciente, c.IdPaciente, c.idPaciente,
+            c.pacienteId, c.id_usuario, c.IdUsuario,
+            c.idusuario, c.paciente_id, c.paciente
+          ];
+
+          let idPacienteCita = null;
+          for (const pid of posiblesIds) {
+            if (pid !== undefined && pid !== null && pid !== '') {
+              idPacienteCita = pid;
+              break;
+            }
+          }
+
+          let idPacienteCitaNum = null;
+          if (idPacienteCita !== null) {
+            idPacienteCitaNum = typeof idPacienteCita === 'string' ? parseInt(idPacienteCita, 10) : idPacienteCita;
+          }
+
+          if (idPacienteCitaNum && idPacienteCitaNum > 0) {
+            const estaAsignado = this.pacientesAsignadosIds.some(id => id === idPacienteCitaNum);
+            if (estaAsignado) {
+              return true;
+            }
+          }
+
+          const correoPaciente = c.correopaciente || c.correoPaciente || c.CorreoPaciente ||
+            c.emailPaciente || c.email || c.correo || c.Correo;
+          if (correoPaciente && correoPaciente.length > 0) {
+            const estaAsignado = this.pacientesAsignadosEmails.some(
+              email => email && email.toLowerCase() === correoPaciente.toLowerCase()
+            );
+            if (estaAsignado) {
+              return true;
+            }
+          }
+
+          return false;
+        })
+        : [];
+
+      const totalVisitas = citasFiltradas.length;
+      const visitasCompletadas = citasFiltradas.filter((c: any) => {
+        const estado = (c.estado || '').toLowerCase();
+        return ['completada', 'realizada', 'finalizada'].includes(estado);
+      }).length;
+      const visitasPendientes = citasFiltradas.filter((c: any) => {
+        const estado = (c.estado || '').toLowerCase();
+        return ['programada', 'pendiente', 'confirmada', 'agendada'].includes(estado);
+      }).length;
+      const visitasCanceladas = citasFiltradas.filter((c: any) => {
+        const estado = (c.estado || '').toLowerCase();
+        return ['cancelada'].includes(estado);
+      }).length;
+
+      let ultimaVisita: string | null = null;
+      let proximaVisita: string | null = null;
+
+      if (citasFiltradas.length > 0) {
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+
+        const citasOrdenadas = [...citasFiltradas].sort((a, b) => {
+          return new Date(b.fechacita || b.fecha || b.fechaCita).getTime() -
+            new Date(a.fechacita || a.fecha || a.fechaCita).getTime();
+        });
+
+        if (citasOrdenadas.length > 0) {
+          ultimaVisita = citasOrdenadas[0].fechacita || citasOrdenadas[0].fecha || citasOrdenadas[0].fechaCita;
+        }
+
+        const citasFuturas = citasFiltradas.filter((c: any) => {
+          const fechaVisita = new Date(c.fechacita || c.fecha || c.fechaCita);
+          const estado = (c.estado || '').toLowerCase();
+          return fechaVisita >= hoy && ['programada', 'pendiente', 'confirmada', 'agendada'].includes(estado);
+        }).sort((a, b) => {
+          return new Date(a.fechacita || a.fecha || a.fechaCita).getTime() -
+            new Date(b.fechacita || b.fecha || b.fechaCita).getTime();
+        });
+
+        if (citasFuturas.length > 0) {
+          proximaVisita = citasFuturas[0].fechacita || citasFuturas[0].fecha || citasFuturas[0].fechaCita;
+        }
+      }
+
+      this.estadisticas = {
+        totalVisitas: totalVisitas,
+        visitasCompletadas: visitasCompletadas,
+        visitasPendientes: visitasPendientes,
+        visitasCanceladas: visitasCanceladas,
+        ultimaVisita: ultimaVisita,
+        proximaVisita: proximaVisita
+      };
+
+      if (citasFiltradas.length > 0) {
+        const pacientesUnicos = new Map();
+        citasFiltradas.forEach((c: any) => {
+          const nombre = c.nombrepaciente || c.nombrePaciente || c.NombrePaciente || '';
+          const apPaterno = c.appaternopaciente || c.apPaternoPaciente || c.ApPaternoPaciente || '';
+          const apMaterno = c.apmaternopaciente || c.apMaternoPaciente || c.ApMaternoPaciente || '';
+          const nombreCompleto = `${nombre} ${apPaterno} ${apMaterno}`.trim() || 'Paciente';
+          const id = c.idpaciente || c.idPaciente || c.pacienteId || c.id;
+
+          if (!pacientesUnicos.has(id) && id) {
+            pacientesUnicos.set(id, {
+              id: id,
+              nombre: nombreCompleto,
+              motivo: c.motivo || c.Motivo || 'Consulta',
+              fechavisita: this.formatearFecha(c.fechacita || c.fecha || c.fechaCita || new Date().toISOString()),
+              horavisita: c.horacita || c.hora || c.horaCita || '00:00',
+              estado: c.estado || 'Programada'
+            });
+          }
+        });
+        this.visitasAcompanante = Array.from(pacientesUnicos.values()).slice(0, 10);
+      } else {
+        this.visitasAcompanante = [];
+      }
+
+      const historial: HistorialItem[] = [];
+
+      citasFiltradas.forEach((c: any) => {
+        const nombre = c.nombrepaciente || c.nombrePaciente || c.NombrePaciente || '';
+        const apPaterno = c.appaternopaciente || c.apPaternoPaciente || c.ApPaternoPaciente || '';
+        const apMaterno = c.apmaternopaciente || c.apMaternoPaciente || c.ApMaternoPaciente || '';
+        const nombreCompleto = `${nombre} ${apPaterno} ${apMaterno}`.trim() || 'Paciente';
+
+        const fecha = c.fechacita || c.fecha || c.fechaCita || c.created_at || new Date().toISOString();
+        const estado = (c.estado || 'Programada').toLowerCase();
+
+        let accion = '';
+        let detalle = '';
+
+        switch (estado) {
+          case 'completada':
+          case 'realizada':
+          case 'finalizada':
+            accion = 'Cita completada';
+            detalle = `Cita con ${nombreCompleto} finalizada`;
+            break;
+          case 'programada':
+          case 'confirmada':
+          case 'agendada':
+            accion = 'Cita programada';
+            detalle = `Nueva cita agendada para ${nombreCompleto}`;
+            break;
+          case 'cancelada':
+            accion = 'Cita cancelada';
+            detalle = `Cita de ${nombreCompleto} fue cancelada`;
+            break;
+          default:
+            accion = `Cita ${estado}`;
+            detalle = `Cita de ${nombreCompleto}`;
+        }
+
+        historial.push({
+          fecha: this.formatearFecha(fecha),
+          accion: accion,
+          detalle: detalle,
+          usuario: nombreCompleto,
+          tipo: 'cita',
+          id: c.idcita || c.id,
+          estado: estado
+        });
+      });
+
+      historial.sort((a, b) => {
+        return new Date(b.fecha).getTime() - new Date(a.fecha).getTime();
+      });
+
+      this.historialCambios = historial;
 
     } catch (error) {
-      console.error('Error al cargar visitas del acompañante:', error);
-      this.visitasAcompanante = [];
       this.estadisticas = {
         totalVisitas: 0,
         visitasCompletadas: 0,
@@ -286,151 +521,31 @@ export class AcompananteDetalle implements OnInit, OnDestroy {
         ultimaVisita: null,
         proximaVisita: null
       };
+      this.visitasAcompanante = [];
+      this.historialCambios = [];
     } finally {
       this.cdr.detectChanges();
     }
   }
 
-  calcularEstadisticas(visitas: any[]) {
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
-
-    const completadas = visitas.filter(v => v.estado === 'Completada');
-    const pendientes = visitas.filter(v => v.estado === 'Programada' || v.estado === 'Confirmada');
-    const canceladas = visitas.filter(v => v.estado === 'Cancelada' || v.estado === 'No Asistió');
-
-    const visitasOrdenadas = [...visitas].sort((a, b) => {
-      const fechaA = new Date(`${a.fechavisita}T${a.horavisita || '00:00'}`);
-      const fechaB = new Date(`${b.fechavisita}T${b.horavisita || '00:00'}`);
-      return fechaB.getTime() - fechaA.getTime();
+  agregarHistorial(accion: string, detalle: string) {
+    const ahora = new Date();
+    const fechaStr = ahora.toLocaleString('es-MX', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
     });
-
-    const ultimaVisita = visitasOrdenadas.length > 0 ? visitasOrdenadas[0] : null;
-
-    const visitasFuturas = visitas.filter(v => {
-      const fechaVisita = new Date(v.fechavisita);
-      return fechaVisita >= hoy && (v.estado === 'Programada' || v.estado === 'Confirmada');
-    }).sort((a, b) => {
-      return new Date(a.fechavisita).getTime() - new Date(b.fechavisita).getTime();
+    this.historialCambios.unshift({
+      fecha: fechaStr,
+      accion: accion,
+      detalle: detalle,
+      usuario: 'Usuario actual',
+      tipo: 'doctor'
     });
-
-    const proximaVisita = visitasFuturas.length > 0 ? visitasFuturas[0] : null;
-
-    this.estadisticas = {
-      totalVisitas: visitas.length,
-      visitasCompletadas: completadas.length,
-      visitasPendientes: pendientes.length,
-      visitasCanceladas: canceladas.length,
-      ultimaVisita: ultimaVisita ? ultimaVisita.fechavisita : null,
-      proximaVisita: proximaVisita ? proximaVisita.fechavisita : null
-    };
   }
 
-  generarHistorialDesdeVisitas(visitas: any[]) {
-    const historial: HistorialItem[] = [];
-
-    const visitasOrdenadas = [...visitas].sort((a, b) => {
-      return new Date(b.fechavisita).getTime() - new Date(a.fechavisita).getTime();
-    });
-
-    visitasOrdenadas.forEach(visita => {
-      const fechaFormateada = this.formatearFechaYHora(visita.fechavisita, visita.horavisita);
-      let accion = '';
-      let detalle = '';
-
-      switch (visita.estado) {
-        case 'Completada':
-          accion = 'Visita completada';
-          detalle = `Visita del ${fechaFormateada} - ${visita.motivo || 'Sin motivo'}`;
-          break;
-        case 'Programada':
-          accion = 'Visita programada';
-          detalle = `Visita para ${fechaFormateada} - ${visita.motivo || 'Sin motivo'}`;
-          break;
-        case 'Confirmada':
-          accion = 'Visita confirmada';
-          detalle = `Visita confirmada para ${fechaFormateada}`;
-          break;
-        case 'Cancelada':
-          accion = 'Visita cancelada';
-          detalle = `Visita del ${fechaFormateada} - Cancelada`;
-          break;
-        case 'No Asistió':
-          accion = 'No asistió';
-          detalle = `No asistió a visita del ${fechaFormateada}`;
-          break;
-        default:
-          accion = 'Visita registrada';
-          detalle = `Visita del ${fechaFormateada}`;
-      }
-
-      historial.push({
-        fecha: fechaFormateada,
-        accion: accion,
-        detalle: detalle,
-        usuario: 'Sistema'
-      });
-    });
-
-    if (historial.length === 0) {
-      const fechaActual = new Date();
-      const fechaStr = fechaActual.toLocaleString('es-MX', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-      historial.push({
-        fecha: fechaStr,
-        accion: 'Acompañante registrado',
-        detalle: `Registrado: ${this.usuarioSeleccionado.nombre || ''} ${this.usuarioSeleccionado.apPaterno || ''}`,
-        usuario: 'Sistema'
-      });
-    }
-
-    this.historialCambios = historial;
-  }
-
-  // --- MÉTODOS DE UTILIDAD ---
-  formatearFechaYHora(fecha: string, hora: string): string {
-    if (!fecha) return 'Fecha no disponible';
-
-    try {
-      const fechaObj = new Date(fecha);
-      if (isNaN(fechaObj.getTime())) return fecha;
-
-      const dia = String(fechaObj.getDate()).padStart(2, '0');
-      const mes = String(fechaObj.getMonth() + 1).padStart(2, '0');
-      const anio = fechaObj.getFullYear();
-      const fechaFormateada = `${dia}/${mes}/${anio}`;
-
-      let horaFormateada = '--:--';
-      if (hora) {
-        let horaLimpia = hora;
-        if (horaLimpia.includes('T')) {
-          horaLimpia = horaLimpia.split('T')[1] || '00:00';
-        }
-        if (horaLimpia.length > 5) {
-          horaLimpia = horaLimpia.substring(0, 5);
-        }
-        if (horaLimpia.includes(':')) {
-          const partes = horaLimpia.split(':');
-          if (partes.length >= 2) {
-            horaFormateada = `${partes[0].padStart(2, '0')}:${partes[1].padStart(2, '0')}`;
-          }
-        } else {
-          horaFormateada = horaLimpia;
-        }
-      }
-
-      return `${fechaFormateada} ${horaFormateada}`;
-    } catch (error) {
-      return fecha;
-    }
-  }
-
-  // --- GUARDAR CAMBIOS ---
   async guardarCambios() {
     if (!this.usuarioSeleccionado) return;
 
@@ -493,7 +608,7 @@ export class AcompananteDetalle implements OnInit, OnDestroy {
 
       await firstValueFrom(this.usersService.updateUsuario(id, payload));
 
-      this.lanzarNotificacion("¡Éxito! La información del acompañante ha sido actualizada.", "success");
+      this.lanzarNotificacion("La información del acompañante ha sido actualizada.", "success");
 
       this.agregarHistorial('Datos actualizados', 'Información del acompañante actualizada');
 
@@ -502,7 +617,6 @@ export class AcompananteDetalle implements OnInit, OnDestroy {
       }, 2000);
 
     } catch (error: any) {
-      console.error("Error al guardar cambios:", error);
       const msgErr = error.error?.error || error.message || "Error interno del servidor";
       this.lanzarNotificacion(`No se pudo guardar: ${msgErr}`, "error");
     } finally {
@@ -511,24 +625,6 @@ export class AcompananteDetalle implements OnInit, OnDestroy {
     }
   }
 
-  agregarHistorial(accion: string, detalle: string) {
-    const ahora = new Date();
-    const fechaStr = ahora.toLocaleString('es-MX', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-    this.historialCambios.unshift({
-      fecha: fechaStr,
-      accion: accion,
-      detalle: detalle,
-      usuario: 'Usuario actual'
-    });
-  }
-
-  // --- TOAST ---
   lanzarNotificacion(mensaje: string, tipo: 'success' | 'error' | 'warning' = 'success') {
     this.mensajeToast = mensaje;
     this.tipoToast = tipo;

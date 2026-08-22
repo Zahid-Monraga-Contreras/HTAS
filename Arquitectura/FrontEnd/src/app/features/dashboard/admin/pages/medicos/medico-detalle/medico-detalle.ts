@@ -7,7 +7,6 @@ import { Users } from '../../../../../../core/services/users.service';
 import { firstValueFrom } from 'rxjs';
 import { Menu } from "../../../template/menu/menu";
 
-// Importar los partials
 import { InfoMedicoComponent } from './partials/info-medico/info-medico';
 import { HistorialMedicoComponent } from './partials/historial-medico/historial-medico';
 import { ExpedienteMedicoComponent } from './partials/expediente-medico/expediente-medico';
@@ -48,6 +47,7 @@ export class MedicoDetalle implements OnInit, OnDestroy {
 
   historialCambios: any[] = [];
   pacientesAtendidos: any[] = [];
+  cargandoDatos: boolean = false;
 
   estadisticas: {
     totalPacientes: number;
@@ -57,6 +57,8 @@ export class MedicoDetalle implements OnInit, OnDestroy {
   } | null = null;
 
   medicoId: number | null = null;
+  pacientesAsignadosIds: number[] = [];
+  pacientesAsignadosEmails: string[] = [];
 
   ngOnInit() {
     if (!isPlatformBrowser(this.platformId)) return;
@@ -67,7 +69,7 @@ export class MedicoDetalle implements OnInit, OnDestroy {
       this.medicoId = state.usuario.idusuario || state.usuario.id;
       this.usuarioSeleccionado = { ...state.usuario };
       this.inicializarCampos();
-      this.cargarDatosAdicionales();
+      this.cargarDatosReales();
     } else {
       this.router.navigate(['/admin/medicos']);
     }
@@ -124,52 +126,365 @@ export class MedicoDetalle implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  cargarDatosAdicionales() {
-    if (!this.usuarioSeleccionado) return;
-
-    this.cargarHistorialMedico();
-
-    this.estadisticas = {
-      totalPacientes: Math.floor(Math.random() * 50) + 10,
-      citasCompletadas: Math.floor(Math.random() * 30) + 5,
-      citasPendientes: Math.floor(Math.random() * 10) + 2,
-      promedioConsultas: Math.floor(Math.random() * 15) + 5
-    };
-
-    this.pacientesAtendidos = [
-      { id: 1, nombre: 'Maria Lopez Gonzalez', fechaUltimaCita: '2026-07-01', motivo: 'Consulta general' },
-      { id: 2, nombre: 'Juan Perez Garcia', fechaUltimaCita: '2026-06-28', motivo: 'Control de rutina' },
-      { id: 3, nombre: 'Ana Martinez Ruiz', fechaUltimaCita: '2026-06-25', motivo: 'Dolor de cabeza' }
-    ];
-
-    if (this.usuarioSeleccionado.especialidad) {
-      this.agregarHistorial(
-        'Especialidad asignada',
-        `Especialidad: ${this.usuarioSeleccionado.especialidad}`
-      );
+  private async cargarPacientesAsignados() {
+    if (!this.medicoId) {
+      return;
     }
 
-    this.cdr.detectChanges();
+    try {
+      let pacientesData: any[] = [];
+      let response: any = null;
+
+      try {
+        response = await firstValueFrom(
+          this.usersService.getPacientesDeDoctor(this.medicoId)
+        );
+      } catch (err) {
+        // Error silencioso
+      }
+
+      if (response) {
+        if (response.success !== undefined && response.data !== undefined) {
+          pacientesData = response.data || [];
+        } else if (response.data !== undefined) {
+          pacientesData = response.data || [];
+        } else if (Array.isArray(response)) {
+          pacientesData = response;
+        } else if (typeof response === 'object') {
+          for (const key in response) {
+            if (Array.isArray(response[key]) && response[key].length > 0) {
+              pacientesData = response[key];
+              break;
+            }
+          }
+        }
+      }
+
+      if (!pacientesData || pacientesData.length === 0) {
+        try {
+          const allPacientesResponse = await firstValueFrom(
+            this.usersService.getTodosLosPacientes()
+          );
+
+          let allPacientes: any[] = [];
+
+          if (allPacientesResponse) {
+            if (allPacientesResponse.data !== undefined) {
+              allPacientes = allPacientesResponse.data || [];
+            } else if (Array.isArray(allPacientesResponse)) {
+              allPacientes = allPacientesResponse;
+            } else if (typeof allPacientesResponse === 'object') {
+              for (const key in allPacientesResponse) {
+                if (Array.isArray(allPacientesResponse[key])) {
+                  allPacientes = allPacientesResponse[key];
+                  break;
+                }
+              }
+            }
+          }
+
+          const doctorIdNum = Number(this.medicoId);
+
+          pacientesData = allPacientes.filter((p: any) => {
+            const posiblesPropiedades = [
+              'DoctorAsignado', 'doctorasignado', 'IdDoctorAsignado', 'iddoctorasignado',
+              'IdDoctor', 'iddoctor', 'DoctorId', 'doctorId', 'doctor_id'
+            ];
+
+            let doctorIdEncontrado = null;
+
+            for (const prop of posiblesPropiedades) {
+              if (p[prop] !== undefined && p[prop] !== null) {
+                doctorIdEncontrado = p[prop];
+                break;
+              }
+            }
+
+            const asignado = p.AsignacionActiva === true || p.asignacionactiva === true;
+
+            if (doctorIdEncontrado !== null && doctorIdEncontrado !== undefined) {
+              const idNum = Number(doctorIdEncontrado);
+              return idNum === doctorIdNum && asignado;
+            }
+            return false;
+          });
+
+        } catch (err) {
+          // Error silencioso
+        }
+      }
+
+      this.pacientesAsignadosIds = pacientesData
+        .map((p: any) => {
+          const id = p.id_usuario || p.IdUsuario || p.idusuario || p.id || p.IdPaciente || p.idpaciente || p.pacienteId;
+          return typeof id === 'string' ? parseInt(id, 10) : id;
+        })
+        .filter((id: number) => id > 0);
+
+      this.pacientesAsignadosEmails = pacientesData
+        .map((p: any) => p.correo || p.Correo || p.email || p.Email || '')
+        .filter((email: string) => email && email.length > 0);
+
+    } catch (error: any) {
+      this.pacientesAsignadosIds = [];
+      this.pacientesAsignadosEmails = [];
+    }
   }
 
-  cargarHistorialMedico() {
-    const ahora = new Date();
-    const fechaStr = ahora.toLocaleString('es-MX', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+  formatearFecha(fecha: string): string {
+    if (!fecha) return 'Fecha no disponible';
+    try {
+      const d = new Date(fecha);
+      if (isNaN(d.getTime())) return fecha;
 
-    this.historialCambios = [
-      {
-        fecha: fechaStr,
-        accion: 'Medico registrado',
-        detalle: `Registrado: ${this.usuarioSeleccionado.nombre || ''} ${this.usuarioSeleccionado.apPaterno || ''}`,
-        usuario: 'Sistema'
+      const hoy = new Date();
+      const diff = hoy.getTime() - d.getTime();
+      const minutos = Math.floor(diff / 60000);
+      const horas = Math.floor(diff / 3600000);
+      const dias = Math.floor(diff / 86400000);
+
+      if (minutos < 1) return 'Hace unos segundos';
+      if (minutos < 60) return `Hace ${minutos} minuto${minutos > 1 ? 's' : ''}`;
+      if (horas < 24) return `Hace ${horas} hora${horas > 1 ? 's' : ''}`;
+      if (dias < 7) return `Hace ${dias} día${dias > 1 ? 's' : ''}`;
+
+      return d.toLocaleDateString('es-MX', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch {
+      return fecha;
+    }
+  }
+
+  private async cargarDatosReales() {
+    if (!this.medicoId) return;
+
+    this.cargandoDatos = true;
+    try {
+      await this.cargarPacientesAsignados();
+
+      const [citas, tratamientos, usuarios] = await Promise.all([
+        firstValueFrom(this.usersService.getAllCitas()).catch(() => []),
+        firstValueFrom(this.usersService.getTratamientos()).catch(() => []),
+        firstValueFrom(this.usersService.getUsuariosBackend()).catch(() => [])
+      ]);
+
+      const citasFiltradas = Array.isArray(citas)
+        ? citas.filter((c: any) => {
+          const posiblesIds = [
+            c.idpaciente, c.IdPaciente, c.idPaciente,
+            c.pacienteId, c.id_usuario, c.IdUsuario,
+            c.idusuario, c.paciente_id, c.paciente
+          ];
+
+          let idPacienteCita = null;
+          for (const pid of posiblesIds) {
+            if (pid !== undefined && pid !== null && pid !== '') {
+              idPacienteCita = pid;
+              break;
+            }
+          }
+
+          let idPacienteCitaNum = null;
+          if (idPacienteCita !== null) {
+            idPacienteCitaNum = typeof idPacienteCita === 'string' ? parseInt(idPacienteCita, 10) : idPacienteCita;
+          }
+
+          if (idPacienteCitaNum && idPacienteCitaNum > 0) {
+            const estaAsignado = this.pacientesAsignadosIds.some(id => id === idPacienteCitaNum);
+            if (estaAsignado) {
+              return true;
+            }
+          }
+
+          const correoPaciente = c.correopaciente || c.correoPaciente || c.CorreoPaciente ||
+            c.emailPaciente || c.email || c.correo || c.Correo;
+          if (correoPaciente && correoPaciente.length > 0) {
+            const estaAsignado = this.pacientesAsignadosEmails.some(
+              email => email && email.toLowerCase() === correoPaciente.toLowerCase()
+            );
+            if (estaAsignado) {
+              return true;
+            }
+          }
+
+          return false;
+        })
+        : [];
+
+      const tratamientosFiltrados = Array.isArray(tratamientos)
+        ? tratamientos.filter((t: any) => {
+          const pacienteId = t.idpaciente || t.IdPaciente || t.idPaciente || t.pacienteId || t.id_usuario;
+          const pacienteIdNum = typeof pacienteId === 'string' ? parseInt(pacienteId, 10) : pacienteId;
+          return pacienteIdNum > 0 && this.pacientesAsignadosIds.some(id => id === pacienteIdNum);
+        })
+        : [];
+
+      const totalPacientes = this.pacientesAsignadosIds.length;
+
+      const citasCompletadas = citasFiltradas.filter((c: any) => {
+        const estado = (c.estado || '').toLowerCase();
+        return ['completada', 'realizada', 'finalizada'].includes(estado);
+      }).length;
+
+      const citasPendientes = citasFiltradas.filter((c: any) => {
+        const estado = (c.estado || '').toLowerCase();
+        return ['programada', 'pendiente', 'confirmada', 'agendada'].includes(estado);
+      }).length;
+
+      let promedioConsultas = 0;
+      if (citasFiltradas.length > 0) {
+        const meses = new Set();
+        citasFiltradas.forEach((c: any) => {
+          const fecha = c.fechacita || c.fecha || c.fechaCita;
+          if (fecha) {
+            try {
+              const d = new Date(fecha);
+              if (!isNaN(d.getTime())) {
+                meses.add(`${d.getFullYear()}-${d.getMonth()}`);
+              }
+            } catch (e) { }
+          }
+        });
+        const mesesCount = meses.size || 1;
+        promedioConsultas = Math.round((citasFiltradas.length / mesesCount) * 10) / 10;
       }
-    ];
+
+      this.estadisticas = {
+        totalPacientes: totalPacientes,
+        citasCompletadas: citasCompletadas,
+        citasPendientes: citasPendientes,
+        promedioConsultas: promedioConsultas
+      };
+
+      if (citasFiltradas.length > 0) {
+        const pacientesUnicos = new Map();
+        citasFiltradas.forEach((c: any) => {
+          const nombre = c.nombrepaciente || c.nombrePaciente || c.NombrePaciente || '';
+          const apPaterno = c.appaternopaciente || c.apPaternoPaciente || c.ApPaternoPaciente || '';
+          const apMaterno = c.apmaternopaciente || c.apMaternoPaciente || c.ApMaternoPaciente || '';
+          const nombreCompleto = `${nombre} ${apPaterno} ${apMaterno}`.trim() || 'Paciente';
+          const id = c.idpaciente || c.idPaciente || c.pacienteId || c.id;
+
+          if (!pacientesUnicos.has(id) && id) {
+            pacientesUnicos.set(id, {
+              id: id,
+              nombre: nombreCompleto,
+              motivo: c.motivo || c.Motivo || 'Consulta',
+              fechaUltimaCita: this.formatearFecha(c.fechacita || c.fecha || c.fechaCita || new Date().toISOString())
+            });
+          }
+        });
+        this.pacientesAtendidos = Array.from(pacientesUnicos.values()).slice(0, 10);
+      } else {
+        this.pacientesAtendidos = [];
+      }
+
+      const historial: any[] = [];
+
+      if (citasFiltradas.length > 0) {
+        citasFiltradas.forEach((c: any) => {
+          const nombre = c.nombrepaciente || c.nombrePaciente || c.NombrePaciente || '';
+          const apPaterno = c.appaternopaciente || c.apPaternoPaciente || c.ApPaternoPaciente || '';
+          const apMaterno = c.apmaternopaciente || c.apMaternoPaciente || c.ApMaternoPaciente || '';
+          const nombreCompleto = `${nombre} ${apPaterno} ${apMaterno}`.trim() || 'Paciente';
+          const fecha = c.fechacita || c.fecha || c.fechaCita || c.created_at || new Date().toISOString();
+          const estado = (c.estado || 'Programada').toLowerCase();
+
+          let accion = '';
+          let detalle = '';
+
+          switch (estado) {
+            case 'completada':
+            case 'realizada':
+            case 'finalizada':
+              accion = 'Cita completada';
+              detalle = `Consulta con ${nombreCompleto} finalizada`;
+              break;
+            case 'programada':
+            case 'confirmada':
+            case 'agendada':
+              accion = 'Cita programada';
+              detalle = `Nueva cita agendada para ${nombreCompleto}`;
+              break;
+            case 'cancelada':
+              accion = 'Cita cancelada';
+              detalle = `Cita de ${nombreCompleto} fue cancelada`;
+              break;
+            case 'pendiente':
+              accion = 'Cita pendiente';
+              detalle = `Cita de ${nombreCompleto} está pendiente`;
+              break;
+            default:
+              accion = `Cita ${estado}`;
+              detalle = `Cita de ${nombreCompleto}`;
+          }
+
+          historial.push({
+            fecha: this.formatearFecha(fecha),
+            accion: accion,
+            detalle: detalle,
+            usuario: nombreCompleto,
+            tipo: 'cita',
+            id: c.idcita || c.id,
+            estado: estado
+          });
+        });
+      }
+
+      if (tratamientosFiltrados.length > 0) {
+        tratamientosFiltrados.forEach((t: any) => {
+          const nombreMedicamento = t.nombremedicamento || t.NombreMedicamento || 'Medicamento';
+
+          let nombrePaciente = 'Paciente';
+          const pacienteId = t.idpaciente || t.IdPaciente || t.idPaciente;
+          if (pacienteId && Array.isArray(usuarios)) {
+            const paciente = usuarios.find((u: any) => (u.idusuario || u.id) === pacienteId);
+            if (paciente) {
+              const nombre = paciente.nombre || '';
+              const apPaterno = paciente.apPaterno || '';
+              const apMaterno = paciente.apMaterno || '';
+              nombrePaciente = `${nombre} ${apPaterno} ${apMaterno}`.trim() || 'Paciente';
+            }
+          }
+
+          const fecha = t.created_at || t.fechainicio || t.FechaInicio || new Date().toISOString();
+          const activo = t.activo !== false && t.activo !== 0;
+
+          historial.push({
+            fecha: this.formatearFecha(fecha),
+            accion: activo ? 'Tratamiento iniciado' : 'Tratamiento finalizado',
+            detalle: `${activo ? 'Inicio' : 'Fin'} de tratamiento con ${nombreMedicamento} para ${nombrePaciente}`,
+            usuario: nombrePaciente,
+            tipo: 'tratamiento',
+            id: t.idtratamiento || t.id
+          });
+        });
+      }
+
+      historial.sort((a, b) => {
+        return new Date(b.fecha).getTime() - new Date(a.fecha).getTime();
+      });
+
+      this.historialCambios = historial;
+
+    } catch (error) {
+      this.estadisticas = {
+        totalPacientes: 0,
+        citasCompletadas: 0,
+        citasPendientes: 0,
+        promedioConsultas: 0
+      };
+      this.pacientesAtendidos = [];
+      this.historialCambios = [];
+    } finally {
+      this.cargandoDatos = false;
+      this.cdr.detectChanges();
+    }
   }
 
   agregarHistorial(accion: string, detalle: string) {
@@ -185,7 +500,8 @@ export class MedicoDetalle implements OnInit, OnDestroy {
       fecha: fechaStr,
       accion: accion,
       detalle: detalle,
-      usuario: 'Usuario actual'
+      usuario: 'Usuario actual',
+      tipo: 'doctor'
     });
   }
 
@@ -330,7 +646,6 @@ export class MedicoDetalle implements OnInit, OnDestroy {
       }, 2000);
 
     } catch (error) {
-      console.error('Error detallado al guardar:', error);
       this.lanzarNotificacion("No se pudieron guardar los cambios en el servidor.", "error");
     } finally {
       this.isSaving = false;
@@ -338,7 +653,6 @@ export class MedicoDetalle implements OnInit, OnDestroy {
     }
   }
 
-  // Método para cuando cambian datos en el partial
   onCambioDatos() {
     this.cdr.detectChanges();
   }

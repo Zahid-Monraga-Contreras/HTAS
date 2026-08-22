@@ -116,7 +116,7 @@ export class Menu implements OnInit, OnDestroy {
         {
           route: '/admin/asignacion',
           icon: 'bi-person-plus',
-          label: 'Asignación',
+          label: 'Asignacion',
           queryParams: { canAdd: false, canEdit: true, canDelete: false }
         }
       ]
