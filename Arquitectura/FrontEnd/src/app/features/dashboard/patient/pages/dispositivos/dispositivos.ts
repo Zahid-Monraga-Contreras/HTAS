@@ -77,7 +77,6 @@ export class PatientDispositivos implements OnInit {
     obteniendoMedicion = false;
     medicionError = '';
 
-    // Mensajes del script Python en tiempo real
     medicionLogs: string[] = [];
     medicionCompletada = false;
 
@@ -116,7 +115,7 @@ export class PatientDispositivos implements OnInit {
             }
 
         } catch (error) {
-            console.error('Error al cargar dispositivos:', error);
+            // Error al cargar dispositivos
         } finally {
             this.isLoading = false;
             this.cdr.markForCheck();
@@ -148,7 +147,6 @@ export class PatientDispositivos implements OnInit {
                 this.cdr.markForCheck();
             }
         } catch (error) {
-            console.error('Error al cargar dispositivos:', error);
             this.dispositivos = [];
         }
     }
@@ -241,7 +239,6 @@ export class PatientDispositivos implements OnInit {
             await this.cargarDispositivos();
 
         } catch (error: any) {
-            console.error('Error al guardar dispositivo:', error);
             let mensaje = 'Error al vincular el dispositivo';
             if (error.error && error.error.error) {
                 mensaje = error.error.error;
@@ -263,7 +260,6 @@ export class PatientDispositivos implements OnInit {
             await this.cargarDispositivos();
 
         } catch (error) {
-            console.error('Error al sincronizar dispositivo:', error);
             this.mostrarNotificacion('Error', 'Error al sincronizar el dispositivo', 'error');
         }
     }
@@ -287,7 +283,6 @@ export class PatientDispositivos implements OnInit {
             await this.cargarDispositivos();
 
         } catch (error) {
-            console.error('Error al cambiar estado:', error);
             this.mostrarNotificacion('Error', 'Error al cambiar el estado del dispositivo', 'error');
         }
     }
@@ -298,7 +293,6 @@ export class PatientDispositivos implements OnInit {
             return;
         }
 
-        // Reiniciar el estado de la medición
         this.obteniendoMedicion = true;
         this.medicionError = '';
         this.medicionActual = null;
@@ -308,7 +302,6 @@ export class PatientDispositivos implements OnInit {
         document.body.style.overflow = 'hidden';
         this.cdr.markForCheck();
 
-        // Simular logs en tiempo real (para dar feedback al usuario)
         this.agregarLog('Iniciando escaneo de dispositivos Bluetooth...');
         this.agregarLog('Asegurate de que el tensiometro este ENCENDIDO');
         this.agregarLog('Presiona START en el tensiometro si es necesario');
@@ -318,7 +311,6 @@ export class PatientDispositivos implements OnInit {
                 this.usersService.obtenerMedicionTensiometro(this.patientId)
             );
 
-            // Agregar logs adicionales de la respuesta
             if (response && response.logs) {
                 for (const log of response.logs) {
                     this.agregarLog(log);
@@ -326,13 +318,10 @@ export class PatientDispositivos implements OnInit {
             }
 
             if (response && response.success && response.medicion) {
-                // Procesar la medición recibida
                 const medicion = response.medicion;
 
-                // Asegurar que la fecha sea correcta
                 let fechaFormateada = medicion.fechahoralectura || medicion.FechaHoraLectura;
                 if (fechaFormateada) {
-                    // Si la fecha viene en formato ISO, convertirla a formato legible
                     try {
                         const fecha = new Date(fechaFormateada);
                         if (!isNaN(fecha.getTime())) {
@@ -377,7 +366,6 @@ export class PatientDispositivos implements OnInit {
             }
 
         } catch (error: any) {
-            console.error('Error al tomar medicion:', error);
             this.medicionError = error.error?.error || error.message || 'Error al obtener la medicion';
             this.agregarLog(`Error: ${this.medicionError}`);
             this.mostrarNotificacion('Error', this.medicionError, 'error');
@@ -421,9 +409,6 @@ export class PatientDispositivos implements OnInit {
         this.cdr.markForCheck();
     }
 
-    // ==========================================
-    // NOTIFICACIONES TOAST
-    // ==========================================
     mostrarToast = false;
     mensajeToast = '';
     tipoToast: 'success' | 'error' | 'warning' = 'success';
@@ -442,10 +427,6 @@ export class PatientDispositivos implements OnInit {
             this.cdr.markForCheck();
         }, 4000);
     }
-
-    // ==========================================
-    // METODOS DE UTILIDAD
-    // ==========================================
 
     formatearFecha(fecha: string): string {
         if (!fecha) return 'No sincronizado';

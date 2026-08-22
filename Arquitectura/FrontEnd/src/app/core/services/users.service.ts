@@ -405,8 +405,6 @@ export class Users {
   }
 
   establecerSesion(res: any) {
-    console.log('ESTABLECIENDO SESION - Datos recibidos:', res);
-
     const nombre = res.nombre || '';
     const apPaterno = res.apPaterno || '';
     const apMaterno = res.apMaterno || '';
@@ -427,10 +425,6 @@ export class Users {
       telefono: res.telefono || '',
       photoURL: `https://ui-avatars.com/api/?name=${encodeURIComponent(res.nombre || 'Usuario')}&background=b0001e&color=fff&bold=true`
     };
-
-    console.log('USUARIO PROCESADO (guardado en localStorage):', usuarioProcesado);
-    console.log('ID de usuario guardado:', usuarioProcesado.idusuario);
-    console.log('Nombre completo guardado:', usuarioProcesado.nombreCompleto);
 
     this.currentUserSubject.next(usuarioProcesado);
     localStorage.setItem('user_htas', JSON.stringify(usuarioProcesado));
@@ -493,9 +487,8 @@ export class Users {
 
     try {
       await emailjs.send('service_tqqxijq', 'template_a59hcr9', templateParams);
-      console.log(`PIN (${pin}) enviado exitosamente a: ${email}`);
     } catch (error) {
-      console.error('Error al enviar el PIN con EmailJS:', error);
+      // Error al enviar el PIN con EmailJS
     }
   }
 
@@ -849,7 +842,6 @@ export class Users {
   }
 
   eliminarTodasTomas(idTratamiento: number): Observable<any> {
-    console.log(`[Service] Eliminando todas las tomas del tratamiento ID: ${idTratamiento}`);
     return this.http.delete<any>(`${this.apiUrl}/tomas/tratamiento/${idTratamiento}/todas`);
   }
 
@@ -979,7 +971,6 @@ export class Users {
   }
 
   obtenerMedicionTensiometro(idPaciente: number | string): Observable<any> {
-    console.log(`[Service] Solicitando medicion para paciente ID: ${idPaciente}`);
     return this.http.get(`${this.apiUrl}/mediciones/tensiometro/${idPaciente}`);
   }
 
@@ -1041,16 +1032,10 @@ export class Users {
   // ALGORITMO - ANALISIS DE HIPERTENSION - ACTUALIZADO
   // ==========================================================================
 
-  /**
-   * Verifica el estado del algoritmo (si el script Python está disponible)
-   */
   verificarEstadoAlgoritmo(): Observable<EstadoResponse> {
     return this.http.get<EstadoResponse>(`${this.apiUrl}/algorithm/estado`);
   }
 
-  /**
-   * Analiza un paciente con un solo PDF (diagnóstico)
-   */
   analizarConPDF(request: AnalisisRequest): Observable<AnalisisResponse> {
     const formData = new FormData();
 
@@ -1076,9 +1061,6 @@ export class Users {
     );
   }
 
-  /**
-   * Analiza un paciente con dos PDFs (cédula + diagnóstico)
-   */
   analizarConMultiplesPDFs(request: AnalisisCompletoRequest): Observable<AnalisisResponse> {
     const formData = new FormData();
 
@@ -1105,37 +1087,29 @@ export class Users {
     );
   }
 
-  /**
-   * Obtiene el último expediente de un paciente
-   */
   obtenerUltimoExpediente(idPaciente: number): Observable<UltimoExpedienteResponse> {
     return this.http.get<UltimoExpedienteResponse>(
       `${this.apiUrl}/algorithm/ultimo-expediente/${idPaciente}`
     ).pipe(
       map((response: any) => {
-        // Si la respuesta tiene success: false pero data: null, devolver como éxito con data null
         if (response && response.success === false && response.data === null) {
           return {
             success: true,
             data: null
           } as UltimoExpedienteResponse;
         }
-        // Si la respuesta tiene data: null pero success: true
         if (response && response.success === true && response.data === null) {
           return response as UltimoExpedienteResponse;
         }
-        // Si la respuesta tiene data con valores
         if (response && response.success === true && response.data) {
           return response as UltimoExpedienteResponse;
         }
-        // Si la respuesta es directamente los datos (sin wrapper)
         if (response && response.folio) {
           return {
             success: true,
             data: response
           } as UltimoExpedienteResponse;
         }
-        // Si no hay datos
         return {
           success: true,
           data: null
@@ -1144,18 +1118,12 @@ export class Users {
     );
   }
 
-  /**
-   * Obtiene el PDF de un expediente en formato Base64 (sin descargar)
-   */
   obtenerPDFBase64(folio: number): Observable<PdfResponse> {
     return this.http.get<PdfResponse>(
       `${this.apiUrl}/algorithm/pdf-base64/${folio}`
     );
   }
 
-  /**
-   * Obtiene el PDF de un expediente como archivo (descarga directa)
-   */
   obtenerPDFExpediente(folio: number): Observable<Blob> {
     return this.http.get(
       `${this.apiUrl}/algorithm/pdf/${folio}`,
@@ -1163,15 +1131,11 @@ export class Users {
     );
   }
 
-  /**
-   * Obtiene el último análisis de un médico por su cédula
-   */
   obtenerUltimoAnalisis(cedulaMedico: string): Observable<UltimoAnalisisResponse> {
     return this.http.get<UltimoAnalisisResponse>(
       `${this.apiUrl}/algorithm/ultimo-analisis/${cedulaMedico}`
     ).pipe(
       map((response: any) => {
-        // Si la respuesta tiene success: false pero data: null
         if (response && response.success === false && response.data === null) {
           return {
             success: true,
@@ -1179,25 +1143,21 @@ export class Users {
             mensaje: response.mensaje || 'No hay analisis para esta cedula'
           } as UltimoAnalisisResponse;
         }
-        // Si la respuesta tiene data: null pero success: true
         if (response && response.success === true && response.data === null) {
           return {
             ...response,
             mensaje: response.mensaje || 'No hay analisis para esta cedula'
           } as UltimoAnalisisResponse;
         }
-        // Si la respuesta tiene data con valores
         if (response && response.success === true && response.data) {
           return response as UltimoAnalisisResponse;
         }
-        // Si la respuesta es directamente los datos
         if (response && response.folio) {
           return {
             success: true,
             data: response
           } as UltimoAnalisisResponse;
         }
-        // Si no hay datos
         return {
           success: true,
           data: null,
@@ -1207,9 +1167,6 @@ export class Users {
     );
   }
 
-  /**
-   * Ejecuta una acción personalizada en Python (utilidad/depuración)
-   */
   ejecutarAccionPersonalizada(accion: string, payload?: any): Observable<any> {
     return this.http.post(
       `${this.apiUrl}/algorithm/accion-personalizada`,

@@ -1,15 +1,14 @@
-import { Component, inject, ChangeDetectorRef, NgZone, PLATFORM_ID, AfterViewInit, ViewChild } from '@angular/core';
+import { Component, inject, ChangeDetectorRef, NgZone, PLATFORM_ID, AfterViewInit, Renderer2 } from '@angular/core';
 import { Auth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from '@angular/fire/auth';
 import { Firestore, doc, getDoc, setDoc } from '@angular/fire/firestore';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { soloLetrasValidator, soloLetras } from '../../../shared/validations/validators';
 import { GoogleService } from '../../../core/services/google.service';
 import { Router } from '@angular/router';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { CommonModule, isPlatformBrowser, DOCUMENT } from '@angular/common';
 import flatpickr from 'flatpickr';
 import { Spanish } from 'flatpickr/dist/l10n/es.js';
 import { Users } from '../../../core/services/users.service';
-import { RecaptchaModule, RecaptchaFormsModule, RecaptchaComponent } from 'ng-recaptcha';
 import { environment } from '../../../../environments/environment';
 
 @Component({
@@ -19,8 +18,6 @@ import { environment } from '../../../../environments/environment';
     CommonModule,
     ReactiveFormsModule,
     FormsModule,
-    RecaptchaModule,
-    RecaptchaFormsModule,
   ],
   templateUrl: './login.html',
   styleUrl: './login.css',
@@ -34,6 +31,8 @@ export class Login implements AfterViewInit {
   private cdr = inject(ChangeDetectorRef);
   private ngZone = inject(NgZone);
   private platformId = inject(PLATFORM_ID);
+  private renderer = inject(Renderer2);
+  private document = inject(DOCUMENT);
 
   isToggled = false;
   registerForm: FormGroup;
@@ -64,13 +63,7 @@ export class Login implements AfterViewInit {
   nombreArchivoCedula: string = '';
   fotoCedulaBase64: string = '';
 
-  captchaTokenLogin: string | null = null;
-  captchaTokenRegister: string | null = null;
-
   recaptchaSiteKey = environment.recaptchaSiteKey;
-
-  @ViewChild('recaptchaLogin') recaptchaLoginComponent!: RecaptchaComponent;
-  @ViewChild('recaptchaRegister') recaptchaRegisterComponent!: RecaptchaComponent;
 
   constructor(public users: Users, private fb: FormBuilder) {
     this.registerForm = this.fb.group({
@@ -86,13 +79,11 @@ export class Login implements AfterViewInit {
       DireccionClinica: [''],
       FechaAsignacion: [''],
       Activo: [true],
-      recaptcha: ['', Validators.required],
     }, { validators: this.passwordMatchValidator });
 
     this.loginForm = this.fb.group({
       Email: ['', [Validators.required, Validators.email]],
       Password: ['', [Validators.required, Validators.minLength(6)]],
-      recaptcha: ['', Validators.required]
     });
 
     this.registerForm.get('Rol')?.valueChanges.subscribe(rol => {
@@ -104,37 +95,43 @@ export class Login implements AfterViewInit {
 
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
-      const isMobile = window.innerWidth < 768;
-      if (isMobile) {
-        setTimeout(() => {
-          this.recargarCaptchaLogin();
-          this.recargarCaptchaRegister();
-        }, 500);
-      }
+      this.cargarRecaptchaV3();
     }
   }
 
-  recargarCaptchaLogin() {
-    if (this.recaptchaLoginComponent) {
-      try {
-        this.recaptchaLoginComponent.reset();
-        this.captchaTokenLogin = null;
-        this.loginForm.get('recaptcha')?.setValue(null);
-      } catch (error) {
-        console.warn('Error al recargar reCAPTCHA login:', error);
-      }
+  private cargarRecaptchaV3(): void {
+    if (this.document.querySelector('script[src*="recaptcha/api.js"]')) {
+      return;
     }
+
+    const script = this.renderer.createElement('script');
+    script.src = `https://www.google.com/recaptcha/api.js?render=${this.recaptchaSiteKey}`;
+    script.async = true;
+    script.defer = true;
+    this.renderer.appendChild(this.document.body, script);
   }
 
-  recargarCaptchaRegister() {
-    if (this.recaptchaRegisterComponent) {
-      try {
-        this.recaptchaRegisterComponent.reset();
-        this.captchaTokenRegister = null;
-        this.registerForm.get('recaptcha')?.setValue(null);
-      } catch (error) {
-        console.warn('Error al recargar reCAPTCHA register:', error);
-      }
+  private async obtenerTokenRecaptchaV3(action: string): Promise<string> {
+    if (!isPlatformBrowser(this.platformId)) {
+      return '';
+    }
+
+    if (typeof (window as any).grecaptcha === 'undefined') {
+      await new Promise((resolve) => {
+        const checkInterval = setInterval(() => {
+          if (typeof (window as any).grecaptcha !== 'undefined') {
+            clearInterval(checkInterval);
+            resolve(true);
+          }
+        }, 100);
+      });
+    }
+
+    try {
+      const token = await (window as any).grecaptcha.execute(this.recaptchaSiteKey, { action });
+      return token;
+    } catch (error) {
+      return '';
     }
   }
 
@@ -233,16 +230,6 @@ export class Login implements AfterViewInit {
     }
   }
 
-  onCaptchaLoginResolved(token: string | null): void {
-    this.captchaTokenLogin = token;
-    this.loginForm.get('recaptcha')?.setValue(token);
-  }
-
-  onCaptchaRegisterResolved(token: string | null): void {
-    this.captchaTokenRegister = token;
-    this.registerForm.get('recaptcha')?.setValue(token);
-  }
-
   private configurarLimitesFecha(): void {
     const hoy = new Date();
     this.fechaMaxima = hoy.toISOString().split('T')[0];
@@ -307,16 +294,13 @@ export class Login implements AfterViewInit {
 
   private redirectBasedOnRole(role: string): void {
     const route = this.getRouteForRole(role.toLowerCase());
-    console.log('Redirigiendo a: ' + route + ' (rol: ' + role + ')');
 
     this.ngZone.run(() => {
       this.router.navigate([route]).then(success => {
-        console.log('Navegacion a ' + route + ': ' + success);
         if (!success) {
           window.location.href = route;
         }
-      }).catch(err => {
-        console.error('Error en navegacion:', err);
+      }).catch(() => {
         window.location.href = route;
       });
     });
@@ -324,78 +308,80 @@ export class Login implements AfterViewInit {
 
   private guardarToken(token: string): void {
     if (!token) {
-      console.warn('No se proporcionó token para guardar');
       return;
     }
-
-    console.log('Guardando token:', token.substring(0, 30) + '...');
 
     localStorage.setItem('access_token', token);
     localStorage.setItem('token', token);
     localStorage.setItem('accessToken', token);
-
-    const verificado = localStorage.getItem('access_token');
-    console.log('Token verificado en localStorage:', verificado ? 'Sí' : 'No');
   }
 
   async onSubmitSignUp(): Promise<void> {
-    if (!this.captchaTokenRegister) {
-      this.openModal('Verificacion requerida', 'Por favor completa el reCAPTCHA.', 'modal-error');
-      return;
-    }
-
     if (this.registerForm.valid) {
       this.loading = true;
       this.cdr.detectChanges();
 
-      const f = this.registerForm.value;
-      const partesNombre = f.NombreCompleto.trim().split(' ');
-      const nombre = partesNombre[0] || '';
-      const apPaterno = partesNombre[1] || '';
-      const apMaterno = partesNombre.slice(2).join(' ') || '';
+      try {
+        const recaptchaToken = await this.obtenerTokenRecaptchaV3('register');
 
-      const datosParaBackend = {
-        nombre: nombre,
-        apPaterno: apPaterno,
-        apMaterno: apMaterno,
-        correo: f.Email,
-        contrasenia: f.Password,
-        rol: f.Rol,
-        telefono: f.Telefono,
-        recaptchaToken: this.captchaTokenRegister,
-        datosExtra: {
-          cedula: f.FotoCedula,
-          especialidad: f.Especialidad,
-          direccion: f.DireccionClinica,
-          nss: f.NSS,
-          fechaAsignacion: f.FechaAsignacion,
-          idPacienteAsociado: f.IdPacienteAsociado || null
+        if (!recaptchaToken) {
+          this.loading = false;
+          this.openModal('Verificacion requerida', 'No se pudo verificar la seguridad. Intenta de nuevo.', 'modal-error');
+          return;
         }
-      };
 
-      this.users.registrar(datosParaBackend).subscribe({
-        next: (res: any) => {
-          console.log('Registro exitoso:', res);
-          this.ngZone.run(() => {
-            this.loading = false;
-            this.isToggled = false;
-            this.currentStep = 1;
-            this.openModal(
-              'Registro Exitoso',
-              'Usuario guardado correctamente. Por favor inicia sesion.',
-              'modal-success'
-            );
-            this.cdr.detectChanges();
-          });
-        },
-        error: (err) => {
-          this.ngZone.run(() => {
-            this.loading = false;
-            const mensajeError = err.error?.error || 'No se pudo conectar con el servidor.';
-            this.openModal('Error al Registrar', mensajeError, 'modal-error');
-          });
-        }
-      });
+        const f = this.registerForm.value;
+        const partesNombre = f.NombreCompleto.trim().split(' ');
+        const nombre = partesNombre[0] || '';
+        const apPaterno = partesNombre[1] || '';
+        const apMaterno = partesNombre.slice(2).join(' ') || '';
+
+        const datosParaBackend = {
+          nombre: nombre,
+          apPaterno: apPaterno,
+          apMaterno: apMaterno,
+          correo: f.Email,
+          contrasenia: f.Password,
+          rol: f.Rol,
+          telefono: f.Telefono,
+          recaptchaToken: recaptchaToken,
+          datosExtra: {
+            cedula: f.FotoCedula,
+            especialidad: f.Especialidad,
+            direccion: f.DireccionClinica,
+            nss: f.NSS,
+            fechaAsignacion: f.FechaAsignacion,
+            idPacienteAsociado: f.IdPacienteAsociado || null
+          }
+        };
+
+        this.users.registrar(datosParaBackend).subscribe({
+          next: (res: any) => {
+            this.ngZone.run(() => {
+              this.loading = false;
+              this.isToggled = false;
+              this.currentStep = 1;
+              this.openModal(
+                'Registro Exitoso',
+                'Usuario guardado correctamente. Por favor inicia sesion.',
+                'modal-success'
+              );
+              this.cdr.detectChanges();
+            });
+          },
+          error: (err) => {
+            this.ngZone.run(() => {
+              this.loading = false;
+              const mensajeError = err.error?.error || 'No se pudo conectar con el servidor.';
+              this.openModal('Error al Registrar', mensajeError, 'modal-error');
+            });
+          }
+        });
+
+      } catch (error) {
+        this.loading = false;
+        this.openModal('Error', 'Ocurrio un error al procesar la solicitud.', 'modal-error');
+      }
 
     } else {
       this.openModal('Formulario Incompleto', 'Por favor revisa los campos marcados.', 'modal-error');
@@ -408,7 +394,6 @@ export class Login implements AfterViewInit {
 
     try {
       const res: any = await this.googleService.loginWithGoogle();
-      console.log('Google login response:', res);
 
       this.ngZone.run(() => {
         this.loading = false;
@@ -430,8 +415,6 @@ export class Login implements AfterViewInit {
             telefono: res.telefono || ''
           };
 
-          console.log('Guardando en localStorage (Google):', userData);
-
           localStorage.setItem('user_htas', JSON.stringify(userData));
           this.users.establecerSesion(userData);
 
@@ -445,14 +428,12 @@ export class Login implements AfterViewInit {
           }
 
           const role = res.rol || res.role || res.tipo || '';
-          console.log('Rol obtenido del backend: ' + role);
 
           if (role) {
             setTimeout(() => {
               this.redirectBasedOnRole(role);
             }, 300);
           } else {
-            console.error('No se pudo obtener el rol del usuario');
             this.openModal('Error', 'No se pudo obtener la informacion del usuario.', 'modal-error');
           }
         }
@@ -466,11 +447,6 @@ export class Login implements AfterViewInit {
   }
 
   async onLoginWithEmailPassword(): Promise<void> {
-    if (!this.captchaTokenLogin) {
-      this.openModal('Verificacion requerida', 'Por favor completa el reCAPTCHA.', 'modal-error');
-      return;
-    }
-
     if (this.loginForm.invalid) {
       this.openModal('Formulario Incompleto', 'Por favor ingresa un correo y contrasena validos.', 'modal-error');
       return;
@@ -479,84 +455,88 @@ export class Login implements AfterViewInit {
     this.loading = true;
     this.cdr.detectChanges();
 
-    const { Email, Password } = this.loginForm.value;
-    const credenciales = { correo: Email, contrasenia: Password, recaptchaToken: this.captchaTokenLogin };
+    try {
+      const recaptchaToken = await this.obtenerTokenRecaptchaV3('login');
 
-    this.users.login(credenciales).subscribe({
-      next: (res: any) => {
-        console.log('Login response del backend COMPLETA:', JSON.stringify(res, null, 2));
-        this.ngZone.run(() => {
-          this.loading = false;
-
-          if (res) {
-            const token = res.token || res.accessToken;
-            if (token) {
-              this.guardarToken(token);
-            } else {
-              console.warn('No se recibió token en la respuesta');
-            }
-
-            const userId = res.uid || res.idusuario || res.id || res.idUsuario || res.userId || null;
-
-            const nombre = res.nombre || '';
-            const apPaterno = res.apPaterno || '';
-            const apMaterno = res.apMaterno || '';
-            const nombreCompleto = `${nombre} ${apPaterno} ${apMaterno}`.trim() || nombre;
-
-            const userData = {
-              uid: res.uid || '',
-              idusuario: userId,
-              rol: res.rol || res.role || res.tipo || 'Paciente',
-              nombre: res.nombre || 'Usuario',
-              nombreCompleto: nombreCompleto,
-              correo: res.correo || res.Email || res.email || '',
-              apPaterno: res.apPaterno || '',
-              apMaterno: res.apMaterno || '',
-              telefono: res.telefono || ''
-            };
-
-            console.log('Guardando en localStorage:', userData);
-            console.log('ID de usuario:', userData.idusuario);
-            console.log('Nombre completo:', userData.nombreCompleto);
-
-            localStorage.setItem('user_htas', JSON.stringify(userData));
-            this.users.establecerSesion(userData);
-
-            if (res.pinVerificado === false) {
-              this.usuarioUidTemporal = res.uid || res.idusuario || res.id;
-              this.pinCorrectoBD = res.pin;
-              this.esperandoPin = true;
-              this.openModal('Verificacion Requerida', 'Se ha enviado un codigo de seguridad a tu correo.', 'modal-success');
-              this.cdr.detectChanges();
-              return;
-            }
-
-            const role = res.rol || res.role || res.tipo || '';
-            console.log('Rol obtenido del backend: ' + role);
-
-            if (role) {
-              setTimeout(() => {
-                this.redirectBasedOnRole(role);
-              }, 300);
-            } else {
-              console.error('No se pudo obtener el rol del usuario');
-              this.openModal('Error', 'No se pudo obtener la informacion del usuario.', 'modal-error');
-            }
-          }
-        });
-      },
-      error: (err) => {
-        this.ngZone.run(() => {
-          this.loading = false;
-          if (err.status === 423) {
-            this.openModal('Cuenta Bloqueada', 'Demasiados intentos. Espera un momento.', 'modal-error');
-          } else {
-            const mensajeError = err.error?.error || 'Correo o contrasena incorrectos.';
-            this.openModal('Error de Acceso', mensajeError, 'modal-error');
-          }
-        });
+      if (!recaptchaToken) {
+        this.loading = false;
+        this.openModal('Verificacion requerida', 'No se pudo verificar la seguridad. Intenta de nuevo.', 'modal-error');
+        return;
       }
-    });
+
+      const { Email, Password } = this.loginForm.value;
+      const credenciales = { correo: Email, contrasenia: Password, recaptchaToken: recaptchaToken };
+
+      this.users.login(credenciales).subscribe({
+        next: (res: any) => {
+          this.ngZone.run(() => {
+            this.loading = false;
+
+            if (res) {
+              const token = res.token || res.accessToken;
+              if (token) {
+                this.guardarToken(token);
+              }
+
+              const userId = res.uid || res.idusuario || res.id || res.idUsuario || res.userId || null;
+
+              const nombre = res.nombre || '';
+              const apPaterno = res.apPaterno || '';
+              const apMaterno = res.apMaterno || '';
+              const nombreCompleto = `${nombre} ${apPaterno} ${apMaterno}`.trim() || nombre;
+
+              const userData = {
+                uid: res.uid || '',
+                idusuario: userId,
+                rol: res.rol || res.role || res.tipo || 'Paciente',
+                nombre: res.nombre || 'Usuario',
+                nombreCompleto: nombreCompleto,
+                correo: res.correo || res.Email || res.email || '',
+                apPaterno: res.apPaterno || '',
+                apMaterno: res.apMaterno || '',
+                telefono: res.telefono || ''
+              };
+
+              localStorage.setItem('user_htas', JSON.stringify(userData));
+              this.users.establecerSesion(userData);
+
+              if (res.pinVerificado === false) {
+                this.usuarioUidTemporal = res.uid || res.idusuario || res.id;
+                this.pinCorrectoBD = res.pin;
+                this.esperandoPin = true;
+                this.openModal('Verificacion Requerida', 'Se ha enviado un codigo de seguridad a tu correo.', 'modal-success');
+                this.cdr.detectChanges();
+                return;
+              }
+
+              const role = res.rol || res.role || res.tipo || '';
+
+              if (role) {
+                setTimeout(() => {
+                  this.redirectBasedOnRole(role);
+                }, 300);
+              } else {
+                this.openModal('Error', 'No se pudo obtener la informacion del usuario.', 'modal-error');
+              }
+            }
+          });
+        },
+        error: (err) => {
+          this.ngZone.run(() => {
+            this.loading = false;
+            if (err.status === 423) {
+              this.openModal('Cuenta Bloqueada', 'Demasiados intentos. Espera un momento.', 'modal-error');
+            } else {
+              const mensajeError = err.error?.error || 'Correo o contrasena incorrectos.';
+              this.openModal('Error de Acceso', mensajeError, 'modal-error');
+            }
+          });
+        }
+      });
+    } catch (error) {
+      this.loading = false;
+      this.openModal('Error', 'Ocurrio un error al procesar la solicitud.', 'modal-error');
+    }
   }
 
   async verificarPin(): Promise<void> {
@@ -565,7 +545,6 @@ export class Login implements AfterViewInit {
 
     this.users.verificarPin(this.usuarioUidTemporal, this.pinIngresado).subscribe({
       next: (res: any) => {
-        console.log('PIN verification response:', res);
         this.loading = false;
 
         const token = res.accessToken || res.token;
@@ -584,21 +563,17 @@ export class Login implements AfterViewInit {
           telefono: res.telefono || ''
         };
 
-        console.log('Guardando en localStorage (PIN):', userData);
-
         localStorage.setItem('user_htas', JSON.stringify(userData));
         this.users.establecerSesion(userData);
 
         this.ngZone.run(() => {
           const role = res.rol || res.role || res.tipo || '';
-          console.log('Rol obtenido despues de verificar PIN: ' + role);
 
           if (role) {
             setTimeout(() => {
               this.redirectBasedOnRole(role);
             }, 300);
           } else {
-            console.error('No se pudo obtener el rol despues de verificar PIN');
             this.router.navigate(['/landing']);
           }
         });

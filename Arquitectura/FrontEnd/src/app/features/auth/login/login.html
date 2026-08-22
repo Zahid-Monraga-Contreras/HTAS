@@ -30,9 +30,6 @@
             <input [type]="showLoginPassword ? 'text' : 'password'" formControlName="Password" placeholder="Contraseña">
             <i class="bi" [ngClass]="showLoginPassword ? 'bi-eye-slash' : 'bi-eye'" (click)="toggleLoginPassword()"></i>
           </div>
-          <re-captcha #recaptchaLogin mode="invisible" formControlName="recaptcha" [formGroup]="loginForm"
-            [siteKey]="recaptchaSiteKey" (resolved)="onCaptchaLoginResolved($event)">
-          </re-captcha>
           <button type="button" class="button google-style" (click)="onLoginWithEmailPassword()"
             [disabled]="loading || loginForm.invalid">
             <i class="bi bi-box-arrow-in-right"></i>
@@ -73,7 +70,7 @@
           <p class="mobile-toggle"><a (click)="esperandoPin = false">Intentar con otra cuenta</a></p>
         </div>
 
-        <!-- TÉRMINOS Y CONDICIONES - CORREGIDO -->
+        <!-- TÉRMINOS Y CONDICIONES -->
         <div class="legal-terms" *ngIf="!esperandoPin">
           <p>
             Al continuar, aceptas nuestro
@@ -156,7 +153,7 @@
             <input type="email" formControlName="Email" placeholder="Correo Electrónico">
           </div>
 
-          <!-- TÉRMINOS Y CONDICIONES EN PASO 1 - CORREGIDO -->
+          <!-- TÉRMINOS Y CONDICIONES EN PASO 1 -->
           <div class="legal-terms register-terms">
             <p>
               Al continuar, aceptas nuestro
@@ -185,7 +182,7 @@
               (click)="toggleConfirmPassword()"></i>
           </div>
 
-          <!-- TÉRMINOS Y CONDICIONES EN PASO 2 - CORREGIDO -->
+          <!-- TÉRMINOS Y CONDICIONES EN PASO 2 -->
           <div class="legal-terms register-terms">
             <p>
               Al continuar, aceptas nuestro
@@ -251,14 +248,7 @@
             </div>
           </ng-container>
 
-          <!-- reCAPTCHA -->
-          <div class="recaptcha-wrapper">
-            <re-captcha #recaptchaRegister mode="invisible" formControlName="recaptcha" [formGroup]="registerForm"
-              [siteKey]="recaptchaSiteKey" (resolved)="onCaptchaRegisterResolved($event)">
-            </re-captcha>
-          </div>
-
-          <!-- TÉRMINOS Y CONDICIONES EN PASO 3 - CORREGIDO -->
+          <!-- TÉRMINOS Y CONDICIONES EN PASO 3 -->
           <div class="legal-terms register-terms">
             <p>
               Al continuar, aceptas nuestro

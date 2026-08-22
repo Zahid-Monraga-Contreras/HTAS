@@ -16,28 +16,23 @@ export const authGuard: CanActivateFn = (route, state) => {
         unsubscribe();
 
         if (user) {
-          console.log('AuthGuard: Usuario autenticado:', user.uid);
           observer.next(true);
           observer.complete();
         } else {
-          console.warn('AuthGuard: Usuario no autenticado, verificando localStorage...');
-
           const savedUser = localStorage.getItem('user_htas');
           if (savedUser) {
             try {
               const userData = JSON.parse(savedUser);
               if (userData && (userData.uid || userData.idusuario)) {
-                console.log('AuthGuard: Usuario encontrado en localStorage, permitiendo acceso');
                 observer.next(true);
                 observer.complete();
                 return;
               }
             } catch (e) {
-              console.warn('AuthGuard: Error al parsear localStorage');
+              // Error al parsear localStorage
             }
           }
 
-          console.warn('AuthGuard: Redirigiendo a login');
           router.navigate(['/login']);
           observer.next(false);
           observer.complete();
@@ -47,7 +42,6 @@ export const authGuard: CanActivateFn = (route, state) => {
       if (!isResolved) {
         isResolved = true;
         unsubscribe();
-        console.error('Error en AuthGuard:', error);
         router.navigate(['/login']);
         observer.next(false);
         observer.complete();

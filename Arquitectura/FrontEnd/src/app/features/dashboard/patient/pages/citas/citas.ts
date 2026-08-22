@@ -63,7 +63,6 @@ export class PatientCitas implements OnInit {
     citaSeleccionada: any = null;
     citaParaCancelar: any = null;
 
-    // Variables para disponibilidad
     horarioDisponible: boolean = true;
     mensajeDisponibilidad: string = '';
     horariosDisponibles: string[] = [];
@@ -95,9 +94,6 @@ export class PatientCitas implements OnInit {
         this.fechaMinima = hoy.toISOString().split('T')[0];
     }
 
-    // ==========================================
-    // SISTEMA DE NOTIFICACIONES TOAST
-    // ==========================================
     private showToast(type: ToastNotification['type'], title: string, message: string, duration: number = 5000) {
         const id = ++this.notificationCounter;
         const notification: ToastNotification = {
@@ -137,9 +133,6 @@ export class PatientCitas implements OnInit {
         this.showToast('info', title, message, duration);
     }
 
-    // ==========================================
-    // MODAL DE CONFIRMACION PERSONALIZADO
-    // ==========================================
     mostrarConfirmacionCancelar(cita: any) {
         this.citaParaCancelar = cita;
         this.modalConfirmacion = {
@@ -158,9 +151,6 @@ export class PatientCitas implements OnInit {
         document.body.style.overflow = '';
     }
 
-    // ==========================================
-    // NGONINIT
-    // ==========================================
     async ngOnInit() {
         if (!isPlatformBrowser(this.platformId)) return;
 
@@ -201,9 +191,6 @@ export class PatientCitas implements OnInit {
         }
     }
 
-    // ==========================================
-    // CARGA DE CITAS
-    // ==========================================
     private async cargarCitas() {
         try {
             let citasData: any[] = [];
@@ -297,9 +284,6 @@ export class PatientCitas implements OnInit {
         }
     }
 
-    // ==========================================
-    // MODAL AGENDAR
-    // ==========================================
     abrirModalAgendar() {
         if (!this.userEmail) {
             this.showError('Error de Identificacion', 'No se pudo identificar al usuario. Por favor inicia sesion nuevamente.');
@@ -312,7 +296,6 @@ export class PatientCitas implements OnInit {
         const mes = String(hoy.getMonth() + 1).padStart(2, '0');
         const dia = String(hoy.getDate()).padStart(2, '0');
 
-        // Resetear variables de disponibilidad
         this.horarioDisponible = true;
         this.mensajeDisponibilidad = '';
         this.mostrandoHorarios = false;
@@ -340,9 +323,6 @@ export class PatientCitas implements OnInit {
         this.mostrandoHorarios = false;
     }
 
-    // ==========================================
-    // MODAL DETALLE
-    // ==========================================
     verDetalleCita(cita: any) {
         this.citaSeleccionada = cita;
         this.mostrarModalDetalle = true;
@@ -355,9 +335,6 @@ export class PatientCitas implements OnInit {
         document.body.style.overflow = '';
     }
 
-    // ==========================================
-    // CALENDARIOS CON VALIDACION DE DISPONIBILIDAD
-    // ==========================================
     inicializarCalendario() {
         if (isPlatformBrowser(this.platformId)) {
             setTimeout(() => {
@@ -382,9 +359,7 @@ export class PatientCitas implements OnInit {
                         onChange: (selectedDates: any, dateStr: string) => {
                             this.citaForm.patchValue({ fechaCita: dateStr });
                             this.citaForm.get('fechaCita')?.markAsTouched();
-                            // Verificar disponibilidad al cambiar fecha
                             this.verificarDisponibilidadEnTiempoReal();
-                            // Cargar horarios disponibles para esta fecha
                             this.cargarHorariosDisponibles(dateStr);
                             this.cdr.detectChanges();
                         }
@@ -405,14 +380,12 @@ export class PatientCitas implements OnInit {
                         onChange: (selectedDates: any, dateStr: string) => {
                             this.citaForm.patchValue({ horaCita: dateStr });
                             this.citaForm.get('horaCita')?.markAsTouched();
-                            // Verificar disponibilidad al cambiar hora
                             this.verificarDisponibilidadEnTiempoReal();
                             this.cdr.detectChanges();
                         }
                     });
                 }
 
-                // Cargar horarios disponibles para la fecha inicial
                 const fechaInicial = this.citaForm.get('fechaCita')?.value;
                 if (fechaInicial) {
                     this.cargarHorariosDisponibles(fechaInicial);
@@ -432,13 +405,6 @@ export class PatientCitas implements OnInit {
         }
     }
 
-    // ==========================================
-    // VALIDACION DE DISPONIBILIDAD
-    // ==========================================
-
-    /**
-     * Verifica disponibilidad en tiempo real cuando el usuario selecciona fecha y hora
-     */
     private async verificarDisponibilidadEnTiempoReal() {
         const fecha = this.citaForm.get('fechaCita')?.value;
         const hora = this.citaForm.get('horaCita')?.value;
@@ -463,15 +429,12 @@ export class PatientCitas implements OnInit {
             this.correoOcupante = disponibilidad.detalles?.correoExistente || null;
 
             if (!disponibilidad.disponible) {
-                // Marcar el formulario como inválido
                 this.citaForm.setErrors({ horarioOcupado: true });
                 this.horarioSeleccionadoValido = false;
 
-                // Mostrar advertencia con detalles
                 if (disponibilidad.detalles) {
                     const detalles = disponibilidad.detalles;
 
-                    // Verificar si alguien más ya tiene la cita
                     if (detalles.yaAgendado && detalles.correoExistente && detalles.correoExistente !== this.userEmail) {
                         this.showWarning(
                             'Horario ocupado',
@@ -491,13 +454,10 @@ export class PatientCitas implements OnInit {
                 this.citaForm.setErrors(null);
                 this.horarioSeleccionadoValido = true;
                 this.correoOcupante = null;
-                // Mostrar mensaje de disponibilidad
                 this.showInfo('Horario disponible', 'Puedes agendar tu cita en este horario.');
             }
 
         } catch (error) {
-            console.error('Error verificando disponibilidad:', error);
-            // Si hay error, permitir continuar pero mostrar advertencia
             this.showWarning('Error de verificación', 'No se pudo verificar la disponibilidad. Intenta nuevamente.');
         } finally {
             this.verificandoDisponibilidad = false;
@@ -505,9 +465,6 @@ export class PatientCitas implements OnInit {
         }
     }
 
-    /**
-     * Carga los horarios disponibles para una fecha específica
-     */
     private async cargarHorariosDisponibles(fecha: string) {
         if (!fecha) {
             this.horariosDisponibles = [];
@@ -524,7 +481,6 @@ export class PatientCitas implements OnInit {
                 this.horariosDisponibles = response.horariosDisponibles || [];
                 this.mostrandoHorarios = this.horariosDisponibles.length > 0;
 
-                // Si solo hay un horario disponible, sugerirlo
                 if (this.horariosDisponibles.length === 1) {
                     const horaSugerida = this.horariosDisponibles[0];
                     this.seleccionarHorario(horaSugerida);
@@ -533,7 +489,6 @@ export class PatientCitas implements OnInit {
                     this.showWarning('Sin horarios', 'No hay horarios disponibles para esta fecha.');
                     this.mostrandoHorarios = false;
                 } else {
-                    // Mostrar los horarios disponibles
                     const horariosTexto = this.horariosDisponibles.map(h => this.formatearHora(h)).join(', ');
                     this.showInfo('Horarios disponibles', `Horarios disponibles: ${horariosTexto}`);
                 }
@@ -541,55 +496,41 @@ export class PatientCitas implements OnInit {
 
             this.cdr.detectChanges();
         } catch (error) {
-            console.error('Error cargando horarios disponibles:', error);
             this.mostrandoHorarios = false;
         }
     }
 
-    /**
-     * Selecciona un horario disponible de la lista y actualiza el input
-     */
     seleccionarHorario(hora: string) {
-        // Actualizar el formulario
         this.citaForm.patchValue({ horaCita: hora });
         this.citaForm.get('horaCita')?.markAsTouched();
 
-        // Actualizar el flatpickr manualmente para reflejar el cambio en el input
         if (this.fpHoraInstance) {
             try {
-                // Crear una fecha con la hora seleccionada
                 const hoy = new Date();
                 const [h, m] = hora.split(':').map(Number);
                 hoy.setHours(h, m, 0, 0);
                 this.fpHoraInstance.setDate(hoy, false);
             } catch (e) {
-                console.warn('Error actualizando flatpickr hora:', e);
+                // Error actualizando flatpickr hora
             }
         }
 
-        // Verificar disponibilidad automáticamente
         this.verificarDisponibilidadEnTiempoReal();
         this.cdr.detectChanges();
     }
 
-    // ==========================================
-    // AGENDAR CITA CON VALIDACION
-    // ==========================================
     async agendarCita() {
-        // Verificar si el formulario es válido
         if (this.citaForm.invalid) {
             this.citaForm.markAllAsTouched();
             this.showWarning('Formulario Incompleto', 'Por favor, completa todos los campos requeridos.');
             return;
         }
 
-        // Verificar si el horario está disponible
         if (!this.horarioDisponible) {
             this.showWarning('Horario no disponible', this.mensajeDisponibilidad || 'El horario seleccionado no está disponible.');
             return;
         }
 
-        // Verificar si el horario seleccionado es válido
         if (!this.horarioSeleccionadoValido) {
             this.showWarning('Horario no válido', 'Por favor, selecciona un horario disponible de la lista.');
             return;
@@ -607,7 +548,6 @@ export class PatientCitas implements OnInit {
                 return;
             }
 
-            // Verificar disponibilidad una última vez antes de agendar
             const disponibilidadFinal = await firstValueFrom(
                 this.usersService.verificarDisponibilidad(
                     formData.fechaCita,
@@ -624,7 +564,6 @@ export class PatientCitas implements OnInit {
                 this.horarioDisponible = false;
                 this.horarioSeleccionadoValido = false;
                 this.cargandoAgendar = false;
-                // Recargar horarios disponibles
                 this.cargarHorariosDisponibles(formData.fechaCita);
                 return;
             }
@@ -673,13 +612,11 @@ export class PatientCitas implements OnInit {
 
             if (error.error && error.error.error) {
                 mensajeError = error.error.error;
-                // Si el error es por horario ocupado, actualizar estado
                 if (mensajeError.includes('horario no disponible') ||
                     mensajeError.includes('ya hay 3 citas') ||
                     mensajeError.includes('ocupado por')) {
                     this.horarioDisponible = false;
                     this.horarioSeleccionadoValido = false;
-                    // Recargar horarios disponibles
                     const fecha = this.citaForm.get('fechaCita')?.value;
                     if (fecha) {
                         this.cargarHorariosDisponibles(fecha);
@@ -699,9 +636,6 @@ export class PatientCitas implements OnInit {
         }
     }
 
-    // ==========================================
-    // CANCELAR CITA - CON MODAL PERSONALIZADO
-    // ==========================================
     confirmarCancelarCita(cita: any) {
         const estado = (cita.estado || '').toLowerCase();
         if (estado === 'cancelada') {
@@ -781,9 +715,6 @@ export class PatientCitas implements OnInit {
         }
     }
 
-    // ==========================================
-    // METODOS DE UTILIDAD
-    // ==========================================
     getEstadoClass(estado: string): string {
         if (!estado) return 'estado-info';
         const estadoLower = estado.toLowerCase();

@@ -83,7 +83,6 @@ export class PatientTratamientos implements OnInit, OnDestroy {
 
     searchTerm: string = '';
 
-    // Variables para el registro de tomas
     registrosTomas: RegistroToma[] = [];
     estadisticasTomas: any = null;
     cargandoTomas = false;
@@ -91,7 +90,6 @@ export class PatientTratamientos implements OnInit, OnDestroy {
     eliminandoTomas = false;
     mostrarModalTomas = false;
 
-    // Filtro de fecha (flatpickr)
     filtroFecha: string = '';
     private flatpickrInstance: any = null;
 
@@ -135,22 +133,18 @@ export class PatientTratamientos implements OnInit, OnDestroy {
         }
     }
 
-    // Notificaciones Toast
     mostrarToast = false;
     mensajeToast = '';
     tipoToast: 'success' | 'error' | 'warning' = 'success';
     private toastTimeout: any = null;
 
-    // Modal de confirmación para tomas
     mostrarModalConfirmacionTomas = false;
     modalConfirmacionMensaje = '';
     modalConfirmacionAccion: (() => void) | null = null;
 
-    // Modal para eliminar toma individual - SOLO PARA ADMIN
     mostrarModalEliminarToma = false;
     tomaAEliminar: number | null = null;
 
-    // Modal para eliminar todas las tomas - SOLO PARA ADMIN
     mostrarModalEliminarTodas = false;
 
     async ngOnInit() {
@@ -188,7 +182,7 @@ export class PatientTratamientos implements OnInit, OnDestroy {
             }
 
         } catch (error) {
-            console.error('Error al cargar tratamientos:', error);
+            // Error al cargar tratamientos
         } finally {
             this.isLoading = false;
             this.cdr.markForCheck();
@@ -231,7 +225,6 @@ export class PatientTratamientos implements OnInit, OnDestroy {
                 this.aplicarFiltro('todos');
             }
         } catch (error) {
-            console.error('Error al cargar tratamientos:', error);
             this.tratamientos = [];
         }
     }
@@ -255,7 +248,7 @@ export class PatientTratamientos implements OnInit, OnDestroy {
                 }
             }
         } catch (error) {
-            console.error('Error al cargar tratamientos por email:', error);
+            // Error al cargar tratamientos por email
         }
     }
 
@@ -333,10 +326,6 @@ export class PatientTratamientos implements OnInit, OnDestroy {
         }
     }
 
-    // ==========================================
-    // FILTRO DE FECHA (TOMAS)
-    // ==========================================
-
     get registrosTomasFiltrados(): RegistroToma[] {
         if (!this.filtroFecha || this.filtroFecha.trim() === '') {
             return this.registrosTomas;
@@ -369,10 +358,6 @@ export class PatientTratamientos implements OnInit, OnDestroy {
         this.cdr.markForCheck();
     }
 
-    // ==========================================
-    // METODOS PARA EL REGISTRO DE TOMAS
-    // ==========================================
-
     async cargarTomas(idTratamiento: number) {
         try {
             this.cargandoTomas = true;
@@ -397,7 +382,6 @@ export class PatientTratamientos implements OnInit, OnDestroy {
 
             this.cdr.markForCheck();
         } catch (error) {
-            console.error('Error al cargar tomas:', error);
             this.lanzarNotificacion('Error al cargar las tomas', 'error');
         } finally {
             this.cargandoTomas = false;
@@ -417,12 +401,10 @@ export class PatientTratamientos implements OnInit, OnDestroy {
         }
     }
 
-    // Verifica si el tratamiento ya tiene tomas generadas
     tieneTomasGeneradas(): boolean {
         return this.registrosTomas && this.registrosTomas.length > 0;
     }
 
-    // Verifica si el boton de generar tomas debe estar deshabilitado
     isBotonGenerarDisabled(): boolean {
         if (this.generandoTomas) return true;
         if (this.tieneTomasGeneradas()) return true;
@@ -431,7 +413,6 @@ export class PatientTratamientos implements OnInit, OnDestroy {
         return false;
     }
 
-    // Obtiene el mensaje del boton de generar tomas
     getMensajeBotonGenerar(): string {
         if (this.generandoTomas) {
             return 'Generando...';
@@ -473,7 +454,6 @@ export class PatientTratamientos implements OnInit, OnDestroy {
             await this.cargarTomas(this.tratamientoSeleccionado.idtratamiento);
 
         } catch (error) {
-            console.error('Error al generar tomas:', error);
             this.lanzarNotificacion('Error al generar las tomas', 'error');
         } finally {
             this.generandoTomas = false;
@@ -495,14 +475,9 @@ export class PatientTratamientos implements OnInit, OnDestroy {
             await this.cargarTomas(this.tratamientoSeleccionado!.idtratamiento);
 
         } catch (error) {
-            console.error('Error al actualizar toma:', error);
             this.lanzarNotificacion('Error al actualizar la toma', 'error');
         }
     }
-
-    // ==========================================
-    // METODOS DE UTILIDAD PARA TOMAS
-    // ==========================================
 
     getEstadoColor(estado: string): string {
         const colores: { [key: string]: string } = {
@@ -537,10 +512,6 @@ export class PatientTratamientos implements OnInit, OnDestroy {
         }
         return this.registrosTomas.some(t => t.estado !== 'Eliminada');
     }
-
-    // ==========================================
-    // METODOS DE UTILIDAD GENERALES
-    // ==========================================
 
     getEstadoClass(activo: boolean): string {
         return activo ? 'estado-activo' : 'estado-inactivo';
@@ -607,10 +578,6 @@ export class PatientTratamientos implements OnInit, OnDestroy {
         }
     }
 
-    // ==========================================
-    // METODOS DE CONFIRMACION GENERAL
-    // ==========================================
-
     mostrarConfirmacion(titulo: string, mensaje: string, icono: string, tratamiento: Tratamiento) {
         this.tratamientoParaAccion = tratamiento;
         this.modalConfirmacion = {
@@ -649,13 +616,9 @@ export class PatientTratamientos implements OnInit, OnDestroy {
             this.cerrarModalConfirmacion();
 
         } catch (error) {
-            console.error('Error al cambiar estado:', error);
+            // Error al cambiar estado
         }
     }
-
-    // ==========================================
-    // METODOS PARA NOTIFICACIONES TOAST
-    // ==========================================
 
     lanzarNotificacion(mensaje: string, tipo: 'success' | 'error' | 'warning' = 'success') {
         this.mensajeToast = mensaje;

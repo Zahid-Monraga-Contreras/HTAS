@@ -154,12 +154,9 @@
   transition: transform 0.5s ease-in;
   position: relative;
   overflow: hidden;
-  /* Ocultamos el scroll */
   padding: 40px 0;
   scrollbar-width: none;
-  /* Firefox */
   -ms-overflow-style: none;
-  /* IE y Edge */
 }
 
 .login-form-content {
@@ -169,7 +166,6 @@
   width: 100%;
 }
 
-/* Ocultar scrollbar para Chrome, Safari y Opera */
 .container-form form::-webkit-scrollbar,
 .sign-in::-webkit-scrollbar {
   display: none;
@@ -181,7 +177,6 @@
   right: -20px;
   font-size: 150px;
   color: rgba(176, 0, 29, 0.103);
-  /* Muy sutil */
   transform: rotate(15deg);
   pointer-events: none;
   z-index: 0;
@@ -222,7 +217,6 @@
 
 .security-badge span {
   margin: 0 !important;
-  /* Forces vertical centering by removing inherited margin-bottom */
   line-height: normal;
   display: flex;
   align-items: center;
@@ -359,17 +353,14 @@
   transform: translateX(0);
 }
 
-/* Fixed header spacing */
 .container.toggle .welcome-sign-up {
   transform: translateX(-100%);
 }
 
-/* Mobile Toggle Links (Hidden on Desktop) */
 .mobile-toggle {
   display: none;
 }
 
-/* Helper text style */
 .mobile-toggle a {
   cursor: pointer;
   font-weight: 600;
@@ -384,7 +375,6 @@
     padding: 15px;
     min-height: 100vh;
     background-color: #f5f5f5;
-    /* Opcional, para que resalte más la tarjeta blanca */
   }
 
   .container {
@@ -409,7 +399,6 @@
     height: auto;
   }
 
-  /* Forms reset */
   .container-form form,
   .sign-in {
     transform: none !important;
@@ -420,7 +409,6 @@
     overflow: visible;
   }
 
-  /* Toggle States */
   .container:not(.toggle) #google {
     display: block !important;
   }
@@ -493,7 +481,6 @@
     align-items: center !important;
   }
 
-  /* Bootstrap/Decorative Icons on Mobile */
   .decor-icon {
     display: block !important;
     position: absolute !important;
@@ -519,7 +506,7 @@
   }
 }
 
-/* --- ESTILOS DEL MODAL (SIMPLIFICADOS PARA CARGA INSTANTÁNEA) --- */
+/* --- ESTILOS DEL MODAL --- */
 .custom-modal-overlay {
   position: fixed;
   top: 0;
@@ -534,7 +521,6 @@
   padding: 20px;
 }
 
-/* Clase para mostrar al instante */
 .custom-modal-overlay.show {
   display: flex !important;
 }
@@ -565,7 +551,6 @@
   margin-bottom: 10px;
   color: #333;
   font-weight: 700;
-  /* Eliminado uppercase para un look más limpio */
 }
 
 .custom-modal p {
@@ -593,8 +578,6 @@
   background-color: #8a0017;
 }
 
-/* --- ANIMACIONES --- */
-
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -617,7 +600,6 @@
   }
 }
 
-/* Ajuste específico para móvil */
 @media (max-width: 768px) {
   .custom-modal {
     width: 85%;
@@ -633,35 +615,26 @@
   }
 }
 
-/* Asegura que el contenedor sea la referencia para el error */
 .container-input {
   position: relative;
   margin-bottom: 20px;
-  /* Aumentamos un poco el margen para que el error tenga aire */
   overflow: visible;
-  /* IMPORTANTE: permitimos que el error se vea fuera del borde gris */
 }
 
 .error {
   position: absolute;
-  /* Lo alineamos justo debajo del borde gris, pero sin ocupar espacio físico */
   bottom: -16px;
   left: 5px;
   color: #8B0015;
   font-size: 10px;
-  /* Un poco más pequeño para que sea elegante */
   font-weight: 700;
   text-transform: uppercase;
-  /* Opcional: le da un look más de "alerta" */
   letter-spacing: 0.5px;
   pointer-events: none;
-  /* Para que no interfiera con los clics */
   animation: fadeInError 0.2s ease-out;
   white-space: nowrap;
-  /* Evita que el texto salte de línea */
 }
 
-/* Animación de entrada más profesional */
 @keyframes fadeInError {
   from {
     opacity: 0;
@@ -674,19 +647,15 @@
   }
 }
 
-/* Feedback visual en el input cuando hay error */
 .container-input:has(.error) {
   border: 1.5px solid rgba(176, 0, 30, 0.4);
   background-color: #fff5f5;
-  /* Un tono rosado muy suave */
 }
 
 .container-input:has(.error) i {
   color: #8B0015;
-  /* Iconos en rojo si hay error */
 }
 
-/* Estilos para el nuevo botón de Google */
 .social-networks {
   width: 320px;
   margin: 15px 0 10px;
@@ -727,7 +696,6 @@
   color: #8B0015;
   font-size: 20px;
   display: flex;
-  /* Ayuda a que el icono no tenga espacio extra abajo */
   align-items: center;
 }
 
@@ -800,15 +768,12 @@
   transform: translateY(-1px);
 }
 
-/* Estilo para el contenedor cuando tiene un select */
 .container-input {
   position: relative;
-  /* Necesario para posicionar la flecha y el error */
   display: flex;
   align-items: center;
 }
 
-/* Reset completo del select */
 .select-custom {
   border: none;
   outline: none;
@@ -820,38 +785,30 @@
   color: #555;
   cursor: pointer;
   appearance: none;
-  /* Quita la flecha nativa de Windows/Mac */
   -webkit-appearance: none;
   -moz-appearance: none;
   padding-right: 30px;
-  /* Espacio para que el texto no tape la flecha */
 }
 
-/* Estilo para las opciones (el menú desplegable) */
 .select-custom option {
   background-color: white;
   color: #333;
   padding: 10px;
 }
 
-/* Flecha personalizada usando Bootstrap Icons */
 .arrow-select {
   position: absolute;
   right: 15px;
   font-size: 12px;
   color: #888;
   pointer-events: none;
-  /* Para que al hacer clic en la flecha se abra el select */
   transition: color 0.3s ease;
 }
 
-/* Efecto visual al interactuar */
 .container-input:focus-within .arrow-select {
   color: #8B0015;
-  /* Cambia al color de tu marca al seleccionar */
 }
 
-/* Ajuste para que el icono de la izquierda (bi-person-badge) mantenga el estilo */
 .container-input i:first-child {
   color: #666;
   font-size: 18px;
@@ -861,7 +818,6 @@
   .social-networks {
     width: 100%;
     padding: 0 1.5rem;
-    /* Para que no pegue a los bordes en móvil */
   }
 
   .info-text {
@@ -870,7 +826,6 @@
   }
 }
 
-/* Contenedor principal de la verificación */
 .pin-verification-container {
   width: 100%;
   max-width: 320px;
@@ -883,7 +838,6 @@
   margin: 0 auto;
 }
 
-/* Texto de instrucción */
 .pin-verification-container span {
   font-size: 13px;
   color: #777;
@@ -892,7 +846,6 @@
   line-height: 1.5;
 }
 
-/* Estilo específico para el input del PIN */
 .pin-verification-container .container-input {
   width: 100%;
   margin-bottom: 10px;
@@ -900,18 +853,15 @@
 
 .pin-verification-container .container-input input {
   letter-spacing: 0.8rem;
-  /* More elegant spacing */
   font-weight: 800;
   text-align: center;
   font-size: 1.4rem;
   color: #8B0015;
-  /* Using brand red for the input text */
   border: 1px solid #ddd;
   border-radius: 12px;
   background-color: #fcfcfc;
   transition: all 0.3s ease;
   padding-left: 0.8rem;
-  /* Offset for letter-spacing offset */
 }
 
 .pin-verification-container .container-input input:focus {
@@ -920,7 +870,6 @@
   box-shadow: 0 0 0 4px rgba(176, 0, 30, 0.05);
 }
 
-/* Botón de verificar adaptado al estilo Google del resto de la app */
 .pin-verification-container .button.google-style {
   width: 100%;
   height: 48px;
@@ -951,7 +900,6 @@
   box-shadow: 0 4px 12px rgba(176, 0, 30, 0.1);
 }
 
-/* Enlace para regresar corregido */
 .pin-verification-container .mobile-toggle {
   margin-top: 5px;
 }
@@ -967,7 +915,6 @@
   color: #8B0015;
 }
 
-/* Animación sutil de aparición */
 @keyframes fadeInPin {
   from {
     opacity: 0;
@@ -980,7 +927,6 @@
   }
 }
 
-/* --- VISTA COMPACTA PARA DOCTOR (Para mejorar espaciado y legibilidad) --- */
 .sign-up.doctor-active {
   justify-content: flex-start;
   padding-top: 30px;
@@ -1025,7 +971,6 @@
   font-size: 13px;
 }
 
-/* --- VISTA COMPACTA PARA ACOMPAÑANTE --- */
 .sign-up.acompanante-active {
   justify-content: flex-start;
   padding-top: 35px;
@@ -1041,7 +986,6 @@
   margin-bottom: 12px;
 }
 
-/* Estilo específico para el input tipo fecha */
 input[type="date"] {
   color: #666;
   font-size: 13px;
@@ -1053,7 +997,6 @@ input[type="date"] {
   margin-top: 10px;
 }
 
-/* Estilo general para el contenedor de fecha */
 .container-input input[type="date"] {
   cursor: pointer;
   text-transform: uppercase;
@@ -1063,27 +1006,22 @@ input[type="date"] {
   color: #444;
 }
 
-/* Personalización del icono del calendario nativo (Chrome/Edge) */
 ::-webkit-calendar-picker-indicator {
   background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23b0001e" class="bi bi-calendar-check" viewBox="0 0 16 16"><path d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0z"/><path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/></svg>');
   cursor: pointer;
   padding: 5px;
   filter: invert(0);
-  /* Mantiene el color original del SVG */
 }
 
-/* Efecto cuando el input es obligatorio y falta (Acompañante activo) */
 .sign-up.doctor-active .container-input:has(input:invalid) {
   border: 1px solid rgba(176, 0, 29, 0.2);
 }
 
-/* Ajuste compacto para que el input date no se vea gigante */
 .sign-up:has([formControlName="Rol"][value="Acompañante"]) .container-input {
   height: 34px;
   margin-bottom: 6px;
 }
 
-/* Contenedor principal con el estilo de tu login */
 .date-wrapper-premium {
   background-color: #EEEEEE !important;
   border: 2px solid transparent;
@@ -1099,7 +1037,6 @@ input[type="date"] {
   box-shadow: 0 4px 12px rgba(176, 0, 30, 0.1);
 }
 
-/* El input invisible pero funcional */
 .input-clean {
   border: none;
   outline: none;
@@ -1114,8 +1051,6 @@ input[type="date"] {
   -webkit-appearance: none;
 }
 
-/* Personalización del ICONO del calendario nativo */
-/* Esto lo hace ver como un botón de acción limpio */
 .input-clean::-webkit-calendar-picker-indicator {
   background: transparent;
   bottom: 0;
@@ -1128,11 +1063,8 @@ input[type="date"] {
   top: 0;
   width: auto;
   z-index: 2;
-  /* El calendario se abre al tocar cualquier parte del input */
 }
 
-/* ESTILO DEL PANEL (Solo funciona en algunos navegadores, pero ayuda) */
-/* Forzamos que el texto de la fecha se vea profesional */
 ::-webkit-datetime-edit {
   padding: 0 10px;
 }
@@ -1150,14 +1082,12 @@ input[type="date"] {
   color: #888;
 }
 
-/* Icono visual (el de la izquierda) */
 .main-icon {
   color: #8B0015 !important;
   font-size: 18px;
   z-index: 1;
 }
 
-/* Esto asegura que el calendario flote sobre el modal */
 .flatpickr-calendar {
   background: #ffffff !important;
   z-index: 9999999 !important;
@@ -1188,14 +1118,6 @@ input[type="date"] {
   color: #ccc;
   cursor: not-allowed;
   pointer-events: none;
-}
-
-/* File Input Styling for Doctor Photo Validation */
-.file-input-wrapper {
-  position: relative;
-  overflow: hidden;
-  cursor: pointer;
-  transition: all 0.3s ease;
 }
 
 .file-input-hidden {
@@ -1273,10 +1195,9 @@ input[type="date"] {
 }
 
 /* ============================================================
-   NUEVOS ESTILOS PARA FORMULARIO POR PASOS (REGISTRO)
+   FORMULARIO POR PASOS (REGISTRO)
    ============================================================ */
 
-/* --- BARRA DE PROGRESO --- */
 .progress-steps {
   width: 100%;
   max-width: 320px;
@@ -1373,7 +1294,6 @@ input[type="date"] {
   background: linear-gradient(90deg, #8B0015, #b0001e);
 }
 
-/* --- CONTENIDO DE PASOS --- */
 .step-content {
   animation: fadeSlideIn 0.35s ease;
   width: 100%;
@@ -1392,7 +1312,6 @@ input[type="date"] {
   }
 }
 
-/* --- WRAPPER PARA CONTRASEÑAS CON OJO --- */
 .password-wrapper {
   position: relative;
 }
@@ -1423,7 +1342,6 @@ input[type="date"] {
   padding-right: 44px !important;
 }
 
-/* --- BOTONES DE NAVEGACIÓN --- */
 .step-navigation {
   display: flex;
   gap: 10px;
@@ -1498,18 +1416,6 @@ input[type="date"] {
   align-items: center;
 }
 
-/* --- RECAPTCHA WRAPPER --- */
-.recaptcha-wrapper {
-  margin-top: 14px;
-  width: 100%;
-  max-width: 320px;
-  display: flex;
-  justify-content: center;
-  transform: scale(0.9);
-  transform-origin: center center;
-}
-
-/* --- AJUSTES PARA MÓVIL (steps) --- */
 @media (max-width: 768px) {
   .progress-steps {
     max-width: 100%;
@@ -1539,10 +1445,6 @@ input[type="date"] {
   .step-label {
     font-size: 9px;
     margin-top: 4px;
-  }
-
-  .recaptcha-wrapper {
-    transform: scale(0.8);
   }
 
   .step-content {
@@ -1581,7 +1483,6 @@ input[type="date"] {
   }
 }
 
-/* --- ANIMACIÓN DE SHAKE PARA ERRORES --- */
 .step-content .container-input.error-shake {
   animation: shakeError 0.4s ease;
 }
@@ -1610,7 +1511,6 @@ input[type="date"] {
   }
 }
 
-/* --- ESTILO PARA INPUTS CON ERROR EN PASOS --- */
 .step-content .container-input.input-error {
   border: 1.5px solid #e74c3c !important;
   background-color: #fff5f5 !important;
@@ -1620,7 +1520,6 @@ input[type="date"] {
   color: #e74c3c !important;
 }
 
-/* --- INDICADOR DE CAMPO OBLIGATORIO --- */
 .required-field::after {
   content: '*';
   color: #8B0015;
@@ -1629,7 +1528,6 @@ input[type="date"] {
   font-size: 14px;
 }
 
-/* --- ESTILO PARA EL SELECT EN EL PASO 3 --- */
 .sign-up .container-input .select-custom {
   font-size: 14px;
   color: #444;
@@ -1639,7 +1537,6 @@ input[type="date"] {
   color: #aaa;
 }
 
-/* --- MEJORA EN EL CONTENEDOR DEL FORMULARIO --- */
 .sign-up {
   padding: 30px 0;
   gap: 2px;
@@ -1660,7 +1557,6 @@ input[type="date"] {
   margin-bottom: 10px;
 }
 
-/* --- AJUSTE PARA EL BOTÓN DE CREAR CUENTA DENTRO DEL PASO 3 --- */
 .sign-up .step-navigation .btn-submit {
   background: linear-gradient(135deg, #8B0015 0%, #b0001e 100%);
 }
@@ -1670,7 +1566,6 @@ input[type="date"] {
   transform: translateY(-2px);
 }
 
-/* --- AJUSTE PARA EL MODAL EN MÓVIL --- */
 @media (max-width: 768px) {
   .custom-modal {
     padding: 25px 18px;
@@ -1685,12 +1580,10 @@ input[type="date"] {
   }
 }
 
-/* --- ESTILO PARA EL BOTÓN DE REGISTRO COMPLETO --- */
 .btn-submit i {
   font-size: 16px;
 }
 
-/* --- MEJORA DE VISIBILIDAD DEL PUNTO ACTIVO --- */
 .step-dot.active span {
   animation: pulseDot 2s infinite;
 }
@@ -1707,14 +1600,12 @@ input[type="date"] {
   }
 }
 
-/* --- ESTILO PARA CUANDO EL FORMULARIO ESTÁ CARGANDO --- */
 .btn-step .spinner-border-sm {
   width: 16px;
   height: 16px;
   border-width: 2px;
 }
 
-/* --- AJUSTE DEL SELECT EN EL PASO 3 PARA QUE SE VEA BIEN --- */
 .container-input select.select-custom {
   background-color: transparent;
   padding-right: 30px;
@@ -1724,7 +1615,6 @@ input[type="date"] {
   outline: none;
 }
 
-/* --- ESTILO PARA EL ARCHIVO PDF (Doctor) --- */
 .file-input-wrapper .file-label {
   font-size: 13px;
   color: #666;
@@ -1735,7 +1625,6 @@ input[type="date"] {
   font-weight: 600;
 }
 
-/* --- ESTILOS PARA EL CALENDARIO (Acompañante) --- */
 .date-wrapper-premium {
   background-color: #EEEEEE !important;
   border: 2px solid transparent;
@@ -1765,7 +1654,6 @@ input[type="date"] {
   -webkit-appearance: none;
 }
 
-/* --- ESTILOS DEL PIN EN LOGIN --- */
 .pin-verification-container .container-input input {
   letter-spacing: 0.8rem;
   font-weight: 700;
@@ -1821,7 +1709,6 @@ input[type="date"] {
   width: 100%;
 }
 
-/* --- MEJORA DE RESPONSIVE PARA EL LOGIN EN MÓVIL --- */
 @media (max-width: 768px) {
   .pin-verification-container {
     max-width: 100%;
@@ -1842,7 +1729,6 @@ input[type="date"] {
   }
 }
 
-/* --- SEGURIDAD PARA QUE EL CONTENIDO NO SE SALGA --- */
 .sign-in,
 .sign-up {
   overflow-y: auto;
@@ -1867,12 +1753,6 @@ input[type="date"] {
   background: transparent;
 }
 
-/* --- ESTILO PARA EL RECAPTCHA EN EL PASO 3 --- */
-.recaptcha-wrapper iframe {
-  border-radius: 8px !important;
-}
-
-/* --- ESTILO PARA EL BOTÓN DE GOOGLE EN LOGIN --- */
 .social-networks .google-btn {
   width: 320px;
   height: 45px;
@@ -1913,7 +1793,6 @@ input[type="date"] {
   transform: none !important;
 }
 
-/* --- ESTILO PARA EL BOTÓN DE INICIO DE SESIÓN CON EMAIL --- */
 .button.google-style {
   width: 320px;
   height: 45px;
@@ -1952,7 +1831,6 @@ input[type="date"] {
   box-shadow: none !important;
 }
 
-/* --- RESPONSIVE PARA EL LOGIN EN MÓVIL --- */
 @media (max-width: 768px) {
 
   .social-networks .google-btn,
@@ -1962,11 +1840,6 @@ input[type="date"] {
   }
 }
 
-/* ============================================================
-   MODIFICACIONES PARA EL LOGIN (QUITAR SCROLL)
-   ============================================================ */
-
-/* --- ELIMINAR SCROLL DEL LOGIN --- */
 .sign-in {
   overflow: visible !important;
   padding: 40px 0;
@@ -1981,7 +1854,6 @@ input[type="date"] {
   display: none !important;
 }
 
-/* --- MANTENER SCROLL SOLO EN REGISTRO SI ES NECESARIO --- */
 .sign-up {
   overflow-y: auto;
   overflow-x: hidden;
@@ -2004,11 +1876,6 @@ input[type="date"] {
   background: transparent;
 }
 
-/* ============================================================
-   NUEVOS ESTILOS PARA FORMULARIO POR PASOS (REGISTRO) - MEJORADOS
-   ============================================================ */
-
-/* --- BARRA DE PROGRESO MEJORADA --- */
 .progress-steps {
   width: 100%;
   max-width: 360px;
@@ -2053,7 +1920,6 @@ input[type="date"] {
   line-height: 1;
 }
 
-/* Punto activo (actual) */
 .step-dot.active span {
   background: linear-gradient(135deg, #8B0015 0%, #b0001e 100%);
   color: #ffffff !important;
@@ -2062,7 +1928,6 @@ input[type="date"] {
   animation: pulseDot 2s infinite;
 }
 
-/* Punto completado con palomita */
 .step-dot.completed span {
   background: #8B0015;
   color: #ffffff !important;
@@ -2070,7 +1935,6 @@ input[type="date"] {
   box-shadow: 0 0 0 3px #8B0015, 0 4px 20px rgba(16, 185, 129, 0.35);
 }
 
-/* Asegurar que el contenido esté centrado */
 .step-dot span i,
 .step-dot span ng-container,
 .step-dot span span {
@@ -2102,7 +1966,6 @@ input[type="date"] {
   font-weight: 700;
 }
 
-/* Líneas de conexión */
 .step-line {
   flex: 1;
   height: 4px;
@@ -2123,7 +1986,6 @@ input[type="date"] {
   background: #10b981;
 }
 
-/* --- Animación del punto activo --- */
 @keyframes pulseDot {
 
   0%,
@@ -2136,14 +1998,12 @@ input[type="date"] {
   }
 }
 
-/* --- CONTENIDO DE PASOS --- */
 .step-content {
   animation: fadeSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   width: 100%;
   max-width: 360px;
 }
 
-/* --- ESTILO ESPECIAL PARA EL PASO DE DOCTOR (input más pequeños) --- */
 .step-content.doctor-step .container-input {
   height: 40px !important;
   margin-bottom: 10px !important;
@@ -2175,7 +2035,6 @@ input[type="date"] {
   }
 }
 
-/* --- INPUTS MÁS GRANDES PARA REGISTRO (Paciente y Acompañante) --- */
 .sign-up .container-input {
   width: 100%;
   max-width: 360px;
@@ -2199,7 +2058,6 @@ input[type="date"] {
   font-size: 15px;
 }
 
-/* --- WRAPPER PARA CONTRASEÑAS CON OJO --- */
 .password-wrapper {
   position: relative;
 }
@@ -2230,7 +2088,6 @@ input[type="date"] {
   padding-right: 48px !important;
 }
 
-/* --- BOTONES DE NAVEGACIÓN --- */
 .step-navigation {
   display: flex;
   gap: 12px;
@@ -2305,22 +2162,6 @@ input[type="date"] {
   align-items: center;
 }
 
-/* --- RECAPTCHA WRAPPER --- */
-.recaptcha-wrapper {
-  margin-top: 14px;
-  width: 100%;
-  max-width: 360px;
-  display: flex;
-  justify-content: center;
-  transform: scale(0.9);
-  transform-origin: center center;
-}
-
-.recaptcha-wrapper iframe {
-  border-radius: 8px !important;
-}
-
-/* --- ESTILO PARA EL BOTÓN DE GOOGLE EN LOGIN --- */
 .social-networks .google-btn {
   width: 320px;
   height: 45px;
@@ -2361,7 +2202,6 @@ input[type="date"] {
   transform: none !important;
 }
 
-/* --- ESTILO PARA EL BOTÓN DE INICIO DE SESIÓN CON EMAIL --- */
 .button.google-style {
   width: 320px;
   height: 45px;
@@ -2400,7 +2240,6 @@ input[type="date"] {
   box-shadow: none !important;
 }
 
-/* --- ESTILOS DEL PIN EN LOGIN --- */
 .pin-verification-container .container-input input {
   letter-spacing: 0.8rem;
   font-weight: 700;
@@ -2456,7 +2295,6 @@ input[type="date"] {
   width: 100%;
 }
 
-/* --- MEJORA DE RESPONSIVE --- */
 @media (max-width: 768px) {
   .pin-verification-container {
     max-width: 100%;
@@ -2503,10 +2341,6 @@ input[type="date"] {
     padding: 10px 20px;
     font-size: 13px;
     flex: 1;
-  }
-
-  .recaptcha-wrapper {
-    transform: scale(0.85);
   }
 
   .step-content {
@@ -2579,124 +2413,37 @@ input[type="date"] {
 }
 
 /* ============================================================
-   RECAPTCHA - CORRECCIÓN PARA MÓVILES
-   ============================================================ */
-
-/* Ajustar el contenedor del reCAPTCHA */
-.recaptcha-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  max-width: 360px;
-  margin: 12px 0;
-  min-height: 80px;
-  overflow: hidden;
-}
-
-/* Ajustar el iframe del reCAPTCHA */
-.recaptcha-wrapper re-captcha {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  transform: scale(1);
-  transform-origin: center center;
-}
-
-/* Ajustes específicos para móviles */
-@media screen and (max-width: 768px) {
-  .recaptcha-wrapper {
-    min-height: 90px;
-    padding: 4px 0;
-    max-width: 100%;
-  }
-
-  .recaptcha-wrapper re-captcha {
-    transform: scale(0.95);
-    transform-origin: center center;
-  }
-
-  .recaptcha-wrapper iframe {
-    pointer-events: auto !important;
-    touch-action: auto !important;
-    min-height: 78px;
-    width: 100% !important;
-    max-width: 302px !important;
-  }
-}
-
-@media screen and (max-width: 480px) {
-  .recaptcha-wrapper {
-    min-height: 100px;
-    padding: 8px 0;
-  }
-
-  .recaptcha-wrapper re-captcha {
-    transform: scale(0.85);
-    transform-origin: center center;
-  }
-
-  .recaptcha-wrapper iframe {
-    min-height: 78px;
-    width: 100% !important;
-    max-width: 280px !important;
-  }
-}
-
-@media screen and (max-width: 360px) {
-  .recaptcha-wrapper re-captcha {
-    transform: scale(0.75);
-    transform-origin: center center;
-  }
-
-  .recaptcha-wrapper iframe {
-    max-width: 240px !important;
-  }
-}
-
-/* Forzar que el reCAPTCHA sea clickeable en móviles */
-.recaptcha-wrapper iframe {
-  border-radius: 8px !important;
-  pointer-events: auto !important;
-  touch-action: auto !important;
-}
-
-/* Ajuste adicional para el reCAPTCHA en el paso 3 */
-.recaptcha-wrapper iframe {
-  border-radius: 8px !important;
-}
-
-/* ============================================================
-   TÉRMINOS Y CONDICIONES - Estilo en una sola línea
+   TÉRMINOS Y CONDICIONES - TEXTO MÁS GRANDE
    ============================================================ */
 
 .legal-terms {
   width: 100%;
   max-width: 320px;
-  margin: 15px auto 5px;
+  margin: 18px auto 8px;
   text-align: center;
   padding: 0 10px;
 }
 
 .legal-terms p {
-  font-size: 11px;
-  color: #999;
+  font-size: 13px;
+  color: #888;
   margin: 0;
-  line-height: 1.6;
-  letter-spacing: 0.2px;
+  line-height: 1.7;
+  letter-spacing: 0.3px;
 }
 
 .legal-terms a {
   color: #8B0015;
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 700;
   transition: all 0.3s ease;
-  border-bottom: 1px solid transparent;
-  padding: 0 2px;
+  border-bottom: 1.5px solid transparent;
+  padding: 0 3px;
   cursor: pointer;
   pointer-events: auto;
   position: relative;
   z-index: 10;
+  font-size: 13px;
 }
 
 .legal-terms a:hover {
@@ -2709,271 +2456,268 @@ input[type="date"] {
   opacity: 0.7;
 }
 
-/* --- Estilos para el registro (más compacto solo el texto legal) --- */
+/* --- Estilos para el registro - TEXTO MÁS GRANDE --- */
 .register-terms {
   max-width: 360px;
-  margin: 10px auto 4px;
-  padding: 6px 12px;
+  margin: 14px auto 6px;
+  padding: 10px 14px;
   background: #f8f8f8;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid #eee;
 }
 
 .register-terms p {
-  font-size: 9px;
-  color: #888;
-  line-height: 1.4;
+  font-size: 12px;
+  color: #777;
+  line-height: 1.6;
   margin: 0;
 }
 
 .register-terms a {
-  font-size: 9px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #8B0015;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s ease;
   cursor: pointer;
   pointer-events: auto;
   position: relative;
   z-index: 10;
+  padding: 0 2px;
+}
+
+.register-terms a:hover {
+  border-bottom-color: #8B0015;
 }
 
 /* ============================================================
-   RESPONSIVE - SOLO PARA PANTALLAS PEQUEÑAS Y MÓVILES
+   RESPONSIVE - TÉRMINOS MÁS GRANDES EN MÓVILES
    ============================================================ */
 
-/* Tablets y móviles grandes */
 @media (max-width: 768px) {
   .legal-terms {
     max-width: 100%;
     padding: 0 12px;
+    margin: 8px auto 4px;
+  }
+
+  .legal-terms p {
+    font-size: 12px;
+    line-height: 1.5;
+    letter-spacing: 0.2px;
+  }
+
+  .legal-terms a {
+    font-size: 12px;
+    padding: 3px 4px;
+  }
+
+  .register-terms {
+    max-width: 100%;
+    padding: 8px 12px;
+    margin: 6px 8px 4px;
+    border-radius: 8px;
+  }
+
+  .register-terms p {
+    font-size: 11px;
+    line-height: 1.5;
+  }
+
+  .register-terms a {
+    font-size: 11px;
+    padding: 3px 3px;
+  }
+
+  .legal-terms a,
+  .register-terms a {
+    padding: 4px 4px;
+    display: inline-block;
+    min-height: 32px;
+    min-width: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .legal-terms {
+    padding: 0 8px;
     margin: 6px auto 3px;
+  }
+
+  .legal-terms p {
+    font-size: 11px;
+    line-height: 1.4;
+    letter-spacing: 0px;
+  }
+
+  .legal-terms a {
+    font-size: 11px;
+    padding: 3px 3px;
+  }
+
+  .register-terms {
+    padding: 6px 10px;
+    margin: 4px 5px 3px;
+    border-radius: 6px;
+  }
+
+  .register-terms p {
+    font-size: 10px;
+    line-height: 1.4;
+  }
+
+  .register-terms a {
+    font-size: 10px;
+    padding: 3px 3px;
+  }
+
+  .legal-terms a,
+  .register-terms a {
+    padding: 5px 3px;
+    display: inline-block;
+    min-height: 32px;
+    min-width: 32px;
+  }
+}
+
+@media (max-width: 360px) {
+  .legal-terms {
+    padding: 0 6px;
+    margin: 4px auto 2px;
   }
 
   .legal-terms p {
     font-size: 10px;
     line-height: 1.3;
-    letter-spacing: 0.1px;
   }
 
   .legal-terms a {
     font-size: 10px;
-    padding: 2px 3px;
+    padding: 3px 2px;
   }
 
   .register-terms {
-    max-width: 100%;
     padding: 4px 8px;
-    margin: 4px 8px 3px;
-    border-radius: 6px;
-  }
-
-  .register-terms p {
-    font-size: 9px;
-    line-height: 1.2;
-  }
-
-  .register-terms a {
-    font-size: 9px;
-    padding: 2px 3px;
-  }
-
-  /* Ajuste para que los enlaces sean más fáciles de tocar */
-  .legal-terms a,
-  .register-terms a {
-    padding: 4px 3px;
-    display: inline-block;
-    min-height: 30px;
-    min-width: 30px;
-  }
-}
-
-/* Móviles pequeños */
-@media (max-width: 480px) {
-  .legal-terms {
-    padding: 0 8px;
-    margin: 4px auto 2px;
-  }
-
-  .legal-terms p {
-    font-size: 9px;
-    line-height: 1.2;
-    letter-spacing: 0px;
-  }
-
-  .legal-terms a {
-    font-size: 9px;
-    padding: 2px 2px;
-  }
-
-  .register-terms {
-    padding: 3px 6px;
-    margin: 3px 5px 2px;
+    margin: 3px 4px 2px;
     border-radius: 5px;
   }
 
   .register-terms p {
-    font-size: 8px;
-    line-height: 1.2;
+    font-size: 9px;
+    line-height: 1.3;
   }
 
   .register-terms a {
-    font-size: 8px;
-    padding: 2px 2px;
+    font-size: 9px;
+    padding: 3px 2px;
   }
 
-  /* En móviles, hacer los enlaces más grandes para tocar */
   .legal-terms a,
   .register-terms a {
-    padding: 5px 2px;
-    display: inline-block;
+    padding: 4px 3px;
     min-height: 30px;
     min-width: 30px;
   }
 }
 
-/* Móviles muy pequeños (menos de 360px) */
-@media (max-width: 360px) {
+@media (max-height: 700px) {
   .legal-terms {
-    padding: 0 6px;
-    margin: 3px auto 2px;
+    margin: 6px auto 3px;
   }
 
   .legal-terms p {
-    font-size: 8px;
-    line-height: 1.1;
-  }
-
-  .legal-terms a {
-    font-size: 8px;
-    padding: 2px 2px;
+    font-size: 11px;
+    line-height: 1.3;
   }
 
   .register-terms {
-    padding: 2px 5px;
-    margin: 2px 4px 2px;
-    border-radius: 4px;
+    margin: 4px auto 3px;
+    padding: 5px 8px;
   }
 
   .register-terms p {
-    font-size: 7px;
-    line-height: 1.1;
-  }
-
-  .register-terms a {
-    font-size: 7px;
-    padding: 2px 2px;
+    font-size: 10px;
+    line-height: 1.3;
   }
 
   .legal-terms a,
   .register-terms a {
-    padding: 4px 2px;
     min-height: 28px;
     min-width: 28px;
+    padding: 3px 3px;
   }
 }
 
-/* Ajuste para pantallas con altura pequeña */
-@media (max-height: 700px) {
+@media (max-width: 768px) and (orientation: landscape) {
   .legal-terms {
     margin: 4px auto 2px;
   }
 
   .legal-terms p {
+    font-size: 10px;
+    line-height: 1.3;
+  }
+
+  .register-terms {
+    padding: 4px 8px;
+    margin: 3px 8px 2px;
+  }
+
+  .register-terms p {
     font-size: 9px;
     line-height: 1.2;
   }
 
-  .register-terms {
-    margin: 3px auto 2px;
-    padding: 3px 6px;
-  }
-
-  .register-terms p {
-    font-size: 8px;
-    line-height: 1.1;
-  }
-
   .legal-terms a,
   .register-terms a {
-    min-height: 25px;
-    min-width: 25px;
-    padding: 3px 2px;
+    min-height: 26px;
+    min-width: 26px;
+    padding: 3px 3px;
   }
 }
 
-/* Ajuste para orientación horizontal en móviles */
-@media (max-width: 768px) and (orientation: landscape) {
-  .legal-terms {
-    margin: 3px auto 2px;
-  }
-
-  .legal-terms p {
-    font-size: 9px;
-    line-height: 1.2;
-  }
-
-  .register-terms {
-    padding: 2px 6px;
-    margin: 2px 8px 2px;
-  }
-
-  .register-terms p {
-    font-size: 8px;
-    line-height: 1.1;
-  }
-
-  .legal-terms a,
-  .register-terms a {
-    min-height: 22px;
-    min-width: 22px;
-    padding: 3px 2px;
-  }
-}
-
-/* ============================================================
-   ESTILOS PARA PANTALLAS GRANDES - SE MANTIENEN IGUAL
-   ============================================================ */
-
-/* Desktop (pantallas grandes) - sin cambios */
 @media (min-width: 769px) {
   .legal-terms {
     max-width: 320px;
-    margin: 15px auto 5px;
+    margin: 18px auto 8px;
     padding: 0 10px;
   }
 
   .legal-terms p {
-    font-size: 11px;
-    line-height: 1.6;
-    letter-spacing: 0.2px;
+    font-size: 13px;
+    line-height: 1.7;
+    letter-spacing: 0.3px;
   }
 
   .legal-terms a {
-    font-size: 11px;
-    padding: 0 2px;
+    font-size: 13px;
+    padding: 0 3px;
     white-space: nowrap;
   }
 
   .register-terms {
     max-width: 360px;
-    margin: 10px auto 4px;
-    padding: 6px 12px;
+    margin: 14px auto 6px;
+    padding: 10px 14px;
   }
 
   .register-terms p {
-    font-size: 9px;
-    line-height: 1.4;
+    font-size: 12px;
+    line-height: 1.6;
   }
 
   .register-terms a {
-    font-size: 9px;
+    font-size: 12px;
     padding: 0 2px;
     white-space: nowrap;
   }
 
-  /* Quitar estilos móviles en desktop */
   .legal-terms a,
   .register-terms a {
     display: inline;
     min-height: auto;
     min-width: auto;
-    padding: 0 2px;
+    padding: 0 3px;
   }
 }

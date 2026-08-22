@@ -93,7 +93,7 @@ export class PatientMedicamentos implements OnInit {
             await this.cargarMedicamentos();
 
         } catch (error) {
-            console.error('Error al cargar medicamentos:', error);
+            // Error al cargar medicamentos
         } finally {
             this.isLoading = false;
             this.cdr.markForCheck();
@@ -124,7 +124,6 @@ export class PatientMedicamentos implements OnInit {
                 this.cdr.markForCheck();
             }
         } catch (error) {
-            console.error('Error al cargar medicamentos:', error);
             this.medicamentos = [];
         }
     }
@@ -206,7 +205,7 @@ export class PatientMedicamentos implements OnInit {
                 this.cdr.markForCheck();
             }
         } catch (error) {
-            console.error('Error al cargar detalle del medicamento:', error);
+            // Error al cargar detalle del medicamento
         } finally {
             this.cargandoDetalle = false;
             this.cdr.markForCheck();
