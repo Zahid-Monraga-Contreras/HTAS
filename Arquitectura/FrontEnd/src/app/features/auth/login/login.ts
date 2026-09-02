@@ -110,6 +110,9 @@ export class Login implements AfterViewInit {
     script.src = `https://www.google.com/recaptcha/api.js?render=${this.recaptchaSiteKey}`;
     script.async = true;
     script.defer = true;
+    script.onerror = () => {
+      console.error('[reCAPTCHA] Fallo al cargar el script de Google. Revisa bloqueadores de anuncios o conexión.');
+    };
     this.renderer.appendChild(this.document.body, script);
   }
 
@@ -118,22 +121,30 @@ export class Login implements AfterViewInit {
       return '';
     }
 
-    // Esperar a que grecaptcha esté disponible
-    if (typeof grecaptcha === 'undefined') {
-      await new Promise((resolve) => {
-        const checkInterval = setInterval(() => {
-          if (typeof grecaptcha !== 'undefined') {
-            clearInterval(checkInterval);
-            resolve(true);
-          }
-        }, 100);
-      });
-    }
-
     try {
+      // Esperar a que grecaptcha esté listo, con timeout de 8s
+      await Promise.race([
+        new Promise<void>((resolve, reject) => {
+          if (typeof grecaptcha === 'undefined' || !grecaptcha.ready) {
+            reject(new Error('grecaptcha no está definido en window'));
+            return;
+          }
+          grecaptcha.ready(() => resolve());
+        }),
+        new Promise<void>((_, reject) =>
+          setTimeout(() => reject(new Error('Timeout esperando grecaptcha.ready()')), 8000)
+        ),
+      ]);
+
       const token = await grecaptcha.execute(this.recaptchaSiteKey, { action });
-      return token;
+
+      if (!token) {
+        console.error('[reCAPTCHA] execute() devolvió un token vacío para la acción:', action);
+      }
+
+      return token || '';
     } catch (error) {
+      console.error('[reCAPTCHA] Error al generar el token:', error);
       return '';
     }
   }
