@@ -14,3 +14,12 @@ body {
     background-position: center;
     background-attachment: fixed;
 }
+
+/* Ocultar badge de reCAPTCHA en toda la app */
+.grecaptcha-badge {
+    visibility: hidden !important;
+    opacity: 0 !important;
+    position: fixed !important;
+    bottom: -9999px !important;
+    right: -9999px !important;
+}

@@ -11,6 +11,9 @@ import { Spanish } from 'flatpickr/dist/l10n/es.js';
 import { Users } from '../../../core/services/users.service';
 import { environment } from '../../../../environments/environment';
 
+// Declarar grecaptcha para TypeScript
+declare var grecaptcha: any;
+
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -22,7 +25,6 @@ import { environment } from '../../../../environments/environment';
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
-
 export class Login implements AfterViewInit {
   private googleService = inject(GoogleService);
   private auth = inject(Auth);
@@ -95,11 +97,11 @@ export class Login implements AfterViewInit {
 
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
-      this.cargarRecaptchaV3();
+      this.cargarRecaptchaInvisible();
     }
   }
 
-  private cargarRecaptchaV3(): void {
+  private cargarRecaptchaInvisible(): void {
     if (this.document.querySelector('script[src*="recaptcha/api.js"]')) {
       return;
     }
@@ -111,15 +113,16 @@ export class Login implements AfterViewInit {
     this.renderer.appendChild(this.document.body, script);
   }
 
-  private async obtenerTokenRecaptchaV3(action: string): Promise<string> {
+  private async ejecutarRecaptcha(action: string): Promise<string> {
     if (!isPlatformBrowser(this.platformId)) {
       return '';
     }
 
-    if (typeof (window as any).grecaptcha === 'undefined') {
+    // Esperar a que grecaptcha esté disponible
+    if (typeof grecaptcha === 'undefined') {
       await new Promise((resolve) => {
         const checkInterval = setInterval(() => {
-          if (typeof (window as any).grecaptcha !== 'undefined') {
+          if (typeof grecaptcha !== 'undefined') {
             clearInterval(checkInterval);
             resolve(true);
           }
@@ -128,7 +131,7 @@ export class Login implements AfterViewInit {
     }
 
     try {
-      const token = await (window as any).grecaptcha.execute(this.recaptchaSiteKey, { action });
+      const token = await grecaptcha.execute(this.recaptchaSiteKey, { action });
       return token;
     } catch (error) {
       return '';
@@ -322,7 +325,7 @@ export class Login implements AfterViewInit {
       this.cdr.detectChanges();
 
       try {
-        const recaptchaToken = await this.obtenerTokenRecaptchaV3('register');
+        const recaptchaToken = await this.ejecutarRecaptcha('register');
 
         if (!recaptchaToken) {
           this.loading = false;
@@ -456,7 +459,7 @@ export class Login implements AfterViewInit {
     this.cdr.detectChanges();
 
     try {
-      const recaptchaToken = await this.obtenerTokenRecaptchaV3('login');
+      const recaptchaToken = await this.ejecutarRecaptcha('login');
 
       if (!recaptchaToken) {
         this.loading = false;
