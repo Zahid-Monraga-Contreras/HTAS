@@ -33,9 +33,7 @@ export class Laptop3dComponent implements AfterViewInit, OnDestroy {
     private readonly BODY_METAL = 0xd4d6da;
     private readonly DARK_PLASTIC = 0x16181a;
 
-    private readonly SCREEN_GRAD_START = '#8B0015';
-    private readonly SCREEN_GRAD_END = '#690014';
-    private readonly SCREEN_WHITE = '#FFFFFF';
+    private readonly SCREEN_IMAGE_PATH = '/assets/logs/laptop3d_2.png';
 
     private readonly baseWidth = 34;
     private readonly baseDepth = 22;
@@ -60,8 +58,7 @@ export class Laptop3dComponent implements AfterViewInit, OnDestroy {
     private lidPivot!: THREE.Group;
     private ledMaterial!: THREE.MeshStandardMaterial;
     private screenMaterial!: THREE.MeshBasicMaterial;
-    private screenCanvas!: HTMLCanvasElement;
-    private screenTexture!: THREE.CanvasTexture;
+    private screenTexture!: THREE.Texture;
 
     private mainTl?: gsap.core.Timeline;
     private floatingTl?: gsap.core.Timeline;
@@ -88,16 +85,6 @@ export class Laptop3dComponent implements AfterViewInit, OnDestroy {
         this.createTimelines();
         this.observeVisibility();
         this.render();
-
-        // Si las fuentes (Montserrat) aún no habían cargado al dibujar
-        // el canvas del dashboard, esto lo vuelve a pintar cuando estén
-        // listas — evita textos con tipografía de respaldo/mal alineados.
-        if ('fonts' in document) {
-            (document as any).fonts.ready.then(() => {
-                if (!this.screenCanvas) return;
-                this.redrawScreen();
-            });
-        }
     }
 
     ngOnDestroy(): void {
@@ -109,6 +96,7 @@ export class Laptop3dComponent implements AfterViewInit, OnDestroy {
         this.intersectionObserver?.disconnect();
         this.mainTl?.kill();
         this.floatingTl?.kill();
+        this.screenTexture?.dispose();
         this.renderer?.dispose();
     }
 
@@ -120,12 +108,13 @@ export class Laptop3dComponent implements AfterViewInit, OnDestroy {
 
         const container = this.containerRef.nativeElement;
         this.camera = new THREE.PerspectiveCamera(
-            42, // un poco más ancho que antes (38) para que nada quede fuera de cuadro
+            42, // FOV
             container.clientWidth / container.clientHeight,
             1,
             1000
         );
-        this.camera.position.set(0, 10, 62);
+        // Posición estándar para que se vea bien en todo el proyecto
+        this.camera.position.set(0, 4, 85);
 
         this.renderer = new THREE.WebGLRenderer({
             antialias: true,
@@ -154,7 +143,7 @@ export class Laptop3dComponent implements AfterViewInit, OnDestroy {
         this.orbit.target.set(0, 8, -5);
 
         this.macGroup = new THREE.Group();
-        this.macGroup.position.y = -8;
+        this.macGroup.position.y = -5; // Centrado
         this.scene.add(this.macGroup);
 
         this.updateSceneSize();
@@ -208,13 +197,8 @@ export class Laptop3dComponent implements AfterViewInit, OnDestroy {
         this.baseGroup.add(keyboardWell);
 
         this.addKeyboard();
-
-        const touchpad = new THREE.Mesh(
-            new RoundedBoxGeometry(11, 0.15, 6.5, 2, 0.35),
-            new THREE.MeshStandardMaterial({ color: 0x2a2d31, metalness: 0.3, roughness: 0.15 })
-        );
-        touchpad.position.set(0, this.baseThickness + 0.1, 5.2);
-        this.baseGroup.add(touchpad);
+        this.addTouchpad();
+        this.addPorts();
 
         [
             [-this.baseWidth / 2 + 2, -this.baseDepth / 2 + 2],
@@ -250,27 +234,123 @@ export class Laptop3dComponent implements AfterViewInit, OnDestroy {
         const keyGeometry = new RoundedBoxGeometry(keySize, 0.35, keySize, 1, 0.15);
         const keyMaterial = new THREE.MeshStandardMaterial({ color: 0x24272b, metalness: 0.1, roughness: 0.7 });
 
-        const totalKeys = cols * rows;
-        const instanced = new THREE.InstancedMesh(keyGeometry, keyMaterial, totalKeys);
-
         const startX = -((cols - 1) * (keySize + gap)) / 2;
         const startZ = -3.6 - ((rows - 1) * (keySize + gap)) / 2;
+
+        // La barra espaciadora ocupa el hueco de las columnas centrales
+        // de la última fila (la fila más cercana al usuario/touchpad).
+        // Esas posiciones se excluyen de la cuadrícula normal de teclas
+        // y en su lugar se coloca una sola tecla larga.
+        const spacebarStartCol = 3;
+        const spacebarEndCol = 8; // inclusive -> 6 columnas de ancho
+        const lastRow = rows - 1;
+
         const dummy = new THREE.Object3D();
-        let i = 0;
+        const normalKeyPositions: THREE.Vector3[] = [];
 
         for (let r = 0; r < rows; r++) {
             for (let c = 0; c < cols; c++) {
-                dummy.position.set(
-                    startX + c * (keySize + gap),
-                    this.baseThickness + 0.25,
-                    startZ + r * (keySize + gap)
+                const isSpacebarSlot = r === lastRow && c >= spacebarStartCol && c <= spacebarEndCol;
+                if (isSpacebarSlot) {
+                    continue;
+                }
+                normalKeyPositions.push(
+                    new THREE.Vector3(
+                        startX + c * (keySize + gap),
+                        this.baseThickness + 0.25,
+                        startZ + r * (keySize + gap)
+                    )
                 );
-                dummy.updateMatrix();
-                instanced.setMatrixAt(i, dummy.matrix);
-                i++;
             }
         }
+
+        const instanced = new THREE.InstancedMesh(keyGeometry, keyMaterial, normalKeyPositions.length);
+        normalKeyPositions.forEach((pos, i) => {
+            dummy.position.copy(pos);
+            dummy.updateMatrix();
+            instanced.setMatrixAt(i, dummy.matrix);
+        });
         this.baseGroup.add(instanced);
+
+        // ---- Barra espaciadora ----
+        // Una sola tecla ancha centrada, ocupando el espacio de las
+        // columnas 3 a 8 en la última fila.
+        const spacebarCols = spacebarEndCol - spacebarStartCol + 1;
+        const spacebarWidth = spacebarCols * keySize + (spacebarCols - 1) * gap;
+        const spacebarGeometry = new RoundedBoxGeometry(spacebarWidth, 0.35, keySize, 1, 0.15);
+        const spacebar = new THREE.Mesh(spacebarGeometry, keyMaterial);
+
+        const spacebarCenterCol = (spacebarStartCol + spacebarEndCol) / 2;
+        spacebar.position.set(
+            startX + spacebarCenterCol * (keySize + gap),
+            this.baseThickness + 0.25,
+            startZ + lastRow * (keySize + gap)
+        );
+        this.baseGroup.add(spacebar);
+    }
+
+    private addTouchpad(): void {
+        // El marco (11.5 ancho x 6.2 profundo) queda completamente
+        // contenido dentro del área oscura del teclado (keyboardWell).
+        const trackpadFrame = new THREE.Mesh(
+            new RoundedBoxGeometry(11.5, 0.14, 6.2, 3, 0.5),
+            new THREE.MeshStandardMaterial({ color: 0x0d0f11, metalness: 0.15, roughness: 0.85 })
+        );
+        trackpadFrame.position.set(0, this.baseThickness + 0.08, 5.2);
+        this.baseGroup.add(trackpadFrame);
+
+        const touchpad = new THREE.Mesh(
+            new RoundedBoxGeometry(10, 0.18, 5.4, 3, 0.4),
+            new THREE.MeshStandardMaterial({ color: 0x3d4147, metalness: 0.35, roughness: 0.1 })
+        );
+        touchpad.position.set(0, this.baseThickness + 0.15, 5.2);
+        this.baseGroup.add(touchpad);
+    }
+
+    // =======================================================
+    // Puertos (huecos) en los laterales de la base:
+    // cargador, 2x USB, audífonos y HDMI. Se representan como
+    // pequeñas formas oscuras "hundidas" justo en la superficie
+    // de los lados izquierdo y derecho de la carcasa.
+
+    private addPorts(): void {
+        const portMaterial = new THREE.MeshStandardMaterial({
+            color: 0x030303,
+            metalness: 0.1,
+            roughness: 0.9,
+        });
+
+        const portY = this.baseThickness / 2;
+        const leftX = -this.baseWidth / 2 - 0.01;
+        const rightX = this.baseWidth / 2 + 0.01;
+
+        // ---- Lado izquierdo: cargador + 2 puertos USB ----
+        const chargerPort = new THREE.Mesh(new THREE.CircleGeometry(0.4, 20), portMaterial);
+        chargerPort.rotation.y = -Math.PI / 2;
+        chargerPort.position.set(leftX, portY, -7.5);
+        this.baseGroup.add(chargerPort);
+
+        const usbGeometry = new THREE.PlaneGeometry(1.0, 0.4);
+        const usb1 = new THREE.Mesh(usbGeometry, portMaterial);
+        usb1.rotation.y = -Math.PI / 2;
+        usb1.position.set(leftX, portY, -4.5);
+        this.baseGroup.add(usb1);
+
+        const usb2 = new THREE.Mesh(usbGeometry, portMaterial);
+        usb2.rotation.y = -Math.PI / 2;
+        usb2.position.set(leftX, portY, -2);
+        this.baseGroup.add(usb2);
+
+        // ---- Lado derecho: audífonos + HDMI ----
+        const headphoneJack = new THREE.Mesh(new THREE.CircleGeometry(0.3, 20), portMaterial);
+        headphoneJack.rotation.y = Math.PI / 2;
+        headphoneJack.position.set(rightX, portY, -6.5);
+        this.baseGroup.add(headphoneJack);
+
+        const hdmiPort = new THREE.Mesh(new THREE.PlaneGeometry(1.7, 0.35), portMaterial);
+        hdmiPort.rotation.y = Math.PI / 2;
+        hdmiPort.position.set(rightX, portY, -3);
+        this.baseGroup.add(hdmiPort);
     }
 
     private buildLid(bodyMaterial: THREE.Material, darkMaterial: THREE.Material): void {
@@ -300,6 +380,18 @@ export class Laptop3dComponent implements AfterViewInit, OnDestroy {
         bezel.position.set(0, this.lidHeight / 2, this.lidThickness / 2);
         lidPivot.add(bezel);
 
+        // ---- Cámara web ----
+        // Antes: solo un círculo oscuro, casi imperceptible sobre el
+        // bezel (también oscuro). Ahora se agrega un anillo un poco
+        // más claro alrededor de la lente para que se note el
+        // "hueco" de la cámara, como en una laptop real.
+        const webcamRing = new THREE.Mesh(
+            new THREE.CircleGeometry(0.32, 20),
+            new THREE.MeshStandardMaterial({ color: 0x2a2d31, metalness: 0.4, roughness: 0.4 })
+        );
+        webcamRing.position.set(0, this.lidHeight - 0.5, this.lidThickness / 2 + 0.005);
+        lidPivot.add(webcamRing);
+
         const webcam = new THREE.Mesh(
             new THREE.CircleGeometry(0.18, 16),
             new THREE.MeshStandardMaterial({ color: 0x0a0a0a })
@@ -308,25 +400,26 @@ export class Laptop3dComponent implements AfterViewInit, OnDestroy {
         lidPivot.add(webcam);
 
         // ---- Pantalla ----
-        this.screenCanvas = this.createScreenCanvas();
-        this.screenTexture = new THREE.CanvasTexture(this.screenCanvas);
-        this.screenTexture.needsUpdate = true;
-
-        // OJO: antes empezaba en opacity 0 y dependía de una animación
-        // anidada para "encenderse". Si esa animación no corría bien,
-        // se quedaba en negro para siempre. Ahora arranca ya visible;
-        // solo el LED tiene su pequeño efecto de encendido.
+        // Antes: se dibujaba el dashboard a mano con Canvas 2D.
+        // Ahora: se carga la imagen real del dashboard (laptop3d_2.png)
+        // como textura. Arranca con un material "placeholder" oscuro
+        // para que no haya parpadeo mientras carga la imagen.
         this.screenMaterial = new THREE.MeshBasicMaterial({
-            map: this.screenTexture,
+            color: 0x111111,
             transparent: true,
             opacity: 1,
         });
+
         const screenMesh = new THREE.Mesh(
             new THREE.PlaneGeometry(this.screenWidth, this.screenHeight),
             this.screenMaterial
         );
-        screenMesh.position.set(0, this.lidHeight / 2, this.lidThickness / 2 + 0.05);
+        // La pantalla estaba "enterrada" dentro del marco (bezel).
+        // El bezel llega hasta z = this.lidThickness, así que la pantalla va un poco más adelante.
+        screenMesh.position.set(0, this.lidHeight / 2, this.lidThickness + 0.01);
         lidPivot.add(screenMesh);
+
+        this.loadScreenTexture();
 
         this.ledMaterial = new THREE.MeshStandardMaterial({
             color: 0x0a0a0a,
@@ -342,142 +435,37 @@ export class Laptop3dComponent implements AfterViewInit, OnDestroy {
     }
 
     // =======================================================
-    // Dashboard dibujado con Canvas 2D (gradiente #8B0015 → #690014 + blanco)
+    // Carga de la imagen del dashboard (reemplaza el dibujo con Canvas 2D)
 
-    private redrawScreen(): void {
-        const canvas = this.createScreenCanvas();
-        this.screenCanvas = canvas;
-        this.screenTexture.image = canvas;
-        this.screenTexture.needsUpdate = true;
-    }
+    private loadScreenTexture(): void {
+        const loader = new THREE.TextureLoader();
+        loader.load(
+            this.SCREEN_IMAGE_PATH,
+            (texture) => {
+                // Color correcto (evita que se vea "lavado" o muy oscuro)
+                texture.colorSpace = THREE.SRGBColorSpace;
 
-    private createScreenCanvas(): HTMLCanvasElement {
-        const canvas = document.createElement('canvas');
-        canvas.width = 1024;
-        canvas.height = 620;
-        const ctx = canvas.getContext('2d')!;
-        const W = canvas.width;
+                // FIX nitidez: antes usábamos LinearFilter como minFilter,
+                // lo cual desactiva mipmaps y produce aliasing/borrosidad
+                // al minificar la textura (la imagen es más grande que el
+                // espacio que ocupa en pantalla). Con mipmaps + filtro
+                // trilinear el texto de la captura se ve nítido.
+                texture.generateMipmaps = true;
+                texture.minFilter = THREE.LinearMipmapLinearFilter;
+                texture.magFilter = THREE.LinearFilter;
+                texture.anisotropy = this.renderer.capabilities.getMaxAnisotropy();
+                texture.needsUpdate = true;
 
-        ctx.fillStyle = '#f4f5f7';
-        ctx.fillRect(0, 0, W, canvas.height);
-
-        const headerH = 88;
-        const headerGrad = ctx.createLinearGradient(0, 0, W, 0);
-        headerGrad.addColorStop(0, this.SCREEN_GRAD_START);
-        headerGrad.addColorStop(1, this.SCREEN_GRAD_END);
-        ctx.fillStyle = headerGrad;
-        ctx.fillRect(0, 0, W, headerH);
-
-        ctx.fillStyle = this.SCREEN_WHITE;
-        ctx.textBaseline = 'middle';
-        ctx.font = 'bold 32px Montserrat, sans-serif';
-        ctx.fillText('HTAS', 40, 44);
-        ctx.font = '20px Montserrat, sans-serif';
-        ctx.globalAlpha = 0.85;
-        ctx.fillText('Panel de Monitoreo del Paciente', 150, 46);
-        ctx.globalAlpha = 1;
-
-        ctx.beginPath();
-        ctx.fillStyle = '#2ecc71';
-        ctx.arc(W - 150, 44, 6, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = this.SCREEN_WHITE;
-        ctx.font = '18px Montserrat, sans-serif';
-        ctx.fillText('En vivo', W - 130, 46);
-
-        this.drawStatCard(ctx, 40, 118, 300, 190, '120/80', 'mmHg', 'Presión Arterial', true);
-        this.drawStatCard(ctx, 362, 118, 300, 190, '78', 'bpm', 'Frecuencia Cardiaca', false);
-        this.drawStatCard(ctx, 684, 118, 300, 190, '97%', 'SpO2', 'Oxigenación', false);
-
-        const ecgX = 40;
-        const ecgY = 332;
-        const ecgW = 944;
-        const ecgH = 150;
-        this.roundRect(ctx, ecgX, ecgY, ecgW, ecgH, 20);
-        ctx.fillStyle = this.SCREEN_WHITE;
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(139,0,21,0.15)';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        ctx.fillStyle = this.SCREEN_GRAD_START;
-        ctx.font = 'bold 18px Montserrat, sans-serif';
-        ctx.fillText('RITMO CARDIACO (ECG)', ecgX + 26, ecgY + 34);
-
-        ctx.save();
-        ctx.translate(ecgX + 24, ecgY + 95);
-        const ecgGrad = ctx.createLinearGradient(0, 0, ecgW - 48, 0);
-        ecgGrad.addColorStop(0, this.SCREEN_GRAD_START);
-        ecgGrad.addColorStop(1, this.SCREEN_GRAD_END);
-        ctx.strokeStyle = ecgGrad;
-        ctx.lineWidth = 4;
-        ctx.lineJoin = 'round';
-        ctx.lineCap = 'round';
-        ctx.beginPath();
-        const pts: [number, number][] = [
-            [0, 40], [70, 40], [95, 0], [120, 90], [145, -30],
-            [170, 110], [195, 40], [260, 40], [330, 40], [355, 0],
-            [380, 90], [405, -30], [430, 110], [455, 40], [520, 40],
-            [590, 40], [615, 0], [640, 90], [665, -30], [690, 110],
-            [715, 40], [780, 40], [850, 40], [875, 0], [900, 40],
-        ];
-        pts.forEach(([x, y], idx) => (idx === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)));
-        ctx.stroke();
-        ctx.restore();
-
-        ctx.fillStyle = '#999999';
-        ctx.font = '18px Montserrat, sans-serif';
-        ctx.fillText('Última actualización: hace 2 minutos', 40, 560);
-
-        return canvas;
-    }
-
-    private drawStatCard(
-        ctx: CanvasRenderingContext2D,
-        x: number,
-        y: number,
-        w: number,
-        h: number,
-        value: string,
-        unit: string,
-        label: string,
-        highlighted: boolean
-    ): void {
-        this.roundRect(ctx, x, y, w, h, 22);
-        ctx.fillStyle = this.SCREEN_WHITE;
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(139,0,21,0.15)';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        this.roundRect(ctx, x, y, w, 8, 4);
-        const accentGrad = ctx.createLinearGradient(x, 0, x + w, 0);
-        accentGrad.addColorStop(0, this.SCREEN_GRAD_START);
-        accentGrad.addColorStop(1, this.SCREEN_GRAD_END);
-        ctx.fillStyle = accentGrad;
-        ctx.fill();
-
-        ctx.fillStyle = highlighted ? this.SCREEN_GRAD_START : '#8B0015';
-        ctx.font = 'bold 17px Montserrat, sans-serif';
-        ctx.fillText(label.toUpperCase(), x + 26, y + 46);
-
-        ctx.fillStyle = '#222222';
-        ctx.font = '800 52px Montserrat, sans-serif';
-        ctx.fillText(value, x + 26, y + 105);
-
-        ctx.fillStyle = '#888888';
-        ctx.font = '20px Montserrat, sans-serif';
-        ctx.fillText(unit, x + 26, y + 145);
-    }
-
-    private roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number): void {
-        ctx.beginPath();
-        ctx.moveTo(x + r, y);
-        ctx.arcTo(x + w, y, x + w, y + h, r);
-        ctx.arcTo(x + w, y + h, x, y + h, r);
-        ctx.arcTo(x, y + h, x, y, r);
-        ctx.arcTo(x, y, x + w, y, r);
-        ctx.closePath();
+                this.screenTexture = texture;
+                this.screenMaterial.map = texture;
+                this.screenMaterial.color.set(0xffffff);
+                this.screenMaterial.needsUpdate = true;
+            },
+            undefined,
+            (error) => {
+                console.error('No se pudo cargar la imagen de la pantalla:', this.SCREEN_IMAGE_PATH, error);
+            }
+        );
     }
 
     private createLogoTexture(): THREE.CanvasTexture {
@@ -503,9 +491,6 @@ export class Laptop3dComponent implements AfterViewInit, OnDestroy {
             .to(this.macGroup.position, { duration: 2, y: '-=0.8', ease: 'power1.inOut' })
             .timeScale(0);
 
-        // Antes: una animación anidada (screenOnTl) controlada por
-        // progress. Ahora: tween directo sobre el material, dentro del
-        // mismo timeline de apertura — más simple y sin puntos de falla.
         this.laptopOpeningTl = gsap
             .timeline({ paused: true })
             .fromTo(

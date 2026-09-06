@@ -9,9 +9,11 @@
 
 /* ===== CONTENT SECTION ===== */
 .content-section {
-    padding: 4rem 5% 4rem;
+    padding: 1.5rem 5% 1.5rem;
+    /* Reducido para eliminar espacios blancos */
     background: #f9fbfc;
-    margin-top: -40px;
+    margin-top: -20px;
+    /* Reducido */
     position: relative;
     z-index: 10;
     overflow: visible;
@@ -23,7 +25,8 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 4rem;
+    gap: 2rem;
+    /* Reducido para acercar el texto al modelo */
     padding: 2.5rem;
     background: rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(10px);
@@ -39,16 +42,22 @@
 
 .laptop-wrapper {
     flex: 1;
-    min-width: 400px;
-    min-height: 600px;
-    /* antes 450px */
+    min-width: 320px;
+    min-height: 420px;
     position: relative;
     z-index: 20;
-    /* la deja por encima del panel de cristal y del texto */
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: visible;
+    /* Hacerlo grande y encimarlo al texto sin salirse de la sección y estropear el resto de la página */
+    transform: scale(1.35) translateX(8%);
+    transform-origin: center right;
+}
+
+app-laptop-3d {
+    width: 100%;
+    height: 100%;
 }
 
 .promo-decor {
@@ -495,10 +504,8 @@ input#pos3:checked~main#items-carrusel {
     }
 
     .content-section {
-        margin-top: -30px;
-        /* Reduced to bring content closer to the hero shape */
-        padding: 3rem 5% 1rem;
-        /* Significantly reduced from 8rem to match visual flow */
+        margin-top: -15px;
+        padding: 1.5rem 5% 1rem;
     }
 
     .hero-section,
@@ -536,7 +543,11 @@ input#pos3:checked~main#items-carrusel {
     .laptop-wrapper {
         min-width: 0;
         width: 100%;
-        min-height: 420px;
+        min-height: 350px;
+        margin-top: 20px;
+        transform: scale(1.1) translateX(0);
+        /* En móvil no lo hacemos tan masivo para que quepa */
+        transform-origin: center;
     }
 
     .cont-carrusel {
