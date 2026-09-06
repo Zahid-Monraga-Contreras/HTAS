@@ -40,19 +40,19 @@ export class Recursos implements AfterViewInit, OnDestroy {
   infoCardsContent = [
     {
       title: 'Dispositivo Wearable',
-      image: 'assets/baumanometro.png',
+      image: 'assets/images/baumanometro.png',
       shortDesc: 'Sensor de grado clínico diseñado para la captura continua de presión arterial sistólica y diastólica.',
       extraInfo: 'Nuestra pulsera utiliza tecnología avanzada de fotopletismografía (PPG) y algoritmos patentados para ofrecer una precisión comparable a los tensiómetros de brazo tradicionales, pero con la comodidad de un uso continuo las 24 horas del día. Es resistente al agua y tiene una autonomía de hasta 7 días.'
     },
     {
       title: 'Gestión Personal',
-      image: 'assets/celhtas4.png',
+      image: 'assets/images/celhtas4.png',
       shortDesc: 'Centro de control del paciente donde se visualizan tendencias diarias y se gestiona el tratamiento.',
       extraInfo: 'La aplicación móvil HTAS permite llevar un diario digital completo. Registra automáticamente las tomas de la pulsera, permite añadir recordatorios de medicación, y genera reportes detallados en PDF para compartir con tu médico. Además, incluye consejos personalizados basados en tus niveles actuales.'
     },
     {
       title: 'Portal Especialista',
-      image: 'assets/laptophtas2.png',
+      image: 'assets/images/laptophtas2.png',
       shortDesc: 'Plataforma de telemonitorización para médicos que utiliza analítica avanzada para predecir crisis.',
       extraInfo: 'El dashboard para profesionales permite monitorear a cientos de pacientes simultáneamente. El sistema prioriza automáticamente aquellos casos que presentan anomalías o tendencias de riesgo, permitiendo una intervención proactiva antes de que ocurra una crisis hipertensiva.'
     }
@@ -218,7 +218,7 @@ export class Recursos implements AfterViewInit, OnDestroy {
     const textureLoader = new THREE.TextureLoader();
     const planeGeo = new THREE.PlaneGeometry(this.CONFIG.pWidth, this.CONFIG.pHeight);
 
-    const images = ['assets/baumanometrohtas.jpg', 'assets/celhtas2.jpeg', 'assets/laptophtas.jpg'];
+    const images = ['assets/images/baumanometrohtas.jpg', 'assets/images/celhtas2.jpeg', 'assets/images/laptophtas.jpg'];
 
     for (let i = 0; i < this.CONFIG.slideCount; i++) {
       const group = new THREE.Group();

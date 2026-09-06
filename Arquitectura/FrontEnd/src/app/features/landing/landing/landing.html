@@ -91,9 +91,9 @@
               </div>
             </div>
             <div class="screen-track" [style.transform]="screenTransform">
-              <img src="assets/Imagen1.png" alt="App Screen 1" class="app-screen" loading="lazy">
-              <img src="assets/Imagen2.png" alt="App Screen 2" class="app-screen" loading="lazy">
-              <img src="assets/Imagen4.png" alt="App Screen 3" class="app-screen" loading="lazy">
+              <img src="assets/images/Imagen1.png" alt="App Screen 1" class="app-screen" loading="lazy">
+              <img src="assets/images/Imagen2.png" alt="App Screen 2" class="app-screen" loading="lazy">
+              <img src="assets/images/Imagen4.png" alt="App Screen 3" class="app-screen" loading="lazy">
             </div>
           </div>
           <div class="phone-reflections"></div>
@@ -111,6 +111,21 @@
 
   <section class="bracelet-schematic-section">
     <div class="tech-circles-container">
+      <!-- Anillos tipo radar/pulso -->
+      <div class="pulse-rings">
+        <span class="pulse-ring ring-1"></span>
+        <span class="pulse-ring ring-2"></span>
+        <span class="pulse-ring ring-3"></span>
+      </div>
+
+      <!-- Línea de electrocardiograma animada -->
+      <svg class="ecg-line" viewBox="0 0 600 600" preserveAspectRatio="xMidYMid meet">
+        <path class="ecg-path" d="M0,300 L40,300 L55,270 L70,330 L85,180 L100,420 L115,300 L150,300
+         L190,300 L205,270 L220,330 L235,180 L250,420 L265,300 L300,300
+         L340,300 L355,270 L370,330 L385,180 L400,420 L415,300 L450,300
+         L490,300 L505,270 L520,330 L535,180 L550,420 L565,300 L600,300" />
+      </svg>
+
       <div class="ellipses-container">
         <div class="ellipses ellipses__outer--thin">
           <div class="ellipses ellipses__orbit"></div>
@@ -138,7 +153,8 @@
       </div>
 
       <div class="bracelet-center-display">
-        <img src="assets/baumanometro.png" class="bracelet-hero-img" alt="Smart Bracelet" loading="lazy" #animateUp>
+        <img src="assets/images/baumanometro.png" class="bracelet-hero-img" alt="Smart Bracelet" loading="lazy"
+          #animateUp>
         <div class="bracelet-shadow-ellipse" #animateUp></div>
       </div>
 
@@ -183,19 +199,19 @@
 
         <div class="slide" [class.active]="activeGalleryTab === 1" (click)="setActiveGalleryTab(1)">
           <div class="image-card">
-            <img src="assets/celhtas.png" alt="Monitoreo App" class="gallery-img" loading="lazy">
+            <img src="assets/images/celhtas.png" alt="Monitoreo App" class="gallery-img" loading="lazy">
           </div>
         </div>
 
         <div class="slide" [class.active]="activeGalleryTab === 2" (click)="setActiveGalleryTab(2)">
           <div class="image-card">
-            <img src="assets/baumanometrohtas2.jpg" alt="Detalle Pulsera" class="gallery-img" loading="lazy">
+            <img src="assets/images/baumanometrohtas2.jpg" alt="Detalle Pulsera" class="gallery-img" loading="lazy">
           </div>
         </div>
 
         <div class="slide" [class.active]="activeGalleryTab === 3" (click)="setActiveGalleryTab(3)">
           <div class="image-card">
-            <img src="assets/laptophtas3.png" alt="Plataforma Web" class="gallery-img" loading="lazy">
+            <img src="assets/images/laptophtas3.png" alt="Plataforma Web" class="gallery-img" loading="lazy">
           </div>
         </div>
 

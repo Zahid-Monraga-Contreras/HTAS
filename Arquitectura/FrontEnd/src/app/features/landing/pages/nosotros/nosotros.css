@@ -31,30 +31,24 @@
     border-radius: 30px;
     border: 1px solid rgba(255, 255, 255, 0.8);
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.04);
-    /* SOLUCIÓN: Aísla el contexto de apilamiento para evitar errores de renderizado en resize */
     isolation: isolate;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
+    /* antes: hidden — esto era lo que cortaba la laptop */
 }
 
 .laptop-wrapper {
     flex: 1;
     min-width: 400px;
+    min-height: 600px;
+    /* antes 450px */
     position: relative;
+    z-index: 20;
+    /* la deja por encima del panel de cristal y del texto */
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.laptop-stage {
-    position: absolute;
-    width: 350px;
-    height: 40px;
-    background: radial-gradient(ellipse at center, rgba(176, 0, 30, 0.1) 0%, transparent 70%);
-    bottom: 20px;
-    transform: rotateX(60deg);
-    border-radius: 50%;
-    pointer-events: none;
+    overflow: visible;
 }
 
 .promo-decor {
@@ -127,276 +121,6 @@
     margin-bottom: 1.8rem;
     color: #444;
     font-weight: 400;
-}
-
-/* Eliminados estilos de placeholder antiguos que causaban ruido visual */
-
-/* Contenedor con la rotación de perfil que te gusta */
-.laptop {
-    position: relative;
-    width: 400px;
-    height: 260px;
-    transform-style: preserve-3d;
-    transform: rotateX(15deg) rotateY(-35deg);
-    transition: transform 0.8s ease;
-    margin: 20px 40px 60px -20px;
-}
-
-/* --- BASE: AQUÍ ESTÁ EL TRUCO --- */
-.base {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 100%;
-    background: #1e272e;
-    /* Graphite reverted */
-    border-radius: 15px;
-    transform: rotateX(90deg) translateZ(-1px);
-    transform-origin: bottom;
-    box-shadow: -30px 30px 60px rgba(0, 0, 0, 0.4);
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-    box-sizing: border-box;
-
-    /* GROSOR EXTREMO DE LA BASE: Mantenido */
-    border-bottom: 25px solid #0f1418;
-    /* Darker graphite for depth */
-    border-left: 10px solid #141a1f;
-    border-right: 10px solid #141a1f;
-
-    box-shadow:
-        0 8px 1px rgba(0, 0, 0, 0.5),
-        -15px 25px 50px rgba(0, 0, 0, 0.6),
-        -30px 40px 100px rgba(0, 0, 0, 0.4);
-}
-
-/* TECLADO: Ahora se posiciona arriba (al fondo, junto a la pantalla) */
-.keyboard {
-    width: 95%;
-    height: 55%;
-    background: #1a1a1a;
-    border-radius: 8px;
-    padding: 10px;
-    box-sizing: border-box;
-    border: 1px solid #3d4a57;
-    box-shadow: inset 0 5px 15px rgba(0, 0, 0, 0.5);
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    grid-template-rows: repeat(5, 1fr);
-    gap: 4px;
-    margin-top: 15px;
-    position: relative;
-    z-index: 1;
-    /* Mantén esto bajo */
-    transform: translateZ(0);
-    /* Obliga a que se queden pegados a la base */
-    /* Espacio respecto al touchpad que ahora está al frente */
-}
-
-.key {
-    background: linear-gradient(145deg, #2d3436, #1e272e);
-    /* Original graphite-ish */
-    border-radius: 3px;
-    border-bottom: 3px solid #000;
-    box-shadow: 0 2px 0 #000;
-    transition: transform 0.1s;
-}
-
-.key:active {
-    transform: translateY(1px);
-    box-shadow: 0 1px 0 #000;
-}
-
-.key.space {
-    grid-column: span 6;
-}
-
-/* TOUCHPAD: Ahora se posiciona abajo (al frente) */
-.touchpad {
-    width: 120px;
-    height: 70px;
-    background: #252d35;
-    /* Reverted color */
-    border-radius: 6px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
-    position: relative;
-    z-index: 1;
-    transform: translateZ(2px);
-}
-
-.lid-back {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #1e272e;
-    border-radius: 15px;
-    /* Reducimos el translateZ para que estén más pegadas */
-    transform: translateZ(-2px);
-    backface-visibility: visible !important;
-    -webkit-backface-visibility: visible !important;
-    z-index: 1;
-    box-shadow:
-        inset 0 0 40px rgba(0, 0, 0, 0.5),
-        0 0 0 5px #0f1418;
-    /* Borde exterior para sellar el canto */
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.lid-back::after {
-    content: 'HTAS';
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 900;
-    font-size: 2.5rem;
-    color: rgba(255, 255, 255, 0.15);
-    letter-spacing: 5px;
-    text-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-}
-
-/* --- PANTALLA --- */
-.lid {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    bottom: 0;
-    transform-style: preserve-3d;
-    transform-origin: bottom;
-    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    transform: translateZ(10px) rotateX(90deg);
-    z-index: 50;
-    /* Estado cerrado */
-}
-
-.lid-screen {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: #000;
-    border-radius: 15px;
-    /* Reducimos el translateZ para que estén más pegadas */
-    transform: translateZ(2px);
-    backface-visibility: visible !important;
-    -webkit-backface-visibility: visible !important;
-    z-index: 2;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 15px solid #1e272e;
-    box-sizing: border-box;
-    isolation: isolate;
-    /* SELLADO DE BORDES: Sombras que cubren el "hueco" lateral */
-    box-shadow:
-        inset 0 0 0 2px rgba(255, 255, 255, 0.05),
-        /* Capas de profundidad para cerrar el gap */
-        0 1px 0 #0f1418,
-        0 -1px 0 #0f1418,
-        1px 0 0 #0f1418,
-        -1px 0 0 #0f1418,
-        /* Grosor visual unificado */
-        0 0 0 4px #0f1418;
-}
-
-.screen-content {
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle at 50% 0%, #ffffff 0%, #f1f4f8 100%);
-    /* Color exacto del phone */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: black;
-    font-family: 'Segoe UI', 'Montserrat', sans-serif;
-    padding: 20px;
-    box-sizing: border-box;
-    overflow: hidden;
-    transform: translateZ(0);
-    transform-style: flat !important;
-}
-
-.screen-content {
-    width: 100%;
-    height: 100%;
-    background: #ffffff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    overflow: hidden;
-}
-
-.pulse-background {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    opacity: 0.4;
-    display: flex;
-    align-items: center;
-    z-index: 1;
-}
-
-.pulse-path {
-    fill: none;
-    stroke: #8B0015;
-    stroke-width: 1;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    animation: dash 3s linear infinite;
-    stroke-dasharray: 1000;
-    stroke-dashoffset: 1000;
-}
-
-@keyframes dash {
-    to {
-        stroke-dashoffset: 0;
-    }
-}
-
-.main-heart-container {
-    position: relative;
-    z-index: 2;
-    font-size: 6rem;
-    color: #8B0015;
-    filter: drop-shadow(0 0 15px rgba(139, 0, 21, 0.4));
-    animation: pulseHeart 1.5s infinite ease-in-out;
-}
-
-@keyframes pulseHeart {
-
-    0%,
-    100% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.1);
-    }
-}
-
-/* --- TUS ANIMACIONES --- */
-.laptop:hover .lid {
-    transform: translateZ(5px) rotateX(-25deg);
-}
-
-.laptop:hover {
-    transform: rotateX(25deg) rotateY(-25deg) scale(1.1);
-    /* Better view angle for thickness */
-}
-
-/* Al quitar el hover (Cuando se cierra) */
-.laptop:not(:hover) .lid {
-    /* Reforzamos que al cerrar use este valor */
-    transform: translateZ(10px) rotateX(90deg);
 }
 
 /* ===== SECTION HEADER (通用) ===== */
@@ -733,14 +457,8 @@ input#pos3:checked~main#items-carrusel {
         font-size: 2rem;
     }
 
-    /* Ajuste de escala hover para tablet */
-    .laptop {
-        transform: scale(0.8) rotateX(15deg) rotateY(-35deg);
-        margin: -20px auto 20px auto;
-    }
-
-    .laptop:hover {
-        transform: scale(0.85) rotateX(20deg) rotateY(-30deg) !important;
+    .laptop-wrapper {
+        min-height: 480px;
     }
 }
 
@@ -812,24 +530,13 @@ input#pos3:checked~main#items-carrusel {
         padding: 1.5rem;
         gap: 2rem;
         overflow: visible;
-        /* Permitir que la laptop sobresalga si es necesario sin "cortar" el cristal */
+        /* Permitir que el contenido sobresalga si es necesario sin "cortar" el cristal */
     }
 
     .laptop-wrapper {
         min-width: 0;
         width: 100%;
-    }
-
-    /* Laptop ajustada para no crecer de más en hover */
-    .laptop {
-        transform: scale(0.55) rotateX(15deg) rotateY(-35deg);
-        margin: 0 auto 0px auto !important;
-        /* Reduced negative margin since padding is now smaller */
-        transform-origin: center center;
-    }
-
-    .laptop:hover {
-        transform: scale(0.6) rotateX(20deg) rotateY(-30deg) !important;
+        min-height: 420px;
     }
 
     .cont-carrusel {
@@ -881,15 +588,8 @@ input#pos3:checked~main#items-carrusel {
         height: 250px;
     }
 
-    /* Laptop: Mantenemos la escala pequeña incluso en el hover táctil */
-    .laptop {
-        transform: scale(0.35) rotateX(15deg) rotateY(-30deg);
-        margin: -80px auto -60px auto !important;
-        transform-origin: center center;
-    }
-
-    .laptop:hover {
-        transform: scale(0.38) rotateX(20deg) rotateY(-25deg) !important;
+    .laptop-wrapper {
+        min-height: 320px;
     }
 
     .cont-carrusel {
@@ -1002,7 +702,6 @@ input#pos3:checked~main#items-carrusel {
     margin: 0;
     font-weight: 700;
 }
-
 
 /* Línea Inferior */
 .card-footer-line {

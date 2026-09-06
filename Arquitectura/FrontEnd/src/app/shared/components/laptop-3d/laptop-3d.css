@@ -1,0 +1,23 @@
+.laptop-3d-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 560px;
+    /* antes 400px — evita que la pantalla se corte arriba */
+    overflow: visible;
+    /* deja que el render "respire" fuera de su caja */
+    background: transparent;
+    /* sin fondo propio */
+}
+
+.laptop-3d-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+    background: transparent;
+}
+
+.laptop-3d-canvas:active {
+    cursor: grabbing;
+}

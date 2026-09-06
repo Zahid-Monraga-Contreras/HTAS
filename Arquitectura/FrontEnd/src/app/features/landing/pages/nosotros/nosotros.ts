@@ -1,10 +1,11 @@
 import { Component, AfterViewInit, ElementRef, QueryList, ViewChildren, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Laptop3dComponent } from '../../../../shared/components/laptop-3d/laptop-3d';
 
 @Component({
   selector: 'app-nosotros',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, Laptop3dComponent],
   templateUrl: './nosotros.html',
   styleUrl: './nosotros.css',
 })
