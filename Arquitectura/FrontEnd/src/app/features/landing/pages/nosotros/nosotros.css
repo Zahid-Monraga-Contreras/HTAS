@@ -534,8 +534,10 @@ input#pos3:checked~main#items-carrusel {
     }
 
     .container-glass {
-        padding: 1.5rem;
-        gap: 2rem;
+        padding: 1.5rem 1.5rem 0.5rem 1.5rem;
+        /* Ajustado el padding inferior en móvil */
+        gap: 1rem;
+        /* Reducido el espacio entre texto y laptop */
         overflow: visible;
         /* Permitir que el contenido sobresalga si es necesario sin "cortar" el cristal */
     }
@@ -543,8 +545,20 @@ input#pos3:checked~main#items-carrusel {
     .laptop-wrapper {
         min-width: 0;
         width: 100%;
-        min-height: 350px;
-        margin-top: 20px;
+        /* FIX: antes solo tenía min-height (280px), y como height:100% del
+           hijo .laptop-3d-container no podía resolverse sin una altura
+           EXPLÍCITA acá, el layout terminaba dependiendo de valores
+           impredecibles y el componente TS medía un contenedor mucho más
+           alto/angosto de lo real al calcular el encuadre de cámara —
+           eso disparaba el zoom-out máximo (narrowness al tope) y dejaba
+           la laptop chica rodeada de espacio en blanco.
+           Ahora se fija height explícito, igual al de .laptop-3d-container
+           en laptop-3d.css, para que la cadena de alturas se resuelva
+           de forma predecible desde el primer render. */
+        height: 260px;
+        min-height: 260px;
+        margin-top: 0px;
+        /* Eliminado margen superior extra */
         transform: scale(1.1) translateX(0);
         /* En móvil no lo hacemos tan masivo para que quepa */
         transform-origin: center;
@@ -582,12 +596,15 @@ input#pos3:checked~main#items-carrusel {
         font-size: 1rem !important;
         line-height: 1.6;
         text-align: center;
+        margin-bottom: 1rem;
+        /* Espaciado más compacto en móviles pequeños */
     }
 
     .section-header h2,
     .content-text h2 {
         font-size: 1.7rem !important;
         text-align: center;
+        margin-bottom: 1rem;
     }
 
     .content-text h2::after {
@@ -599,8 +616,19 @@ input#pos3:checked~main#items-carrusel {
         height: 250px;
     }
 
+    .container-glass {
+        padding: 1rem 1rem 0rem 1rem;
+        /* Ajuste óptimo para pantallas muy pequeñas */
+        gap: 0.5rem;
+    }
+
     .laptop-wrapper {
-        min-height: 320px;
+        /* Mismo fix que en el breakpoint de 768px, con una altura
+           un poco menor acorde a pantallas más chicas, y coincidiendo
+           con .laptop-3d-container en laptop-3d.css. */
+        height: 220px;
+        min-height: 220px;
+        margin-top: -10px;
     }
 
     .cont-carrusel {
@@ -632,7 +660,7 @@ input#pos3:checked~main#items-carrusel {
     gap: 30px;
     max-width: 1300px;
     margin: 0 auto;
-    flex-wrap: wrap;
+    flex-path: wrap;
 }
 
 /* La Tarjeta Individual */

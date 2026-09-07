@@ -37,14 +37,34 @@ export class Laptop3dComponent implements AfterViewInit, OnDestroy {
 
     private readonly baseWidth = 34;
     private readonly baseDepth = 22;
-    private readonly baseThickness = 1.4;
+    // ---- GROSOR REDUCIDO ----
+    // Antes: 1.4 (base) / 1 (tapa) — se veía demasiado gruesa para
+    // una laptop real. Ahora ambos valores son más delgados; el resto
+    // de las posiciones ya estaban calculadas EN FUNCIÓN de estas
+    // constantes, así que todo se reajusta proporcionalmente solo.
+    private readonly baseThickness = 0.8;
     private readonly lidWidth = 34;
     private readonly lidHeight = 21;
-    private readonly lidThickness = 1;
+    // Bajado de 0.45 a 0.2: seguía viéndose gruesa la franja negra
+    // (bisel + pantalla) para ser una laptop real. 0.2 da un perfil
+    // delgado tipo laptop moderna, manteniendo el mismo negro/gris.
+    private readonly lidThickness = 0.3;
     private readonly screenWidth = 30.5;
     private readonly screenHeight = 18.5;
 
     private readonly OPEN_ANGLE = -0.1 * Math.PI;
+
+    // ---- Encuadre responsive ----
+    // BASE_* son el encuadre original (desktop), tal cual estaba antes de
+    // tocar nada — se usan siempre que la pantalla NO sea mobile.
+    // MOBILE_BREAKPOINT debe coincidir con el media query del CSS
+    // (@media max-width: 768px) para que ambos ajustes (tamaño de
+    // contenedor y encuadre de cámara) cambien en el mismo punto.
+    private readonly BASE_FOV = 42;
+    private readonly BASE_CAMERA_DISTANCE = 85;
+    private readonly BASE_MAX_DISTANCE = 100;
+    private readonly REFERENCE_ASPECT = 1.6;
+    private readonly MOBILE_BREAKPOINT = 768;
 
     private scene!: THREE.Scene;
     private camera!: THREE.PerspectiveCamera;
@@ -56,6 +76,15 @@ export class Laptop3dComponent implements AfterViewInit, OnDestroy {
     private hingeGroup!: THREE.Group;
     private baseGroup!: THREE.Group;
     private lidPivot!: THREE.Group;
+    // ---- Grupo para teclado + barra espaciadora + touchpad ----
+    // El problema real: con la tapa cerrada, las teclas y el touchpad
+    // ocupan casi la misma altura que la tapa, así que aunque la tapa
+    // esté en el ángulo/posición correctos, se atraviesan visualmente
+    // con ella (las teclas "se asoman" por el borde). En vez de intentar
+    // afinar alturas/ángulos (frágil y depende de la geometría exacta),
+    // se oculta todo este grupo mientras está cerrada y se muestra un
+    // poco después de que la tapa empieza a abrirse.
+    private keyboardGroup!: THREE.Group;
     private ledMaterial!: THREE.MeshStandardMaterial;
     private screenMaterial!: THREE.MeshBasicMaterial;
     private screenTexture!: THREE.Texture;
@@ -113,7 +142,9 @@ export class Laptop3dComponent implements AfterViewInit, OnDestroy {
             1,
             1000
         );
-        // Posición estándar para que se vea bien en todo el proyecto
+        // Posición original — el intento de "reencuadrar" acercando la
+        // cámara hizo que la laptop se viera más grande de lo deseado.
+        // Se revierte a los valores de antes.
         this.camera.position.set(0, 4, 85);
 
         this.renderer = new THREE.WebGLRenderer({
@@ -142,6 +173,18 @@ export class Laptop3dComponent implements AfterViewInit, OnDestroy {
         this.orbit.enableDamping = true;
         this.orbit.target.set(0, 8, -5);
 
+        // ---- En celular/tablet, no capturar el gesto de un dedo ----
+        // OrbitControls usa el drag de un dedo para rotar la cámara, y al
+        // hacerlo bloquea el scroll normal de la página con ese mismo dedo.
+        // En dispositivos de puntero "coarse" (touch) se desactiva el
+        // rotate — la laptop se sigue animando sola (aparición + apertura
+        // + flotación), solo no se puede arrastrar con el dedo. En mouse
+        // (puntero "fine") se mantiene el comportamiento original.
+        const isCoarsePointer =
+            typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches;
+        this.orbit.enableRotate = !isCoarsePointer;
+        this.renderer.domElement.style.touchAction = isCoarsePointer ? 'pan-y' : 'none';
+
         this.macGroup = new THREE.Group();
         this.macGroup.position.y = -5; // Centrado
         this.scene.add(this.macGroup);
@@ -152,9 +195,51 @@ export class Laptop3dComponent implements AfterViewInit, OnDestroy {
 
     private updateSceneSize(): void {
         const container = this.containerRef.nativeElement;
-        this.camera.aspect = container.clientWidth / container.clientHeight;
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+        const aspect = width / height;
+
+        // ---- CORREGIDO: el ajuste solo se activa en pantallas mobile ----
+        // Antes decidíamos si achicar la cámara según el aspect ratio del
+        // CONTENEDOR. El problema: si el contenedor en desktop no es tan
+        // ancho como el de referencia (1.6) —muchos layouts no lo son—,
+        // el mismo cálculo se disparaba también ahí, achicando el modelo
+        // en pantallas grandes sin que fuera mobile.
+        // Ahora se decide por el ANCHO REAL DE LA VENTANA
+        // (window.innerWidth), igual que el media query del CSS: en
+        // desktop/tablet grande (> MOBILE_BREAKPOINT) el encuadre es
+        // SIEMPRE el original (BASE_FOV / BASE_CAMERA_DISTANCE), sin
+        // importar el aspect del contenedor. Solo por debajo del
+        // breakpoint se abre un poco el FOV y se aleja un poco la cámara
+        // (con topes) para que la laptop no se corte en pantallas
+        // angostas.
+        const isMobileViewport = window.innerWidth <= this.MOBILE_BREAKPOINT;
+
+        if (isMobileViewport) {
+            const narrowness = Math.max(1, this.REFERENCE_ASPECT / aspect);
+
+            const MAX_FOV = 58;
+            this.camera.fov = Math.min(MAX_FOV, this.BASE_FOV * Math.sqrt(narrowness));
+
+            const MAX_DISTANCE = 130;
+            const targetDistance = Math.min(MAX_DISTANCE, this.BASE_CAMERA_DISTANCE * Math.sqrt(narrowness));
+            this.camera.position.z = targetDistance;
+
+            // OrbitControls recorta la distancia de la cámara a
+            // [minDistance, maxDistance] en cada update(); si no subimos
+            // maxDistance aquí, la próxima llamada a orbit.update()
+            // deshace este ajuste.
+            this.orbit.maxDistance = Math.max(this.BASE_MAX_DISTANCE, targetDistance + 10);
+        } else {
+            // Desktop / tablet grande: encuadre original, sin excepciones.
+            this.camera.fov = this.BASE_FOV;
+            this.camera.position.z = this.BASE_CAMERA_DISTANCE;
+            this.orbit.maxDistance = this.BASE_MAX_DISTANCE;
+        }
+
+        this.camera.aspect = aspect;
         this.camera.updateProjectionMatrix();
-        this.renderer.setSize(container.clientWidth, container.clientHeight);
+        this.renderer.setSize(width, height);
     }
 
     private render = (): void => {
@@ -179,6 +264,15 @@ export class Laptop3dComponent implements AfterViewInit, OnDestroy {
             roughness: 0.8,
         });
 
+        // Material del indicador de encendido (blanco, antes verde).
+        // Se define aquí porque ahora vive dentro del botón de encendido
+        // (ver addPorts()) y ya no como un LED suelto en el borde de la base.
+        this.ledMaterial = new THREE.MeshStandardMaterial({
+            color: 0x0a0a0a,
+            emissive: 0xffffff,
+            emissiveIntensity: 0,
+        });
+
         this.baseGroup = new THREE.Group();
         this.macGroup.add(this.baseGroup);
 
@@ -196,6 +290,15 @@ export class Laptop3dComponent implements AfterViewInit, OnDestroy {
         keyboardWell.position.set(0, this.baseThickness + 0.05, -0.5);
         this.baseGroup.add(keyboardWell);
 
+        // ---- Grupo contenedor, oculto por defecto ----
+        // Todo lo que "sobresale" del hueco del teclado (teclas, barra
+        // espaciadora, touchpad) va dentro de este grupo. Arranca oculto
+        // de forma directa e inmediata, así nunca depende de en qué frame
+        // decida renderizar GSAP.
+        this.keyboardGroup = new THREE.Group();
+        this.keyboardGroup.visible = false;
+        this.baseGroup.add(this.keyboardGroup);
+
         this.addKeyboard();
         this.addTouchpad();
         this.addPorts();
@@ -211,16 +314,18 @@ export class Laptop3dComponent implements AfterViewInit, OnDestroy {
             this.baseGroup.add(foot);
         });
 
+        // Bisagra: radio reducido de 0.9 a 0.5 para que combine con
+        // el cuerpo ahora más delgado (antes se veía sobredimensionada).
         const hinge = new THREE.Mesh(
-            new THREE.CylinderGeometry(0.9, 0.9, this.baseWidth - 6, 20),
+            new THREE.CylinderGeometry(0.5, 0.5, this.baseWidth - 6, 20),
             darkMaterial
         );
         hinge.rotation.z = Math.PI / 2;
-        hinge.position.set(0, this.baseThickness + 0.3, -this.baseDepth / 2 + 0.3);
+        hinge.position.set(0, this.baseThickness + 0.22, -this.baseDepth / 2 + 0.3);
         this.baseGroup.add(hinge);
 
         this.hingeGroup = new THREE.Group();
-        this.hingeGroup.position.set(0, this.baseThickness + 0.3, -this.baseDepth / 2 + 0.3);
+        this.hingeGroup.position.set(0, this.baseThickness + 0.22, -this.baseDepth / 2 + 0.3);
         this.baseGroup.add(this.hingeGroup);
 
         this.buildLid(bodyMaterial, darkMaterial);
@@ -270,7 +375,7 @@ export class Laptop3dComponent implements AfterViewInit, OnDestroy {
             dummy.updateMatrix();
             instanced.setMatrixAt(i, dummy.matrix);
         });
-        this.baseGroup.add(instanced);
+        this.keyboardGroup.add(instanced);
 
         // ---- Barra espaciadora ----
         // Una sola tecla ancha centrada, ocupando el espacio de las
@@ -286,7 +391,7 @@ export class Laptop3dComponent implements AfterViewInit, OnDestroy {
             this.baseThickness + 0.25,
             startZ + lastRow * (keySize + gap)
         );
-        this.baseGroup.add(spacebar);
+        this.keyboardGroup.add(spacebar);
     }
 
     private addTouchpad(): void {
@@ -297,14 +402,14 @@ export class Laptop3dComponent implements AfterViewInit, OnDestroy {
             new THREE.MeshStandardMaterial({ color: 0x0d0f11, metalness: 0.15, roughness: 0.85 })
         );
         trackpadFrame.position.set(0, this.baseThickness + 0.08, 5.2);
-        this.baseGroup.add(trackpadFrame);
+        this.keyboardGroup.add(trackpadFrame);
 
         const touchpad = new THREE.Mesh(
             new RoundedBoxGeometry(10, 0.18, 5.4, 3, 0.4),
             new THREE.MeshStandardMaterial({ color: 0x3d4147, metalness: 0.35, roughness: 0.1 })
         );
         touchpad.position.set(0, this.baseThickness + 0.15, 5.2);
-        this.baseGroup.add(touchpad);
+        this.keyboardGroup.add(touchpad);
     }
 
     // =======================================================
@@ -324,11 +429,38 @@ export class Laptop3dComponent implements AfterViewInit, OnDestroy {
         const leftX = -this.baseWidth / 2 - 0.01;
         const rightX = this.baseWidth / 2 + 0.01;
 
-        // ---- Lado izquierdo: cargador + 2 puertos USB ----
-        const chargerPort = new THREE.Mesh(new THREE.CircleGeometry(0.4, 20), portMaterial);
-        chargerPort.rotation.y = -Math.PI / 2;
-        chargerPort.position.set(leftX, portY, -7.5);
-        this.baseGroup.add(chargerPort);
+        // ---- Lado izquierdo: BOTÓN DE ENCENDIDO + 2 puertos USB ----
+        // Botón de encendido blanco. Tamaño reducido de nuevo
+        // (antes 0.3/0.22/0.08 de radio, ahora 0.18/0.13/0.05).
+        const powerButtonMaterial = new THREE.MeshStandardMaterial({
+            color: 0xffffff,
+            metalness: 0.05,
+            roughness: 0.4,
+        });
+
+        const powerButtonRing = new THREE.Mesh(
+            new THREE.CircleGeometry(0.18, 24),
+            powerButtonMaterial
+        );
+        powerButtonRing.rotation.y = -Math.PI / 2;
+        powerButtonRing.position.set(leftX, portY, -7.5);
+        this.baseGroup.add(powerButtonRing);
+
+        const powerButtonFace = new THREE.Mesh(
+            new THREE.CircleGeometry(0.13, 24),
+            powerButtonMaterial
+        );
+        powerButtonFace.rotation.y = -Math.PI / 2;
+        powerButtonFace.position.set(leftX + 0.005, portY, -7.5);
+        this.baseGroup.add(powerButtonFace);
+
+        const powerButtonIndicator = new THREE.Mesh(
+            new THREE.CircleGeometry(0.05, 16),
+            this.ledMaterial
+        );
+        powerButtonIndicator.rotation.y = -Math.PI / 2;
+        powerButtonIndicator.position.set(leftX + 0.01, portY, -7.5);
+        this.baseGroup.add(powerButtonIndicator);
 
         const usbGeometry = new THREE.PlaneGeometry(1.0, 0.4);
         const usb1 = new THREE.Mesh(usbGeometry, portMaterial);
@@ -355,6 +487,14 @@ export class Laptop3dComponent implements AfterViewInit, OnDestroy {
 
     private buildLid(bodyMaterial: THREE.Material, darkMaterial: THREE.Material): void {
         const lidPivot = new THREE.Group();
+        // FIX: antes esta rotación "cerrada" solo se aplicaba dentro del
+        // fromTo() de GSAP (más abajo, en createTimelines()). Al estar
+        // anidada dentro de otra timeline controlada por progreso, GSAP
+        // no garantizaba aplicarla en el primer frame — por eso se veía
+        // el teclado descubierto antes de que la animación arrancara.
+        // Ahora se fija de forma directa e inmediata: la tapa SIEMPRE
+        // arranca cerrada, sin depender de cuándo GSAP decida renderizar.
+        lidPivot.rotation.x = 0.5 * Math.PI;
         this.hingeGroup.add(lidPivot);
 
         const lidBack = new THREE.Mesh(
@@ -380,24 +520,32 @@ export class Laptop3dComponent implements AfterViewInit, OnDestroy {
         bezel.position.set(0, this.lidHeight / 2, this.lidThickness / 2);
         lidPivot.add(bezel);
 
-        // ---- Cámara web ----
-        // Antes: solo un círculo oscuro, casi imperceptible sobre el
-        // bezel (también oscuro). Ahora se agrega un anillo un poco
-        // más claro alrededor de la lente para que se note el
-        // "hueco" de la cámara, como en una laptop real.
+        // ---- Cámara web: AHORA VISIBLE ----
+        // Antes: un anillo (0x2a2d31) casi idéntico en tono al bisel
+        // (0x16181a) — se perdía por falta de contraste. Ahora el
+        // anillo es más claro y metálico, más grande, y se agrega un
+        // pequeño "glint" (brillo de lente) para venderla como una
+        // cámara real en vez de un punto plano.
         const webcamRing = new THREE.Mesh(
-            new THREE.CircleGeometry(0.32, 20),
-            new THREE.MeshStandardMaterial({ color: 0x2a2d31, metalness: 0.4, roughness: 0.4 })
+            new THREE.CircleGeometry(0.38, 24),
+            new THREE.MeshStandardMaterial({ color: 0x5a5f66, metalness: 0.6, roughness: 0.3 })
         );
         webcamRing.position.set(0, this.lidHeight - 0.5, this.lidThickness / 2 + 0.005);
         lidPivot.add(webcamRing);
 
         const webcam = new THREE.Mesh(
-            new THREE.CircleGeometry(0.18, 16),
-            new THREE.MeshStandardMaterial({ color: 0x0a0a0a })
+            new THREE.CircleGeometry(0.2, 20),
+            new THREE.MeshStandardMaterial({ color: 0x020202, metalness: 0.2, roughness: 0.5 })
         );
         webcam.position.set(0, this.lidHeight - 0.5, this.lidThickness / 2 + 0.01);
         lidPivot.add(webcam);
+
+        const webcamGlint = new THREE.Mesh(
+            new THREE.CircleGeometry(0.05, 12),
+            new THREE.MeshBasicMaterial({ color: 0x9fd3ff, transparent: true, opacity: 0.85 })
+        );
+        webcamGlint.position.set(-0.07, this.lidHeight - 0.43, this.lidThickness / 2 + 0.015);
+        lidPivot.add(webcamGlint);
 
         // ---- Pantalla ----
         // Antes: se dibujaba el dashboard a mano con Canvas 2D.
@@ -420,16 +568,6 @@ export class Laptop3dComponent implements AfterViewInit, OnDestroy {
         lidPivot.add(screenMesh);
 
         this.loadScreenTexture();
-
-        this.ledMaterial = new THREE.MeshStandardMaterial({
-            color: 0x0a0a0a,
-            emissive: 0x2ecc71,
-            emissiveIntensity: 0,
-        });
-        const led = new THREE.Mesh(new THREE.CircleGeometry(0.15, 12), this.ledMaterial);
-        led.position.set(this.baseWidth / 2 - 1.5, this.baseThickness + 0.01, this.baseDepth / 2 - 0.5);
-        led.rotation.x = -Math.PI / 2;
-        this.baseGroup.add(led);
 
         this.lidPivot = lidPivot;
     }
@@ -493,12 +631,19 @@ export class Laptop3dComponent implements AfterViewInit, OnDestroy {
 
         this.laptopOpeningTl = gsap
             .timeline({ paused: true })
-            .fromTo(
+            .to(
                 this.lidPivot.rotation,
-                { x: 0.5 * Math.PI },
                 { x: this.OPEN_ANGLE, duration: 1.2, ease: 'power2.out' },
                 0
             )
+            // ---- Revelar el teclado un poco DESPUÉS del inicio ----
+            // Si el teclado se hace visible en el instante 0 de la apertura,
+            // con power2.out la tapa arranca lenta y en esos primeros frames
+            // casi no se ha movido — el teclado se asoma por debajo de una
+            // tapa todavía casi cerrada. Con este delay (~30% del giro) la
+            // tapa ya se levantó lo suficiente antes de mostrar el teclado.
+            // Si aún se alcanza a ver un parpadeo, sube este valor (p. ej. 0.5).
+            .set(this.keyboardGroup, { visible: true }, 0.35)
             .to(this.ledMaterial, { duration: 0.4, emissiveIntensity: 1.2 }, 0.5);
 
         this.laptopAppearTl = gsap.timeline({ paused: true }).fromTo(

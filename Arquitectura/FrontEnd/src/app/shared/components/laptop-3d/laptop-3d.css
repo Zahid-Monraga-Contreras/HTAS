@@ -21,3 +21,32 @@
 .laptop-3d-canvas:active {
     cursor: grabbing;
 }
+
+/* ---- Celular/pantallas angostas ----
+   FIX REAL: el problema no era solo el número de min-height, era que
+   "height: 100%" (arriba) NUNCA se resuelve si el padre (.laptop-wrapper)
+   no tiene una altura EXPLÍCITA — con min-height no alcanza. Eso hacía
+   que, al momento en que el componente TS mide container.clientHeight
+   para calcular el encuadre de cámara (ngAfterViewInit), la medida real
+   no fuera la esperada, y la lógica de "narrowness" en updateSceneSize()
+   terminaba alejando la cámara al máximo permitido (MAX_DISTANCE / MAX_FOV),
+   dejando la laptop chica y rodeada de aire.
+   Ahora se fija HEIGHT explícito (no solo min-height) igual en ambos
+   breakpoints, coincidiendo con el height explícito que se agrega a
+   .laptop-wrapper en nosotros.css. Con una altura real y predecible,
+   el aspect ratio del contenedor deja de ser extremo y la cámara no
+   necesita alejarse tanto. Este breakpoint (768px) debe seguir
+   coincidiendo con MOBILE_BREAKPOINT en el componente TS. */
+@media (max-width: 768px) {
+    .laptop-3d-container {
+        height: 260px;
+        min-height: 260px;
+    }
+}
+
+@media (max-width: 480px) {
+    .laptop-3d-container {
+        height: 220px;
+        min-height: 220px;
+    }
+}
