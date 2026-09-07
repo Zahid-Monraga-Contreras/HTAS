@@ -457,7 +457,7 @@ export class DoctorNuevaCita implements OnInit {
             );
 
             setTimeout(() => {
-                this.router.navigate(['/doctor/citas']);
+                this.router.navigate(['/dashboard/doctor/citas']);
             }, 1500);
 
         } catch (error: any) {
@@ -484,7 +484,7 @@ export class DoctorNuevaCita implements OnInit {
     }
 
     cancelar() {
-        this.router.navigate(['/doctor/citas']);
+        this.router.navigate(['/dashboard/doctor/citas']);
     }
 
     getAvatarUrl(nombre: string, apPaterno: string): string {

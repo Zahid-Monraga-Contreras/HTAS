@@ -178,14 +178,14 @@ export class DoctorPacienteDetalle implements OnInit {
     }
 
     volver() {
-        this.router.navigate(['/doctor/pacientes']);
+        this.router.navigate(['/dashboard/doctor/pacientes']);
     }
 
     irACita(cita: any) {
-        this.router.navigate(['/doctor/citas/detalle', cita.idcita]);
+        this.router.navigate(['/dashboard/doctor/citas/detalle', cita.idcita]);
     }
 
     irATratamiento(tratamiento: any) {
-        this.router.navigate(['/doctor/tratamientos/detalle', tratamiento.idtratamiento]);
+        this.router.navigate(['/dashboard/doctor/tratamientos/detalle', tratamiento.idtratamiento]);
     }
 }

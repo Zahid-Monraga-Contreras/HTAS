@@ -272,7 +272,7 @@ export class DoctorMedicamentoDetalle implements OnInit {
             );
 
             setTimeout(() => {
-                this.router.navigate(['/doctor/medicamentos']);
+                this.router.navigate(['/dashboard/doctor/medicamentos']);
             }, 1000);
 
         } catch (error: any) {
@@ -299,12 +299,12 @@ export class DoctorMedicamentoDetalle implements OnInit {
     }
 
     volver() {
-        this.router.navigate(['/doctor/medicamentos']);
+        this.router.navigate(['/dashboard/doctor/medicamentos']);
     }
 
     verTratamiento(id: number) {
         if (id) {
-            this.router.navigate(['/doctor/tratamientos/detalle', id]);
+            this.router.navigate(['/dashboard/doctor/tratamientos/detalle', id]);
         }
     }
 

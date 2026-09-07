@@ -353,7 +353,7 @@ export class DoctorPerfil implements OnInit {
     }
 
     irANotificaciones() {
-        this.router.navigate(['/doctor/notificaciones']);
+        this.router.navigate(['/dashboard/doctor/notificaciones']);
     }
 
     abrirModalCerrarSesion() {
@@ -382,7 +382,7 @@ export class DoctorPerfil implements OnInit {
             }
 
             this.cerrarModalCerrarSesion();
-            this.router.navigate(['/login']);
+            this.router.navigate(['/auth/login']);
 
         } catch (error) {
             console.error('Error al cerrar sesion:', error);

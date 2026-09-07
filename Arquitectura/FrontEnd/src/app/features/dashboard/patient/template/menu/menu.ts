@@ -18,13 +18,13 @@ export class PatientMenu {
   searchTerm = '';
 
   menuItems = [
-    { path: '/patient/inicio', icon: 'bi-house-door', label: 'Inicio' },
-    { path: '/patient/citas', icon: 'bi-calendar-check', label: 'Mis Citas' },
-    { path: '/patient/tratamientos', icon: 'bi-heart-pulse', label: 'Tratamientos' },
-    { path: '/patient/medicamentos', icon: 'bi-capsule', label: 'Medicamentos' },
-    { path: '/patient/dispositivos', icon: 'bi-device-hdd', label: 'Dispositivos' },
-    { path: '/patient/analisis', icon: 'bi-clipboard2-pulse', label: 'Analisis' },
-    { path: '/patient/perfil', icon: 'bi-person', label: 'Perfil' }
+    { path: '/dashboard/patient/inicio', icon: 'bi-house-door', label: 'Inicio' },
+    { path: '/dashboard/patient/citas', icon: 'bi-calendar-check', label: 'Mis Citas' },
+    { path: '/dashboard/patient/tratamientos', icon: 'bi-heart-pulse', label: 'Tratamientos' },
+    { path: '/dashboard/patient/medicamentos', icon: 'bi-capsule', label: 'Medicamentos' },
+    { path: '/dashboard/patient/dispositivos', icon: 'bi-device-hdd', label: 'Dispositivos' },
+    { path: '/dashboard/patient/analisis', icon: 'bi-clipboard2-pulse', label: 'Analisis' },
+    { path: '/dashboard/patient/perfil', icon: 'bi-person', label: 'Perfil' }
   ];
 
   constructor(

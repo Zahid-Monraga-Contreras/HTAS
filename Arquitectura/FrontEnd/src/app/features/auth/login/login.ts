@@ -293,15 +293,15 @@ export class Login implements AfterViewInit {
 
   private getRouteForRole(role: string): string {
     const roleMap: { [key: string]: string } = {
-      'admin': '/admin',
-      'administrador': '/admin',
-      'paciente': '/patient',
-      'patient': '/patient',
-      'doctor': '/doctor',
-      'medico': '/doctor',
-      'acompanante': '/caregiver',
-      'acompañante': '/caregiver',
-      'caregiver': '/caregiver'
+      'admin': '/dashboard/admin',
+      'administrador': '/dashboard/admin',
+      'paciente': '/dashboard/patient',
+      'patient': '/dashboard/patient',
+      'doctor': '/dashboard/doctor',
+      'medico': '/dashboard/doctor',
+      'acompanante': '/dashboard/caregiver',
+      'acompañante': '/dashboard/caregiver',
+      'caregiver': '/dashboard/caregiver'
     };
     return roleMap[role] || '/landing';
   }

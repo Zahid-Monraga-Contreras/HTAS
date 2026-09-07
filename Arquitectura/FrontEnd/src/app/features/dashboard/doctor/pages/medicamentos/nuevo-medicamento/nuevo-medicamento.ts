@@ -117,7 +117,7 @@ export class DoctorNuevoMedicamento implements OnInit {
             );
 
             setTimeout(() => {
-                this.router.navigate(['/doctor/medicamentos']);
+                this.router.navigate(['/dashboard/doctor/medicamentos']);
             }, 1000);
 
         } catch (error: any) {
@@ -135,6 +135,6 @@ export class DoctorNuevoMedicamento implements OnInit {
     }
 
     cancelar() {
-        this.router.navigate(['/doctor/medicamentos']);
+        this.router.navigate(['/dashboard/doctor/medicamentos']);
     }
 }

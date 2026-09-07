@@ -352,7 +352,7 @@ export class DoctorAsignacion implements OnInit {
     }
 
     volver() {
-        this.router.navigate(['/doctor/inicio']);
+        this.router.navigate(['/dashboard/doctor/inicio']);
     }
 
     mostrarMensaje(texto: string, clase: string) {

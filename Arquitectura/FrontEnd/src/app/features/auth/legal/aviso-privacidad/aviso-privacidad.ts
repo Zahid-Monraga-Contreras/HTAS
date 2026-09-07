@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-aviso-privacidad',
+  standalone: true,
   imports: [CommonModule],
   templateUrl: './aviso-privacidad.html',
   styleUrl: './aviso-privacidad.css',
@@ -32,7 +33,7 @@ export class AvisoPrivacidad implements OnInit, OnDestroy {
   }
 
   irATerminos(): void {
-    this.router.navigate(['/legal/terminos-condiciones']);
+    this.router.navigate(['/auth/terminos-condiciones']);
   }
 
   scrollTo(sectionId: string): void {

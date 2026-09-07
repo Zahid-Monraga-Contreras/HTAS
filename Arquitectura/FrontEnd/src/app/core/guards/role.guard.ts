@@ -100,15 +100,15 @@ export const roleGuard: CanActivateFn = (route, state) => {
 
 function redirectBasedOnRole(role: string, router: Router): void {
     const roleMap: { [key: string]: string } = {
-        'admin': '/admin',
-        'administrador': '/admin',
-        'paciente': '/patient',
-        'patient': '/patient',
-        'doctor': '/doctor',
-        'medico': '/doctor',
-        'acompanante': '/caregiver',
-        'acompañante': '/caregiver',
-        'caregiver': '/caregiver'
+        'admin': '/dashboard/admin',
+        'administrador': '/dashboard/admin',
+        'paciente': '/dashboard/patient',
+        'patient': '/dashboard/patient',
+        'doctor': '/dashboard/doctor',
+        'medico': '/dashboard/doctor',
+        'acompanante': '/dashboard/caregiver',
+        'acompañante': '/dashboard/caregiver',
+        'caregiver': '/dashboard/caregiver'
     };
     const route = roleMap[role] || '/landing';
     router.navigate([route]);

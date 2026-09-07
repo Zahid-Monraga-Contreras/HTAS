@@ -1,3 +1,4 @@
+/* ===== RESET / BASE ===== */
 * {
     margin: 0;
     padding: 0;
@@ -19,10 +20,8 @@
     width: 100%;
     display: flex;
     align-items: center;
-    /* Mantiene el centrado base */
     justify-content: center;
     padding-top: 10vh;
-    /* ESTO BAJA EL TEXTO: Ajusta este valor (15vh, 20vh) para bajarlo más */
     overflow: hidden;
     color: #fff;
     text-align: center;
@@ -109,7 +108,6 @@ app-electric-waves {
     margin-right: auto;
     color: rgba(255, 255, 255, 0.9);
     font-weight: 700;
-    /* Bolded for better distinction */
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
     will-change: transform, opacity;
 }
@@ -175,14 +173,11 @@ section[id] {
 /* ===== CONTENT SECTION ===== */
 .content-section {
     padding: 6rem 5% 5rem;
-    /* Standardized padding */
     background-color: #ffffff;
     margin-top: -80px;
     margin-bottom: 0rem;
     border-radius: 0;
-    /* Flat top for seamless join */
     box-shadow: none;
-    /* Shadow removed for clean join */
     max-width: 1400px;
     margin-left: auto;
     margin-right: auto;
@@ -194,14 +189,14 @@ section[id] {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 4rem;
+    gap: 1rem;
     max-width: 1200px;
     margin: 0 auto;
 }
 
 .content-text {
     flex: 1;
-    min-width: 300px;
+    min-width: 280px;
 }
 
 .content-text h2 {
@@ -232,12 +227,11 @@ section[id] {
     margin-bottom: 1.8rem;
     color: #444;
     font-weight: 700;
-    /* Increased weight for better distinction */
 }
 
 .content-image {
     flex: 1;
-    min-width: 300px;
+    min-width: 280px;
 }
 
 .image-placeholder {
@@ -269,12 +263,10 @@ section[id] {
 /* ===== APP PROMO SECTION ===== */
 .app-promo-section {
     padding: 2rem 5% 2rem;
-    /* Reduced top padding from 5rem to 2rem */
     background: radial-gradient(circle at 10% 20%, rgba(176, 0, 30, 0.03) 0%, transparent 50%),
         radial-gradient(circle at 90% 80%, rgba(30, 55, 153, 0.03) 0%, transparent 50%),
         #ffffff;
     margin-top: 0;
-    /* Removed negative margin to avoid overlap issues */
     margin-bottom: 0rem;
     position: relative;
     overflow: hidden;
@@ -355,13 +347,13 @@ section[id] {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-width: 700px;
-    /* Increased to fit labels */
+    min-width: 600px;
     position: relative;
-    padding: 20px;
+    padding: 0 20px;
     z-index: 5;
     transform: scale(0.9);
     transform-origin: center right;
+    gap: 0;
 }
 
 .phone-mockup {
@@ -423,15 +415,11 @@ section[id] {
 .dynamic-island {
     position: absolute;
     top: 8px;
-    /* Perfectly centered within 44px status bar: (44-28)/2 = 8 */
     left: 50%;
     transform: translateX(-50%);
     width: 80px;
-    /* Further reduced to accommodate left-aligned WiFi */
     height: 24px;
-    /* Slimmer profile */
     background: #080808;
-    /* Slightly lighter than pure black to stand out on #000 screen */
     border-radius: 20px;
     z-index: 25;
     display: flex;
@@ -441,7 +429,6 @@ section[id] {
     padding: 0 15px;
     transition: width 0.5s cubic-bezier(0.19, 1, 0.22, 1), background-color 0.5s ease;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    /* More visible border */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
 }
 
@@ -615,17 +602,14 @@ section[id] {
     width: 100%;
     height: 44px;
     padding: 0 24px;
-    /* Balanced padding */
     display: flex;
     justify-content: space-between;
     align-items: center;
     z-index: 15;
     color: white;
     background: #000;
-    /* Solid black background for full consistency and readability */
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     pointer-events: none;
-    /* Let clicks pass to dynamic island if needed */
 }
 
 .status-left,
@@ -634,7 +618,6 @@ section[id] {
     align-items: center;
     gap: 6px;
     pointer-events: auto;
-    /* Re-enable clicks for items */
 }
 
 .operator {
@@ -711,13 +694,10 @@ section[id] {
 
 .screen-track {
     position: absolute;
-    /* Changed to absolute for better control */
     top: 40px;
-    /* Starts below the status bar */
     left: 0;
     width: 100%;
     height: calc(100% - 40px);
-    /* Fills the rest of the screen */
     display: flex;
     flex-direction: column;
     transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
@@ -860,7 +840,6 @@ section[id] {
 .button {
     position: absolute;
     left: -4px;
-    /* Cambiado a la izquierda para variedad */
     width: 4px;
     height: 50px;
     background: #2d3436;
@@ -876,7 +855,6 @@ section[id] {
 /* ===== INTERACTIVE SECTION ===== */
 .interactive-section {
     padding: 5rem 5%;
-    /* Standardized padding */
     background-color: #ffffff;
     margin-bottom: 0rem;
     border-radius: 10px;
@@ -884,13 +862,8 @@ section[id] {
     max-width: 1400px;
     margin-left: auto;
     margin-right: auto;
-
-    /* ESTAS DOS LÍNEAS SON LA CLAVE */
     position: relative;
-    /* Define el límite para los iconos absolutos */
     overflow: hidden;
-    /* Corta cualquier cosa que salga del borde redondeado */
-
     opacity: 1;
     z-index: 1;
 }
@@ -898,12 +871,9 @@ section[id] {
 .decor-section-icon {
     position: absolute;
     font-size: 500px;
-    /* Ajustado ligeramente para mejor balance */
     color: rgba(176, 0, 29, 0.151);
-    /* Bajé la opacidad a 0.05 para que sea más elegante */
     pointer-events: none;
     z-index: -1;
-    /* Asegura que esté DETRÁS del texto y botones */
     line-height: 1;
 }
 
@@ -963,7 +933,6 @@ section[id] {
 
 .nav-item {
     background: rgba(248, 249, 250, 0.5);
-    /* Semi-transparente */
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     padding: 1.5rem 2rem;
@@ -974,7 +943,6 @@ section[id] {
     justify-content: space-between;
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
     border: 1px solid rgba(255, 255, 255, 0.5);
-    /* Borde claro para resaltar brillo */
     position: relative;
     overflow: hidden;
     color: #444;
@@ -1022,7 +990,6 @@ section[id] {
 /* Pantalla de Visualización (Glassmorphism) */
 .dashboard-display {
     background: rgba(255, 255, 255, 0.4);
-    /* Transparencia equilibrada */
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-radius: 30px;
@@ -1155,7 +1122,7 @@ section[id] {
 @media (max-width: 900px) {
     .content-block {
         flex-direction: column;
-        gap: 3rem;
+        gap: 0.5rem;
     }
 
     .dashboard-wrapper {
@@ -1192,7 +1159,6 @@ section[id] {
 
     .app-promo-section {
         padding: 2rem 5% 0;
-        /* No bottom padding */
         text-align: center;
         margin-top: -60px;
     }
@@ -1203,16 +1169,16 @@ section[id] {
 
     .phone-mockup-wrapper {
         min-width: 100%;
-        padding: 20px 20px 0;
-        /* Reduced top/bottom padding */
+        padding: 0 20px 0;
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        align-items: center;
+        gap: 12px;
+        transform: none;
     }
 
     .feature-label-box {
         position: relative;
-        /* Change from absolute to relative */
         width: 100%;
         max-width: 320px;
         top: auto !important;
@@ -1221,15 +1187,19 @@ section[id] {
         bottom: auto !important;
         margin: 0 auto;
         display: flex;
-        /* Restore visibility */
     }
 
     .mockup-controls {
-        right: -30px;
+        position: absolute;
+        right: -35px;
         top: 50%;
-        bottom: auto;
-        flex-direction: column;
         transform: translateY(-50%);
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 0;
+        right: -35px;
+        left: auto;
+        bottom: auto;
     }
 
     .phone-mockup {
@@ -1276,9 +1246,7 @@ section[id] {
 /* ===== GALLERY SECTION ===== */
 .gallery-section {
     padding: 5rem 5% 5rem;
-    /* Reduced bottom padding */
     background: linear-gradient(172deg, #ffffff 65%, #8B0015 65.2%);
-    /* Pushed red stop even higher */
     margin-bottom: 0rem;
     border-radius: 10px;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
@@ -1418,7 +1386,6 @@ section[id] {
 
 .dot.active {
     background-color: #ffffff;
-    /* White dots for better visibility on red background */
     transform: scale(1.3);
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
@@ -1427,19 +1394,16 @@ section[id] {
 .bracelet-schematic-section {
     position: relative;
     padding: 5rem 5%;
-    /* Standardized padding */
-    background-size: cover;
-    background-position: center;
+    background: #fafafa;
     overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 700px;
-    /* Adjusted to maintain proportions with labels */
     font-family: 'Montserrat', sans-serif;
 }
 
-/* Tech Circles */
+/* Tech Circles - visible en todos los tamaños */
 .tech-circles-container {
     position: absolute;
     z-index: 1;
@@ -1472,7 +1436,6 @@ section[id] {
     border-width: 1px;
     border-color: rgba(180, 180, 180, 0.2);
     animation: ellipsesOrbit 12s linear infinite;
-    /* Removed problematic external background image */
 }
 
 .ellipses__outer--thick {
@@ -1739,7 +1702,6 @@ section[id] {
 
 .left .feature-mini-box:hover .feature-card {
     transform: translateX(-10px) scale(1.05);
-    /* Elevación estática elegante */
 }
 
 .right .feature-mini-box:hover .feature-card {
@@ -1980,10 +1942,147 @@ section[id] {
     }
 }
 
-/* Responsivo */
+/* Responsivo - la animación se mantiene visible en móviles */
 @media (max-width: 992px) {
     .eco-card {
         max-width: 90%;
+    }
+
+    .bracelet-schematic-section {
+        min-height: auto;
+        padding: 3rem 5%;
+    }
+
+    .schematic-container {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .feature-column {
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+    }
+
+    .feature-mini-box {
+        width: 100%;
+        max-width: 350px;
+        animation: none !important;
+    }
+
+    .feature-card {
+        animation: none !important;
+        transform: none !important;
+    }
+
+    .pointer-line {
+        display: none;
+    }
+
+    /* Mantenemos las animaciones del orbe en móviles */
+    .tech-circles-container {
+        display: flex !important;
+    }
+
+    .ellipses-container {
+        width: 400px;
+        height: 400px;
+    }
+
+    .pulse-rings {
+        width: 400px;
+        height: 400px;
+    }
+
+    .ecg-line {
+        width: 400px;
+        height: 400px;
+    }
+
+    .bracelet-shadow-ellipse {
+        display: block;
+        width: 160px;
+        height: 16px;
+        bottom: -12px;
+    }
+
+    .bracelet-hero-img {
+        max-width: 300px;
+        animation: none;
+    }
+}
+
+@media (max-width: 600px) {
+    .ellipses-container {
+        width: 320px;
+        height: 320px;
+    }
+
+    .pulse-rings {
+        width: 320px;
+        height: 320px;
+    }
+
+    .ecg-line {
+        width: 320px;
+        height: 320px;
+    }
+
+    .ellipses__orbit {
+        width: 1.6rem;
+        height: 1.6rem;
+    }
+
+    .ellipses__orbit:before {
+        width: 0.5rem;
+        height: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .ellipses-container {
+        width: 280px;
+        height: 280px;
+    }
+
+    .pulse-rings {
+        width: 280px;
+        height: 280px;
+    }
+
+    .ecg-line {
+        width: 280px;
+        height: 280px;
+    }
+
+    .ellipses__orbit {
+        width: 1.4rem;
+        height: 1.4rem;
+        top: 8%;
+        right: 12%;
+    }
+
+    .ellipses__orbit:before {
+        width: 0.4rem;
+        height: 0.4rem;
+    }
+
+    .bracelet-hero-img {
+        max-width: 230px;
+    }
+
+    .bracelet-shadow-ellipse {
+        width: 120px;
+        height: 12px;
+        bottom: -8px;
+    }
+
+    .feature-mini-box {
+        max-width: 280px;
+    }
+
+    .feature-card {
+        padding: 16px;
     }
 }
 
@@ -2148,48 +2247,6 @@ section[id] {
     }
 }
 
-/* 992px */
-@media (max-width: 992px) {
-    .bracelet-schematic-section {
-        min-height: auto;
-        padding: 2rem 5%;
-        /* Reduced top/bottom padding */
-    }
-
-    .schematic-container {
-        grid-template-columns: 1fr;
-        gap: 40px;
-    }
-
-    .feature-column {
-        flex-direction: column;
-        align-items: center;
-        gap: 30px;
-    }
-
-    .feature-mini-box {
-        width: 100%;
-        max-width: 350px;
-        animation: none !important;
-    }
-
-    .feature-card {
-        animation: none !important;
-        transform: none !important;
-    }
-
-    .pointer-line,
-    .tech-circles-container,
-    .bracelet-shadow-ellipse {
-        display: none;
-    }
-
-    .bracelet-hero-img {
-        max-width: 300px;
-        animation: none;
-    }
-}
-
 /* 900px */
 @media (max-width: 900px) {
     .info-grid {
@@ -2271,7 +2328,7 @@ section[id] {
 
     .content-block {
         flex-direction: column;
-        gap: 3rem;
+        gap: 0.5rem;
     }
 
     .content-text h2 {
@@ -2440,5 +2497,55 @@ section[id] {
         width: 70px;
         height: 70px;
         font-size: 1.8rem;
+    }
+
+    /* ---- Phone mockup: ajuste extra para pantallas muy chicas ---- */
+    .app-promo-section {
+        margin-top: -40px;
+    }
+
+    .phone-mockup {
+        width: 220px;
+        height: 460px;
+    }
+
+    .feature-label-box {
+        max-width: 260px;
+        padding: 14px;
+        gap: 12px;
+    }
+
+    .label-icon {
+        width: 34px;
+        height: 34px;
+        font-size: 1rem;
+    }
+
+    .mockup-controls {
+        gap: 10px;
+        margin-top: 14px;
+    }
+
+    /* ---- Baumanómetro/elipse: animación visible en móvil ---- */
+    .bracelet-schematic-section {
+        padding: 2rem 5%;
+    }
+
+    .bracelet-hero-img {
+        max-width: 230px;
+    }
+
+    .bracelet-shadow-ellipse {
+        width: 120px;
+        height: 12px;
+        bottom: -8px;
+    }
+
+    .feature-mini-box {
+        max-width: 280px;
+    }
+
+    .feature-card {
+        padding: 16px;
     }
 }

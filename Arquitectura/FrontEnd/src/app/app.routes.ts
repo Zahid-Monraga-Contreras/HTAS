@@ -1,91 +1,47 @@
 import { Routes } from '@angular/router';
-import { Landing } from './features/landing/landing/landing';
-import { Login } from './features/auth/login/login';
-import { Register } from './features/auth/register/register';
-import { AvisoPrivacidad } from './features/auth/legal/aviso-privacidad/aviso-privacidad';
-import { TerminosCondiciones } from './features/auth/legal/terminos-condiciones/terminos-condiciones';
-import { Nosotros } from './features/landing/pages/nosotros/nosotros';
-import { Recursos } from './features/landing/pages/recursos/recursos';
-import { Contacto } from './features/landing/pages/contacto/contacto';
-import { Pagos } from './features/landing/pages/pagos/pagos';
-import { Error404 } from './features/landing/pages/error-404/error-404';
-import { Success } from './features/landing/pages/success/success';
 
 export const routes: Routes = [
+  // ==========================================
+  // REDIRECCIÓN PRINCIPAL
+  // ==========================================
   {
     path: '',
     pathMatch: 'full',
     redirectTo: '/landing'
   },
+
+  // ==========================================
+  // LANDING Y PÁGINAS PÚBLICAS (CON LAZY LOADING)
+  // ==========================================
   {
     path: 'landing',
-    component: Landing,
-  },
-  {
-    path: 'login',
-    component: Login,
-  },
-  {
-    path: 'register',
-    component: Register,
-  },
-  {
-    path: 'legal/aviso-privacidad',
-    component: AvisoPrivacidad,
-    title: 'Aviso de Privacidad',
-  },
-  {
-    path: 'legal/terminos-condiciones',
-    component: TerminosCondiciones,
-    title: 'Términos y Condiciones',
-  },
-  {
-    path: 'nosotros',
-    component: Nosotros,
-  },
-  {
-    path: 'recursos',
-    component: Recursos,
-  },
-  {
-    path: 'contactos',
-    component: Contacto,
-  },
-  {
-    path: 'success',
-    component: Success,
-  },
-  {
-    path: 'pagos',
-    component: Pagos,
+    loadChildren: () => import('./features/landing/landing.routes').then(m => m.LANDING_ROUTES)
   },
 
   // ==========================================
-  // RUTAS CON LAZY LOADING PARA CADA ROL
+  // RUTAS DE AUTENTICACIÓN (CON LAZY LOADING)
   // ==========================================
-
   {
-    path: 'admin',
-    loadChildren: () => import('./features/dashboard/admin/admin.routes').then(m => m.ADMIN_ROUTES)
+    path: 'auth',
+    loadChildren: () => import('./features/auth/auth.routes').then(m => m.AUTH_ROUTES)
   },
 
+  // ==========================================
+  // DASHBOARD (CON LAZY LOADING)
+  // ==========================================
   {
-    path: 'patient',
-    loadChildren: () => import('./features/dashboard/patient/patient.routes').then(m => m.PATIENT_ROUTES)
+    path: 'dashboard',
+    loadChildren: () => import('./features/dashboard/dashboard.routes').then(m => m.DASHBOARD_ROUTES)
   },
 
-  {
-    path: 'doctor',
-    loadChildren: () => import('./features/dashboard/doctor/doctor.routes').then(m => m.DOCTOR_ROUTES)
-  },
-
-  {
-    path: 'caregiver',
-    loadChildren: () => import('./features/dashboard/caregiver/caregiver.routes').then(m => m.CAREGIVER_ROUTES)
-  },
-
+  // ==========================================
+  // RUTA 404 GLOBAL (SIEMPRE AL FINAL)
+  // ==========================================
   {
     path: '**',
-    component: Error404
+    redirectTo: '/landing/404' // Redirige al 404 del landing
+    // O si prefieres un componente 404 independiente:
+    // component: Error404,
+    // title: 'HTAS - Página no encontrada'
   }
 ];

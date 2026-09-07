@@ -375,7 +375,7 @@ export class PatientPerfil implements OnInit {
   // NOTIFICACIONES
   // ==========================================
   irANotificaciones() {
-    this.router.navigate(['/patient/notificaciones']);
+    this.router.navigate(['/dashboard/patient/notificaciones']);
   }
 
   // ==========================================
@@ -407,7 +407,7 @@ export class PatientPerfil implements OnInit {
       }
 
       this.cerrarModalCerrarSesion();
-      this.router.navigate(['/login']);
+      this.router.navigate(['/auth/login']);
 
     } catch (error) {
       console.error('Error al cerrar sesion:', error);

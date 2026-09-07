@@ -105,6 +105,6 @@ export class DoctorPacientes implements OnInit {
 
     verDetalle(paciente: any) {
         // ✅ Navegar al detalle del paciente
-        this.router.navigate(['/doctor/pacientes/detalle', paciente.idusuario]);
+        this.router.navigate(['/dashboard/doctor/pacientes/detalle', paciente.idusuario]);
     }
 }

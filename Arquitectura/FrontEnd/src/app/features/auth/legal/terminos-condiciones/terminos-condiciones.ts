@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-terminos-condiciones',
+  standalone: true,
   imports: [CommonModule],
   templateUrl: './terminos-condiciones.html',
   styleUrl: './terminos-condiciones.css',
@@ -32,7 +33,7 @@ export class TerminosCondiciones implements OnInit, OnDestroy {
   }
 
   irAAviso(): void {
-    this.router.navigate(['/legal/aviso-privacidad']);
+    this.router.navigate(['/auth/aviso-privacidad']);
   }
 
   scrollTo(sectionId: string): void {

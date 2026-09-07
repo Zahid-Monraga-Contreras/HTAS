@@ -350,7 +350,7 @@ export class DoctorNuevoTratamiento implements OnInit {
             );
 
             setTimeout(() => {
-                this.router.navigate(['/doctor/tratamientos']);
+                this.router.navigate(['/dashboard/doctor/tratamientos']);
             }, 1000);
 
         } catch (error: any) {
@@ -369,7 +369,7 @@ export class DoctorNuevoTratamiento implements OnInit {
     }
 
     cancelar() {
-        this.router.navigate(['/doctor/tratamientos']);
+        this.router.navigate(['/dashboard/doctor/tratamientos']);
     }
 
     getAvatarUrl(nombre: string, apPaterno: string): string {

@@ -593,7 +593,7 @@ export class DoctorTratamientoDetalle implements OnInit {
             );
 
             setTimeout(() => {
-                this.router.navigate(['/doctor/tratamientos']);
+                this.router.navigate(['/dashboard/doctor/tratamientos']);
             }, 1000);
 
         } catch (error: any) {
@@ -675,13 +675,13 @@ export class DoctorTratamientoDetalle implements OnInit {
     }
 
     volver() {
-        this.router.navigate(['/doctor/tratamientos']);
+        this.router.navigate(['/dashboard/doctor/tratamientos']);
     }
 
     irAPaciente() {
         const idPaciente = this.tratamiento.idpaciente || this.tratamiento.IdPaciente;
         if (idPaciente) {
-            this.router.navigate(['/doctor/pacientes/detalle', idPaciente]);
+            this.router.navigate(['/dashboard/doctor/pacientes/detalle', idPaciente]);
         }
     }
 }

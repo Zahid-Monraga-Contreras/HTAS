@@ -511,11 +511,11 @@ export class DoctorAnalisisDetalle implements OnInit {
     // NAVEGACION
     // ============================================================
     volver() {
-        this.router.navigate(['/doctor/analisis']);
+        this.router.navigate(['/dashboard/doctor/analisis']);
     }
 
     volverAPacientes() {
-        this.router.navigate(['/doctor/pacientes']);
+        this.router.navigate(['/dashboard/doctor/pacientes']);
     }
 
     // ============================================================

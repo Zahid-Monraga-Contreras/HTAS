@@ -535,9 +535,9 @@ export class DoctorAnalisis implements OnInit {
         console.log('  - Paciente:', item.nombre_paciente);
 
         if (idPaciente && folio) {
-            this.router.navigate(['/doctor/analisis/detalle', idPaciente, folio]);
+            this.router.navigate(['/dashboard/doctor/analisis/detalle', idPaciente, folio]);
         } else if (idPaciente) {
-            this.router.navigate(['/doctor/analisis/detalle', idPaciente]);
+            this.router.navigate(['/dashboard/doctor/analisis/detalle', idPaciente]);
         } else {
             this.showError('Error', 'No se pudo identificar el análisis.');
         }
@@ -598,7 +598,7 @@ export class DoctorAnalisis implements OnInit {
     }
 
     volverAPacientes() {
-        this.router.navigate(['/doctor/pacientes']);
+        this.router.navigate(['/dashboard/doctor/pacientes']);
     }
 
     recargarDatos() {

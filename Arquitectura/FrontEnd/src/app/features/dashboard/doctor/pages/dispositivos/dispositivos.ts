@@ -501,7 +501,7 @@ export class DoctorDispositivos implements OnInit {
     verDetalle(dispositivo: any) {
         const id = dispositivo.iddispositivo || dispositivo.id;
         if (id) {
-            this.router.navigate(['/doctor/dispositivos/detalle', id]);
+            this.router.navigate(['/dashboard/doctor/dispositivos/detalle', id]);
         }
     }
 
@@ -535,7 +535,7 @@ export class DoctorDispositivos implements OnInit {
     }
 
     irANuevo() {
-        this.router.navigate(['/doctor/dispositivos/nuevo']);
+        this.router.navigate(['/dashboard/doctor/dispositivos/nuevo']);
     }
 
     recargarDatos() {

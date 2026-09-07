@@ -220,7 +220,7 @@ export class DoctorNuevoDispositivo implements OnInit {
             );
 
             setTimeout(() => {
-                this.router.navigate(['/doctor/dispositivos']);
+                this.router.navigate(['/dashboard/doctor/dispositivos']);
             }, 1000);
 
         } catch (error: any) {
@@ -238,7 +238,7 @@ export class DoctorNuevoDispositivo implements OnInit {
     }
 
     cancelar() {
-        this.router.navigate(['/doctor/dispositivos']);
+        this.router.navigate(['/dashboard/doctor/dispositivos']);
     }
 
     getAvatarUrl(nombre: string, apPaterno: string): string {

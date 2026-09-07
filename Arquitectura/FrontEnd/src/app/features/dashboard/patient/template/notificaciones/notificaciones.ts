@@ -195,7 +195,7 @@ export class PatientNotificaciones implements OnInit {
                     leida: false,
                     icono: 'bi-calendar-event',
                     color: '#b0001e',
-                    accion: '/patient/citas',
+                    accion: '/dashboard/patient/citas',
                     idReferencia: cita.idcita || cita.id
                 });
             });
@@ -221,7 +221,7 @@ export class PatientNotificaciones implements OnInit {
                     leida: false,
                     icono: 'bi-capsule',
                     color: '#10b981',
-                    accion: '/patient/tratamientos',
+                    accion: '/dashboard/patient/tratamientos',
                     idReferencia: tratamiento.idtratamiento
                 });
             });
@@ -243,7 +243,7 @@ export class PatientNotificaciones implements OnInit {
                         leida: false,
                         icono: 'bi-capsule',
                         color: '#7c3aed',
-                        accion: '/patient/medicamentos',
+                        accion: '/dashboard/patient/medicamentos',
                         idReferencia: medicamento.idmedicamento
                     });
                 }
@@ -269,7 +269,7 @@ export class PatientNotificaciones implements OnInit {
                     leida: false,
                     icono: 'bi-device-hdd',
                     color: '#f59e0b',
-                    accion: '/patient/dispositivos',
+                    accion: '/dashboard/patient/dispositivos',
                     idReferencia: dispositivo.iddispositivo
                 });
             });
@@ -332,7 +332,7 @@ export class PatientNotificaciones implements OnInit {
                     mensaje: data.mensaje || 'Se ha registrado una nueva cita',
                     icono: 'bi-calendar-event',
                     color: '#b0001e',
-                    accion: '/patient/citas',
+                    accion: '/dashboard/patient/citas',
                     idReferencia: data.id
                 });
             }
@@ -347,7 +347,7 @@ export class PatientNotificaciones implements OnInit {
                     mensaje: data.mensaje || 'Se ha actualizado un tratamiento',
                     icono: 'bi-capsule',
                     color: '#10b981',
-                    accion: '/patient/tratamientos',
+                    accion: '/dashboard/patient/tratamientos',
                     idReferencia: data.id
                 });
             }
@@ -362,7 +362,7 @@ export class PatientNotificaciones implements OnInit {
                     mensaje: data.mensaje || 'Se ha recetado un nuevo medicamento',
                     icono: 'bi-capsule',
                     color: '#7c3aed',
-                    accion: '/patient/medicamentos',
+                    accion: '/dashboard/patient/medicamentos',
                     idReferencia: data.id
                 });
             }
@@ -377,7 +377,7 @@ export class PatientNotificaciones implements OnInit {
                     mensaje: data.mensaje || 'Se ha vinculado un nuevo dispositivo',
                     icono: 'bi-device-hdd',
                     color: '#f59e0b',
-                    accion: '/patient/dispositivos',
+                    accion: '/dashboard/patient/dispositivos',
                     idReferencia: data.id
                 });
             }

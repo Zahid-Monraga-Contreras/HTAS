@@ -537,12 +537,12 @@ export class DoctorTratamientos implements OnInit {
     verDetalle(tratamiento: any) {
         const id = tratamiento.idtratamiento || tratamiento.id;
         if (id) {
-            this.router.navigate(['/doctor/tratamientos/detalle', id]);
+            this.router.navigate(['/dashboard/doctor/tratamientos/detalle', id]);
         }
     }
 
     irANuevo() {
-        this.router.navigate(['/doctor/tratamientos/nuevo']);
+        this.router.navigate(['/dashboard/doctor/tratamientos/nuevo']);
     }
 
     recargarDatos() {

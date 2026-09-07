@@ -316,6 +316,6 @@ export class DoctorCitaDetalle implements OnInit {
     }
 
     volver() {
-        this.router.navigate(['/doctor/citas']);
+        this.router.navigate(['/dashboard/doctor/citas']);
     }
 }

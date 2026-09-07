@@ -10,10 +10,8 @@
 /* ===== CONTENT SECTION ===== */
 .content-section {
     padding: 1.5rem 5% 1.5rem;
-    /* Reducido para eliminar espacios blancos */
     background: #f9fbfc;
     margin-top: -20px;
-    /* Reducido */
     position: relative;
     z-index: 10;
     overflow: visible;
@@ -26,7 +24,6 @@
     flex-wrap: wrap;
     align-items: center;
     gap: 2rem;
-    /* Reducido para acercar el texto al modelo */
     padding: 2.5rem;
     background: rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(10px);
@@ -37,7 +34,6 @@
     isolation: isolate;
     position: relative;
     overflow: visible;
-    /* antes: hidden — esto era lo que cortaba la laptop */
 }
 
 .laptop-wrapper {
@@ -50,7 +46,6 @@
     justify-content: center;
     align-items: center;
     overflow: visible;
-    /* Hacerlo grande y encimarlo al texto sin salirse de la sección y estropear el resto de la página */
     transform: scale(1.35) translateX(8%);
     transform-origin: center right;
 }
@@ -63,13 +58,10 @@ app-laptop-3d {
 .promo-decor {
     position: absolute;
     font-size: 300px;
-    /* Reducido un poco para que sea más manejable */
     color: rgba(176, 0, 29, 0.151);
-    /* Un poco más sutil para que no tape el texto */
     pointer-events: none;
     line-height: 1;
     z-index: -1;
-    /* Cambiado a -1 para que el texto siempre esté POR ENCIMA */
 }
 
 .decor-top-right {
@@ -81,7 +73,6 @@ app-laptop-3d {
 .decor-bottom-left {
     bottom: -50px;
     left: -80px;
-    /* Ajustado para que se vea una parte importante del icono */
     transform: rotate(-15deg);
 }
 
@@ -99,7 +90,6 @@ app-laptop-3d {
     min-width: 300px;
     position: relative;
     z-index: 10;
-    /* Asegura que el texto esté por encima de cualquier artefacto visual */
 }
 
 .content-text h2 {
@@ -132,7 +122,7 @@ app-laptop-3d {
     font-weight: 400;
 }
 
-/* ===== SECTION HEADER (通用) ===== */
+/* ===== SECTION HEADER ===== */
 .section-header {
     text-align: center;
     margin-bottom: 3rem;
@@ -161,7 +151,7 @@ app-laptop-3d {
     border-radius: 2px;
 }
 
-/* ===== REDISEÑO NOSOTROS GRID (Estilo Referencia) ===== */
+/* ===== REDISEÑO NOSOTROS GRID ===== */
 .nosotros-grid-section {
     padding: 6rem 5%;
     background-color: #4D000D;
@@ -222,40 +212,20 @@ app-laptop-3d {
     margin: 0;
 }
 
-/* Responsivo */
-@media (max-width: 768px) {
-    .nosotros-grid-section .main-title {
-        font-size: 1.8rem;
-    }
-
-    .nosotros-grid-section .features-grid {
-        grid-template-columns: 1fr;
-        gap: 2.5rem;
-    }
-
-    .nosotros-grid-section {
-        padding: 4rem 5%;
-    }
-}
-
 /* ===== VALUES SECTION (Carrusel 3D) ===== */
 .values-section {
     width: 100%;
     padding: 20px 20px 0px;
-    /* Reduced from 50px 20px */
     border-radius: 20px;
     margin: 1rem 0 0;
-    /* Reduced from 2rem 0 */
     overflow: hidden;
 }
 
 .cont-carrusel {
     width: 100%;
     height: 470px;
-    /* Reduced height from 500px to tighten space */
     display: grid;
     grid-template-rows: 380px 40px;
-    /* Adjusted row heights */
     grid-template-columns: 1fr 30px 30px 30px 1fr;
     align-items: center;
     justify-items: center;
@@ -290,12 +260,10 @@ main#items-carrusel {
     transform: rotateY(calc(-15deg * var(--r))) translateX(calc(-250px * var(--r))) translateZ(calc(-100px * var(--abs)));
     z-index: calc(10 - var(--abs));
     opacity: calc(1 - (0.15 * var(--abs)));
-    /* Menos transparencia en laterales */
     user-select: none;
 }
 
 .item:hover:not([for^="pos"]) {
-    /* Si no es la principal (esto es un truco, mejoramos abajo) */
     transform: rotateY(calc(-15deg * var(--r))) translateX(calc(-250px * var(--r))) translateZ(calc(-50px * var(--abs))) scale(1.02);
 }
 
@@ -357,7 +325,6 @@ input#pos3:checked~main#items-carrusel {
 
 .value-card {
     background: #ffffff;
-    /* Sólido como pidió el usuario */
     border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 25px;
     display: flex;
@@ -369,23 +336,19 @@ input#pos3:checked~main#items-carrusel {
 .value-icon {
     background-color: #8B0015;
     min-width: 90px;
-    /* Aumentado nuevamente */
     width: 90px;
     height: 90px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 2rem;
-    /* Aumentado nuevamente */
     border-radius: 0 0 30px 0;
-    /* Ajustado al nuevo tamaño */
     color: #fff;
 }
 
 .value-icon i,
 .value-icon .bi {
     font-size: 2.8rem;
-    /* Aumentado nuevamente */
     line-height: 1;
 }
 
@@ -426,13 +389,8 @@ input#pos3:checked~main#items-carrusel {
     }
 }
 
-/* ===== RESPONSIVE BREAKPOINTS ===== */
-
 /* ============================================================
    RESPONSIVE: PANTALLAS PEQUEÑAS (CORREGIDO)
-   ============================================================ */
-/* ============================================================
-   SOLUCIÓN PARA MÓVIL (CORRECCIÓN DE DESBORDE, ALINEACIÓN Y HOVER)
    ============================================================ */
 
 /* 1024px */
@@ -471,7 +429,7 @@ input#pos3:checked~main#items-carrusel {
     }
 }
 
-/* 768px */
+/* 768px - CORRECCIÓN PRINCIPAL PARA MÓVIL */
 @media (max-width: 768px) {
 
     .content-section,
@@ -535,35 +493,21 @@ input#pos3:checked~main#items-carrusel {
 
     .container-glass {
         padding: 1.5rem 1.5rem 0.5rem 1.5rem;
-        /* Ajustado el padding inferior en móvil */
         gap: 1rem;
-        /* Reducido el espacio entre texto y laptop */
         overflow: visible;
-        /* Permitir que el contenido sobresalga si es necesario sin "cortar" el cristal */
     }
 
     .laptop-wrapper {
         min-width: 0;
         width: 100%;
-        /* FIX: antes solo tenía min-height (280px), y como height:100% del
-           hijo .laptop-3d-container no podía resolverse sin una altura
-           EXPLÍCITA acá, el layout terminaba dependiendo de valores
-           impredecibles y el componente TS medía un contenedor mucho más
-           alto/angosto de lo real al calcular el encuadre de cámara —
-           eso disparaba el zoom-out máximo (narrowness al tope) y dejaba
-           la laptop chica rodeada de espacio en blanco.
-           Ahora se fija height explícito, igual al de .laptop-3d-container
-           en laptop-3d.css, para que la cadena de alturas se resuelva
-           de forma predecible desde el primer render. */
         height: 260px;
         min-height: 260px;
         margin-top: 0px;
-        /* Eliminado margen superior extra */
         transform: scale(1.1) translateX(0);
-        /* En móvil no lo hacemos tan masivo para que quepa */
         transform-origin: center;
     }
 
+    /* ===== CORRECCIÓN DEL CARRUSEL EN MÓVIL ===== */
     .cont-carrusel {
         height: 400px;
         grid-template-rows: 320px 40px;
@@ -573,10 +517,23 @@ input#pos3:checked~main#items-carrusel {
     .item {
         width: 280px;
         height: 330px;
+        /* Reducimos la separación y perspectiva en móvil */
+        transform: rotateY(calc(-10deg * var(--r))) translateX(calc(-180px * var(--r))) translateZ(calc(-60px * var(--abs)));
+        /* Aumentamos la opacidad de los laterales en móvil */
+        opacity: calc(1 - (0.05 * var(--abs)));
+    }
+
+    .item:hover:not([for^="pos"]) {
+        transform: rotateY(calc(-10deg * var(--r))) translateX(calc(-180px * var(--r))) translateZ(calc(-30px * var(--abs))) scale(1.02);
+    }
+
+    /* Reducimos la perspectiva para que los laterales se vean más */
+    main#items-carrusel {
+        perspective: 600px;
     }
 }
 
-/* 480px */
+/* 480px - CORRECCIÓN PARA PANTALLAS MUY PEQUEÑAS */
 @media (max-width: 480px) {
     .hero-section {
         clip-path: polygon(0 0, 100% 0, 100% 92%, 50% 100%, 0 92%);
@@ -597,7 +554,6 @@ input#pos3:checked~main#items-carrusel {
         line-height: 1.6;
         text-align: center;
         margin-bottom: 1rem;
-        /* Espaciado más compacto en móviles pequeños */
     }
 
     .section-header h2,
@@ -618,32 +574,66 @@ input#pos3:checked~main#items-carrusel {
 
     .container-glass {
         padding: 1rem 1rem 0rem 1rem;
-        /* Ajuste óptimo para pantallas muy pequeñas */
         gap: 0.5rem;
     }
 
     .laptop-wrapper {
-        /* Mismo fix que en el breakpoint de 768px, con una altura
-           un poco menor acorde a pantallas más chicas, y coincidiendo
-           con .laptop-3d-container en laptop-3d.css. */
         height: 220px;
         min-height: 220px;
         margin-top: -10px;
     }
 
+    /* ===== CORRECCIÓN DEL CARRUSEL EN PANTALLAS MUY PEQUEÑAS ===== */
     .cont-carrusel {
         height: 350px;
         grid-template-rows: 280px 40px;
+        grid-template-columns: 1fr 15px 15px 15px 1fr;
     }
 
     .item {
-        width: 220px;
-        height: 260px;
-        transform: rotateY(calc(-12deg * var(--r))) translateX(calc(-110px * var(--r))) translateZ(calc(-60px * var(--abs)));
+        width: 200px;
+        height: 240px;
+        /* Ajuste aún más cerrado para móviles muy pequeños */
+        transform: rotateY(calc(-8deg * var(--r))) translateX(calc(-130px * var(--r))) translateZ(calc(-40px * var(--abs)));
+        /* Mayor opacidad en los laterales */
+        opacity: calc(1 - (0.03 * var(--abs)));
     }
 
     .item:hover:not([for^="pos"]) {
-        transform: rotateY(calc(-12deg * var(--r))) translateX(calc(-110px * var(--r))) translateZ(calc(-30px * var(--abs))) scale(1.02);
+        transform: rotateY(calc(-8deg * var(--r))) translateX(calc(-130px * var(--r))) translateZ(calc(-20px * var(--abs))) scale(1.02);
+    }
+
+    /* Perspectiva aún más reducida */
+    main#items-carrusel {
+        perspective: 500px;
+    }
+
+    /* Botones más pequeños */
+    input[name="posicion"] {
+        width: 10px;
+        height: 10px;
+    }
+
+    .value-content h3 {
+        font-size: 1rem;
+        white-space: normal;
+    }
+
+    .value-content p {
+        font-size: 0.8rem;
+        min-width: 0;
+    }
+
+    .value-icon {
+        min-width: 60px;
+        width: 60px;
+        height: 60px;
+        font-size: 1.2rem;
+    }
+
+    .value-icon i,
+    .value-icon .bi {
+        font-size: 1.8rem;
     }
 }
 
@@ -660,7 +650,7 @@ input#pos3:checked~main#items-carrusel {
     gap: 30px;
     max-width: 1300px;
     margin: 0 auto;
-    flex-path: wrap;
+    flex-wrap: wrap;
 }
 
 /* La Tarjeta Individual */
@@ -757,4 +747,64 @@ input#pos3:checked~main#items-carrusel {
 
 .eco-card:hover .card-footer-line {
     transform: scaleX(1);
+}
+
+/* ============================================================
+   RESPONSIVE PARA ECO-CARDS EN MÓVIL
+   ============================================================ */
+@media (max-width: 768px) {
+    .cards-wrapper {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .eco-card {
+        min-width: 0;
+        max-width: 100%;
+        width: 100%;
+        padding: 40px 25px;
+    }
+
+    .icon-circle {
+        width: 65px;
+        height: 65px;
+        font-size: 2rem;
+        margin-bottom: 25px;
+    }
+
+    .card-content h3 {
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+    }
+
+    .card-content p {
+        font-size: 0.9rem;
+        line-height: 1.6;
+    }
+
+    .ecosystem-container {
+        padding: 40px 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .eco-card {
+        padding: 30px 20px;
+    }
+
+    .icon-circle {
+        width: 55px;
+        height: 55px;
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+    }
+
+    .card-content h3 {
+        font-size: 1rem;
+    }
+
+    .card-content p {
+        font-size: 0.85rem;
+    }
 }

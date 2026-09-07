@@ -18,15 +18,15 @@ export class DoctorMenu {
     nombreCompleto: string = '';
 
     menuItems = [
-        { path: '/doctor/inicio', icon: 'bi-house-door', label: 'Inicio' },
-        { path: '/doctor/pacientes', icon: 'bi-people', label: 'Pacientes' },
-        { path: '/doctor/asignacion', icon: 'bi-person-plus', label: 'Asignación' },
-        { path: '/doctor/citas', icon: 'bi-calendar-check', label: 'Citas' },
-        { path: '/doctor/tratamientos', icon: 'bi-heart-pulse', label: 'Tratamientos' },
-        { path: '/doctor/medicamentos', icon: 'bi-capsule', label: 'Medicamentos' },
-        { path: '/doctor/dispositivos', icon: 'bi-device-hdd', label: 'Dispositivos' },
-        { path: '/doctor/analisis', icon: 'bi-clipboard2-pulse', label: 'Analisis' },
-        { path: '/doctor/perfil', icon: 'bi-person', label: 'Perfil' }
+        { path: '/dashboard/doctor/inicio', icon: 'bi-house-door', label: 'Inicio' },
+        { path: '/dashboard/doctor/pacientes', icon: 'bi-people', label: 'Pacientes' },
+        { path: '/dashboard/doctor/asignacion', icon: 'bi-person-plus', label: 'Asignación' },
+        { path: '/dashboard/doctor/citas', icon: 'bi-calendar-check', label: 'Citas' },
+        { path: '/dashboard/doctor/tratamientos', icon: 'bi-heart-pulse', label: 'Tratamientos' },
+        { path: '/dashboard/doctor/medicamentos', icon: 'bi-capsule', label: 'Medicamentos' },
+        { path: '/dashboard/doctor/dispositivos', icon: 'bi-device-hdd', label: 'Dispositivos' },
+        { path: '/dashboard/doctor/analisis', icon: 'bi-clipboard2-pulse', label: 'Analisis' },
+        { path: '/dashboard/doctor/perfil', icon: 'bi-person', label: 'Perfil' }
     ];
 
     constructor(

@@ -581,7 +581,7 @@ export class DoctorCitas implements OnInit {
     verDetalleCita(cita: any) {
         const idCita = cita.idcita || cita.id;
         if (idCita) {
-            this.router.navigate(['/doctor/citas/detalle', idCita]);
+            this.router.navigate(['/dashboard/doctor/citas/detalle', idCita]);
         }
     }
 

@@ -600,14 +600,14 @@ export class DoctorInicio implements OnInit {
     verDetalleCita(cita: any) {
         const idCita = cita.idcita || cita.id;
         if (idCita) {
-            this.router.navigate(['/doctor/citas/detalle', idCita]);
+            this.router.navigate(['/dashboard/doctor/citas/detalle', idCita]);
         }
     }
 
     verDetallePaciente(paciente: any) {
         const idPaciente = paciente.idusuario || paciente.id || paciente.uid || paciente.id_usuario;
         if (idPaciente) {
-            this.router.navigate(['/doctor/pacientes/detalle', idPaciente]);
+            this.router.navigate(['/dashboard/doctor/pacientes/detalle', idPaciente]);
         }
     }
 

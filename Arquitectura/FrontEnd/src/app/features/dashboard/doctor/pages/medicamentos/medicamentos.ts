@@ -122,7 +122,7 @@ export class DoctorMedicamentos implements OnInit {
     }
 
     irANuevoMedicamento() {
-        this.router.navigate(['/doctor/medicamentos/nuevo']);
+        this.router.navigate(['/dashboard/doctor/medicamentos/nuevo']);
     }
 
     async ejecutarEliminarMedicamento() {
@@ -299,7 +299,7 @@ export class DoctorMedicamentos implements OnInit {
     verDetalle(medicamento: any) {
         const id = medicamento.idmedicamento || medicamento.id;
         if (id) {
-            this.router.navigate(['/doctor/medicamentos/detalle', id]);
+            this.router.navigate(['/dashboard/doctor/medicamentos/detalle', id]);
         }
     }
 }

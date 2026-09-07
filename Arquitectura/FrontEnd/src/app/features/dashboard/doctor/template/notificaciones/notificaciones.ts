@@ -209,7 +209,7 @@ export class DoctorNotificaciones implements OnInit {
                     leida: false,
                     icono: 'bi-calendar-event',
                     color: '#b0001e',
-                    accion: '/doctor/citas',
+                    accion: '/dashboard/doctor/citas',
                     idReferencia: cita.idcita || cita.id
                 });
             });
@@ -232,7 +232,7 @@ export class DoctorNotificaciones implements OnInit {
                     leida: false,
                     icono: 'bi-person-plus',
                     color: '#3b82f6',
-                    accion: '/doctor/pacientes',
+                    accion: '/dashboard/doctor/pacientes',
                     idReferencia: paciente.idusuario
                 });
             });
@@ -258,7 +258,7 @@ export class DoctorNotificaciones implements OnInit {
                     leida: false,
                     icono: 'bi-capsule',
                     color: '#10b981',
-                    accion: '/doctor/tratamientos',
+                    accion: '/dashboard/doctor/tratamientos',
                     idReferencia: tratamiento.idtratamiento
                 });
             });
@@ -280,7 +280,7 @@ export class DoctorNotificaciones implements OnInit {
                         leida: false,
                         icono: 'bi-capsule',
                         color: '#7c3aed',
-                        accion: '/doctor/medicamentos',
+                        accion: '/dashboard/doctor/medicamentos',
                         idReferencia: medicamento.idmedicamento
                     });
                 }
@@ -306,7 +306,7 @@ export class DoctorNotificaciones implements OnInit {
                     leida: false,
                     icono: 'bi-device-hdd',
                     color: '#f59e0b',
-                    accion: '/doctor/dispositivos',
+                    accion: '/dashboard/doctor/dispositivos',
                     idReferencia: dispositivo.iddispositivo
                 });
             });
@@ -323,7 +323,7 @@ export class DoctorNotificaciones implements OnInit {
                 leida: false,
                 icono: 'bi-info-circle-fill',
                 color: '#3b82f6',
-                accion: '/doctor/inicio'
+                accion: '/dashboard/doctor/inicio'
             });
         }
 
@@ -369,7 +369,7 @@ export class DoctorNotificaciones implements OnInit {
                     mensaje: data.mensaje || 'Se ha agendado una nueva cita',
                     icono: 'bi-calendar-event',
                     color: '#b0001e',
-                    accion: '/doctor/citas',
+                    accion: '/dashboard/doctor/citas',
                     idReferencia: data.id
                 });
             }
@@ -384,7 +384,7 @@ export class DoctorNotificaciones implements OnInit {
                     mensaje: data.mensaje || 'Un nuevo paciente se ha registrado',
                     icono: 'bi-person-plus',
                     color: '#3b82f6',
-                    accion: '/doctor/pacientes',
+                    accion: '/dashboard/doctor/pacientes',
                     idReferencia: data.id
                 });
             }
@@ -399,7 +399,7 @@ export class DoctorNotificaciones implements OnInit {
                     mensaje: data.mensaje || 'Se ha iniciado un nuevo tratamiento',
                     icono: 'bi-capsule',
                     color: '#10b981',
-                    accion: '/doctor/tratamientos',
+                    accion: '/dashboard/doctor/tratamientos',
                     idReferencia: data.id
                 });
             }
@@ -414,7 +414,7 @@ export class DoctorNotificaciones implements OnInit {
                     mensaje: data.mensaje || 'Se ha recetado un medicamento',
                     icono: 'bi-capsule',
                     color: '#7c3aed',
-                    accion: '/doctor/medicamentos',
+                    accion: '/dashboard/doctor/medicamentos',
                     idReferencia: data.id
                 });
             }
@@ -429,7 +429,7 @@ export class DoctorNotificaciones implements OnInit {
                     mensaje: data.mensaje || 'Se ha vinculado un nuevo dispositivo',
                     icono: 'bi-device-hdd',
                     color: '#f59e0b',
-                    accion: '/doctor/dispositivos',
+                    accion: '/dashboard/doctor/dispositivos',
                     idReferencia: data.id
                 });
             }
