@@ -278,7 +278,7 @@ export class CaregiverNotificaciones implements OnInit {
                     leida: false,
                     icono: icono,
                     color: color,
-                    accion: '/caregiver/pacientes',
+                    accion: '/dashboard/caregiver/pacientes',
                     idReferencia: solicitud.idsolicitud
                 });
             });
@@ -298,7 +298,7 @@ export class CaregiverNotificaciones implements OnInit {
                     leida: false,
                     icono: 'bi-person-check',
                     color: '#3b82f6',
-                    accion: '/caregiver/pacientes',
+                    accion: '/dashboard/caregiver/pacientes',
                     idReferencia: paciente.idusuario
                 });
             });
@@ -361,7 +361,7 @@ export class CaregiverNotificaciones implements OnInit {
                     leida: false,
                     icono: icono,
                     color: color,
-                    accion: '/caregiver/citas',
+                    accion: '/dashboard/caregiver/citas',
                     idReferencia: cita.idcita || cita.IdCita || cita.id || cita.idCita
                 });
             });
@@ -386,7 +386,7 @@ export class CaregiverNotificaciones implements OnInit {
                     leida: false,
                     icono: 'bi-capsule',
                     color: '#10b981',
-                    accion: '/caregiver/tratamientos',
+                    accion: '/dashboard/caregiver/tratamientos',
                     idReferencia: tratamiento.idtratamiento
                 });
             });
@@ -406,7 +406,7 @@ export class CaregiverNotificaciones implements OnInit {
                         leida: false,
                         icono: 'bi-capsule',
                         color: '#7c3aed',
-                        accion: '/caregiver/medicamentos',
+                        accion: '/dashboard/caregiver/medicamentos',
                         idReferencia: medicamento.idmedicamento
                     });
                 }
@@ -431,7 +431,7 @@ export class CaregiverNotificaciones implements OnInit {
                     leida: false,
                     icono: 'bi-device-hdd',
                     color: '#f59e0b',
-                    accion: '/caregiver/dispositivos',
+                    accion: '/dashboard/caregiver/dispositivos',
                     idReferencia: dispositivo.iddispositivo
                 });
             });
@@ -447,7 +447,7 @@ export class CaregiverNotificaciones implements OnInit {
                 leida: false,
                 icono: 'bi-info-circle-fill',
                 color: '#3b82f6',
-                accion: '/caregiver/inicio'
+                accion: '/dashboard/caregiver/inicio'
             });
         }
 
@@ -492,7 +492,7 @@ export class CaregiverNotificaciones implements OnInit {
                     mensaje: data.mensaje || 'Un nuevo paciente ha sido asignado a tu cuidado',
                     icono: 'bi-person-check',
                     color: '#3b82f6',
-                    accion: '/caregiver/pacientes',
+                    accion: '/dashboard/caregiver/pacientes',
                     idReferencia: data.id
                 });
             }
@@ -507,7 +507,7 @@ export class CaregiverNotificaciones implements OnInit {
                     mensaje: data.mensaje || 'Se ha programado una nueva cita para tu paciente',
                     icono: 'bi-calendar-event',
                     color: '#b0001e',
-                    accion: '/caregiver/citas',
+                    accion: '/dashboard/caregiver/citas',
                     idReferencia: data.id
                 });
             }
@@ -522,7 +522,7 @@ export class CaregiverNotificaciones implements OnInit {
                     mensaje: data.mensaje || 'Se ha iniciado un nuevo tratamiento para tu paciente',
                     icono: 'bi-capsule',
                     color: '#10b981',
-                    accion: '/caregiver/tratamientos',
+                    accion: '/dashboard/caregiver/tratamientos',
                     idReferencia: data.id
                 });
             }
@@ -537,7 +537,7 @@ export class CaregiverNotificaciones implements OnInit {
                     mensaje: data.mensaje || 'El estado de tu solicitud ha sido actualizado',
                     icono: 'bi-clock-history',
                     color: '#f59e0b',
-                    accion: '/caregiver/pacientes',
+                    accion: '/dashboard/caregiver/pacientes',
                     idReferencia: data.id
                 });
             }

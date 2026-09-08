@@ -381,7 +381,7 @@ export class CaregiverPacientes implements OnInit {
     verDetalle(paciente: any) {
         const id = paciente.idusuario || paciente.IdUsuario || paciente.id;
         if (id) {
-            this.router.navigate(['/caregiver/pacientes/detalle', id]);
+            this.router.navigate(['/dashboard/caregiver/pacientes/detalle', id]);
         } else {
             this.mostrarToast('warning', 'Error', 'No se pudo identificar al paciente.');
         }
@@ -393,7 +393,7 @@ export class CaregiverPacientes implements OnInit {
                 'Ya tienes una solicitud pendiente. Espera la aprobación del administrador.');
             return;
         }
-        this.router.navigate(['/caregiver/solicitar-acceso']);
+        this.router.navigate(['/dashboard/caregiver/solicitar-acceso']);
     }
 
     recargarDatos() {

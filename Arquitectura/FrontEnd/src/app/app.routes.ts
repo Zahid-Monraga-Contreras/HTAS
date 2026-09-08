@@ -11,7 +11,7 @@ export const routes: Routes = [
   },
 
   // ==========================================
-  // LANDING Y PÁGINAS PÚBLICAS (CON LAZY LOADING)
+  // LANDING Y PÁGINAS PÚBLICAS
   // ==========================================
   {
     path: 'landing',
@@ -19,7 +19,7 @@ export const routes: Routes = [
   },
 
   // ==========================================
-  // RUTAS DE AUTENTICACIÓN (CON LAZY LOADING)
+  // RUTAS DE AUTENTICACIÓN
   // ==========================================
   {
     path: 'auth',
@@ -27,7 +27,7 @@ export const routes: Routes = [
   },
 
   // ==========================================
-  // DASHBOARD (CON LAZY LOADING)
+  // DASHBOARD
   // ==========================================
   {
     path: 'dashboard',
@@ -35,7 +35,7 @@ export const routes: Routes = [
   },
 
   // ==========================================
-  // RUTA 404 GLOBAL (SIEMPRE AL FINAL)
+  // RUTA 404 GLOBAL
   // ==========================================
   {
     path: '**',

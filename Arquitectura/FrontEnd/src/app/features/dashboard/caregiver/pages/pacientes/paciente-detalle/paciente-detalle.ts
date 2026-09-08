@@ -188,15 +188,15 @@ export class CaregiverPacienteDetalle implements OnInit {
     }
 
     volver() {
-        this.router.navigate(['/caregiver/pacientes']);
+        this.router.navigate(['/dashboard/caregiver/pacientes']);
     }
 
     irACita(cita: any) {
-        this.router.navigate(['/caregiver/citas/detalle', cita.idcita]);
+        this.router.navigate(['/dashboard/caregiver/citas/detalle', cita.idcita]);
     }
 
     irATratamiento(tratamiento: any) {
-        this.router.navigate(['/caregiver/tratamientos/detalle', tratamiento.idtratamiento]);
+        this.router.navigate(['/dashboard/caregiver/tratamientos/detalle', tratamiento.idtratamiento]);
     }
 
     // Toast Notifications

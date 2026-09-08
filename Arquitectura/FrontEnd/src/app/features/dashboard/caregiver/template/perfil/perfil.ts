@@ -325,7 +325,7 @@ export class CaregiverPerfil implements OnInit {
     }
 
     irANotificaciones() {
-        this.router.navigate(['/caregiver/notificaciones']);
+        this.router.navigate(['/dashboard/caregiver/notificaciones']);
     }
 
     abrirModalCerrarSesion() {
@@ -354,7 +354,7 @@ export class CaregiverPerfil implements OnInit {
             }
 
             this.cerrarModalCerrarSesion();
-            this.router.navigate(['/login']);
+            this.router.navigate(['/auth/login']);
 
         } catch (error) {
             console.error('Error al cerrar sesion:', error);

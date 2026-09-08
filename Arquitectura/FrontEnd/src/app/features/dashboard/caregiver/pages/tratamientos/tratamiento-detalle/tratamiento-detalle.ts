@@ -442,6 +442,6 @@ export class CaregiverTratamientoDetalle implements OnInit {
     }
 
     volver() {
-        this.router.navigate(['/caregiver/tratamientos']);
+        this.router.navigate(['/dashboard/caregiver/tratamientos']);
     }
 }

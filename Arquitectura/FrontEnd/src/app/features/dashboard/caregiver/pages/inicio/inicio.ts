@@ -360,14 +360,14 @@ export class CaregiverInicio implements OnInit {
     verDetalleCita(cita: any) {
         const idCita = cita.idcita || cita.id;
         if (idCita) {
-            this.router.navigate(['/caregiver/citas/detalle', idCita]);
+            this.router.navigate(['/dashboard/caregiver/citas/detalle', idCita]);
         }
     }
 
     verDetallePaciente(paciente: any) {
         const idPaciente = paciente.idusuario || paciente.id || paciente.uid;
         if (idPaciente) {
-            this.router.navigate(['/caregiver/pacientes/detalle', idPaciente]);
+            this.router.navigate(['/dashboard/caregiver/pacientes/detalle', idPaciente]);
         }
     }
 }

@@ -18,13 +18,13 @@ export class CaregiverMenu {
     searchTerm = '';
 
     menuItems = [
-        { path: '/caregiver/inicio', icon: 'bi-house-door', label: 'Inicio' },
-        { path: '/caregiver/pacientes', icon: 'bi-people', label: 'Pacientes' },
-        { path: '/caregiver/citas', icon: 'bi-calendar-check', label: 'Citas' },
-        { path: '/caregiver/tratamientos', icon: 'bi-heart-pulse', label: 'Tratamientos' },
-        { path: '/caregiver/medicamentos', icon: 'bi-capsule', label: 'Medicamentos' },
-        { path: '/caregiver/dispositivos', icon: 'bi-device-hdd', label: 'Dispositivos' },
-        { path: '/caregiver/perfil', icon: 'bi-person', label: 'Perfil' }
+        { path: '/dashboard/caregiver/inicio', icon: 'bi-house-door', label: 'Inicio' },
+        { path: '/dashboard/caregiver/pacientes', icon: 'bi-people', label: 'Pacientes' },
+        { path: '/dashboard/caregiver/citas', icon: 'bi-calendar-check', label: 'Citas' },
+        { path: '/dashboard/caregiver/tratamientos', icon: 'bi-heart-pulse', label: 'Tratamientos' },
+        { path: '/dashboard/caregiver/medicamentos', icon: 'bi-capsule', label: 'Medicamentos' },
+        { path: '/dashboard/caregiver/dispositivos', icon: 'bi-device-hdd', label: 'Dispositivos' },
+        { path: '/dashboard/caregiver/perfil', icon: 'bi-person', label: 'Perfil' }
     ];
 
     constructor(

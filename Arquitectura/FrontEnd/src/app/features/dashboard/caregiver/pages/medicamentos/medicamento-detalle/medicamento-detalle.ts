@@ -314,12 +314,12 @@ export class CaregiverMedicamentoDetalle implements OnInit {
     }
 
     volver() {
-        this.router.navigate(['/caregiver/medicamentos']);
+        this.router.navigate(['/dashboard/caregiver/medicamentos']);
     }
 
     verTratamiento(id: number) {
         if (id) {
-            this.router.navigate(['/caregiver/tratamientos/detalle', id]);
+            this.router.navigate(['/dashboard/caregiver/tratamientos/detalle', id]);
         }
     }
 

@@ -362,7 +362,7 @@ export class CaregiverMedicamentos implements OnInit {
     verDetalle(medicamento: any) {
         const id = medicamento.idmedicamento || medicamento.id;
         if (id) {
-            this.router.navigate(['/caregiver/medicamentos/detalle', id]);
+            this.router.navigate(['/dashboard/caregiver/medicamentos/detalle', id]);
         }
     }
 

@@ -17,8 +17,8 @@ export class Recursos implements AfterViewInit, OnDestroy {
   slides = [
     {
       num: '01',
-      title: 'Monitoreo <br>Wearable',
-      description: 'Dispositivo biomédico de pulso diseñado para la captura de constantes hemodinámicas. Utiliza sensores PPG de alta resolución.'
+      title: 'Monitoreo <br>de Presión',
+      description: 'Baumanómetro digital de brazo con medición precisa de presión sistólica y diastólica en mmHg. Incluye detección de ritmo cardíaco (PULSE) y visualización de hora.'
     },
     {
       num: '02',
@@ -39,10 +39,10 @@ export class Recursos implements AfterViewInit, OnDestroy {
   expandedCardIndex: number | null = null;
   infoCardsContent = [
     {
-      title: 'Dispositivo Wearable',
+      title: 'Baumanómetro Digital',
       image: 'assets/images/baumanometro.png',
-      shortDesc: 'Sensor de grado clínico diseñado para la captura continua de presión arterial sistólica y diastólica.',
-      extraInfo: 'Nuestra pulsera utiliza tecnología avanzada de fotopletismografía (PPG) y algoritmos patentados para ofrecer una precisión comparable a los tensiómetros de brazo tradicionales, pero con la comodidad de un uso continuo las 24 horas del día. Es resistente al agua y tiene una autonomía de hasta 7 días.'
+      shortDesc: 'Equipo médico de precisión para la medición exacta de presión arterial sistólica y diastólica en mmHg.',
+      extraInfo: 'Baumanómetro digital con tecnología de oscilometría avanzada para lecturas precisas. Pantalla LCD que muestra SYS, DIA, PULSE y hora. Incluye detección de ritmo sinusal (RS), botones START/STOP y memoria para seguimiento de mediciones. Ideal para uso doméstico y profesional.'
     },
     {
       title: 'Gestión Personal',

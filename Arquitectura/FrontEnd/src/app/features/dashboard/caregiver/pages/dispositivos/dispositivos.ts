@@ -294,7 +294,7 @@ export class CaregiverDispositivos implements OnInit {
     verDetalle(dispositivo: any) {
         const id = dispositivo.iddispositivo || dispositivo.id;
         if (id) {
-            this.router.navigate(['/caregiver/dispositivos/detalle', id]);
+            this.router.navigate(['/dashboard/caregiver/dispositivos/detalle', id]);
         }
     }
 

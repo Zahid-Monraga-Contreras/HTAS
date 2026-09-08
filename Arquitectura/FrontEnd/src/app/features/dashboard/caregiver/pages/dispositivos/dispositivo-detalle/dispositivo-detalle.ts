@@ -399,7 +399,7 @@ export class CaregiverDispositivoDetalle implements OnInit {
     }
 
     volver() {
-        this.router.navigate(['/caregiver/dispositivos']);
+        this.router.navigate(['/dashboard/caregiver/dispositivos']);
     }
 
     formatearFecha(fecha: string): string {

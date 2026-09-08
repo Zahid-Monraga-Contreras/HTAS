@@ -465,7 +465,7 @@ export class CaregiverCitas implements OnInit {
     verDetalleCita(cita: any) {
         const idCita = cita.idcita || cita.id;
         if (idCita) {
-            this.router.navigate(['/caregiver/citas/detalle', idCita]);
+            this.router.navigate(['/dashboard/caregiver/citas/detalle', idCita]);
         }
     }
 
