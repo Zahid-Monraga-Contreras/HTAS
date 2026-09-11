@@ -58,3 +58,15 @@
         </div>
     </div>
 </div>
+
+<!-- Modal de Error personalizado (reemplaza cualquier alert() del navegador) -->
+<div class="custom-modal-backdrop" *ngIf="showErrorModal" (click)="closeErrorModal()">
+    <div class="custom-modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-icon-wrapper">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+        <h3 class="modal-title">{{ errorTitle }}</h3>
+        <p class="modal-message">{{ errorMessage }}</p>
+        <button class="modal-accept-btn" (click)="closeErrorModal()">Aceptar</button>
+    </div>
+</div>

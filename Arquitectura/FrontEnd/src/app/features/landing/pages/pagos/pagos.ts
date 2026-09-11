@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, ViewChildren, QueryList, ElementRef, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, AfterViewInit, ViewChildren, QueryList, ElementRef, Inject, PLATFORM_ID, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { StripeService } from '../../../../core/services/stripe.service';
 
@@ -15,15 +15,33 @@ export class Pagos implements AfterViewInit {
   loadingBasic = false;
   loadingPro = false;
 
+  // Estado del modal de error personalizado, reemplaza el alert() nativo
+  showErrorModal = false;
+  errorTitle = 'Error de Envío';
+  errorMessage = 'No pudimos procesar tu solicitud. Por favor, verifica tu conexión o intenta más tarde.';
+
   private observer?: IntersectionObserver;
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object,
-    private stripeService: StripeService) { }
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private stripeService: StripeService,
+    // FIX "se queda cargando"/"solo aparece con el scroll": el error
+    // que devuelve stripeService.redirectToCheckout() viaja a través
+    // de una cadena async/await + firstValueFrom + timeout de RxJS.
+    // En algunos casos esa resolución/rechazo ocurre en un microtask
+    // que zone.js no detecta a tiempo, así que Angular no vuelve a
+    // pintar el componente hasta el siguiente evento del DOM (por
+    // eso "se despierta" al mover el scroll). Con ChangeDetectorRef
+    // forzamos el repintado justo después de actualizar el estado.
+    private cdr: ChangeDetectorRef
+  ) { }
 
   async empezarGratis() {
     if (this.loadingBasic || this.loadingPro) return;
 
     this.loadingBasic = true;
+    this.cdr.detectChanges();
+
     try {
       // Generamos el ID de invitado igual que en el plan Full
       const guestId = 'guest_' + Date.now();
@@ -32,9 +50,16 @@ export class Pagos implements AfterViewInit {
 
       // Llamamos al mismo servicio pero con el plan 'BASIC'
       await this.stripeService.redirectToCheckout('BASIC', guestId);
+    } catch (error: any) {
+      console.error('Error al procesar Plan Básico:', error);
+      this.mostrarError(
+        'No pudimos activar tu Plan Básico',
+        error?.message || 'Ocurrió un problema al conectar con el servidor. Por favor, verifica tu conexión o intenta más tarde.'
+      );
     } finally {
       // In case redirect fails or is slow
       this.loadingBasic = false;
+      this.cdr.detectChanges();
     }
   }
 
@@ -43,6 +68,8 @@ export class Pagos implements AfterViewInit {
     if (this.loadingBasic || this.loadingPro) return;
 
     this.loadingPro = true;
+    this.cdr.detectChanges();
+
     try {
       // Generamos un ID temporal para que el backend no reciba un valor vacío
       // Usamos un timestamp para que sea único: "invitado_171145..."
@@ -52,10 +79,34 @@ export class Pagos implements AfterViewInit {
 
       // Llamamos al servicio pasando este ID temporal
       await this.stripeService.redirectToCheckout('PRO', guestId);
+    } catch (error: any) {
+      console.error('Error al procesar Plan Full:', error);
+      this.mostrarError(
+        'No pudimos iniciar tu pago',
+        error?.message || 'Ocurrió un problema al conectar con el servidor. Por favor, verifica tu conexión o intenta más tarde.'
+      );
     } finally {
       // In case redirect fails or is slow
       this.loadingPro = false;
+      this.cdr.detectChanges();
     }
+  }
+
+  /** Abre el modal de error personalizado con un título y mensaje dados */
+  private mostrarError(titulo: string, mensaje: string) {
+    this.errorTitle = titulo;
+    this.errorMessage = mensaje;
+    this.showErrorModal = true;
+    // Forzamos el repintado aquí también: es el punto exacto donde
+    // antes el modal "no aparecía" hasta que el usuario interactuaba
+    // con la página (scroll, click, etc.).
+    this.cdr.detectChanges();
+  }
+
+  /** Cierra el modal de error */
+  closeErrorModal() {
+    this.showErrorModal = false;
+    this.cdr.detectChanges();
   }
 
   ngAfterViewInit() {

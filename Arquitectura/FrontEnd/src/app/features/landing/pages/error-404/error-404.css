@@ -176,7 +176,7 @@
     top: 0;
 }
 
-/* TEXTO Y BOTÓN */
+/* TEXTO Y BOTONES */
 .info-layer {
     text-align: center;
     margin-top: 30px;
@@ -195,9 +195,17 @@
     color: #666;
 }
 
+/* Contenedor de los dos botones lado a lado */
+.actions-layer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
 
 .btn-reanimate {
-    margin-top: 30px;
     padding: 18px 60px;
     background-color: #8B0015;
     color: white;
@@ -217,6 +225,29 @@
 }
 
 .btn-reanimate:active {
+    transform: scale(0.98);
+}
+
+/* Botón "Regresar": mismo tamaño/forma que el original, pero en
+   estilo outline para no competir con el botón principal. */
+.btn-back {
+    padding: 18px 60px;
+    background-color: transparent;
+    color: #8B0015;
+    border: 2px solid #8B0015;
+    border-radius: 50px;
+    font-weight: bold;
+    font-size: 1.4rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-back:hover {
+    background-color: rgba(139, 0, 21, 0.08);
+    transform: scale(1.05);
+}
+
+.btn-back:active {
     transform: scale(0.98);
 }
 
@@ -294,7 +325,15 @@
         font-size: 1rem;
     }
 
-    .btn-reanimate {
+    .actions-layer {
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 20px;
+        width: 100%;
+    }
+
+    .btn-reanimate,
+    .btn-back {
         padding: 15px 40px;
         font-size: 1.1rem;
         width: 100%;

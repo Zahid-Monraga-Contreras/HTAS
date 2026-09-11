@@ -35,9 +35,14 @@
         <div class="info-layer">
             <h2>Página sin Signos Vitales</h2>
             <p>El recurso que buscas no está respondiendo en este momento.</p>
-            <button class="btn-reanimate" (click)="goToHome()">
-                Volver al inicio
-            </button>
+            <div class="actions-layer">
+                <button class="btn-reanimate" (click)="goToHome()">
+                    Volver al inicio
+                </button>
+                <button class="btn-back" (click)="goBack()">
+                    Regresar
+                </button>
+            </div>
         </div>
 
     </div>

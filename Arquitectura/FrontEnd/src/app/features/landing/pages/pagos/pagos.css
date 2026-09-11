@@ -280,3 +280,120 @@
         font-size: 2.8rem;
     }
 }
+
+/* ===== MODAL DE ERROR PERSONALIZADO ===== */
+.custom-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 0, 4, 0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+    animation: fadeInBackdrop 0.25s ease;
+}
+
+@keyframes fadeInBackdrop {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.custom-modal-card {
+    background: #ffffff;
+    border-radius: 24px;
+    padding: 45px 40px 35px;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+    animation: popInModal 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popInModal {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-icon-wrapper {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-icon-wrapper i {
+    font-size: 3.2rem;
+    color: #8B0015;
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #262626;
+    margin-bottom: 12px;
+}
+
+.modal-message {
+    font-size: 1rem;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 28px;
+}
+
+.modal-accept-btn {
+    background: #8B0015;
+    color: #fff;
+    border: none;
+    padding: 14px 45px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(176, 0, 30, 0.25);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal-accept-btn:hover {
+    background: #a30018;
+    transform: scale(1.05);
+    box-shadow: 0 15px 30px rgba(176, 0, 30, 0.35);
+}
+
+.modal-accept-btn:active {
+    transform: scale(0.98);
+}
+
+@media (max-width: 576px) {
+    .custom-modal-card {
+        padding: 35px 25px 30px;
+    }
+
+    .modal-title {
+        font-size: 1.3rem;
+    }
+
+    .modal-message {
+        font-size: 0.95rem;
+    }
+
+    .modal-accept-btn {
+        width: 100%;
+    }
+}
