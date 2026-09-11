@@ -98,7 +98,7 @@ export class TratamientoDetalle implements OnInit, OnDestroy {
       this.inicializarCampos();
       this.cargarDatosAdicionales();
     } else {
-      this.router.navigate(['/admin/tratamientos']);
+      this.router.navigate(['/dashboard/admin/tratamientos']);
     }
   }
 
@@ -511,7 +511,7 @@ export class TratamientoDetalle implements OnInit, OnDestroy {
       this.lanzarNotificacion("¡Éxito! El tratamiento ha sido actualizado correctamente.", "success");
 
       setTimeout(() => {
-        this.router.navigate(['/admin/tratamientos']);
+        this.router.navigate(['/dashboard/admin/tratamientos']);
       }, 2000);
 
     } catch (error: any) {

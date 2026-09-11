@@ -17,7 +17,7 @@ export class InfoPacienteComponent implements OnInit, OnDestroy {
     @Input() estadisticas: any = null;
     @Output() volver = new EventEmitter<void>();
     @Output() guardarCambios = new EventEmitter<void>();
-    @Output() abrirModalCita = new EventEmitter<void>(); // ✅ Output para abrir modal
+    @Output() abrirModalCita = new EventEmitter<void>();
     @Output() cambioDatos = new EventEmitter<void>();
 
     private cdr = inject(ChangeDetectorRef);

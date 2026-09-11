@@ -637,7 +637,7 @@ export class Citas implements OnInit, OnDestroy {
       return;
     }
     const id = this.citaSeleccionada.idcita || this.citaSeleccionada.id;
-    this.router.navigate(['/admin/citas/editar', id], { state: { cita: this.citaSeleccionada } });
+    this.router.navigate(['/dashboard/admin/citas/editar', id], { state: { cita: this.citaSeleccionada } });
   }
 
   abrirEliminarCita() {

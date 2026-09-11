@@ -155,11 +155,11 @@ export class Solicitudes implements OnInit, OnDestroy {
                     apMaterno: acompanante.apmaternoacompanante || acompanante.ApMaternoAcompanante || '',
                     correo: acompanante.correoacompanante || acompanante.CorreoAcompanante || ''
                 };
-                this.router.navigate(['/admin/acompanantes/editar', id], {
+                this.router.navigate(['/dashboard/admin/acompanantes/editar', id], {
                     state: { usuario: usuario }
                 });
             } else {
-                this.router.navigate(['/admin/acompanantes/editar', id]);
+                this.router.navigate(['/dashboard/admin/acompanantes/editar', id]);
             }
         } else {
             this.lanzarNotificacion('ID de acompañante no válido', 'warning');
@@ -189,12 +189,12 @@ export class Solicitudes implements OnInit, OnDestroy {
                     correo: paciente.correopaciente || paciente.CorreoPaciente || ''
                 };
                 console.log('Navegando con usuario:', usuario);
-                this.router.navigate(['/admin/pacientes/editar', id], {
+                this.router.navigate(['/dashboard/admin/pacientes/editar', id], {
                     state: { usuario: usuario }
                 });
             } else {
                 console.log('Navegando sin usuario, solo ID:', id);
-                this.router.navigate(['/admin/pacientes/editar', id]);
+                this.router.navigate(['/dashboard/admin/pacientes/editar', id]);
             }
         } else {
             this.lanzarNotificacion('ID de paciente no válido', 'warning');

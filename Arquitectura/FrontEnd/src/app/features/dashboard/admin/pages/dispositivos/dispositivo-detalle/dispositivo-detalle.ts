@@ -189,14 +189,14 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
             this.inicializarCampos();
             setTimeout(() => this.cdr.detectChanges());
           } else {
-            this.router.navigate(['/admin/dispositivos']);
+            this.router.navigate(['/dashboard/admin/dispositivos']);
           }
         } catch (error) {
           console.error("Error al cargar dispositivo:", error);
-          this.router.navigate(['/admin/dispositivos']);
+          this.router.navigate(['/dashboard/admin/dispositivos']);
         }
       } else {
-        this.router.navigate(['/admin/dispositivos']);
+        this.router.navigate(['/dashboard/admin/dispositivos']);
       }
     }
   }
@@ -889,7 +889,7 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
       this.lanzarNotificacion("¡Dispositivo actualizado con éxito!", "success");
 
       setTimeout(() => {
-        this.router.navigate(['/admin/dispositivos']);
+        this.router.navigate(['/dashboard/admin/dispositivos']);
       }, 1500);
 
     } catch (error: any) {

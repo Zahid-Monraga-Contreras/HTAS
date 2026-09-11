@@ -39,7 +39,7 @@ export class Menu implements OnInit, OnDestroy {
       category: 'General',
       items: [
         {
-          route: '/admin/inicio',
+          route: '/dashboard/admin/inicio',
           icon: 'bi bi-house-heart',
           label: 'Inicio',
           queryParams: { canAdd: false, canEdit: false, canDelete: false }
@@ -50,25 +50,25 @@ export class Menu implements OnInit, OnDestroy {
       category: 'Administracion',
       items: [
         {
-          route: '/admin/usuarios',
+          route: '/dashboard/admin/usuarios',
           icon: 'bi-people',
           label: 'Usuarios',
           queryParams: { canAdd: true, canEdit: true, canDelete: true }
         },
         {
-          route: '/admin/medicos',
+          route: '/dashboard/admin/medicos',
           icon: 'bi-person-badge',
           label: 'Medicos',
           queryParams: { canAdd: true, canEdit: true, canDelete: true }
         },
         {
-          route: '/admin/pacientes',
+          route: '/dashboard/admin/pacientes',
           icon: 'bi-person-heart',
           label: 'Pacientes',
           queryParams: { canAdd: true, canEdit: true, canDelete: true }
         },
         {
-          route: '/admin/acompanantes',
+          route: '/dashboard/admin/acompanantes',
           icon: 'bi-person-fill-add',
           label: 'Acompañantes',
           queryParams: { canAdd: true, canEdit: true, canDelete: true }
@@ -79,25 +79,25 @@ export class Menu implements OnInit, OnDestroy {
       category: 'Seguimiento',
       items: [
         {
-          route: '/admin/citas',
+          route: '/dashboard/admin/citas',
           icon: 'bi-calendar-check',
           label: 'Citas',
           queryParams: { canAdd: true, canEdit: true, canDelete: true }
         },
         {
-          route: '/admin/tratamientos',
+          route: '/dashboard/admin/tratamientos',
           icon: 'bi-clipboard-data',
           label: 'Tratamientos',
           queryParams: { canAdd: true, canEdit: true, canDelete: true }
         },
         {
-          route: '/admin/medicamentos',
+          route: '/dashboard/admin/medicamentos',
           icon: 'bi-capsule',
           label: 'Medicamentos',
           queryParams: { canAdd: true, canEdit: true, canDelete: true }
         },
         {
-          route: '/admin/dispositivos',
+          route: '/dashboard/admin/dispositivos',
           icon: 'bi-heart-pulse',
           label: 'Dispositivos',
           queryParams: { canAdd: true, canEdit: true, canDelete: true }
@@ -108,13 +108,13 @@ export class Menu implements OnInit, OnDestroy {
       category: 'Solicitudes y Asignaciones',
       items: [
         {
-          route: '/admin/solicitudes',
+          route: '/dashboard/admin/solicitudes',
           icon: 'bi-list-check',
           label: 'Solicitudes',
           queryParams: { canAdd: false, canEdit: true, canDelete: true }
         },
         {
-          route: '/admin/asignacion',
+          route: '/dashboard/admin/asignacion',
           icon: 'bi-person-plus',
           label: 'Asignacion',
           queryParams: { canAdd: false, canEdit: true, canDelete: false }
@@ -125,7 +125,7 @@ export class Menu implements OnInit, OnDestroy {
       category: 'Cuenta',
       items: [
         {
-          route: '/admin/configuracion',
+          route: '/dashboard/admin/configuracion',
           icon: 'bi-gear',
           label: 'Configuracion',
           queryParams: { canAdd: false, canEdit: true, canDelete: false }
@@ -305,6 +305,6 @@ export class Menu implements OnInit, OnDestroy {
     this.googleService.logout();
     const service = this.usersService as any;
     if (service.limpiarSesion) service.limpiarSesion();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/auth/login']);
   }
 }

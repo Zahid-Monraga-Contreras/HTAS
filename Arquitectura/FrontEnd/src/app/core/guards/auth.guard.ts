@@ -33,7 +33,7 @@ export const authGuard: CanActivateFn = (route, state) => {
             }
           }
 
-          router.navigate(['/login']);
+          router.navigate(['/auth/login']);
           observer.next(false);
           observer.complete();
         }
@@ -42,7 +42,7 @@ export const authGuard: CanActivateFn = (route, state) => {
       if (!isResolved) {
         isResolved = true;
         unsubscribe();
-        router.navigate(['/login']);
+        router.navigate(['/auth/login']);
         observer.next(false);
         observer.complete();
       }

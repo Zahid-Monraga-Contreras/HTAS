@@ -78,7 +78,7 @@ export class CitaDetalle implements OnInit, OnDestroy {
       this.inicializarHistorial();
 
     } else {
-      this.router.navigate(['/admin/citas']);
+      this.router.navigate(['/dashboard/admin/citas']);
     }
   }
 
@@ -256,7 +256,7 @@ export class CitaDetalle implements OnInit, OnDestroy {
       this.lanzarNotificacion("¡Éxito! La información de la cita ha sido actualizada.", "success");
 
       setTimeout(() => {
-        this.router.navigate(['/admin/citas']);
+        this.router.navigate(['/dashboard/admin/citas']);
       }, 2000);
 
     } catch (error: any) {
@@ -299,7 +299,7 @@ export class CitaDetalle implements OnInit, OnDestroy {
       this.lanzarNotificacion("Cita cancelada exitosamente.", "success");
 
       setTimeout(() => {
-        this.router.navigate(['/citas']);
+        this.router.navigate(['/dashboard/admin/citas']);
       }, 2000);
 
     } catch (error: any) {
@@ -360,7 +360,7 @@ export class CitaDetalle implements OnInit, OnDestroy {
       this.lanzarNotificacion("Cita marcada como completada exitosamente.", "success");
 
       setTimeout(() => {
-        this.router.navigate(['/citas']);
+        this.router.navigate(['/dashboard/admin/citas']);
       }, 2000);
 
     } catch (error: any) {

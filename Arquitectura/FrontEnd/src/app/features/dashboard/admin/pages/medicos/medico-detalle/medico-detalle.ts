@@ -71,7 +71,7 @@ export class MedicoDetalle implements OnInit, OnDestroy {
       this.inicializarCampos();
       this.cargarDatosReales();
     } else {
-      this.router.navigate(['/admin/medicos']);
+      this.router.navigate(['/dashboard/admin/medicos']);
     }
   }
 
@@ -537,7 +537,7 @@ export class MedicoDetalle implements OnInit, OnDestroy {
     }
 
     if (u.curp && u.curp.length > 0) {
-      const curpRegex = /^[A-Z]{4}[0-9]{6}[A-Z]{6}[0-9]{2}$/;
+      const curpRegex = /^[A-Z]{4}[0-9]{6}[HM][A-Z]{5}[A-Z0-9][0-9]$/;
       if (!curpRegex.test(u.curp.toUpperCase())) {
         return { valido: false, mensaje: 'El formato de CURP no es valido' };
       }
@@ -642,7 +642,7 @@ export class MedicoDetalle implements OnInit, OnDestroy {
       this.lanzarNotificacion("Los datos del medico se actualizaron correctamente.", "success");
 
       setTimeout(() => {
-        this.router.navigate(['/admin/medicos']);
+        this.router.navigate(['/dashboard/admin/medicos']);
       }, 2000);
 
     } catch (error) {

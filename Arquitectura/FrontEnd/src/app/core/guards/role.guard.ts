@@ -88,7 +88,7 @@ export const roleGuard: CanActivateFn = (route, state) => {
                     if (user) {
                         router.navigate(['/landing']);
                     } else {
-                        router.navigate(['/login']);
+                        router.navigate(['/auth/login']);
                     }
                     observer.next(false);
                     observer.complete();

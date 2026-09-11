@@ -462,14 +462,14 @@ export class AdminAsignacion implements OnInit, AfterViewInit {
 
     verPacientesAsignados() {
         if (this.doctorSeleccionado) {
-            this.router.navigate(['/admin/pacientes']);
+            this.router.navigate(['/dashboard/admin/pacientes']);
         } else {
             this.mostrarToast('warning', 'Selecciona un doctor', 'Primero selecciona un doctor para ver sus pacientes');
         }
     }
 
     volver() {
-        this.router.navigate(['/admin/inicio']);
+        this.router.navigate(['/dashboard/admin/inicio']);
     }
 
     mostrarMensaje(texto: string, clase: string) {

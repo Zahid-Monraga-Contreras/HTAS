@@ -188,7 +188,7 @@ export class AcompananteDetalle implements OnInit, OnDestroy {
 
     } else {
       if (isPlatformBrowser(this.platformId)) {
-        this.router.navigate(['/admin/acompanantes']);
+        this.router.navigate(['/dashboard/admin/acompanantes']);
       }
     }
   }
@@ -589,8 +589,9 @@ export class AcompananteDetalle implements OnInit, OnDestroy {
       };
 
       if (payload.curp && payload.curp.length > 0) {
-        const curpRegex = /^[A-Z]{4}[0-9]{6}[A-Z]{6}[0-9]{2}$/;
+        const curpRegex = /^[A-Z]{4}[0-9]{6}[HM][A-Z]{5}[A-Z0-9][0-9]$/;
         if (!curpRegex.test(payload.curp)) {
+          console.log('CURP EXACTO:', JSON.stringify(payload.curp), '| longitud:', payload.curp.length);  // ← quitar esto
           this.lanzarNotificacion("El formato de CURP no es válido. Debe tener 18 caracteres alfanuméricos.", "warning");
           this.isSaving = false;
           return;
@@ -613,7 +614,7 @@ export class AcompananteDetalle implements OnInit, OnDestroy {
       this.agregarHistorial('Datos actualizados', 'Información del acompañante actualizada');
 
       setTimeout(() => {
-        this.router.navigate(['/admin/acompanantes']);
+        this.router.navigate(['/dashboard/admin/acompanantes']);
       }, 2000);
 
     } catch (error: any) {

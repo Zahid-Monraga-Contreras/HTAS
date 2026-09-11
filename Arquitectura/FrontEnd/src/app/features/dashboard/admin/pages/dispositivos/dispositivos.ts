@@ -226,7 +226,7 @@ export class Dispositivos implements OnInit, OnDestroy {
 
     // Si es paciente o acompañante: SOLO modo medición
     if (rol === 'paciente' || rol === 'acompañante') {
-      this.router.navigate(['/admin/dispositivos/editar', dispositivo.iddispositivo], {
+      this.router.navigate(['/dashboard/admin/dispositivos/editar', dispositivo.iddispositivo], {
         state: {
           dispositivo: dispositivo,
           modo: 'medir'  // Modo solo medición
@@ -236,7 +236,7 @@ export class Dispositivos implements OnInit, OnDestroy {
     }
 
     // Admin y médico: edición completa
-    this.router.navigate(['/admin/dispositivos/editar', dispositivo.iddispositivo], {
+    this.router.navigate(['/dashboard/admin/dispositivos/editar', dispositivo.iddispositivo], {
       state: {
         dispositivo: dispositivo,
         modo: 'editar'  // Modo edición completa

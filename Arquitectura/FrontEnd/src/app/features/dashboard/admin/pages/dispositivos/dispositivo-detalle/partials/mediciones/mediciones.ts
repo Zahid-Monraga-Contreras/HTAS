@@ -54,7 +54,7 @@ export class Mediciones implements OnChanges {
         try {
             const date = new Date(fecha);
             if (isNaN(date.getTime())) {
-                console.warn('⚠️ Fecha inválida:', fecha);
+                console.warn('Fecha inválida:', fecha);
                 try {
                     const partes = fecha.split('/');
                     if (partes.length === 3) {
@@ -95,7 +95,7 @@ export class Mediciones implements OnChanges {
                 hour12: true
             });
         } catch (error) {
-            console.error('❌ Error al formatear fecha:', error);
+            console.error('Error al formatear fecha:', error);
             return 'Fecha no disponible';
         }
     }
@@ -120,17 +120,17 @@ export class Mediciones implements OnChanges {
 
     ngOnChanges(changes: SimpleChanges) {
         if (changes['medicionesTensiometro']) {
-            console.log('📊 Mediciones recibidas en componente:', this.medicionesTensiometro);
+            console.log('Mediciones recibidas en componente:', this.medicionesTensiometro);
             if (this.medicionesTensiometro) {
                 this.medicionesTensiometro.forEach((med, index) => {
                     if (!med.fecha) {
-                        console.warn(`⚠️ Medición ${index + 1} sin fecha:`, med);
+                        console.warn(`Medición ${index + 1} sin fecha:`, med);
                     }
                 });
             }
         }
         if (changes['ultimaMedicion']) {
-            console.log('📈 Última medición recibida:', this.ultimaMedicion);
+            console.log('Última medición recibida:', this.ultimaMedicion);
         }
     }
 

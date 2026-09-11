@@ -92,7 +92,7 @@ export class PacienteDetalle implements OnInit, OnDestroy {
       this.cargarDatosReales();
       this.cargarUltimaMedicionExpediente();
     } else {
-      this.router.navigate(['/pacientes']);
+      this.router.navigate(['/dashboard/admin/pacientes']);
     }
   }
 
@@ -688,7 +688,7 @@ export class PacienteDetalle implements OnInit, OnDestroy {
       await this.cargarDatosReales();
 
       setTimeout(() => {
-        this.router.navigate(['/admin/pacientes']);
+        this.router.navigate(['/dashboard/admin/pacientes']);
       }, 2000);
 
     } catch (error: any) {
@@ -719,7 +719,7 @@ export class PacienteDetalle implements OnInit, OnDestroy {
     }
 
     if (u.curp && u.curp.length > 0) {
-      const curpRegex = /^[A-Z]{4}[0-9]{6}[A-Z]{6}[0-9]{2}$/;
+      const curpRegex = /^[A-Z]{4}[0-9]{6}[HM][A-Z]{5}[A-Z0-9][0-9]$/;
       if (!curpRegex.test(u.curp.toUpperCase())) {
         return { valido: false, mensaje: 'El formato de CURP no es valido' };
       }

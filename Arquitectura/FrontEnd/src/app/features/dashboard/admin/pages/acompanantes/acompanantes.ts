@@ -140,7 +140,7 @@ export class Acompanantes implements OnInit {
   abrirEditar() {
     if (this.usuarioSeleccionado) {
       const id = this.usuarioSeleccionado.idusuario || this.usuarioSeleccionado.id;
-      this.router.navigate(['/admin/acompanantes/editar', id], { state: { usuario: this.usuarioSeleccionado } });
+      this.router.navigate(['/dashboard/admin/acompanantes/editar', id], { state: { usuario: this.usuarioSeleccionado } });
     }
   }
 
