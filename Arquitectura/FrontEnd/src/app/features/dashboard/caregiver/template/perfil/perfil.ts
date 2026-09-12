@@ -280,6 +280,7 @@ export class CaregiverPerfil implements OnInit {
                 nombre: this.perfilEditado.nombre,
                 apPaterno: this.perfilEditado.apPaterno,
                 apMaterno: this.perfilEditado.apMaterno,
+                correo: this.perfilEditado.correo,
                 telefono: this.perfilEditado.telefono,
                 fechaNacimiento: this.perfilEditado.fechaNacimiento,
                 genero: this.perfilEditado.genero,

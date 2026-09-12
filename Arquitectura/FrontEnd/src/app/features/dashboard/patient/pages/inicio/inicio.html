@@ -45,17 +45,17 @@
                     <p>Aqui tienes un resumen de tu actividad</p>
                 </div>
                 <div class="welcome-stats">
-                    <div class="stat-item" routerLink="/patient/citas" style="cursor: pointer;">
+                    <div class="stat-item" routerLink="/dashboard/patient/citas" style="cursor: pointer;">
                         <span class="stat-number">{{ metrics.totalCitas }}</span>
                         <span class="stat-label">Citas</span>
                     </div>
                     <div class="stat-divider"></div>
-                    <div class="stat-item" routerLink="/patient/medicamentos" style="cursor: pointer;">
+                    <div class="stat-item" routerLink="/dashboard/patient/medicamentos" style="cursor: pointer;">
                         <span class="stat-number">{{ metrics.medicamentosActivos }}</span>
                         <span class="stat-label">Medicamentos</span>
                     </div>
                     <div class="stat-divider"></div>
-                    <div class="stat-item" routerLink="/patient/tratamientos" style="cursor: pointer;">
+                    <div class="stat-item" routerLink="/dashboard/patient/tratamientos" style="cursor: pointer;">
                         <span class="stat-number">{{ metrics.tratamientosActivos }}</span>
                         <span class="stat-label">Tratamientos</span>
                     </div>
@@ -67,7 +67,7 @@
         <!-- METRICAS RAPIDAS -->
         <!-- ========================================== -->
         <section class="quick-metrics">
-            <div class="metric-item" routerLink="/patient/citas">
+            <div class="metric-item" routerLink="/dashboard/patient/citas">
                 <div class="metric-icon" style="background: #b0001e15; color: #b0001e;">
                     <i class="bi bi-calendar-check"></i>
                 </div>
@@ -78,7 +78,7 @@
                 <i class="bi bi-chevron-right metric-arrow"></i>
             </div>
 
-            <div class="metric-item" routerLink="/patient/citas">
+            <div class="metric-item" routerLink="/dashboard/patient/citas">
                 <div class="metric-icon" style="background: #f59e0b15; color: #f59e0b;">
                     <i class="bi bi-clock-history"></i>
                 </div>
@@ -89,7 +89,7 @@
                 <i class="bi bi-chevron-right metric-arrow"></i>
             </div>
 
-            <div class="metric-item" routerLink="/patient/medicamentos">
+            <div class="metric-item" routerLink="/dashboard/patient/medicamentos">
                 <div class="metric-icon" style="background: #10b98115; color: #10b981;">
                     <i class="bi bi-capsule"></i>
                 </div>
@@ -100,7 +100,7 @@
                 <i class="bi bi-chevron-right metric-arrow"></i>
             </div>
 
-            <div class="metric-item" routerLink="/patient/tratamientos">
+            <div class="metric-item" routerLink="/dashboard/patient/tratamientos">
                 <div class="metric-icon" style="background: #7c3aed15; color: #7c3aed;">
                     <i class="bi bi-heart-pulse"></i>
                 </div>
@@ -118,7 +118,7 @@
         <section class="section-card">
             <div class="section-header">
                 <h2><i class="bi bi-calendar-event"></i> Proximas Citas</h2>
-                <a routerLink="/patient/citas" class="view-all">Ver todas</a>
+                <a routerLink="/dashboard/patient/citas" class="view-all">Ver todas</a>
             </div>
             <div class="citas-list">
                 <!-- Cada cita al hacer clic redirige al detalle -->
@@ -142,7 +142,7 @@
                 <div *ngIf="!citasRecientes.length" class="empty-state">
                     <i class="bi bi-calendar-x"></i>
                     <p>No tienes citas programadas</p>
-                    <button class="btn-primary" routerLink="/patient/citas">Agendar Cita</button>
+                    <button class="btn-primary" routerLink="/dashboard/patient/citas">Agendar Cita</button>
                 </div>
             </div>
         </section>
