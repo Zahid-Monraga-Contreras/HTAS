@@ -41,3 +41,19 @@ export interface MedicionRango {
     fechaFin: string;
     mediciones: Medicion[];
 }
+
+/**
+ * Última medición obtenida directamente del tensiómetro Bluetooth
+ * vinculado al paciente. Corresponde a
+ * Users.obtenerMedicionTensiometro(idPaciente), que antes devolvía
+ * `any`. Ajustar campos según la forma real de respuesta del backend.
+ */
+export interface MedicionTensiometro {
+    conectado: boolean;
+    sistolica?: number;
+    diastolica?: number;
+    pulso?: number;
+    iddispositivo?: number;
+    timestamp?: string;
+    mensaje?: string;
+}

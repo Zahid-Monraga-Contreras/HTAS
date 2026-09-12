@@ -31,6 +31,12 @@ export interface CrearTratamientoRequest {
     activo?: boolean;
 }
 
+/**
+ * Datos para actualizar un tratamiento existente
+ * (Users.actualizarTratamiento). Antes se tipaba como `any`.
+ */
+export type ActualizarTratamientoRequest = Partial<CrearTratamientoRequest>;
+
 export interface RegistroToma {
     id?: number;
     idTratamiento: number;
@@ -42,11 +48,39 @@ export interface RegistroToma {
     nombreAcompanante?: string;
 }
 
+/**
+ * Datos para registrar una toma puntual (Users.registrarToma).
+ * Usa `fechaHoraProgramada`, distinto de `fechaProgramada` en RegistroToma.
+ */
+export interface RegistrarTomaRequest {
+    idTratamiento: number;
+    fechaHoraProgramada: string;
+    idAcompananteQueRegistro?: number;
+    notasTomas?: string;
+}
+
+/**
+ * Datos para actualizar el estado de una toma
+ * (Users.actualizarEstadoToma / marcarTomaComoTomada / Omitida / Retrasada).
+ */
+export interface ActualizarEstadoTomaRequest {
+    estado: string;
+    fechaHoraRealizada?: string;
+    notasTomas?: string;
+}
+
 export interface GenerarTomasRequest {
     idTratamiento: number;
     fechaInicio: string;
     fechaFin: string;
     frecuenciaHoras: number;
+}
+
+/** Respuesta de Users.generarTomasProgramadas. */
+export interface GenerarTomasResponse {
+    message: string;
+    totalGeneradas: number;
+    tomas: RegistroToma[];
 }
 
 export interface TomasEstadisticas {

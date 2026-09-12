@@ -37,3 +37,17 @@ export interface MedicamentoEstadisticas {
         total: number;
     }>;
 }
+
+/**
+ * Estadísticas de UN medicamento en particular.
+ * Corresponde a Users.getEstadisticasMedicamento(idMedicamento), que
+ * antes no tenía tipo propio (se usaba `any`). Ajustar campos si el
+ * backend devuelve otros nombres.
+ */
+export interface MedicamentoEstadisticasIndividual {
+    idmedicamento: number;
+    nombrecomercial: string;
+    totalRecetas: number;
+    tratamientosActivos?: number;
+    pacientesActivos?: number;
+}

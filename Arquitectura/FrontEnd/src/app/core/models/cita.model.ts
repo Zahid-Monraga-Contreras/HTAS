@@ -65,6 +65,10 @@ export interface DisponibilidadResponse {
         maximoPermitido: number;
         horaLlena: boolean;
         cuposDisponibles: number;
+        /** Agregado: indica si ya existe una cita para ese correo/horario. */
+        yaAgendado: boolean;
+        /** Agregado: correo con el que ya se agendó, si aplica. */
+        correoExistente?: string | null;
         usuarioYaTieneCita?: boolean;
         citasHoy?: number;
         limiteDiaAlcanzado?: boolean;
@@ -85,6 +89,13 @@ export interface HorariosDisponiblesResponse {
     horariosDisponibles: string[];
     horariosCompletos: string[];
     horariosUsuario: string[];
+    /** Agregado: mapa hora -> quién ocupa ese horario. */
+    horariosOcupados?: {
+        [key: string]: {
+            ocupado: boolean;
+            por: string;
+        };
+    };
     citasUsuario: any[];
     totalDisponibles: number;
     totalHorarios: number;
@@ -120,6 +131,9 @@ export interface ResumenAdminResponse {
     no_asistio: number;
     proximas: number;
     vencidas: number;
+    /** Agregados: faltaban en la versión anterior. */
+    presenciales: number;
+    virtuales: number;
 }
 
 export interface CuposPorHoraResponse {
@@ -129,8 +143,12 @@ export interface CuposPorHoraResponse {
         total: number;
         cupos_disponibles: number;
         estados: string[];
+        /** Agregado: correos de quienes ocupan ese horario. */
+        correos: string[];
     }>;
     total_horarios: number;
+    /** Agregado: conteo total de horarios con cupo disponible. */
+    horarios_disponibles: number;
 }
 
 export interface HistorialCita {
@@ -150,4 +168,57 @@ export interface CitaFiltros {
     fechaInicio?: string;
     fechaFin?: string;
     soloFuturas?: boolean;
+}
+
+// ==========================================================================
+// PROXIMAS CITAS / HISTORIAL
+// (Users.getProximasCitas / Users.getHistorialCompletoCitas)
+// No existían en la versión anterior del modelo.
+// ==========================================================================
+
+export interface ProximasCitasResponse {
+    success: boolean;
+    citas: Cita[];
+    total: number;
+}
+
+export interface HistorialCitasResponse {
+    success: boolean;
+    citas: Cita[];
+    total: number;
+    limite: number;
+    offset: number;
+    totalPaginas: number;
+}
+
+// ==========================================================================
+// DISPONIBILIDAD MASIVA
+// (Users.verificarDisponibilidadMasiva)
+// No existía en la versión anterior del modelo.
+// ==========================================================================
+
+export interface DisponibilidadMasivaItem {
+    fecha: string;
+    hora: string;
+    email?: string;
+}
+
+export interface DisponibilidadMasivaResultado {
+    fecha: string;
+    hora: string;
+    email: string | null;
+    disponible: boolean;
+    mensaje: string;
+    detalles?: {
+        yaAgendado: boolean;
+        correoExistente: string | null;
+        horaLlena: boolean;
+        usuarioYaTieneCita: boolean;
+    };
+}
+
+export interface DisponibilidadMasivaResponse {
+    success: boolean;
+    total: number;
+    resultados: DisponibilidadMasivaResultado[];
 }
