@@ -100,7 +100,9 @@
                     </div>
                     <div class="notification-body">
                         <span class="badge-tipo">Nuevo Usuario</span>
-                        <p class="notification-text"><strong>{{usuario.nombre || 'Sin nombre'}}</strong> - {{usuario.rol
+                        <p class="notification-text"><strong>{{usuario.nombre || 'Sin nombre'}} {{usuario.apPaterno ||
+                                usuario.ApPaterno || ''}} {{usuario.apMaterno || usuario.ApMaterno || ''}}</strong> -
+                            {{usuario.rol
                             || 'Sin rol'}}</p>
                         <span class="notification-time"><i class="bi bi-envelope"></i> {{usuario.correo || 'Sin
                             correo'}}</span>

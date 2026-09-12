@@ -143,6 +143,18 @@
     color: #15803d;
 }
 
+/*
+ * ADMINISTRADOR — igual que en la tabla de usuarios, el rol llega como
+ * 'Admin' desde el backend. [ngClass]="perfilEdit.rol?.toLowerCase()"
+ * genera la clase 'admin', así que se cubre tanto 'admin' como
+ * 'administrador' por compatibilidad, usando el rojo de marca #b0001e.
+ */
+.badge-rol.admin,
+.badge-rol.administrador {
+    background-color: #fbe7ea;
+    color: #b0001e;
+}
+
 /* ============================================================
    TOAST FLOTANTE
    ============================================================ */

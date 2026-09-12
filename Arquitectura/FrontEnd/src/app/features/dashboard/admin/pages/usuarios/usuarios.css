@@ -411,13 +411,24 @@
     background: #15803d;
 }
 
+/*
+ * ADMINISTRADOR — antes esta regla apuntaba solo a data-rol="Administrador"
+ * en tono ámbar, pero el modelo de datos (user.model.ts) guarda el rol
+ * como literalmente 'Admin', no 'Administrador'. Por eso el selector nunca
+ * hacía match y el badge se veía sin pill ni color en la tabla.
+ * Se deja el tono rojo de marca (#b0001e) y se cubre tanto 'Admin' (el
+ * valor real que llega del backend) como 'Administrador' por compatibilidad
+ * con cualquier registro que use el nombre completo.
+ */
+.badge-premium[data-rol="Admin"],
 .badge-premium[data-rol="Administrador"] {
-    background: #fef3c7;
-    color: #92400e;
+    background: #fbe7ea;
+    color: #b0001e;
 }
 
+.badge-premium[data-rol="Admin"] .dot-indicator,
 .badge-premium[data-rol="Administrador"] .dot-indicator {
-    background: #92400e;
+    background: #b0001e;
 }
 
 /* ============================================================
