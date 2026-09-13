@@ -127,10 +127,14 @@ if (process.env.NODE_ENV === 'development' && process.env.ALLOW_DEV_ENDPOINTS ==
     }
 }
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Servidor HTAS corriendo en puerto ${PORT}`);
-    console.log(`URL local: http://localhost:${PORT}`);
-    console.log(`FastAPI URL: ${process.env.URL_FASTAPI || 'http://127.0.0.1:8000'}`);
-    console.log('Servidor listo para recibir peticiones');
-});
+if (require.main === module) {
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+        console.log(`Servidor HTAS corriendo en puerto ${PORT}`);
+        console.log(`URL local: http://localhost:${PORT}`);
+        console.log(`FastAPI URL: ${process.env.URL_FASTAPI || 'http://127.0.0.1:8000'}`);
+        console.log('Servidor listo para recibir peticiones');
+    });
+}
+
+module.exports = app;

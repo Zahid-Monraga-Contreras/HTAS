@@ -10,3 +10,4 @@ seed-data.js
 .dev-admin-credentials.json
 admin-credentials.json
 .vercel
+sync-env-vercel.ps1

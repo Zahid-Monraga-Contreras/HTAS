@@ -164,14 +164,25 @@ const authController = {
   },
 
   login: async (req, res) => {
-    const { correo, contrasenia, recaptchaToken } = req.body;
+    // 1. Flexibilidad en lectura de campos del Body
+    const correo = req.body.correo || req.body.Correo || req.body.email;
+    const contrasenia = req.body.contrasenia || req.body.Contrasenia || req.body.password;
+    const recaptchaToken = req.body.recaptchaToken;
     const deviceInfo = req.headers["user-agent"];
 
-    const captchaValido = await verificarRecaptcha(recaptchaToken);
-    if (!captchaValido) {
-      return res
-        .status(400)
-        .json({ error: "Verificación reCAPTCHA fallida. Intenta de nuevo." });
+    // 2. Validación temprana de campos requeridos
+    if (!correo || !contrasenia) {
+      return res.status(400).json({ error: "El correo y la contraseña son requeridos." });
+    }
+
+    // 3. Validación de reCAPTCHA condicional (solo si se recibe el token)
+    if (recaptchaToken) {
+      const captchaValido = await verificarRecaptcha(recaptchaToken);
+      if (!captchaValido) {
+        return res
+          .status(400)
+          .json({ error: "Verificación reCAPTCHA fallida. Intenta de nuevo." });
+      }
     }
 
     try {

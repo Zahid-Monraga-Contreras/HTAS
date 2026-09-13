@@ -78,7 +78,7 @@ export class Contacto implements AfterViewInit {
     event.preventDefault();
     this.enviando = true;
 
-    this.http.post('http://localhost:3000/api/auth/contacto', this.datosContacto).subscribe({
+    this.http.post('https://htas-backend.vercel.app/api/contacto', this.datosContacto).subscribe({
       next: () => {
         this.mostrarModal(
           '¡Envío Exitoso!',

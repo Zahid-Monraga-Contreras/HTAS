@@ -4,7 +4,7 @@ import { Firestore, doc, setDoc, getDoc, updateDoc, collection, getDocs, deleteD
 import { HttpClient } from '@angular/common/http';
 import { Observable, firstValueFrom } from 'rxjs';
 import emailjs from '@emailjs/browser';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../../environments/environment.prod';
 
 @Injectable({
   providedIn: 'root',

@@ -43,11 +43,10 @@ vercelApp.get('/api/estado', (req, res) => {
 // INTEGRAR LA APP PRINCIPAL (sin duplicar rutas)
 // =============================================
 try {
-    const mainApp = require('../app');
+    const mainApp = require('../src/app');
 
-    // IMPORTANTE: Usamos la app principal pero excluimos rutas específicas
-    // que ya hemos definido en Vercel
-    vercelApp.use('/api', mainApp);
+    // Usamos la app principal directamente en la raíz para que respete sus propias rutas /api/...
+    vercelApp.use('/', mainApp);
     console.log('✅ App principal integrada correctamente');
 } catch (error) {
     console.warn('⚠️ Error al cargar app principal:', error.message);
@@ -89,7 +88,7 @@ function loadRoutesDirectly() {
 // =============================================
 // PROXY PARA PYTHON (solo si no hay rutas de algorithm)
 // =============================================
-vercelApp.all('/api/algorithm/*', async (req, res, next) => {
+vercelApp.all(/^\/api\/algorithm\/.*/, async (req, res, next) => {
     // Si ya hay una ruta definida, no interferimos
     if (req.route && req.route.path) {
         return next();
@@ -157,7 +156,4 @@ vercelApp.use((err, req, res, next) => {
 });
 
 // =============================================
-// EXPORTAR PARA VERCEL
-// =============================================
 module.exports = vercelApp;
-module.exports.handler = serverless(vercelApp);

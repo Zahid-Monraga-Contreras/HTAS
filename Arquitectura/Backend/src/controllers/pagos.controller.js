@@ -24,8 +24,8 @@ const pagosController = {
                     userId: uid,
                     plan: planType,
                 },
-                success_url: `http://localhost:4200/success?session_id={CHECKOUT_SESSION_ID}`,
-                cancel_url: `http://localhost:4200/landing`,
+                success_url: `https://hipertensionarterialsistemica1.web.app/success?session_id={CHECKOUT_SESSION_ID}`,
+                cancel_url: `https://hipertensionarterialsistemica1.web.app/landing`,
             });
 
             // CAMBIO AQUÍ: Enviamos la URL completa, no solo el ID

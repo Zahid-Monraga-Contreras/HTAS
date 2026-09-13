@@ -1,6 +1,6 @@
 import { Injectable, inject, PLATFORM_ID, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../../environments/environment.prod';
 import { isPlatformBrowser } from '@angular/common';
 import { tap, catchError, map } from 'rxjs/operators';
 import emailjs from '@emailjs/browser';
