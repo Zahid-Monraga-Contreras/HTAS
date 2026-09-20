@@ -105,6 +105,11 @@ os.makedirs(PDF_STORAGE_PATH, exist_ok=True)
 # ==============================================================================
 
 # Configuracion de la base de datos PostgreSQL
+# DATABASE_URL es lo que realmente existe en produccion (Neon/Vercel).
+# Las variables DB_HOST/DB_PORT/etc se conservan solo como fallback para
+# desarrollo local si alguien las prefiere en vez de una URL completa.
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
 DB_CONFIG = {
     'host': os.environ.get('DB_HOST', 'localhost'),
     'port': os.environ.get('DB_PORT', 5432),
@@ -114,9 +119,14 @@ DB_CONFIG = {
 }
 
 def get_db_connection():
-    """Establece una conexion directa con PostgreSQL."""
+    """Establece una conexion directa con PostgreSQL.
+    Prioriza DATABASE_URL (formato de Neon/produccion); si no esta
+    definida, cae a las variables sueltas DB_HOST/DB_PORT/etc."""
     try:
-        conn = psycopg2.connect(**DB_CONFIG)
+        if DATABASE_URL:
+            conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        else:
+            conn = psycopg2.connect(**DB_CONFIG)
         return conn
     except Exception as e:
         logger.critical(f"[POSTGRES_CONN] Error critico de conexion a PostgreSQL: {str(e)}")
@@ -174,115 +184,125 @@ class MLModelException(HTASException):
 
 
 # ==============================================================================
-# CAPITULO II: GESTOR DE ALMACENAMIENTO DE PDFs
+# CAPITULO II: GESTOR DE ALMACENAMIENTO DE PDFs (CLOUDINARY)
 # ==============================================================================
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
+cloudinary.config(
+    cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    api_key=os.environ.get('CLOUDINARY_API_KEY'),
+    api_secret=os.environ.get('CLOUDINARY_API_SECRET'),
+    secure=True
+)
+
 
 class GestorAlmacenamientoPDF:
     """
-    Maneja el almacenamiento persistente de archivos PDF en el sistema de archivos.
-    Guarda los PDFs en la carpeta uploads/pdfs/ con nombres estructurados.
+    Maneja el almacenamiento persistente de archivos PDF en Cloudinary.
+    Sube los PDFs a la carpeta 'htas/pdfs' con nombres estructurados por
+    folio de expediente, y guarda la URL publica (no la ruta local) para
+    su recuperacion posterior. Esto es indispensable en Render/Vercel,
+    donde el disco local no persiste entre reinicios o redeploys.
     """
-    
+
     @staticmethod
     def guardar_pdf(base64_data: str, folio_expediente: int, tipo: str) -> Dict[str, Any]:
         """
-        Guarda un PDF en el sistema de archivos
-        
+        Sube un PDF a Cloudinary.
+
         Args:
             base64_data: Datos del PDF en Base64
             folio_expediente: Numero de folio del expediente
             tipo: 'cedula' o 'diagnostico'
-        
+
         Returns:
-            Dict con estado de la operacion
+            Dict con estado de la operacion. En caso de exito, 'ruta'
+            contiene la URL publica de Cloudinary (no una ruta local).
         """
         try:
             # Limpiar cabecera si existe
             if "," in base64_data:
                 base64_data = base64_data.split(",")[1]
-            
+
             # Decodificar Base64 a bytes
             pdf_bytes = base64.b64decode(base64_data)
-            
-            # Crear nombre de archivo
+
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            nombre_archivo = f"folio_{folio_expediente}_{tipo}_{timestamp}.pdf"
-            ruta_completa = os.path.join(PDF_STORAGE_PATH, nombre_archivo)
-            
-            # Guardar archivo
-            with open(ruta_completa, 'wb') as f:
-                f.write(pdf_bytes)
-            
-            logger.info(f"[PDF_STORAGE] PDF guardado: {ruta_completa}")
+            public_id = f"htas/pdfs/folio_{folio_expediente}_{tipo}_{timestamp}"
+
+            # PDFs se suben como resource_type="raw" (no son imagenes)
+            resultado_upload = cloudinary.uploader.upload(
+                io.BytesIO(pdf_bytes),
+                public_id=public_id,
+                resource_type="raw",
+                overwrite=True
+            )
+
+            url_publica = resultado_upload.get("secure_url")
+
+            logger.info(f"[PDF_STORAGE] PDF subido a Cloudinary: {url_publica}")
             logger.info(f"[PDF_STORAGE] Tamanio: {len(pdf_bytes)} bytes")
-            
+
             return {
                 "exito": True,
-                "ruta": ruta_completa,
-                "nombre": nombre_archivo,
+                "ruta": url_publica,
+                "public_id": resultado_upload.get("public_id"),
+                "nombre": f"{public_id}.pdf",
                 "tamano_bytes": len(pdf_bytes),
                 "tamano_mb": round(len(pdf_bytes) / (1024 * 1024), 2)
             }
-            
+
         except Exception as e:
-            logger.error(f"[PDF_STORAGE] Error guardando PDF: {str(e)}")
+            logger.error(f"[PDF_STORAGE] Error subiendo PDF a Cloudinary: {str(e)}")
             return {
                 "exito": False,
                 "error": str(e)
             }
 
     @staticmethod
-    def obtener_pdf(folio_expediente: int, tipo: str) -> Optional[str]:
-        """
-        Obtiene la ruta del PDF mas reciente de un tipo especifico
-        
-        Args:
-            folio_expediente: Numero de folio del expediente
-            tipo: 'cedula' o 'diagnostico'
-        
-        Returns:
-            Ruta del archivo o None si no existe
-        """
-        try:
-            patron = f"folio_{folio_expediente}_{tipo}_"
-            archivos = []
-            
-            for archivo in os.listdir(PDF_STORAGE_PATH):
-                if archivo.startswith(patron) and archivo.endswith('.pdf'):
-                    archivos.append(os.path.join(PDF_STORAGE_PATH, archivo))
-            
-            if archivos:
-                # Devolver el mas reciente (por nombre de archivo que incluye timestamp)
-                archivos.sort(reverse=True)
-                return archivos[0]
-            
-            return None
-            
-        except Exception as e:
-            logger.error(f"[PDF_STORAGE] Error obteniendo PDF: {str(e)}")
-            return None
-
-    @staticmethod
     def obtener_pdf_como_base64(folio_expediente: int, tipo: str) -> Optional[str]:
         """
-        Obtiene un PDF como string Base64
-        
-        Args:
-            folio_expediente: Numero de folio del expediente
-            tipo: 'cedula' o 'diagnostico'
-        
-        Returns:
-            String Base64 del PDF o None
+        Descarga un PDF desde Cloudinary y lo devuelve como string Base64.
+        La ruta guardada en la base de datos ahora es una URL de Cloudinary
+        (ver ruta_pdf_cedula / ruta_pdf_diagnostico en expedientes_htas),
+        asi que esta funcion recibe esa URL a traves del llamador; para
+        mantener la firma existente, esta version consulta el expediente
+        por folio y descarga desde la URL guardada.
         """
-        ruta = GestorAlmacenamientoPDF.obtener_pdf(folio_expediente, tipo)
-        if ruta and os.path.exists(ruta):
-            try:
-                with open(ruta, 'rb') as f:
-                    return base64.b64encode(f.read()).decode('utf-8')
-            except Exception as e:
-                logger.error(f"[PDF_STORAGE] Error leyendo PDF: {str(e)}")
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor(cursor_factory=RealDictCursor)
+            columna = "ruta_pdf_cedula" if tipo == "cedula" else "ruta_pdf_diagnostico"
+            cursor.execute(
+                f"SELECT {columna} AS url FROM expedientes_htas WHERE idexpediente = %s",
+                (folio_expediente,)
+            )
+            fila = cursor.fetchone()
+            cursor.close()
+            conn.close()
+
+            if not fila or not fila.get("url"):
                 return None
-        return None
+
+            url = fila["url"]
+            if not url.startswith("http"):
+                # Ruta local antigua (de antes de migrar a Cloudinary); ya no es recuperable aqui.
+                logger.warning(f"[PDF_STORAGE] Ruta local antigua detectada, no recuperable: {url}")
+                return None
+
+            import requests
+            respuesta = requests.get(url, timeout=15)
+            if respuesta.status_code == 200:
+                return base64.b64encode(respuesta.content).decode('utf-8')
+
+            logger.error(f"[PDF_STORAGE] Cloudinary respondio {respuesta.status_code} para {url}")
+            return None
+
+        except Exception as e:
+            logger.error(f"[PDF_STORAGE] Error obteniendo PDF de Cloudinary: {str(e)}")
+            return None
 
 
 # ==============================================================================
@@ -1110,16 +1130,29 @@ def obtener_ultimo_expediente_paciente(payload: Dict[str, Any]) -> Dict[str, Any
                 "mensaje": "El paciente no tiene expedientes"
             }
         
-        # Obtener el PDF desde el sistema de archivos
+        # Obtener el PDF: ruta_pdf_diagnostico ahora es una URL de Cloudinary
+        # (no una ruta de disco local), asi que se descarga por HTTP.
         ruta_pdf = expediente.get('ruta_pdf_diagnostico')
         pdf_base64 = None
-        
-        if ruta_pdf and os.path.exists(ruta_pdf):
-            try:
-                with open(ruta_pdf, 'rb') as f:
-                    pdf_base64 = base64.b64encode(f.read()).decode('utf-8')
-            except Exception as e:
-                logger.error(f"[NODE] Error leyendo PDF: {str(e)}")
+
+        if ruta_pdf:
+            if ruta_pdf.startswith('http'):
+                try:
+                    import requests
+                    respuesta = requests.get(ruta_pdf, timeout=15)
+                    if respuesta.status_code == 200:
+                        pdf_base64 = base64.b64encode(respuesta.content).decode('utf-8')
+                    else:
+                        logger.error(f"[NODE] Cloudinary respondio {respuesta.status_code} para {ruta_pdf}")
+                except Exception as e:
+                    logger.error(f"[NODE] Error descargando PDF de Cloudinary: {str(e)}")
+            elif os.path.exists(ruta_pdf):
+                # Compatibilidad con expedientes antiguos que aun tengan ruta local
+                try:
+                    with open(ruta_pdf, 'rb') as f:
+                        pdf_base64 = base64.b64encode(f.read()).decode('utf-8')
+                except Exception as e:
+                    logger.error(f"[NODE] Error leyendo PDF local: {str(e)}")
         
         expediente['pdf_diagnostico_base64'] = pdf_base64
         expediente['folio'] = expediente.get('id')
@@ -1439,6 +1472,38 @@ def procesar_desde_stdin() -> Dict[str, Any]:
             "exitoso": False,
             "error": f"Error al procesar stdin: {str(e)}"
         }
+
+
+# ==============================================================================
+# ENDPOINTS PUENTE PARA EL BACKEND DE NODE (api/algorithm/*)
+# Reutilizan las funciones ya existentes (procesar_desde_json,
+# obtener_ultimo_expediente_paciente) para no duplicar logica.
+# Estos son los paths que pythonService.js llama por HTTP.
+# ==============================================================================
+
+@app.get("/api/algorithm/estado", status_code=status.HTTP_200_OK)
+def estado_algoritmo_node():
+    global instancia_ia_global
+    return {
+        "exitoso": True,
+        "data": {
+            "scriptExist": True,
+            "motorActivo": instancia_ia_global.nombre_ganador if instancia_ia_global else "Ninguno",
+            "version": "3.3.0"
+        }
+    }
+
+
+@app.post("/api/algorithm/analizar", status_code=status.HTTP_200_OK)
+def analizar_paciente_node(payload: Dict[str, Any]):
+    resultado = procesar_desde_json(payload)
+    return resultado
+
+
+@app.get("/api/algorithm/ultimo-expediente/{id_paciente}", status_code=status.HTTP_200_OK)
+def ultimo_expediente_node(id_paciente: int):
+    resultado = obtener_ultimo_expediente_paciente({"id_paciente": id_paciente})
+    return resultado
 
 
 @app.get("/api/ia/salud-sistema", status_code=status.HTTP_200_OK)
