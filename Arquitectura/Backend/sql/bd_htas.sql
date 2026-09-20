@@ -329,6 +329,8 @@ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+SELECT * FROM DISPOSITIVOS;
+
 -- ============================================
 -- 12. TABLA: MEDICIONES_PRESION (Lecturas del Tensiómetro)
 -- ============================================
