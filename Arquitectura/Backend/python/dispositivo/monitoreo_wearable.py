@@ -16,7 +16,7 @@ BPM_MEASUREMENT_UUID = "cdeacd81-5235-4c07-8846-93a37ee6b86d"
 DEVICE_NAME_PATTERNS = ["FEMMTO", "BPM", "BP", "MEDISANA", "OMRON", "BEURER", "BLEMODULE", "KF-DT"]
 
 # --- CONFIGURACIÓN DEL BACKEND ---
-BACKEND_URL = "http://localhost:3000/api/mediciones"
+BACKEND_URL = "https://htas-backend.vercel.app/api/mediciones"
 
 # ID del paciente (se pasa como argumento)
 ID_PACIENTE = None
