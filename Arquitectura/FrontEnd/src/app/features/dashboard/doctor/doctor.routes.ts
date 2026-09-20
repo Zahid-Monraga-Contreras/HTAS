@@ -33,45 +33,45 @@ export const DOCTOR_ROUTES: Routes = [
         canActivate: [authGuard, roleGuard],
         data: { roles: ['doctor', 'Doctor', 'médico', 'medico'] },
         children: [
-            { path: '', redirectTo: 'inicio', pathMatch: 'full' },
+            { path: '', redirectTo: 'inicio', pathMatch: 'full', title: 'HTAS - Inicio' },
 
             // Template
-            { path: 'perfil', component: DoctorPerfil },
-            { path: 'notificaciones', component: DoctorNotificaciones },
+            { path: 'perfil', component: DoctorPerfil, title: 'HTAS - Perfil' },
+            { path: 'notificaciones', component: DoctorNotificaciones, title: 'HTAS - Notificaciones' },
 
             // Páginas principales
-            { path: 'inicio', component: DoctorInicio },
+            { path: 'inicio', component: DoctorInicio, title: 'HTAS - Inicio' },
 
             // Pacientes
-            { path: 'pacientes', component: DoctorPacientes },
-            { path: 'pacientes/detalle/:id', component: DoctorPacienteDetalle },
+            { path: 'pacientes', component: DoctorPacientes, title: 'HTAS - Pacientes' },
+            { path: 'pacientes/detalle/:id', component: DoctorPacienteDetalle, title: 'HTAS - Detalle de Paciente' },
 
             // Citas
-            { path: 'citas', component: DoctorCitas },
-            { path: 'citas/detalle/:id', component: DoctorCitaDetalle },
-            { path: 'citas/nueva', component: DoctorNuevaCita },
+            { path: 'citas', component: DoctorCitas, title: 'HTAS - Citas' },
+            { path: 'citas/detalle/:id', component: DoctorCitaDetalle, title: 'HTAS - Detalle de Cita' },
+            { path: 'citas/nueva', component: DoctorNuevaCita, title: 'HTAS - Nueva Cita' },
 
             // Tratamientos
-            { path: 'tratamientos', component: DoctorTratamientos },
-            { path: 'tratamientos/detalle/:id', component: DoctorTratamientoDetalle },
-            { path: 'tratamientos/nuevo', component: DoctorNuevoTratamiento },
+            { path: 'tratamientos', component: DoctorTratamientos, title: 'HTAS - Tratamientos' },
+            { path: 'tratamientos/detalle/:id', component: DoctorTratamientoDetalle, title: 'HTAS - Detalle de Tratamiento' },
+            { path: 'tratamientos/nuevo', component: DoctorNuevoTratamiento, title: 'HTAS - Nuevo Tratamiento' },
 
             // Medicamentos
-            { path: 'medicamentos', component: DoctorMedicamentos },
-            { path: 'medicamentos/detalle/:id', component: DoctorMedicamentoDetalle },
-            { path: 'medicamentos/nuevo', component: DoctorNuevoMedicamento },
+            { path: 'medicamentos', component: DoctorMedicamentos, title: 'HTAS - Medicamentos' },
+            { path: 'medicamentos/detalle/:id', component: DoctorMedicamentoDetalle, title: 'HTAS - Detalle de Medicamento' },
+            { path: 'medicamentos/nuevo', component: DoctorNuevoMedicamento, title: 'HTAS - Nuevo Medicamento' },
 
             // Dispositivos
-            { path: 'dispositivos', component: DoctorDispositivos },
-            { path: 'dispositivos/detalle/:id', component: DoctorDispositivoDetalle },
-            { path: 'dispositivos/nuevo', component: DoctorNuevoDispositivo },
+            { path: 'dispositivos', component: DoctorDispositivos, title: 'HTAS - Dispositivos' },
+            { path: 'dispositivos/detalle/:id', component: DoctorDispositivoDetalle, title: 'HTAS - Detalle de Dispositivo' },
+            { path: 'dispositivos/nuevo', component: DoctorNuevoDispositivo, title: 'HTAS - Nuevo Dispositivo' },
 
             // Analisis
-            { path: 'analisis', component: DoctorAnalisis },
-            { path: 'analisis/detalle/:id/:folio', component: DoctorAnalisisDetalle },
+            { path: 'analisis', component: DoctorAnalisis, title: 'HTAS - Análisis' },
+            { path: 'analisis/detalle/:id/:folio', component: DoctorAnalisisDetalle, title: 'HTAS - Detalle de Análisis' },
 
             // Asignacion
-            { path: 'asignacion', component: DoctorAsignacion },
+            { path: 'asignacion', component: DoctorAsignacion, title: 'HTAS - Asignación' },
         ]
     }
 ];

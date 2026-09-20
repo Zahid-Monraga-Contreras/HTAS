@@ -18,24 +18,24 @@ export const PATIENT_ROUTES: Routes = [
         children: [
             { path: '', redirectTo: 'inicio', pathMatch: 'full' },
 
-            { path: 'inicio', component: PatientInicio },
-            { path: 'perfil', component: PatientPerfil },
-            { path: 'notificaciones', component: PatientNotificaciones },
+            { path: 'inicio', component: PatientInicio, title: 'HTAS - Inicio' },
+            { path: 'perfil', component: PatientPerfil, title: 'HTAS - Perfil' },
+            { path: 'notificaciones', component: PatientNotificaciones, title: 'HTAS - Notificaciones' },
 
-            { path: 'citas', component: PatientCitas },
-            { path: 'citas/editar/:id', component: PatientCitas },
-            { path: 'citas/nueva', component: PatientCitas },
+            { path: 'citas', component: PatientCitas, title: 'HTAS - Citas' },
+            { path: 'citas/editar/:id', component: PatientCitas, title: 'HTAS - Editar Cita' },
+            { path: 'citas/nueva', component: PatientCitas, title: 'HTAS - Nueva Cita' },
 
-            { path: 'tratamientos', component: PatientTratamientos },
-            { path: 'tratamientos/detalle/:id', component: PatientTratamientos },
+            { path: 'tratamientos', component: PatientTratamientos, title: 'HTAS - Tratamientos' },
+            { path: 'tratamientos/detalle/:id', component: PatientTratamientos, title: 'HTAS - Detalle de Tratamiento' },
 
-            { path: 'medicamentos', component: PatientMedicamentos },
-            { path: 'medicamentos/detalle/:id', component: PatientMedicamentos },
+            { path: 'medicamentos', component: PatientMedicamentos, title: 'HTAS - Medicamentos' },
+            { path: 'medicamentos/detalle/:id', component: PatientMedicamentos, title: 'HTAS - Detalle de Medicamento' },
 
-            { path: 'dispositivos', component: PatientDispositivos },
-            { path: 'dispositivos/detalle/:id', component: PatientDispositivos },
+            { path: 'dispositivos', component: PatientDispositivos, title: 'HTAS - Dispositivos' },
+            { path: 'dispositivos/detalle/:id', component: PatientDispositivos, title: 'HTAS - Detalle de Dispositivo' },
 
-            { path: 'analisis', component: PatientAnalisis }
+            { path: 'analisis', component: PatientAnalisis, title: 'HTAS - Análisis' }
         ]
     }
 ];
