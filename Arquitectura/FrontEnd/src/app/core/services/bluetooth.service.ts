@@ -69,6 +69,7 @@ export class BluetoothService {
           { namePrefix: 'OMRON' },
           { namePrefix: 'BEURER' },
           { namePrefix: 'BLEMODULE' },
+          { namePrefix: 'BleModule' },
           { namePrefix: 'KF-DT' }
         ],
         optionalServices: [
