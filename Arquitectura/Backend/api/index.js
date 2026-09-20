@@ -1,7 +1,6 @@
 // api/index.js
 const express = require('express');
 const cors = require('cors');
-const serverless = require('serverless-http');
 const path = require('path');
 
 // =============================================
@@ -22,7 +21,7 @@ vercelApp.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 // =============================================
 vercelApp.get('/', (req, res) => {
     res.json({
-        mensaje: '✅ HTAS API funcionando en Vercel',
+        mensaje: 'HTAS API funcionando en Vercel',
         version: '1.0.0',
         entorno: process.env.NODE_ENV || 'production',
         timestamp: new Date().toISOString()
@@ -42,97 +41,28 @@ vercelApp.get('/api/estado', (req, res) => {
 // =============================================
 // INTEGRAR LA APP PRINCIPAL (sin duplicar rutas)
 // =============================================
+// src/app.js ya monta TODAS las rutas, incluyendo /api/algorithm/*
+// (que a su vez usa src/services/python.service.js para hablar por HTTP
+// con el servicio Python desplegado en Render). No hay que duplicar
+// nada aqui: si src/app.js carga bien, todo pasa por el.
 try {
     const mainApp = require('../src/app');
-
-    // Usamos la app principal directamente en la raíz para que respete sus propias rutas /api/...
     vercelApp.use('/', mainApp);
-    console.log('✅ App principal integrada correctamente');
+    console.log('App principal integrada correctamente');
 } catch (error) {
-    console.warn('⚠️ Error al cargar app principal:', error.message);
+    // Si esto se dispara, revisa los logs de Vercel: significa que
+    // src/app.js (o algo que requiere) tiro un error al cargar.
+    console.error('Error critico al cargar la app principal:', error.message);
+    console.error(error.stack);
 
-    // Fallback: cargar rutas directamente
-    console.log('📦 Cargando rutas directamente...');
-    loadRoutesDirectly();
-}
-
-// Función de fallback para cargar rutas directamente
-function loadRoutesDirectly() {
-    const routes = [
-        { path: '/api/auth', file: '../src/routes/auth.routes' },
-        { path: '/api/usuarios', file: '../src/routes/usuarios.routes' },
-        { path: '/api/citas', file: '../src/routes/citas.routes' },
-        { path: '/api/mediciones', file: '../src/routes/mediciones.routes' },
-        { path: '/api/medicamentos', file: '../src/routes/medicamentos.routes' },
-        { path: '/api/tratamientos', file: '../src/routes/tratamientos.routes' },
-        { path: '/api/tomas', file: '../src/routes/tomas.routes' },
-        { path: '/api/dispositivos', file: '../src/routes/dispositivos.routes' },
-        { path: '/api/pagos', file: '../src/routes/pagos.routes' },
-        { path: '/api/contacto', file: '../src/routes/contacto.routes' },
-        { path: '/api/googlefit', file: '../src/routes/googlefit.routes' },
-        { path: '/api/solicitudes', file: '../src/routes/solicitudes.routes' },
-        { path: '/api/algorithm', file: '../src/routes/algorithm.routes' }
-    ];
-
-    routes.forEach(route => {
-        try {
-            const routeModule = require(route.file);
-            vercelApp.use(route.path, routeModule);
-            console.log(`✅ Ruta cargada: ${route.path}`);
-        } catch (error) {
-            console.warn(`⚠️ Ruta no encontrada: ${route.path}`);
-        }
+    vercelApp.use((req, res) => {
+        res.status(503).json({
+            success: false,
+            error: 'La aplicacion principal no pudo cargarse',
+            detalle: error.message
+        });
     });
 }
-
-// =============================================
-// PROXY PARA PYTHON (solo si no hay rutas de algorithm)
-// =============================================
-vercelApp.all(/^\/api\/algorithm\/.*/, async (req, res, next) => {
-    // Si ya hay una ruta definida, no interferimos
-    if (req.route && req.route.path) {
-        return next();
-    }
-
-    try {
-        const axios = require('axios');
-        const PYTHON_API_URL = process.env.PYTHON_API_URL || 'http://localhost:8000';
-
-        const response = await axios({
-            method: req.method,
-            url: `${PYTHON_API_URL}${req.path}`,
-            data: req.body,
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': req.headers.authorization || ''
-            }
-        });
-
-        return res.json(response.data);
-    } catch (error) {
-        console.error('Error en proxy Python:', error.message);
-
-        // Respuesta mock para desarrollo
-        if (process.env.NODE_ENV !== 'production') {
-            return res.json({
-                success: true,
-                mensaje: 'Mock response - Python API en desarrollo',
-                timestamp: new Date().toISOString(),
-                datos_ejemplo: {
-                    idPaciente: 1,
-                    analisis: 'Paciente estable',
-                    probabilidad: 15.5
-                }
-            });
-        }
-
-        res.status(500).json({
-            success: false,
-            error: 'Python API no disponible',
-            mensaje: 'Intenta nuevamente más tarde'
-        });
-    }
-});
 
 // =============================================
 // MANEJO DE ERRORES
