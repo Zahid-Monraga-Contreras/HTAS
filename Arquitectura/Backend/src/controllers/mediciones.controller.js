@@ -493,17 +493,15 @@ const medicionesController = {
                 });
             }
 
-            // 2. Ruta al script Python - CORREGIDO
+            // 2. Ruta al script Python - Verificación de entorno
             const scriptPath = path.join(__dirname, '../../python/dispositivo/monitoreo_wearable.py');
 
-            console.log('Script path:', scriptPath);
-            console.log('Existe?', fs.existsSync(scriptPath));
-
-            if (!fs.existsSync(scriptPath)) {
-                return res.status(500).json({
+            // En Vercel o en entornos cloud no hay soporte de antena Bluetooth local
+            if (process.env.VERCEL || !fs.existsSync(scriptPath)) {
+                return res.status(400).json({
                     success: false,
-                    error: 'Script Python no encontrado',
-                    details: `No se encontro el archivo en: ${scriptPath}`
+                    error: 'La sincronización directa por Bluetooth debe realizarse desde el cliente.',
+                    details: 'En servidores cloud (Vercel) no es posible conectar Bluetooth físico. Utiliza Web Bluetooth en el navegador (Google Chrome/Edge) o corre localmente: python monitoreo_wearable.py ' + idPaciente
                 });
             }
 

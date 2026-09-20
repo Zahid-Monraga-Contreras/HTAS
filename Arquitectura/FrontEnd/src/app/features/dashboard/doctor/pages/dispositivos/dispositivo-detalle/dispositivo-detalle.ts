@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { DoctorMenu } from "../../../template/menu/menu";
 import { firstValueFrom } from 'rxjs';
 import { Users } from '../../../../../../core/services/users.service';
+import { BluetoothService } from '../../../../../../core/services/bluetooth.service';
 
 interface ToastNotification {
     id: number;
@@ -33,6 +34,7 @@ interface Medicion {
 })
 export class DoctorDispositivoDetalle implements OnInit {
     private usersService = inject(Users);
+    private bluetoothService = inject(BluetoothService);
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     private cdr = inject(ChangeDetectorRef);
@@ -276,6 +278,14 @@ export class DoctorDispositivoDetalle implements OnInit {
             return;
         }
 
+        if (!this.bluetoothService.isSupported()) {
+            this.showError(
+                'Navegador no compatible',
+                'Tu navegador no soporta Web Bluetooth. Por favor utiliza Google Chrome o Microsoft Edge en tu computadora o Android.'
+            );
+            return;
+        }
+
         this.obteniendoMedicion = true;
         this.medicionError = '';
         this.medicionActual = null;
@@ -285,57 +295,68 @@ export class DoctorDispositivoDetalle implements OnInit {
         document.body.style.overflow = 'hidden';
         this.cdr.detectChanges();
 
-        this.agregarLog('Iniciando escaneo de dispositivos Bluetooth...');
-        this.agregarLog('Asegurate de que el tensiometro este ENCENDIDO');
-        this.agregarLog('Presiona START en el tensiometro si es necesario');
-
         try {
+            // 1. Conectar y obtener la medición directamente vía Web Bluetooth
+            const medicionBle = await this.bluetoothService.solicitarMedicion((msg) => {
+                this.agregarLog(msg);
+            });
+
+            this.agregarLog('Guardando medición en la nube...');
+            this.cdr.detectChanges();
+
+            // 2. Registrar la medición en el Backend (Vercel)
             const response = await firstValueFrom(
-                this.usersService.obtenerMedicionTensiometro(this.dispositivo.idpacienteasociado)
+                this.usersService.registrarMedicion({
+                    idPaciente: this.dispositivo.idpacienteasociado,
+                    sistolica: medicionBle.sistolica,
+                    diastolica: medicionBle.diastolica,
+                    pulso: medicionBle.pulso,
+                    metodoSincronizacion: 'Bluetooth'
+                })
             );
 
-            if (response && response.success && response.medicion) {
-                const medicion = response.medicion;
+            const medicionGuardada = response?.medicion || {
+                idmedicion: 0,
+                sistolica: medicionBle.sistolica,
+                diastolica: medicionBle.diastolica,
+                pulso: medicionBle.pulso,
+                fechahoralectura: this.formatearFechaAhora()
+            };
 
-                let fechaFormateada = this.formatearFechaDesdeBackend(
-                    medicion.fechahoralectura || medicion.FechaHoraLectura
-                );
+            const fechaFormateada = this.formatearFechaDesdeBackend(
+                medicionGuardada.fechahoralectura || medicionGuardada.FechaHoraLectura
+            );
 
-                this.medicionActual = {
-                    idmedicion: medicion.idmedicion || medicion.IdMedicion || 0,
-                    sistolica: medicion.sistolica || medicion.Sistolica || 0,
-                    diastolica: medicion.diastolica || medicion.Diastolica || 0,
-                    pulso: medicion.pulso || medicion.Pulso || 0,
-                    fechahoralectura: fechaFormateada || this.formatearFechaAhora(),
-                    metodoclasificacion: medicion.metodoclasificacion || medicion.MetodoSincronizacion || 'Bluetooth',
-                    clasificacionpresion: medicion.clasificacionpresion || this.calcularClasificacion(
-                        medicion.sistolica || medicion.Sistolica || 0,
-                        medicion.diastolica || medicion.Diastolica || 0
-                    )
-                };
+            this.medicionActual = {
+                idmedicion: medicionGuardada.idmedicion || medicionGuardada.IdMedicion || 0,
+                sistolica: medicionGuardada.sistolica || medicionGuardada.Sistolica || medicionBle.sistolica,
+                diastolica: medicionGuardada.diastolica || medicionGuardada.Diastolica || medicionBle.diastolica,
+                pulso: medicionGuardada.pulso || medicionGuardada.Pulso || medicionBle.pulso,
+                fechahoralectura: fechaFormateada || this.formatearFechaAhora(),
+                metodoclasificacion: 'Bluetooth',
+                clasificacionpresion: this.calcularClasificacion(
+                    medicionBle.sistolica,
+                    medicionBle.diastolica
+                )
+            };
 
-                this.medicionCompletada = true;
-                this.agregarLog('Medicion completada exitosamente');
-                this.agregarLog(`Sistolica: ${this.medicionActual.sistolica} mmHg`);
-                this.agregarLog(`Diastolica: ${this.medicionActual.diastolica} mmHg`);
-                this.agregarLog(`Pulso: ${this.medicionActual.pulso} bpm`);
-                this.agregarLog(`Clasificacion: ${this.medicionActual.clasificacionpresion}`);
+            this.medicionCompletada = true;
+            this.agregarLog('¡Medición completada y registrada exitosamente!');
+            this.agregarLog(`Sistólica: ${this.medicionActual.sistolica} mmHg`);
+            this.agregarLog(`Diastólica: ${this.medicionActual.diastolica} mmHg`);
+            this.agregarLog(`Pulso: ${this.medicionActual.pulso} bpm`);
+            this.agregarLog(`Clasificación: ${this.medicionActual.clasificacionpresion}`);
 
-                this.showSuccess('Exito', 'Medicion obtenida correctamente');
+            this.showSuccess('Éxito', 'Medición obtenida y registrada correctamente');
 
-                // Recargar mediciones
-                if (this.dispositivo.idpacienteasociado) {
-                    await this.cargarMediciones(this.dispositivo.idpacienteasociado);
-                }
-            } else {
-                this.medicionError = response?.error || 'No se pudo obtener la medicion';
-                this.agregarLog(`Error: ${this.medicionError}`);
-                this.showError('Error', this.medicionError);
+            // Recargar mediciones
+            if (this.dispositivo.idpacienteasociado) {
+                await this.cargarMediciones(this.dispositivo.idpacienteasociado);
             }
 
         } catch (error: any) {
-            console.error('Error al tomar medicion:', error);
-            this.medicionError = error.error?.error || error.message || 'Error al obtener la medicion';
+            console.error('Error al tomar medición Bluetooth:', error);
+            this.medicionError = error.message || 'Error al obtener la medición del dispositivo';
             this.agregarLog(`Error: ${this.medicionError}`);
             this.showError('Error', this.medicionError);
         } finally {
@@ -368,6 +389,7 @@ export class DoctorDispositivoDetalle implements OnInit {
     }
 
     cerrarModalMedicion() {
+        this.bluetoothService.desconectar();
         this.mostrarModalMedicion = false;
         this.medicionActual = null;
         this.medicionError = '';

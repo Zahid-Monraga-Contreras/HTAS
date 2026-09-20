@@ -3,6 +3,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PatientMenu } from "../../template/menu/menu";
 import { Users } from '../../../../../core/services/users.service';
+import { BluetoothService } from '../../../../../core/services/bluetooth.service';
 import { Auth } from '@angular/fire/auth';
 import { firstValueFrom } from 'rxjs';
 
@@ -37,6 +38,7 @@ interface Medicion {
 })
 export class PatientDispositivos implements OnInit {
     private usersService = inject(Users);
+    private bluetoothService = inject(BluetoothService);
     private auth = inject(Auth);
     private cdr = inject(ChangeDetectorRef);
     private platformId = inject(PLATFORM_ID);
@@ -293,6 +295,15 @@ export class PatientDispositivos implements OnInit {
             return;
         }
 
+        if (!this.bluetoothService.isSupported()) {
+            this.mostrarNotificacion(
+                'Navegador no compatible',
+                'Tu navegador no soporta Web Bluetooth. Por favor utiliza Google Chrome o Microsoft Edge en tu computadora o Android.',
+                'error'
+            );
+            return;
+        }
+
         this.obteniendoMedicion = true;
         this.medicionError = '';
         this.medicionActual = null;
@@ -302,71 +313,82 @@ export class PatientDispositivos implements OnInit {
         document.body.style.overflow = 'hidden';
         this.cdr.markForCheck();
 
-        this.agregarLog('Iniciando escaneo de dispositivos Bluetooth...');
-        this.agregarLog('Asegurate de que el tensiometro este ENCENDIDO');
-        this.agregarLog('Presiona START en el tensiometro si es necesario');
-
         try {
+            // 1. Obtener medición directamente mediante Web Bluetooth
+            const medicionBle = await this.bluetoothService.solicitarMedicion((msg) => {
+                this.agregarLog(msg);
+            });
+
+            this.agregarLog('Guardando medición en la nube...');
+            this.cdr.markForCheck();
+
+            // 2. Registrar la medición en el Backend (Vercel)
             const response = await firstValueFrom(
-                this.usersService.obtenerMedicionTensiometro(this.patientId)
+                this.usersService.registrarMedicion({
+                    idPaciente: this.patientId,
+                    sistolica: medicionBle.sistolica,
+                    diastolica: medicionBle.diastolica,
+                    pulso: medicionBle.pulso,
+                    metodoSincronizacion: 'Bluetooth'
+                })
             );
 
-            if (response && response.logs) {
-                for (const log of response.logs) {
-                    this.agregarLog(log);
+            const medicionGuardada = response?.medicion || {
+                idmedicion: 0,
+                sistolica: medicionBle.sistolica,
+                diastolica: medicionBle.diastolica,
+                pulso: medicionBle.pulso,
+                fechahoralectura: this.formatearFechaAhora()
+            };
+
+            let fechaFormateada = medicionGuardada.fechahoralectura || medicionGuardada.FechaHoraLectura;
+            if (fechaFormateada) {
+                try {
+                    const fecha = new Date(fechaFormateada);
+                    if (!isNaN(fecha.getTime())) {
+                        const dia = String(fecha.getDate()).padStart(2, '0');
+                        const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+                        const anio = fecha.getFullYear();
+                        const horas = String(fecha.getHours()).padStart(2, '0');
+                        const minutos = String(fecha.getMinutes()).padStart(2, '0');
+                        const segundos = String(fecha.getSeconds()).padStart(2, '0');
+                        fechaFormateada = `${dia}/${mes}/${anio} ${horas}:${minutos}:${segundos}`;
+                    }
+                } catch (e) {
+                    // Si falla, mantener la fecha original
                 }
             }
 
-            if (response && response.success && response.medicion) {
-                const medicion = response.medicion;
+            this.medicionActual = {
+                idmedicion: medicionGuardada.idmedicion || medicionGuardada.IdMedicion || 0,
+                sistolica: medicionGuardada.sistolica || medicionGuardada.Sistolica || medicionBle.sistolica,
+                diastolica: medicionGuardada.diastolica || medicionGuardada.Diastolica || medicionBle.diastolica,
+                pulso: medicionGuardada.pulso || medicionGuardada.Pulso || medicionBle.pulso,
+                fechahoralectura: fechaFormateada || this.formatearFechaAhora(),
+                metodoclasificacion: 'Bluetooth',
+                clasificacionpresion: this.calcularClasificacion(
+                    medicionBle.sistolica,
+                    medicionBle.diastolica
+                )
+            };
 
-                let fechaFormateada = medicion.fechahoralectura || medicion.FechaHoraLectura;
-                if (fechaFormateada) {
-                    try {
-                        const fecha = new Date(fechaFormateada);
-                        if (!isNaN(fecha.getTime())) {
-                            const dia = String(fecha.getDate()).padStart(2, '0');
-                            const mes = String(fecha.getMonth() + 1).padStart(2, '0');
-                            const anio = fecha.getFullYear();
-                            const horas = String(fecha.getHours()).padStart(2, '0');
-                            const minutos = String(fecha.getMinutes()).padStart(2, '0');
-                            const segundos = String(fecha.getSeconds()).padStart(2, '0');
-                            fechaFormateada = `${dia}/${mes}/${anio} ${horas}:${minutos}:${segundos}`;
-                        }
-                    } catch (e) {
-                        // Si falla, mantener la fecha original
-                    }
-                }
+            this.medicionCompletada = true;
+            this.agregarLog('¡Medición registrada con éxito en el sistema!');
+            this.agregarLog(`Sistólica: ${this.medicionActual.sistolica} mmHg`);
+            this.agregarLog(`Diastólica: ${this.medicionActual.diastolica} mmHg`);
+            this.agregarLog(`Pulso: ${this.medicionActual.pulso} bpm`);
+            this.agregarLog(`Clasificación: ${this.medicionActual.clasificacionpresion}`);
 
-                this.medicionActual = {
-                    idmedicion: medicion.idmedicion || medicion.IdMedicion || 0,
-                    sistolica: medicion.sistolica || medicion.Sistolica || 0,
-                    diastolica: medicion.diastolica || medicion.Diastolica || 0,
-                    pulso: medicion.pulso || medicion.Pulso || 0,
-                    fechahoralectura: fechaFormateada || this.formatearFechaAhora(),
-                    metodoclasificacion: medicion.metodoclasificacion || medicion.MetodoSincronizacion || 'Bluetooth',
-                    clasificacionpresion: medicion.clasificacionpresion || this.calcularClasificacion(
-                        medicion.sistolica || medicion.Sistolica || 0,
-                        medicion.diastolica || medicion.Diastolica || 0
-                    )
-                };
+            this.mostrarNotificacion('Éxito', 'Medición obtenida y registrada correctamente', 'success');
 
-                this.medicionCompletada = true;
-                this.agregarLog('Medicion completada exitosamente');
-                this.agregarLog(`Sistolica: ${this.medicionActual.sistolica} mmHg`);
-                this.agregarLog(`Diastolica: ${this.medicionActual.diastolica} mmHg`);
-                this.agregarLog(`Pulso: ${this.medicionActual.pulso} bpm`);
-                this.agregarLog(`Clasificacion: ${this.medicionActual.clasificacionpresion}`);
-
-                this.mostrarNotificacion('Exito', 'Medicion obtenida correctamente', 'success');
-            } else {
-                this.medicionError = response?.error || 'No se pudo obtener la medicion';
-                this.agregarLog(`Error: ${this.medicionError}`);
-                this.mostrarNotificacion('Error', this.medicionError, 'error');
+            // Recargar dispositivos del paciente en el dashboard
+            if (this.patientId) {
+                await this.cargarDispositivos();
             }
 
         } catch (error: any) {
-            this.medicionError = error.error?.error || error.message || 'Error al obtener la medicion';
+            console.error('Error al tomar medición Bluetooth:', error);
+            this.medicionError = error.message || 'Error al obtener la medición del dispositivo';
             this.agregarLog(`Error: ${this.medicionError}`);
             this.mostrarNotificacion('Error', this.medicionError, 'error');
         } finally {
@@ -400,6 +422,7 @@ export class PatientDispositivos implements OnInit {
     }
 
     cerrarModalMedicion() {
+        this.bluetoothService.desconectar();
         this.mostrarModalMedicion = false;
         this.medicionActual = null;
         this.medicionError = '';

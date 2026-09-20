@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef, PLATFORM_ID, V
 import { CommonModule, Location, isPlatformBrowser } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Users } from '../../../../../../core/services/users.service';
+import { BluetoothService } from '../../../../../../core/services/bluetooth.service';
 import { firstValueFrom } from 'rxjs';
 import { Menu } from "../../../template/menu/menu";
 
@@ -32,6 +33,7 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private location = inject(Location);
   private usersService = inject(Users);
+  private bluetoothService = inject(BluetoothService);
   private cdr = inject(ChangeDetectorRef);
   private platformId = inject(PLATFORM_ID);
 
@@ -579,6 +581,14 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
       return;
     }
 
+    if (!this.bluetoothService.isSupported()) {
+      this.lanzarNotificacion(
+        'Tu navegador no soporta Web Bluetooth. Por favor utiliza Google Chrome o Microsoft Edge.',
+        'error'
+      );
+      return;
+    }
+
     if (this.isObteniendoMedicion) {
       this.lanzarNotificacion('Ya hay una medición en proceso...', 'warning');
       return;
@@ -586,24 +596,38 @@ export class DispositivoDetalle implements OnInit, OnDestroy {
 
     this.isObteniendoMedicion = true;
     this.estadoConexion = 'sincronizando';
-    this.lanzarNotificacion('Conectando al tensiómetro...', 'warning');
+    this.lanzarNotificacion('Buscando tensiómetro Bluetooth...', 'warning');
     this.iniciarSimulacionProgreso();
     this.cdr.detectChanges();
 
     try {
+      // 1. Obtener medición vía Web Bluetooth
+      const medicionBle = await this.bluetoothService.solicitarMedicion((msg) => {
+        this.lanzarNotificacion(msg, 'warning');
+      });
+
+      this.lanzarNotificacion('Guardando medición en el servidor...', 'warning');
+
+      // 2. Registrar en la base de datos
       const response = await firstValueFrom(
-        this.usersService.obtenerMedicionTensiometro(idPaciente)
+        this.usersService.registrarMedicion({
+          idPaciente: idPaciente,
+          sistolica: medicionBle.sistolica,
+          diastolica: medicionBle.diastolica,
+          pulso: medicionBle.pulso,
+          metodoSincronizacion: 'Bluetooth'
+        })
       );
 
-      if (response?.success && response?.medicion) {
-        this.finalizarProgreso('Medición recibida correctamente', true);
-        await this.procesarMedicionExitosa(response.medicion);
-      } else {
-        const mensajeError = response?.error || 'Error al obtener medición';
-        this.finalizarProgreso(`Error: ${mensajeError}`, false);
-        this.lanzarNotificacion(`${mensajeError}`, 'error');
-        this.estadoConexion = 'desconectado';
-      }
+      const medicion = response?.medicion || {
+        sistolica: medicionBle.sistolica,
+        diastolica: medicionBle.diastolica,
+        pulso: medicionBle.pulso,
+        fecha: new Date().toISOString()
+      };
+
+      this.finalizarProgreso('Medición recibida correctamente', true);
+      await this.procesarMedicionExitosa(medicion);
 
     } catch (error: any) {
       this.finalizarProgreso('Error al conectar con el tensiómetro', false);
