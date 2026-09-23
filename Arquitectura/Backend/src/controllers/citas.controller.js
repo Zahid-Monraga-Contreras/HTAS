@@ -15,7 +15,8 @@ const citasController = {
             horaCita,
             motivo,
             modalidad,
-            sintomas
+            sintomas,
+            idDoctor // ⭐ NUEVO: recibimos el doctor al que pertenece la cita
         } = req.body;
 
         if (!nombrePaciente || !apPaternoPaciente || !fechaCita || !horaCita) {
@@ -43,14 +44,15 @@ const citasController = {
         }
 
         try {
-            // VALIDACIÓN 1: LÍMITE DE 3 CITAS POR HORA
+            // VALIDACIÓN 1: LÍMITE DE 3 CITAS POR HORA — ⭐ AHORA FILTRADO POR DOCTOR
             const citasEnHora = await db.query(
                 `SELECT COUNT(*) as total 
                  FROM citas 
                  WHERE fechacita = $1 
                    AND horacita = $2 
+                   AND iddoctor = $3
                    AND estado NOT IN ('Cancelada', 'No Asistió')`,
-                [fechaCita, horaCita]
+                [fechaCita, horaCita, idDoctor || null]
             );
 
             const totalCitasEnHora = parseInt(citasEnHora.rows[0].total);
@@ -67,14 +69,15 @@ const citasController = {
                 });
             }
 
-            // VALIDACIÓN 2: VERIFICAR SI ALGUIEN YA AGENDÓ ESTA FECHA Y HORA
+            // VALIDACIÓN 2: VERIFICAR SI ALGUIEN YA AGENDÓ ESTA FECHA Y HORA (CON ESE DOCTOR) — ⭐ FILTRADO POR DOCTOR
             const citaExistente = await db.query(
                 `SELECT COUNT(*) as total
                  FROM citas 
                  WHERE fechacita = $1 
                    AND horacita = $2 
+                   AND iddoctor = $3
                    AND estado NOT IN ('Cancelada', 'No Asistió')`,
-                [fechaCita, horaCita]
+                [fechaCita, horaCita, idDoctor || null]
             );
 
             const totalCitas = parseInt(citaExistente.rows[0].total);
@@ -92,6 +95,8 @@ const citasController = {
             }
 
             // VALIDACIÓN 3: USUARIO NO TENGA CITA EN MISMA FECHA Y HORA
+            // (esto se mantiene GLOBAL a propósito: un paciente no puede tener 2 citas
+            //  a la misma hora aunque sean con doctores distintos, sería físicamente imposible)
             if (correoPaciente) {
                 const citaUsuario = await db.query(
                     `SELECT COUNT(*) as total 
@@ -117,6 +122,7 @@ const citasController = {
             }
 
             // VALIDACIÓN 4: LÍMITE DE 2 CITAS POR DÍA POR USUARIO
+            // (también se mantiene GLOBAL: el límite es por paciente, no por doctor)
             if (correoPaciente) {
                 const citasMismoDia = await db.query(
                     `SELECT COUNT(*) as total 
@@ -139,7 +145,7 @@ const citasController = {
                 }
             }
 
-            // CREAR LA CITA
+            // CREAR LA CITA — ⭐ AHORA GUARDA iddoctor
             const result = await db.query(
                 `INSERT INTO citas (
                     nombrepaciente, 
@@ -152,8 +158,9 @@ const citasController = {
                     motivo, 
                     modalidad, 
                     sintomas,
-                    estado
-                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) 
+                    estado,
+                    iddoctor
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) 
                 RETURNING *`,
                 [
                     nombrePaciente.trim(),
@@ -166,7 +173,8 @@ const citasController = {
                     motivo || null,
                     modalidad || 'Presencial',
                     sintomas || null,
-                    'Programada'
+                    'Programada',
+                    idDoctor || null // ⭐ NUEVO
                 ]
             );
 
@@ -187,10 +195,10 @@ const citasController = {
     },
 
     // ==========================================================================
-    // VERIFICAR DISPONIBILIDAD DE CITA - CORREGIDO
+    // VERIFICAR DISPONIBILIDAD DE CITA - CON FILTRO POR DOCTOR
     // ==========================================================================
     verificarDisponibilidad: async (req, res) => {
-        const { fecha, hora, email } = req.query;
+        const { fecha, hora, email, idDoctor } = req.query; // ⭐ NUEVO: idDoctor
 
         if (!fecha || !hora) {
             return res.status(400).json({
@@ -199,14 +207,15 @@ const citasController = {
         }
 
         try {
-            // 1. Verificar si ALGUIEN ya tiene cita en esa fecha y hora
+            // 1. Verificar si ALGUIEN ya tiene cita en esa fecha y hora — ⭐ FILTRADO POR DOCTOR
             const citaExistente = await db.query(
                 `SELECT COUNT(*) as total
                  FROM citas 
                  WHERE fechacita = $1 
                    AND horacita = $2 
+                   AND iddoctor = $3
                    AND estado NOT IN ('Cancelada', 'No Asistió')`,
-                [fecha, hora]
+                [fecha, hora, idDoctor || null]
             );
 
             const totalCitas = parseInt(citaExistente.rows[0].total);
@@ -217,16 +226,17 @@ const citasController = {
             let mensaje = '';
             let correoExistente = null;
 
-            // Si hay citas, obtener el correo del ocupante
+            // Si hay citas, obtener el correo del ocupante — ⭐ FILTRADO POR DOCTOR
             if (yaAgendado) {
                 const correoResult = await db.query(
                     `SELECT correopaciente 
                      FROM citas 
                      WHERE fechacita = $1 
                        AND horacita = $2 
+                       AND iddoctor = $3
                        AND estado NOT IN ('Cancelada', 'No Asistió')
                      LIMIT 1`,
-                    [fecha, hora]
+                    [fecha, hora, idDoctor || null]
                 );
                 correoExistente = correoResult.rows.length > 0 ? correoResult.rows[0].correopaciente : null;
             }
@@ -240,7 +250,7 @@ const citasController = {
                 correoExistente: correoExistente
             };
 
-            // 2. Verificar si el usuario ya tiene cita en ese horario
+            // 2. Verificar si el usuario ya tiene cita en ese horario (GLOBAL, sin filtro de doctor)
             if (email) {
                 const citaUsuario = await db.query(
                     `SELECT COUNT(*) as total 
@@ -274,7 +284,7 @@ const citasController = {
                 }
             }
 
-            // 3. Verificar límite de citas por día
+            // 3. Verificar límite de citas por día (GLOBAL: por paciente, no por doctor)
             let citasHoy = 0;
             let limiteDiaAlcanzado = false;
 
@@ -318,10 +328,10 @@ const citasController = {
     },
 
     // ==========================================================================
-    // OBTENER HORARIOS DISPONIBLES PARA UNA FECHA
+    // OBTENER HORARIOS DISPONIBLES PARA UNA FECHA - CON FILTRO POR DOCTOR
     // ==========================================================================
     getHorariosDisponibles: async (req, res) => {
-        const { fecha, email } = req.query;
+        const { fecha, email, idDoctor } = req.query; // ⭐ NUEVO: idDoctor
 
         if (!fecha) {
             return res.status(400).json({
@@ -336,12 +346,14 @@ const citasController = {
                 todosLosHorarios.push(horaStr);
             }
 
+            // ⭐ FILTRADO POR DOCTOR
             const horariosOcupadosResult = await db.query(
                 `SELECT horacita, correopaciente
                  FROM citas 
                  WHERE fechacita = $1 
+                   AND iddoctor = $2
                    AND estado NOT IN ('Cancelada', 'No Asistió')`,
-                [fecha]
+                [fecha, idDoctor || null]
             );
 
             const horariosOcupados = new Map();
@@ -352,14 +364,16 @@ const citasController = {
                 horariosOcupados.get(row.horacita).push(row.correopaciente);
             });
 
+            // ⭐ FILTRADO POR DOCTOR
             const horariosCompletosResult = await db.query(
                 `SELECT horacita, COUNT(*) as total
                  FROM citas 
                  WHERE fechacita = $1 
+                   AND iddoctor = $2
                    AND estado NOT IN ('Cancelada', 'No Asistió')
                  GROUP BY horacita
                  HAVING COUNT(*) >= 3`,
-                [fecha]
+                [fecha, idDoctor || null]
             );
             const horariosCompletos = horariosCompletosResult.rows.map(row => row.horacita);
 
@@ -418,7 +432,7 @@ const citasController = {
     },
 
     // ==========================================================================
-    // OBTENER CITAS DE USUARIO CON FILTROS MEJORADOS
+    // OBTENER CITAS DE USUARIO CON FILTROS MEJORADOS (sin cambios)
     // ==========================================================================
     getCitasUsuario: async (req, res) => {
         const { email } = req.params;
@@ -443,6 +457,7 @@ const citasController = {
                     fechacancelacion,
                     created_at,
                     updated_at,
+                    iddoctor,
                     CASE 
                         WHEN fechacita < CURRENT_DATE AND estado NOT IN ('Cancelada', 'Completada', 'No Asistió') 
                         THEN 'Vencida'
@@ -489,7 +504,7 @@ const citasController = {
     },
 
     // ==========================================================================
-    // OBTENER TODAS LAS CITAS
+    // OBTENER TODAS LAS CITAS (sin cambios)
     // ==========================================================================
     getAllCitas: async (req, res) => {
         const { fecha, estado, modalidad, busqueda } = req.query;
@@ -513,6 +528,7 @@ const citasController = {
                     fechacancelacion,
                     created_at,
                     updated_at,
+                    iddoctor,
                     CASE 
                         WHEN fechacita < CURRENT_DATE AND estado NOT IN ('Cancelada', 'Completada', 'No Asistió') 
                         THEN 'Vencida'
@@ -571,7 +587,7 @@ const citasController = {
     },
 
     // ==========================================================================
-    // OBTENER CITA POR ID
+    // OBTENER CITA POR ID (sin cambios)
     // ==========================================================================
     getCitaById: async (req, res) => {
         const { idCita } = req.params;
@@ -595,6 +611,7 @@ const citasController = {
                     fechacancelacion,
                     created_at,
                     updated_at,
+                    iddoctor,
                     CASE 
                         WHEN fechacita < CURRENT_DATE AND estado NOT IN ('Cancelada', 'Completada', 'No Asistió') 
                         THEN 'Vencida'
@@ -619,7 +636,7 @@ const citasController = {
     },
 
     // ==========================================================================
-    // OBTENER CITAS POR FECHA
+    // OBTENER CITAS POR FECHA (sin cambios)
     // ==========================================================================
     getCitasByFecha: async (req, res) => {
         const { fecha } = req.params;
@@ -643,6 +660,7 @@ const citasController = {
                     fechacancelacion,
                     created_at,
                     updated_at,
+                    iddoctor,
                     EXTRACT(HOUR FROM horacita) AS hora,
                     EXTRACT(MINUTE FROM horacita) AS minuto,
                     CASE 
@@ -667,7 +685,7 @@ const citasController = {
     },
 
     // ==========================================================================
-    // OBTENER CITAS DE HOY
+    // OBTENER CITAS DE HOY (sin cambios)
     // ==========================================================================
     getCitasHoy: async (req, res) => {
         try {
@@ -689,6 +707,7 @@ const citasController = {
                     fechacancelacion,
                     created_at,
                     updated_at,
+                    iddoctor,
                     CASE 
                         WHEN horacita < CURRENT_TIME THEN 'Pasada'
                         ELSE 'Pendiente'
@@ -719,7 +738,7 @@ const citasController = {
     },
 
     // ==========================================================================
-    // ACTUALIZAR ESTADO DE CITA
+    // ACTUALIZAR ESTADO DE CITA (sin cambios)
     // ==========================================================================
     actualizarEstadoCita: async (req, res) => {
         const { idCita } = req.params;
@@ -777,7 +796,7 @@ const citasController = {
     },
 
     // ==========================================================================
-    // CANCELAR CITA - CON fechacancelacion
+    // CANCELAR CITA - CON fechacancelacion (sin cambios)
     // ==========================================================================
     cancelarCita: async (req, res) => {
         const { idCita } = req.params;
@@ -848,7 +867,7 @@ const citasController = {
     },
 
     // ==========================================================================
-    // ACTUALIZAR CITA COMPLETA
+    // ACTUALIZAR CITA COMPLETA (sin cambios)
     // ==========================================================================
     actualizarCita: async (req, res) => {
         const { idCita } = req.params;
@@ -933,7 +952,7 @@ const citasController = {
     },
 
     // ==========================================================================
-    // ELIMINAR CITA
+    // ELIMINAR CITA (sin cambios)
     // ==========================================================================
     eliminarCita: async (req, res) => {
         const { idCita } = req.params;
@@ -971,7 +990,7 @@ const citasController = {
     },
 
     // ==========================================================================
-    // OBTENER ESTADÍSTICAS DE CITAS
+    // OBTENER ESTADÍSTICAS DE CITAS (sin cambios)
     // ==========================================================================
     getEstadisticasCitas: async (req, res) => {
         try {
@@ -999,7 +1018,7 @@ const citasController = {
     },
 
     // ==========================================================================
-    // OBTENER CITAS DISPONIBLES PARA HOY (CON CUPOS)
+    // OBTENER CITAS DISPONIBLES PARA HOY (CON CUPOS) (sin cambios)
     // ==========================================================================
     getCitasDisponiblesHoy: async (req, res) => {
         try {

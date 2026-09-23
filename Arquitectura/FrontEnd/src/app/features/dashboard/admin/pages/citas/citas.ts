@@ -326,6 +326,15 @@ export class Citas implements OnInit, OnDestroy {
     this.searchDoctorTerm = `${doctor.nombre} ${doctor.apPaterno}`;
     this.doctoresFiltrados = [];
     this.cdr.detectChanges();
+
+    // ⭐ NUEVO: si ya había fecha/hora elegidas, hay que revalidar
+    // porque la disponibilidad depende del doctor seleccionado
+    if (this.nuevaCita.fecha) {
+      this.cargarHorariosDisponibles(this.nuevaCita.fecha);
+    }
+    if (this.nuevaCita.fecha && this.nuevaCita.hora) {
+      this.verificarDisponibilidadEnTiempoReal();
+    }
   }
 
   // ==========================================
@@ -431,8 +440,9 @@ export class Citas implements OnInit, OnDestroy {
     this.cdr.detectChanges();
 
     try {
+      // ⭐ NUEVO: se agrega this.nuevaCita.idDoctor como cuarto parámetro
       const disponibilidad = await firstValueFrom(
-        this.usersService.verificarDisponibilidad(fecha, hora + ':00', this.currentUser?.correo)
+        this.usersService.verificarDisponibilidad(fecha, hora + ':00', this.currentUser?.correo, this.nuevaCita.idDoctor)
       );
 
       this.horarioDisponible = disponibilidad.disponible;
@@ -475,8 +485,9 @@ export class Citas implements OnInit, OnDestroy {
     }
 
     try {
+      // ⭐ NUEVO: se agrega this.nuevaCita.idDoctor como tercer parámetro
       const response = await firstValueFrom(
-        this.usersService.getHorariosDisponibles(fecha, this.currentUser?.correo)
+        this.usersService.getHorariosDisponibles(fecha, this.currentUser?.correo, this.nuevaCita.idDoctor)
       );
 
       if (response && response.success) {
@@ -570,11 +581,13 @@ export class Citas implements OnInit, OnDestroy {
 
     // Verificar disponibilidad una última vez
     try {
+      // ⭐ NUEVO: se agrega this.nuevaCita.idDoctor como cuarto parámetro
       const disponibilidadFinal = await firstValueFrom(
         this.usersService.verificarDisponibilidad(
           this.nuevaCita.fecha,
           this.nuevaCita.hora + ':00',
-          this.currentUser?.correo
+          this.currentUser?.correo,
+          this.nuevaCita.idDoctor
         )
       );
 
@@ -601,7 +614,8 @@ export class Citas implements OnInit, OnDestroy {
       motivo: this.nuevaCita.motivo.trim(),
       modalidad: this.nuevaCita.modalidad,
       sintomas: this.nuevaCita.sintomas.trim() || 'Sin sintomas',
-      estado: 'Programada'
+      estado: 'Programada',
+      idDoctor: this.nuevaCita.idDoctor // ⭐ NUEVO: guardamos a qué doctor pertenece la cita
     };
 
     try {

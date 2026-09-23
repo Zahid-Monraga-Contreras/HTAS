@@ -47,6 +47,8 @@ export class PatientCitas implements OnInit {
     patientApMaterno: string = '';
     fechaMinima: string = '';
 
+    doctorId: number | null = null; // ⭐ NUEVO: doctor asignado a este paciente
+
     citas: any[] = [];
     citasFiltradas: any[] = [];
     filterEstado: string = 'todas';
@@ -181,6 +183,9 @@ export class PatientCitas implements OnInit {
                 }
             }
 
+            // ⭐ NUEVO: obtener el doctor asignado antes de cargar citas
+            await this.cargarDoctorAsignado();
+
             await this.cargarCitas();
 
         } catch (error) {
@@ -188,6 +193,59 @@ export class PatientCitas implements OnInit {
         } finally {
             this.isLoading = false;
             this.cdr.detectChanges();
+        }
+    }
+
+    // ⭐ NUEVO: obtiene el doctor asignado a este paciente para poder
+    // filtrar la disponibilidad de horarios por ese doctor específico
+    private async cargarDoctorAsignado() {
+        if (!this.patientId) {
+            this.doctorId = null;
+            return;
+        }
+
+        try {
+            const response = await firstValueFrom(
+                this.usersService.getDoctorDePaciente(this.patientId)
+            );
+
+            // Manejo flexible: el backend puede regresar el doctor en distintas formas
+            let doctorData: any = null;
+
+            if (response && typeof response === 'object') {
+                if (response.hasOwnProperty('success') && response.hasOwnProperty('data')) {
+                    doctorData = (response as any).data;
+                } else if (Array.isArray(response)) {
+                    doctorData = response.length > 0 ? response[0] : null;
+                } else {
+                    doctorData = response;
+                }
+            }
+
+            if (doctorData) {
+                this.doctorId =
+                    doctorData.idusuario ||
+                    doctorData.IdUsuario ||
+                    doctorData.idDoctor ||
+                    doctorData.IdDoctor ||
+                    doctorData.id ||
+                    null;
+
+                if (this.doctorId && typeof this.doctorId === 'string') {
+                    this.doctorId = parseInt(this.doctorId, 10);
+                }
+            } else {
+                this.doctorId = null;
+            }
+
+            if (!this.doctorId) {
+                this.showWarning('Sin doctor asignado', 'No tienes un doctor asignado. Contacta al administrador para agendar una cita.');
+            }
+
+        } catch (error) {
+            console.error('Error al obtener el doctor asignado:', error);
+            this.doctorId = null;
+            this.showWarning('Sin doctor asignado', 'No se pudo identificar tu doctor asignado. Contacta al administrador.');
         }
     }
 
@@ -287,6 +345,12 @@ export class PatientCitas implements OnInit {
     abrirModalAgendar() {
         if (!this.userEmail) {
             this.showError('Error de Identificacion', 'No se pudo identificar al usuario. Por favor inicia sesion nuevamente.');
+            return;
+        }
+
+        // ⭐ NUEVO: no permitir agendar si no hay doctor asignado
+        if (!this.doctorId) {
+            this.showError('Sin doctor asignado', 'No tienes un doctor asignado. Contacta al administrador antes de agendar una cita.');
             return;
         }
 
@@ -420,8 +484,9 @@ export class PatientCitas implements OnInit {
         this.cdr.detectChanges();
 
         try {
+            // ⭐ NUEVO: se agrega this.doctorId como cuarto parámetro
             const disponibilidad = await firstValueFrom(
-                this.usersService.verificarDisponibilidad(fecha, hora + ':00', this.userEmail)
+                this.usersService.verificarDisponibilidad(fecha, hora + ':00', this.userEmail, this.doctorId)
             );
 
             this.horarioDisponible = disponibilidad.disponible;
@@ -473,8 +538,9 @@ export class PatientCitas implements OnInit {
         }
 
         try {
+            // ⭐ NUEVO: se agrega this.doctorId como tercer parámetro
             const response = await firstValueFrom(
-                this.usersService.getHorariosDisponibles(fecha, this.userEmail)
+                this.usersService.getHorariosDisponibles(fecha, this.userEmail, this.doctorId)
             );
 
             if (response && response.success) {
@@ -536,6 +602,12 @@ export class PatientCitas implements OnInit {
             return;
         }
 
+        // ⭐ NUEVO: no permitir agendar sin doctor asignado
+        if (!this.doctorId) {
+            this.showError('Sin doctor asignado', 'No tienes un doctor asignado. Contacta al administrador.');
+            return;
+        }
+
         this.cargandoAgendar = true;
         this.cdr.detectChanges();
 
@@ -548,11 +620,13 @@ export class PatientCitas implements OnInit {
                 return;
             }
 
+            // ⭐ NUEVO: se agrega this.doctorId como cuarto parámetro
             const disponibilidadFinal = await firstValueFrom(
                 this.usersService.verificarDisponibilidad(
                     formData.fechaCita,
                     formData.horaCita + ':00',
-                    this.userEmail
+                    this.userEmail,
+                    this.doctorId
                 )
             );
 
@@ -592,7 +666,8 @@ export class PatientCitas implements OnInit {
                 horaCita: formData.horaCita + ':00',
                 motivo: formData.motivo || 'Consulta Medica',
                 modalidad: formData.modalidad || 'Presencial',
-                sintomas: formData.sintomas || 'Sin sintomas'
+                sintomas: formData.sintomas || 'Sin sintomas',
+                idDoctor: this.doctorId // ⭐ NUEVO: guardamos a qué doctor pertenece la cita
             };
 
             await firstValueFrom(

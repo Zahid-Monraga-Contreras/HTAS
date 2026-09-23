@@ -249,6 +249,13 @@ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Agregar la columna IdDoctor a la tabla CITAS
+ALTER TABLE CITAS
+ADD COLUMN IdDoctor INT REFERENCES DOCTORES (IdUsuario) ON DELETE SET NULL;
+
+-- Índice para que las consultas por doctor sean rápidas
+CREATE INDEX idx_citas_doctor ON CITAS (IdDoctor);
+
 -- ============================================
 -- 8. TABLA: MEDICAMENTOS
 -- ============================================
@@ -786,52 +793,56 @@ CREATE TRIGGER update_dispositivos_updated_at
 -- ============================================
 CREATE TABLE SOLICITUDES_ASIGNACION (
     IdSolicitud SERIAL PRIMARY KEY,
-    IdAcompanante INT NOT NULL REFERENCES USUARIOS(IdUsuario) ON DELETE CASCADE,
-    IdPaciente INT NOT NULL REFERENCES PACIENTES(IdUsuario) ON DELETE CASCADE,
+    IdAcompanante INT NOT NULL REFERENCES USUARIOS (IdUsuario) ON DELETE CASCADE,
+    IdPaciente INT NOT NULL REFERENCES PACIENTES (IdUsuario) ON DELETE CASCADE,
     Parentesco VARCHAR(50), -- Ej: Hermano, Tio, Primo, Padre, Madre
     Notas TEXT,
     Estado VARCHAR(20) DEFAULT 'pendiente' CHECK (
-        Estado IN ('pendiente', 'aprobada', 'rechazada')
+        Estado IN (
+            'pendiente',
+            'aprobada',
+            'rechazada'
+        )
     ),
-    IdAprobador INT REFERENCES USUARIOS(IdUsuario) ON DELETE SET NULL,
+    IdAprobador INT REFERENCES USUARIOS (IdUsuario) ON DELETE SET NULL,
     FechaSolicitud TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FechaAprobacion TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(IdAcompanante, IdPaciente)
+    UNIQUE (IdAcompanante, IdPaciente)
 );
 
-SELECT  *  FROM  SOLICITUDES_ASIGNACION  
+SELECT * FROM SOLICITUDES_ASIGNACION
 
 -- ============================================
 -- TABLA: ASIGNACIONES_PACIENTES
 -- ============================================
 CREATE TABLE ASIGNACIONES_PACIENTES (
     IdAsignacion SERIAL PRIMARY KEY,
-    IdAcompanante INT NOT NULL REFERENCES USUARIOS(IdUsuario) ON DELETE CASCADE,
-    IdPaciente INT NOT NULL REFERENCES PACIENTES(IdUsuario) ON DELETE CASCADE,
-    IdAprobador INT REFERENCES USUARIOS(IdUsuario) ON DELETE SET NULL,
+    IdAcompanante INT NOT NULL REFERENCES USUARIOS (IdUsuario) ON DELETE CASCADE,
+    IdPaciente INT NOT NULL REFERENCES PACIENTES (IdUsuario) ON DELETE CASCADE,
+    IdAprobador INT REFERENCES USUARIOS (IdUsuario) ON DELETE SET NULL,
     FechaAsignacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     Activo BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(IdAcompanante, IdPaciente)
+    UNIQUE (IdAcompanante, IdPaciente)
 );
 
--- ============================================  
--- TABLA: ASIGNACIONES_DOCTOR_PACIENTE  
--- ============================================  
-CREATE  TABLE  ASIGNACIONES_DOCTOR_PACIENTE  (  
-    IdAsignacion  SERIAL  PRIMARY  KEY ,  
-    IdDoctor  INT  NOT  NULL  REFERENCES  DOCTORES ( IdUsuario )  ON  DELETE  CASCADE ,  
-    IdPaciente  INT  NOT  NULL  REFERENCES  PACIENTES ( IdUsuario )  ON  DELETE  CASCADE ,  
-    FechaAsignacion  TIMESTAMP  DEFAULT  CURRENT_TIMESTAMP ,  
-    Activo  BOOLEAN  DEFAULT  TRUE , 
-    AsignadoPor  INT  REFERENCES  USUARIOS ( IdUsuario )  ON  DELETE  SET  NULL ,  -- Quién asignó (admin o doctor) 
-    Notas  TEXT ,  -- Notas adicionales sobre la asignación 
+-- ============================================
+-- TABLA: ASIGNACIONES_DOCTOR_PACIENTE
+-- ============================================
+CREATE TABLE ASIGNACIONES_DOCTOR_PACIENTE (
+    IdAsignacion SERIAL PRIMARY KEY,
+    IdDoctor INT NOT NULL REFERENCES DOCTORES (IdUsuario) ON DELETE CASCADE,
+    IdPaciente INT NOT NULL REFERENCES PACIENTES (IdUsuario) ON DELETE CASCADE,
+    FechaAsignacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    Activo BOOLEAN DEFAULT TRUE,
+    AsignadoPor INT REFERENCES USUARIOS (IdUsuario) ON DELETE SET NULL, -- Quién asignó (admin o doctor) 
+    Notas TEXT, -- Notas adicionales sobre la asignación 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(IdDoctor, IdPaciente)
+    UNIQUE (IdDoctor, IdPaciente)
 );
 
 -- ============================================
@@ -898,17 +909,11 @@ SELECT COUNT(*) AS TotalRegistros FROM ASIGNACIONES_DOCTOR_PACIENTE;
 -- ============================================
 -- 2. VER QUÉ DATOS ESTÁN ASIGNADOS
 -- ============================================
-SELECT 
-    a.IdAsignacion,
-    a.IdPaciente,
-    u.Nombre AS Paciente,
-    a.IdDoctor,
-    ud.Nombre AS Doctor,
-    a.Activo,
-    a.FechaAsignacion
-FROM ASIGNACIONES_DOCTOR_PACIENTE a
-INNER JOIN USUARIOS u ON a.IdPaciente = u.IdUsuario
-INNER JOIN USUARIOS ud ON a.IdDoctor = ud.IdUsuario;
+SELECT a.IdAsignacion, a.IdPaciente, u.Nombre AS Paciente, a.IdDoctor, ud.Nombre AS Doctor, a.Activo, a.FechaAsignacion
+FROM
+    ASIGNACIONES_DOCTOR_PACIENTE a
+    INNER JOIN USUARIOS u ON a.IdPaciente = u.IdUsuario
+    INNER JOIN USUARIOS ud ON a.IdDoctor = ud.IdUsuario;
 
 -- ============================================
 -- 3. ELIMINAR TODOS LOS REGISTROS (borrado físico)
@@ -923,12 +928,15 @@ SELECT COUNT(*) AS TotalRegistros FROM ASIGNACIONES_DOCTOR_PACIENTE;
 -- ============================================
 -- 5. ELIMINAR LA FUNCIÓN (opcional)
 -- ============================================
-DROP FUNCTION IF EXISTS asignar_paciente_doctor(INT, INT, INT, TEXT);
+DROP FUNCTION IF EXISTS asignar_paciente_doctor (INT, INT, INT, TEXT);
 
 -- ============================================
 -- 6. VERIFICAR QUE LA FUNCIÓN SE ELIMINÓ
 -- ============================================
-SELECT proname FROM pg_proc WHERE proname = 'asignar_paciente_doctor';
+SELECT proname
+FROM pg_proc
+WHERE
+    proname = 'asignar_paciente_doctor';
 
 -- ============================================
 -- FUNCIÓN PARA OBTENER PACIENTES DE UN DOCTOR
@@ -988,8 +996,9 @@ CREATE TRIGGER update_asignaciones_pacientes_updated_at
 -- ============================================
 -- VISTA PARA VER SOLICITUDES CON DETALLES
 -- ============================================
-CREATE OR REPLACE VIEW VW_SOLICITUDES_ASIGNACION AS
-SELECT 
+CREATE
+OR REPLACE VIEW VW_SOLICITUDES_ASIGNACION AS
+SELECT
     s.IdSolicitud,
     s.IdAcompanante,
     ua.Nombre AS NombreAcompanante,
@@ -1011,18 +1020,22 @@ SELECT
     s.FechaAprobacion,
     s.created_at,
     s.updated_at
-FROM SOLICITUDES_ASIGNACION s
-INNER JOIN USUARIOS ua ON s.IdAcompanante = ua.IdUsuario
-INNER JOIN PACIENTES p ON s.IdPaciente = p.IdUsuario
-INNER JOIN USUARIOS up ON p.IdUsuario = up.IdUsuario
-LEFT JOIN USUARIOS uap ON s.IdAprobador = uap.IdUsuario
-WHERE ua.deleted_at IS NULL AND up.deleted_at IS NULL;
+FROM
+    SOLICITUDES_ASIGNACION s
+    INNER JOIN USUARIOS ua ON s.IdAcompanante = ua.IdUsuario
+    INNER JOIN PACIENTES p ON s.IdPaciente = p.IdUsuario
+    INNER JOIN USUARIOS up ON p.IdUsuario = up.IdUsuario
+    LEFT JOIN USUARIOS uap ON s.IdAprobador = uap.IdUsuario
+WHERE
+    ua.deleted_at IS NULL
+    AND up.deleted_at IS NULL;
 
 -- ============================================
 -- VISTA PARA VER ASIGNACIONES ACTIVAS
 -- ============================================
-CREATE OR REPLACE VIEW VW_ASIGNACIONES_ACTIVAS AS
-SELECT 
+CREATE
+OR REPLACE VIEW VW_ASIGNACIONES_ACTIVAS AS
+SELECT
     a.IdAsignacion,
     a.IdAcompanante,
     ua.Nombre AS NombreAcompanante,
@@ -1038,12 +1051,16 @@ SELECT
     uap.Nombre AS NombreAprobador,
     a.FechaAsignacion,
     a.Activo
-FROM ASIGNACIONES_PACIENTES a
-INNER JOIN USUARIOS ua ON a.IdAcompanante = ua.IdUsuario
-INNER JOIN PACIENTES p ON a.IdPaciente = p.IdUsuario
-INNER JOIN USUARIOS up ON p.IdUsuario = up.IdUsuario
-LEFT JOIN USUARIOS uap ON a.IdAprobador = uap.IdUsuario
-WHERE a.Activo = true AND ua.deleted_at IS NULL AND up.deleted_at IS NULL;
+FROM
+    ASIGNACIONES_PACIENTES a
+    INNER JOIN USUARIOS ua ON a.IdAcompanante = ua.IdUsuario
+    INNER JOIN PACIENTES p ON a.IdPaciente = p.IdUsuario
+    INNER JOIN USUARIOS up ON p.IdUsuario = up.IdUsuario
+    LEFT JOIN USUARIOS uap ON a.IdAprobador = uap.IdUsuario
+WHERE
+    a.Activo = true
+    AND ua.deleted_at IS NULL
+    AND up.deleted_at IS NULL;
 
 -- ============================================
 -- 13. TABLA: EXPEDIENTES_HTAS (Análisis de Hipertensión)
@@ -1052,34 +1069,36 @@ WHERE a.Activo = true AND ua.deleted_at IS NULL AND up.deleted_at IS NULL;
 DROP TABLE IF EXISTS expedientes_htas CASCADE;
 
 -- Crear la tabla con los nombres que usa Python
-CREATE  TABLE  expedientes_htas  ( 
-    idexpediente  SERIAL  PRIMARY  KEY , 
-    idpaciente  INTEGER  NOT  NULL , 
-    iddoctor  INTEGER , 
-    fecha_consulta  TIMESTAMP  DEFAULT  CURRENT_TIMESTAMP , 
-    edad  INTEGER  NOT  NULL , 
-    sistolica  INTEGER  NOT  NULL , 
-    diastolica  INTEGER  NOT  NULL , 
-    presion_pdf_sistolica  INTEGER , 
-    presion_pdf_diastolica  INTEGER , 
-    toma_medicamento  INTEGER  NOT  NULL  DEFAULT  0 , 
-    prediccion_crisis  INTEGER  NOT  NULL , 
-    probabilidad_porcentual  REAL  NOT  NULL , 
-    nivel_riesgo  TEXT  NOT  NULL , 
-    motor_utilizado  TEXT  NOT  NULL , 
-    pdf_cedula_valido  INTEGER  DEFAULT  0 ,       -- ← CAMBIADO a INTEGER 
-    pdf_diagnostico_valido  INTEGER  DEFAULT  0 ,  -- ← CAMBIADO a INTEGER 
-    valores_extraidos_pdf  TEXT , 
-    ruta_pdf_cedula  TEXT , 
-    ruta_pdf_diagnostico  TEXT , 
-    created_at  TIMESTAMP  DEFAULT  CURRENT_TIMESTAMP , 
-    updated_at  TIMESTAMP  DEFAULT  CURRENT_TIMESTAMP 
+CREATE TABLE expedientes_htas (
+    idexpediente SERIAL PRIMARY KEY,
+    idpaciente INTEGER NOT NULL,
+    iddoctor INTEGER,
+    fecha_consulta TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    edad INTEGER NOT NULL,
+    sistolica INTEGER NOT NULL,
+    diastolica INTEGER NOT NULL,
+    presion_pdf_sistolica INTEGER,
+    presion_pdf_diastolica INTEGER,
+    toma_medicamento INTEGER NOT NULL DEFAULT 0,
+    prediccion_crisis INTEGER NOT NULL,
+    probabilidad_porcentual REAL NOT NULL,
+    nivel_riesgo TEXT NOT NULL,
+    motor_utilizado TEXT NOT NULL,
+    pdf_cedula_valido INTEGER DEFAULT 0, -- ← CAMBIADO a INTEGER 
+    pdf_diagnostico_valido INTEGER DEFAULT 0, -- ← CAMBIADO a INTEGER 
+    valores_extraidos_pdf TEXT,
+    ruta_pdf_cedula TEXT,
+    ruta_pdf_diagnostico TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Índices para mejorar rendimiento
-CREATE INDEX idx_expedientes_paciente ON EXPEDIENTES_HTAS(IdPaciente);
-CREATE INDEX idx_expedientes_doctor ON EXPEDIENTES_HTAS(IdDoctor);
-CREATE INDEX idx_expedientes_fecha ON EXPEDIENTES_HTAS(FechaConsulta);
+CREATE INDEX idx_expedientes_paciente ON EXPEDIENTES_HTAS (IdPaciente);
+
+CREATE INDEX idx_expedientes_doctor ON EXPEDIENTES_HTAS (IdDoctor);
+
+CREATE INDEX idx_expedientes_fecha ON EXPEDIENTES_HTAS (FechaConsulta);
 
 -- Trigger para updated_at
 CREATE TRIGGER update_expedientes_htas_updated_at 
@@ -1089,8 +1108,9 @@ CREATE TRIGGER update_expedientes_htas_updated_at
 -- ============================================
 -- VISTA PARA EXPEDIENTES HTAS CON DETALLES
 -- ============================================
-CREATE OR REPLACE VIEW VW_EXPEDIENTES_HTAS AS
-SELECT 
+CREATE
+OR REPLACE VIEW VW_EXPEDIENTES_HTAS AS
+SELECT
     e.IdExpediente,
     e.IdPaciente,
     u.Nombre AS NombrePaciente,
@@ -1117,11 +1137,13 @@ SELECT
     e.RutaPDFCedula,
     e.RutaPDFDiagnostico,
     e.FechaConsulta
-FROM EXPEDIENTES_HTAS e
-INNER JOIN USUARIOS u ON e.IdPaciente = u.IdUsuario
-LEFT JOIN DOCTORES d ON e.IdDoctor = d.IdUsuario
-LEFT JOIN USUARIOS ud ON d.IdUsuario = ud.IdUsuario
-WHERE u.deleted_at IS NULL;
+FROM
+    EXPEDIENTES_HTAS e
+    INNER JOIN USUARIOS u ON e.IdPaciente = u.IdUsuario
+    LEFT JOIN DOCTORES d ON e.IdDoctor = d.IdUsuario
+    LEFT JOIN USUARIOS ud ON d.IdUsuario = ud.IdUsuario
+WHERE
+    u.deleted_at IS NULL;
 
 -- ============================================
 -- FUNCIÓN PARA OBTENER ÚLTIMO EXPEDIENTE

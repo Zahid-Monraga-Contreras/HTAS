@@ -145,6 +145,7 @@ export interface DisponibilidadMasivaItem {
   fecha: string;
   hora: string;
   email?: string;
+  idDoctor?: number; // ⭐ NUEVO
 }
 
 export interface DisponibilidadMasivaResultado {
@@ -574,10 +575,15 @@ export class Users {
   // ==========================================================================
   // --- DISPONIBILIDAD DE CITAS ---
   // ==========================================================================
-  verificarDisponibilidad(fecha: string, hora: string, email?: string): Observable<DisponibilidadResponse> {
+
+  // ⭐ MODIFICADO: ahora acepta idDoctor opcional y lo manda como query param
+  verificarDisponibilidad(fecha: string, hora: string, email?: string, idDoctor?: number | null): Observable<DisponibilidadResponse> {
     const params: any = { fecha, hora };
     if (email) {
       params.email = email;
+    }
+    if (idDoctor !== undefined && idDoctor !== null) {
+      params.idDoctor = idDoctor;
     }
     return this.http.get<DisponibilidadResponse>(
       `${this.apiUrl}/citas/verificar-disponibilidad`,
@@ -585,10 +591,14 @@ export class Users {
     );
   }
 
-  getHorariosDisponibles(fecha: string, email?: string): Observable<HorariosDisponiblesResponse> {
+  // ⭐ MODIFICADO: ahora acepta idDoctor opcional y lo manda como query param
+  getHorariosDisponibles(fecha: string, email?: string, idDoctor?: number | null): Observable<HorariosDisponiblesResponse> {
     const params: any = { fecha };
     if (email) {
       params.email = email;
+    }
+    if (idDoctor !== undefined && idDoctor !== null) {
+      params.idDoctor = idDoctor;
     }
     return this.http.get<HorariosDisponiblesResponse>(
       `${this.apiUrl}/citas/horarios-disponibles`,

@@ -127,13 +127,78 @@ export class DoctorNuevaCita implements OnInit {
     async cargarPacientes() {
         this.loadingPacientes = true;
         try {
-            const allUsers = await firstValueFrom(this.usersService.getUsuariosBackend());
-            if (Array.isArray(allUsers)) {
-                this.pacientes = allUsers.filter(u =>
-                    u.rol?.toLowerCase() === 'paciente' && u.activo !== false
-                );
-                this.pacientesFiltrados = [...this.pacientes];
+            if (!this.doctorId) {
+                this.showError('Error', 'No se pudo identificar al doctor.');
+                return;
             }
+
+            let pacientesData: any[] = [];
+
+            // 1) Intentar endpoint directo de pacientes del doctor
+            try {
+                const response = await firstValueFrom(
+                    this.usersService.getPacientesDeDoctor(this.doctorId)
+                );
+
+                if (response && typeof response === 'object') {
+                    if (response.hasOwnProperty('success') && response.hasOwnProperty('data')) {
+                        pacientesData = (response as any).data || [];
+                    } else if (Array.isArray(response)) {
+                        pacientesData = response;
+                    } else {
+                        for (const key in response) {
+                            if (Array.isArray((response as any)[key])) {
+                                pacientesData = (response as any)[key];
+                                break;
+                            }
+                        }
+                    }
+                } else if (Array.isArray(response)) {
+                    pacientesData = response;
+                }
+            } catch (err) {
+                console.warn('getPacientesDeDoctor falló, usando fallback', err);
+            }
+
+            // 2) Fallback: traer todos los usuarios y filtrar por asignación activa a este doctor
+            if (!pacientesData || pacientesData.length === 0) {
+                const allUsers = await firstValueFrom(this.usersService.getUsuariosBackend());
+                const doctorIdNum = Number(this.doctorId);
+
+                if (Array.isArray(allUsers)) {
+                    pacientesData = allUsers.filter((u: any) => {
+                        const esPaciente = u.rol?.toLowerCase() === 'paciente' && u.activo !== false;
+                        const idDoctorAsignado =
+                            u.doctorasignado ?? u.DoctorAsignado ?? u.iddoctorasignado ?? u.IdDoctorAsignado ?? null;
+                        const asignado = u.asignacionactiva === true || u.AsignacionActiva === true;
+
+                        return (
+                            esPaciente &&
+                            asignado &&
+                            idDoctorAsignado !== null &&
+                            idDoctorAsignado !== undefined &&
+                            Number(idDoctorAsignado) === doctorIdNum
+                        );
+                    });
+                }
+            }
+
+            // 3) Normalizar campos para que el resto del componente los use igual que antes
+            this.pacientes = pacientesData.map((p: any) => ({
+                idusuario: p.id_usuario || p.IdUsuario || p.idusuario || p.id || 0,
+                nombre: p.nombre || p.Nombre || '',
+                apPaterno: p.apellido_paterno || p.ap_paterno || p.ApPaterno || p.appaterno || '',
+                apMaterno: p.apellido_materno || p.ap_materno || p.ApMaterno || p.apmaterno || '',
+                correo: p.correo || p.Correo || '',
+                telefono: p.telefono || p.Telefono || ''
+            }));
+
+            this.pacientesFiltrados = [...this.pacientes];
+
+            if (this.pacientes.length === 0) {
+                this.showWarning('Sin pacientes asignados', 'No tienes pacientes asignados. Contacta al administrador.');
+            }
+
         } catch (error) {
             console.error('Error al cargar pacientes:', error);
             this.showError('Error', 'No se pudieron cargar los pacientes.');
@@ -188,8 +253,9 @@ export class DoctorNuevaCita implements OnInit {
         this.cdr.detectChanges();
 
         try {
+            // ⭐ NUEVO: se agrega this.doctorId como cuarto parámetro
             const disponibilidad = await firstValueFrom(
-                this.usersService.verificarDisponibilidad(fecha, hora + ':00', this.userEmail)
+                this.usersService.verificarDisponibilidad(fecha, hora + ':00', this.userEmail, this.doctorId)
             );
 
             this.horarioDisponible = disponibilidad.disponible;
@@ -231,8 +297,9 @@ export class DoctorNuevaCita implements OnInit {
         }
 
         try {
+            // ⭐ NUEVO: se agrega this.doctorId como tercer parámetro
             const response = await firstValueFrom(
-                this.usersService.getHorariosDisponibles(fecha, this.userEmail)
+                this.usersService.getHorariosDisponibles(fecha, this.userEmail, this.doctorId)
             );
 
             if (response && response.success) {
@@ -416,11 +483,13 @@ export class DoctorNuevaCita implements OnInit {
             const pacienteSeleccionado = this.pacientes.find(p => p.idusuario === formData.idPaciente);
 
             // Verificar disponibilidad una última vez antes de agendar
+            // ⭐ NUEVO: se agrega this.doctorId como cuarto parámetro
             const disponibilidadFinal = await firstValueFrom(
                 this.usersService.verificarDisponibilidad(
                     formData.fechaCita,
                     formData.horaCita + ':00',
-                    this.userEmail
+                    this.userEmail,
+                    this.doctorId
                 )
             );
 
@@ -446,7 +515,8 @@ export class DoctorNuevaCita implements OnInit {
                 horaCita: formData.horaCita + ':00',
                 motivo: formData.motivo || 'Consulta Medica',
                 modalidad: formData.modalidad || 'Presencial',
-                sintomas: formData.sintomas || ''
+                sintomas: formData.sintomas || '',
+                idDoctor: this.doctorId // ⭐ NUEVO: guardamos a qué doctor pertenece la cita
             };
 
             await firstValueFrom(this.usersService.crearCita(datosCita));

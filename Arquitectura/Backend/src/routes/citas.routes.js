@@ -5,6 +5,8 @@ const db = require('../db/database');
 
 // ==========================================================================
 // RUTAS EXISTENTES
+// (sin cambios aquí: el idDoctor ya se maneja dentro del controlador,
+//  que lee req.query.idDoctor / req.body.idDoctor automáticamente)
 // ==========================================================================
 router.get('/todas-las-citas', citasController.getAllCitas);
 router.post('/agendar-cita', citasController.agendarCita);
@@ -12,7 +14,7 @@ router.get('/mis-citas/:email', citasController.getCitasUsuario);
 router.put('/actualizar-cita/:idCita', citasController.actualizarEstadoCita);
 
 // ==========================================================================
-// RUTAS PARA GESTIÓN DE CITAS
+// RUTAS PARA GESTIÓN DE CITAS (sin cambios)
 // ==========================================================================
 router.put('/cita/:idCita', citasController.actualizarCita);
 router.get('/cita/:idCita', citasController.getCitaById);
@@ -23,9 +25,8 @@ router.delete('/cita/:idCita', citasController.eliminarCita);
 router.get('/citas/estadisticas', citasController.getEstadisticasCitas);
 
 // ==========================================================================
-// NUEVAS RUTAS PARA VALIDACIÓN DE DISPONIBILIDAD
+// RUTAS PARA VALIDACIÓN DE DISPONIBILIDAD (sin cambios aquí)
 // ==========================================================================
-
 router.get('/verificar-disponibilidad', citasController.verificarDisponibilidad);
 router.get('/horarios-disponibles', citasController.getHorariosDisponibles);
 router.get('/disponibles/hoy', citasController.getCitasDisponiblesHoy);
@@ -34,6 +35,8 @@ router.get('/disponibles/hoy', citasController.getCitasDisponiblesHoy);
 // RUTAS ADICIONALES PARA REPORTES Y CONSULTAS ESPECIALIZADAS
 // ==========================================================================
 
+// ⭐ CORREGIDO: columnas en minúsculas (antes usaba "FechaCita" con comillas
+//    y mayúsculas, que no existen así en tu tabla real) + soporte de idDoctor
 router.post('/consultas/disponibilidad-masiva', async (req, res) => {
     try {
         const { citas } = req.body;
@@ -43,16 +46,17 @@ router.post('/consultas/disponibilidad-masiva', async (req, res) => {
 
         const resultados = [];
         for (const cita of citas) {
-            const { fecha, hora, email } = cita;
+            const { fecha, hora, email, idDoctor } = cita; // ⭐ NUEVO: idDoctor opcional por item
 
             try {
                 const citaExistente = await db.query(
-                    `SELECT COUNT(*) as total, "CorreoPaciente" as correo
+                    `SELECT COUNT(*) as total, correopaciente as correo
                      FROM citas 
-                     WHERE "FechaCita" = $1 
-                       AND "HoraCita" = $2 
-                       AND "Estado" NOT IN ('Cancelada', 'No Asistió')`,
-                    [fecha, hora]
+                     WHERE fechacita = $1 
+                       AND horacita = $2 
+                       AND iddoctor = $3
+                       AND estado NOT IN ('Cancelada', 'No Asistió')`,
+                    [fecha, hora, idDoctor || null]
                 );
 
                 const totalCitas = parseInt(citaExistente.rows[0].total);
@@ -65,10 +69,10 @@ router.post('/consultas/disponibilidad-masiva', async (req, res) => {
                     const citaUsuario = await db.query(
                         `SELECT COUNT(*) as total 
                          FROM citas 
-                         WHERE "FechaCita" = $1 
-                           AND "HoraCita" = $2 
-                           AND "CorreoPaciente" ILIKE $3
-                           AND "Estado" NOT IN ('Cancelada', 'No Asistió')`,
+                         WHERE fechacita = $1 
+                           AND horacita = $2 
+                           AND correopaciente ILIKE $3
+                           AND estado NOT IN ('Cancelada', 'No Asistió')`,
                         [fecha, hora, email]
                     );
                     usuarioYaTieneCita = parseInt(citaUsuario.rows[0].total) > 0;
@@ -130,32 +134,35 @@ router.post('/consultas/disponibilidad-masiva', async (req, res) => {
     }
 });
 
+// ⭐ CORREGIDO: columnas en minúsculas (antes tenía "IdCita", "NombrePaciente", etc.
+//    con comillas y mayúsculas, que hubieran tronado con "columna no existe")
 router.get('/consultas/proximas/:email', async (req, res) => {
     try {
         const { email } = req.params;
         const result = await db.query(
             `SELECT 
-                "IdCita" as idcita,
-                "NombrePaciente" as nombrepaciente,
-                "ApPaternoPaciente" as appaternopaciente,
-                "ApMaternoPaciente" as apmaternopaciente,
-                "TelefonoPaciente" as telefonopaciente,
-                "CorreoPaciente" as correopaciente,
-                "FechaCita" as fechacita,
-                "HoraCita" as horacita,
-                "Motivo" as motivo,
-                "Sintomas" as sintomas,
-                "Estado" as estado,
-                "Modalidad" as modalidad,
-                "NotasDoctor" as notasdoctor,
+                idcita,
+                nombrepaciente,
+                appaternopaciente,
+                apmaternopaciente,
+                telefonopaciente,
+                correopaciente,
+                fechacita,
+                horacita,
+                motivo,
+                sintomas,
+                estado,
+                modalidad,
+                notasdoctor,
                 fechacancelacion,
                 created_at,
-                updated_at
+                updated_at,
+                iddoctor
              FROM citas 
-             WHERE "CorreoPaciente" ILIKE $1 
-               AND "FechaCita" >= CURRENT_DATE 
-               AND "Estado" NOT IN ('Cancelada', 'Completada', 'No Asistió')
-             ORDER BY "FechaCita" ASC, "HoraCita" ASC
+             WHERE correopaciente ILIKE $1 
+               AND fechacita >= CURRENT_DATE 
+               AND estado NOT IN ('Cancelada', 'Completada', 'No Asistió')
+             ORDER BY fechacita ASC, horacita ASC
              LIMIT 5`,
             [email]
         );
@@ -173,6 +180,7 @@ router.get('/consultas/proximas/:email', async (req, res) => {
     }
 });
 
+// ⭐ CORREGIDO: columnas en minúsculas
 router.get('/consultas/historial/:email', async (req, res) => {
     try {
         const { email } = req.params;
@@ -183,31 +191,32 @@ router.get('/consultas/historial/:email', async (req, res) => {
 
         const result = await db.query(
             `SELECT 
-                "IdCita" as idcita,
-                "NombrePaciente" as nombrepaciente,
-                "ApPaternoPaciente" as appaternopaciente,
-                "ApMaternoPaciente" as apmaternopaciente,
-                "TelefonoPaciente" as telefonopaciente,
-                "CorreoPaciente" as correopaciente,
-                "FechaCita" as fechacita,
-                "HoraCita" as horacita,
-                "Motivo" as motivo,
-                "Sintomas" as sintomas,
-                "Estado" as estado,
-                "Modalidad" as modalidad,
-                "NotasDoctor" as notasdoctor,
+                idcita,
+                nombrepaciente,
+                appaternopaciente,
+                apmaternopaciente,
+                telefonopaciente,
+                correopaciente,
+                fechacita,
+                horacita,
+                motivo,
+                sintomas,
+                estado,
+                modalidad,
+                notasdoctor,
                 fechacancelacion,
                 created_at,
-                updated_at
+                updated_at,
+                iddoctor
              FROM citas 
-             WHERE "CorreoPaciente" ILIKE $1 
-             ORDER BY "FechaCita" DESC, "HoraCita" DESC
+             WHERE correopaciente ILIKE $1 
+             ORDER BY fechacita DESC, horacita DESC
              LIMIT $2 OFFSET $3`,
             [email, limit, offsetNum]
         );
 
         const total = await db.query(
-            `SELECT COUNT(*) as total FROM citas WHERE "CorreoPaciente" ILIKE $1`,
+            `SELECT COUNT(*) as total FROM citas WHERE correopaciente ILIKE $1`,
             [email]
         );
 
@@ -230,22 +239,26 @@ router.get('/consultas/historial/:email', async (req, res) => {
 
 // ==========================================================================
 // RUTAS PARA ADMINISTRACIÓN
+// (se dejan GLOBALES a propósito: el admin necesita ver el total de
+//  toda la clínica, no de un solo doctor. Solo se corrige el bug
+//  de columnas con mayúsculas/comillas)
 // ==========================================================================
 
+// ⭐ CORREGIDO: columnas en minúsculas
 router.get('/admin/resumen', async (req, res) => {
     try {
         const resultado = await db.query(`
             SELECT 
                 COUNT(*) as total,
-                COUNT(CASE WHEN "Estado" = 'Programada' THEN 1 END) as programadas,
-                COUNT(CASE WHEN "Estado" = 'Confirmada' THEN 1 END) as confirmadas,
-                COUNT(CASE WHEN "Estado" = 'Completada' THEN 1 END) as completadas,
-                COUNT(CASE WHEN "Estado" = 'Cancelada' THEN 1 END) as canceladas,
-                COUNT(CASE WHEN "Estado" = 'No Asistió' THEN 1 END) as no_asistio,
-                COUNT(CASE WHEN "FechaCita" >= CURRENT_DATE AND "Estado" NOT IN ('Cancelada', 'Completada') THEN 1 END) as proximas,
-                COUNT(CASE WHEN "FechaCita" < CURRENT_DATE AND "Estado" NOT IN ('Cancelada', 'Completada') THEN 1 END) as vencidas,
-                COUNT(CASE WHEN "Modalidad" = 'Presencial' THEN 1 END) as presenciales,
-                COUNT(CASE WHEN "Modalidad" = 'Virtual' THEN 1 END) as virtuales
+                COUNT(CASE WHEN estado = 'Programada' THEN 1 END) as programadas,
+                COUNT(CASE WHEN estado = 'Confirmada' THEN 1 END) as confirmadas,
+                COUNT(CASE WHEN estado = 'Completada' THEN 1 END) as completadas,
+                COUNT(CASE WHEN estado = 'Cancelada' THEN 1 END) as canceladas,
+                COUNT(CASE WHEN estado = 'No Asistió' THEN 1 END) as no_asistio,
+                COUNT(CASE WHEN fechacita >= CURRENT_DATE AND estado NOT IN ('Cancelada', 'Completada') THEN 1 END) as proximas,
+                COUNT(CASE WHEN fechacita < CURRENT_DATE AND estado NOT IN ('Cancelada', 'Completada') THEN 1 END) as vencidas,
+                COUNT(CASE WHEN modalidad = 'Presencial' THEN 1 END) as presenciales,
+                COUNT(CASE WHEN modalidad = 'Virtual' THEN 1 END) as virtuales
             FROM citas
         `);
         res.json({
@@ -261,24 +274,25 @@ router.get('/admin/resumen', async (req, res) => {
     }
 });
 
+// ⭐ CORREGIDO: columnas en minúsculas
 router.get('/admin/cupos-por-hora/:fecha', async (req, res) => {
     try {
         const { fecha } = req.params;
         const result = await db.query(`
             SELECT 
-                "HoraCita" as horacita,
+                horacita,
                 COUNT(*) as total,
                 CASE 
                     WHEN COUNT(*) >= 3 THEN 0
                     ELSE 3 - COUNT(*)
                 END as cupos_disponibles,
-                array_agg("Estado") as estados,
-                array_agg("CorreoPaciente") as correos
+                array_agg(estado) as estados,
+                array_agg(correopaciente) as correos
             FROM citas 
-            WHERE "FechaCita" = $1
-              AND "Estado" NOT IN ('Cancelada', 'No Asistió')
-            GROUP BY "HoraCita"
-            ORDER BY "HoraCita" ASC
+            WHERE fechacita = $1
+              AND estado NOT IN ('Cancelada', 'No Asistió')
+            GROUP BY horacita
+            ORDER BY horacita ASC
         `, [fecha]);
 
         const todosHorarios = [];
