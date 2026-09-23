@@ -47,7 +47,7 @@ export class PatientCitas implements OnInit {
     patientApMaterno: string = '';
     fechaMinima: string = '';
 
-    doctorId: number | null = null; // ⭐ NUEVO: doctor asignado a este paciente
+    doctorId: number | null = null; // ⭐ doctor asignado a este paciente
 
     citas: any[] = [];
     citasFiltradas: any[] = [];
@@ -183,7 +183,7 @@ export class PatientCitas implements OnInit {
                 }
             }
 
-            // ⭐ NUEVO: obtener el doctor asignado antes de cargar citas
+            // ⭐ obtener el doctor asignado antes de cargar citas
             await this.cargarDoctorAsignado();
 
             await this.cargarCitas();
@@ -196,11 +196,65 @@ export class PatientCitas implements OnInit {
         }
     }
 
-    // ⭐ NUEVO: obtiene el doctor asignado a este paciente para poder
+    // ==========================================================================
+    // ⭐ HELPERS DE EXTRACCION ROBUSTA DE CAMPOS
+    // ==========================================================================
+    // Postgres, cuando los alias de columna no van entre comillas dobles,
+    // los devuelve TODO en minusculas (idcita, correopaciente, iddoctor...).
+    // En vez de listar manualmente cada variante de casing posible
+    // (idDoctor, IdDoctor, iddoctor, ID_DOCTOR, etc.), buscamos la clave
+    // de forma case-insensitive dentro del objeto.
+    // Normaliza quitando mayusculas Y separadores (_ , -, espacios) para que
+    // "id_usuario", "IdUsuario", "ID-USUARIO" y "idusuario" se consideren la misma clave.
+    private normalizarClave(clave: string): string {
+        return clave.toLowerCase().replace(/[^a-z0-9]/g, '');
+    }
+
+    private buscarValorPorClave(obj: any, posiblesClaves: string[]): any {
+        if (!obj || typeof obj !== 'object') return null;
+
+        const clavesNormalizadas = posiblesClaves.map(k => this.normalizarClave(k));
+        const claveEncontrada = Object.keys(obj).find(k =>
+            clavesNormalizadas.includes(this.normalizarClave(k))
+        );
+
+        return claveEncontrada ? obj[claveEncontrada] : null;
+    }
+
+    // Busca un id de doctor en el objeto raiz y, si no lo encuentra,
+    // en las propiedades anidadas de primer nivel (por si el backend
+    // envuelve la respuesta como { data: { doctor: {...} } } o similar).
+    private extraerDoctorId(doctorData: any): number | null {
+        if (!doctorData || typeof doctorData !== 'object') return null;
+
+        const clavesId = ['idusuario', 'idUsuario', 'idDoctor', 'iddoctor', 'id'];
+
+        // 1. Buscar directamente en el objeto
+        let valor = this.buscarValorPorClave(doctorData, clavesId);
+
+        // 2. Si no se encontro, buscar en propiedades anidadas de primer nivel
+        if (valor === null || valor === undefined) {
+            for (const key of Object.keys(doctorData)) {
+                const posibleAnidado = doctorData[key];
+                if (posibleAnidado && typeof posibleAnidado === 'object' && !Array.isArray(posibleAnidado)) {
+                    valor = this.buscarValorPorClave(posibleAnidado, clavesId);
+                    if (valor !== null && valor !== undefined) break;
+                }
+            }
+        }
+
+        if (valor === null || valor === undefined) return null;
+
+        const idNumerico = typeof valor === 'string' ? parseInt(valor, 10) : valor;
+        return (typeof idNumerico === 'number' && !isNaN(idNumerico) && idNumerico > 0) ? idNumerico : null;
+    }
+
+    // obtiene el doctor asignado a este paciente para poder
     // filtrar la disponibilidad de horarios por ese doctor específico
     private async cargarDoctorAsignado() {
         if (!this.patientId) {
             this.doctorId = null;
+            console.warn('[cargarDoctorAsignado] patientId vacio, no se puede consultar el doctor asignado.');
             return;
         }
 
@@ -208,6 +262,10 @@ export class PatientCitas implements OnInit {
             const response = await firstValueFrom(
                 this.usersService.getDoctorDePaciente(this.patientId)
             );
+
+            // Log de diagnostico: deja esto o coméntalo una vez confirmado
+            // que la extraccion funciona correctamente en tu backend.
+            console.log('[cargarDoctorAsignado] respuesta cruda:', response);
 
             // Manejo flexible: el backend puede regresar el doctor en distintas formas
             let doctorData: any = null;
@@ -222,21 +280,11 @@ export class PatientCitas implements OnInit {
                 }
             }
 
-            if (doctorData) {
-                this.doctorId =
-                    doctorData.idusuario ||
-                    doctorData.IdUsuario ||
-                    doctorData.idDoctor ||
-                    doctorData.IdDoctor ||
-                    doctorData.id ||
-                    null;
+            console.log('[cargarDoctorAsignado] doctorData:', doctorData);
 
-                if (this.doctorId && typeof this.doctorId === 'string') {
-                    this.doctorId = parseInt(this.doctorId, 10);
-                }
-            } else {
-                this.doctorId = null;
-            }
+            this.doctorId = this.extraerDoctorId(doctorData);
+
+            console.log('[cargarDoctorAsignado] doctorId extraido:', this.doctorId);
 
             if (!this.doctorId) {
                 this.showWarning('Sin doctor asignado', 'No tienes un doctor asignado. Contacta al administrador para agendar una cita.');
@@ -348,7 +396,7 @@ export class PatientCitas implements OnInit {
             return;
         }
 
-        // ⭐ NUEVO: no permitir agendar si no hay doctor asignado
+        // no permitir agendar si no hay doctor asignado
         if (!this.doctorId) {
             this.showError('Sin doctor asignado', 'No tienes un doctor asignado. Contacta al administrador antes de agendar una cita.');
             return;
@@ -484,7 +532,6 @@ export class PatientCitas implements OnInit {
         this.cdr.detectChanges();
 
         try {
-            // ⭐ NUEVO: se agrega this.doctorId como cuarto parámetro
             const disponibilidad = await firstValueFrom(
                 this.usersService.verificarDisponibilidad(fecha, hora + ':00', this.userEmail, this.doctorId)
             );
@@ -538,7 +585,6 @@ export class PatientCitas implements OnInit {
         }
 
         try {
-            // ⭐ NUEVO: se agrega this.doctorId como tercer parámetro
             const response = await firstValueFrom(
                 this.usersService.getHorariosDisponibles(fecha, this.userEmail, this.doctorId)
             );
@@ -602,7 +648,7 @@ export class PatientCitas implements OnInit {
             return;
         }
 
-        // ⭐ NUEVO: no permitir agendar sin doctor asignado
+        // no permitir agendar sin doctor asignado
         if (!this.doctorId) {
             this.showError('Sin doctor asignado', 'No tienes un doctor asignado. Contacta al administrador.');
             return;
@@ -620,7 +666,6 @@ export class PatientCitas implements OnInit {
                 return;
             }
 
-            // ⭐ NUEVO: se agrega this.doctorId como cuarto parámetro
             const disponibilidadFinal = await firstValueFrom(
                 this.usersService.verificarDisponibilidad(
                     formData.fechaCita,
@@ -667,7 +712,7 @@ export class PatientCitas implements OnInit {
                 motivo: formData.motivo || 'Consulta Medica',
                 modalidad: formData.modalidad || 'Presencial',
                 sintomas: formData.sintomas || 'Sin sintomas',
-                idDoctor: this.doctorId // ⭐ NUEVO: guardamos a qué doctor pertenece la cita
+                idDoctor: this.doctorId // guardamos a qué doctor pertenece la cita
             };
 
             await firstValueFrom(
