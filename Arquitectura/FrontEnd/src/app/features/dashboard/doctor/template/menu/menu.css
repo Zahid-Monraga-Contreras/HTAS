@@ -101,6 +101,7 @@
     color: white;
     white-space: nowrap;
     overflow: hidden;
+    text-overflow: ellipsis;
     max-width: 0;
     opacity: 0;
     transition: all 0.3s ease;
@@ -175,10 +176,29 @@
         max-width: calc(100vw - 24px);
         min-width: 320px;
         padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
+        /* ⭐ NUEVO: si los items no caben, se habilita scroll horizontal
+           en lugar de desbordar la pantalla */
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        /* Firefox */
+        -ms-overflow-style: none;
+        /* IE/Edge viejo */
+    }
+
+    .bottom-nav::-webkit-scrollbar {
+        display: none;
+        /* Chrome/Safari */
     }
 
     .bottom-nav-items {
         gap: 2px;
+        /* ⭐ NUEVO: al centrar contenido mas ancho que el viewport, la parte
+           izquierda se corta. Con flex-start + scroll se puede ver todo. */
+        justify-content: flex-start;
+        width: max-content;
+        margin: 0 auto;
     }
 
     .nav-icon-wrapper {
@@ -220,10 +240,24 @@
         min-width: 280px;
         padding: 6px 10px calc(6px + env(safe-area-inset-bottom, 0px));
         border-radius: 40px;
+        /* ⭐ NUEVO: scroll horizontal heredado del breakpoint anterior,
+           se reafirma aqui por si este breakpoint aplica solo */
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .bottom-nav::-webkit-scrollbar {
+        display: none;
     }
 
     .bottom-nav-items {
         gap: 2px;
+        justify-content: flex-start;
+        width: max-content;
+        margin: 0 auto;
     }
 
     .nav-icon-wrapper {
@@ -266,10 +300,22 @@
         min-width: 240px;
         padding: 5px 8px calc(5px + env(safe-area-inset-bottom, 0px));
         border-radius: 30px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .bottom-nav::-webkit-scrollbar {
+        display: none;
     }
 
     .bottom-nav-items {
         gap: 1px;
+        justify-content: flex-start;
+        width: max-content;
+        margin: 0 auto;
     }
 
     .nav-icon-wrapper {
@@ -311,6 +357,21 @@
         padding: 4px 6px calc(4px + env(safe-area-inset-bottom, 0px));
         border-radius: 24px;
         bottom: 8px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .bottom-nav::-webkit-scrollbar {
+        display: none;
+    }
+
+    .bottom-nav-items {
+        justify-content: flex-start;
+        width: max-content;
+        margin: 0 auto;
     }
 
     .nav-icon-wrapper {
