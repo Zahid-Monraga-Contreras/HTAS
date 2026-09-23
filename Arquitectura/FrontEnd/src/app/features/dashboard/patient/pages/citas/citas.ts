@@ -48,6 +48,8 @@ export class PatientCitas implements OnInit {
     fechaMinima: string = '';
 
     doctorId: number | null = null; // ⭐ doctor asignado a este paciente
+    doctorNombre: string = ''; // ⭐ NUEVO: nombre completo del doctor asignado
+    doctorEspecialidad: string = ''; // ⭐ NUEVO: especialidad del doctor asignado (si viene en la respuesta)
 
     citas: any[] = [];
     citasFiltradas: any[] = [];
@@ -249,6 +251,70 @@ export class PatientCitas implements OnInit {
         return (typeof idNumerico === 'number' && !isNaN(idNumerico) && idNumerico > 0) ? idNumerico : null;
     }
 
+    // ⭐ NUEVO: igual que extraerDoctorId, pero para armar el nombre completo del doctor.
+    // Busca nombre / apPaterno / apMaterno (o nombreCompleto ya armado) de forma
+    // case-insensitive, tanto en el objeto raiz como en propiedades anidadas.
+    private extraerDoctorNombre(doctorData: any): string {
+        if (!doctorData || typeof doctorData !== 'object') return '';
+
+        const buscarEnObjeto = (obj: any): string => {
+            if (!obj || typeof obj !== 'object') return '';
+
+            // Si ya viene un nombre completo armado, usarlo directamente
+            const nombreCompleto = this.buscarValorPorClave(obj, ['nombreCompleto', 'nombre_completo', 'fullName']);
+            if (nombreCompleto && typeof nombreCompleto === 'string' && nombreCompleto.trim()) {
+                return nombreCompleto.trim();
+            }
+
+            const nombre = this.buscarValorPorClave(obj, ['nombre', 'name']);
+            const apPaterno = this.buscarValorPorClave(obj, ['apPaterno', 'ap_paterno', 'apellidoPaterno']);
+            const apMaterno = this.buscarValorPorClave(obj, ['apMaterno', 'ap_materno', 'apellidoMaterno']);
+
+            const partes = [nombre, apPaterno, apMaterno].filter(p => p && typeof p === 'string' && p.trim());
+            return partes.length > 0 ? partes.join(' ').trim() : '';
+        };
+
+        // 1. Buscar directamente en el objeto
+        let nombreEncontrado = buscarEnObjeto(doctorData);
+
+        // 2. Si no se encontro, buscar en propiedades anidadas de primer nivel
+        if (!nombreEncontrado) {
+            for (const key of Object.keys(doctorData)) {
+                const posibleAnidado = doctorData[key];
+                if (posibleAnidado && typeof posibleAnidado === 'object' && !Array.isArray(posibleAnidado)) {
+                    nombreEncontrado = buscarEnObjeto(posibleAnidado);
+                    if (nombreEncontrado) break;
+                }
+            }
+        }
+
+        return nombreEncontrado;
+    }
+
+    // ⭐ NUEVO: extrae la especialidad del doctor, si el backend la incluye.
+    private extraerDoctorEspecialidad(doctorData: any): string {
+        if (!doctorData || typeof doctorData !== 'object') return '';
+
+        const buscarEnObjeto = (obj: any): string => {
+            const valor = this.buscarValorPorClave(obj, ['especialidad', 'especialidadMedica', 'especialidad_medica']);
+            return (valor && typeof valor === 'string') ? valor.trim() : '';
+        };
+
+        let valorEncontrado = buscarEnObjeto(doctorData);
+
+        if (!valorEncontrado) {
+            for (const key of Object.keys(doctorData)) {
+                const posibleAnidado = doctorData[key];
+                if (posibleAnidado && typeof posibleAnidado === 'object' && !Array.isArray(posibleAnidado)) {
+                    valorEncontrado = buscarEnObjeto(posibleAnidado);
+                    if (valorEncontrado) break;
+                }
+            }
+        }
+
+        return valorEncontrado;
+    }
+
     // obtiene el doctor asignado a este paciente para poder
     // filtrar la disponibilidad de horarios por ese doctor específico
     private async cargarDoctorAsignado() {
@@ -283,8 +349,11 @@ export class PatientCitas implements OnInit {
             console.log('[cargarDoctorAsignado] doctorData:', doctorData);
 
             this.doctorId = this.extraerDoctorId(doctorData);
+            this.doctorNombre = this.extraerDoctorNombre(doctorData); // ⭐ NUEVO
+            this.doctorEspecialidad = this.extraerDoctorEspecialidad(doctorData); // ⭐ NUEVO
 
             console.log('[cargarDoctorAsignado] doctorId extraido:', this.doctorId);
+            console.log('[cargarDoctorAsignado] doctorNombre extraido:', this.doctorNombre); // ⭐ NUEVO
 
             if (!this.doctorId) {
                 this.showWarning('Sin doctor asignado', 'No tienes un doctor asignado. Contacta al administrador para agendar una cita.');
@@ -293,6 +362,8 @@ export class PatientCitas implements OnInit {
         } catch (error) {
             console.error('Error al obtener el doctor asignado:', error);
             this.doctorId = null;
+            this.doctorNombre = ''; // ⭐ NUEVO
+            this.doctorEspecialidad = ''; // ⭐ NUEVO
             this.showWarning('Sin doctor asignado', 'No se pudo identificar tu doctor asignado. Contacta al administrador.');
         }
     }
@@ -313,7 +384,11 @@ export class PatientCitas implements OnInit {
                             id: c.idcita || c.id,
                             fechacita: c.fechacita || c.fecha,
                             horacita: c.horacita || c.hora,
-                            correopaciente: c.correopaciente || c.correoPaciente || c.email
+                            correopaciente: c.correopaciente || c.correoPaciente || c.email,
+                            // ⭐ NUEVO: si la cita no trae el nombre del medico, usamos el
+                            // nombre del doctor asignado que obtuvimos en cargarDoctorAsignado()
+                            medico: c.medico || c.nombreDoctor || c.doctor || this.doctorNombre || 'Medico',
+                            especialidad: c.especialidad || this.doctorEspecialidad || c.especialidad
                         }));
 
                         this.citas.sort((a: any, b: any) => {
@@ -344,7 +419,10 @@ export class PatientCitas implements OnInit {
                             ...c,
                             id: c.idcita || c.id,
                             fechacita: c.fechacita || c.fecha,
-                            horacita: c.horacita || c.hora
+                            horacita: c.horacita || c.hora,
+                            // ⭐ NUEVO: mismo respaldo de nombre de doctor en el fallback
+                            medico: c.medico || c.nombreDoctor || c.doctor || this.doctorNombre || 'Medico',
+                            especialidad: c.especialidad || this.doctorEspecialidad || c.especialidad
                         }));
 
                     this.citas.sort((a: any, b: any) => {
