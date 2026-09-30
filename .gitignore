@@ -1,11 +1,73 @@
-*.env
+# ============================================================
+# HTAS — .gitignore
+# ============================================================
+
+# Variables de entorno (NUNCA subir credenciales)
 .env
 .env.local
+.env.production
+.env.vercel-check
+**/.env
+**/.env.local
+**/.env.production
+
+# Credenciales y secretos
+*client_secret*.json
+*.credentials.json
+.dev-admin-credentials.json
+admin-credentials.json
+
+# Dependencias
 node_modules/
+**/node_modules/
+
+# Build outputs
 dist/
+**/dist/
+
+# Angular específico
 .angular/
+**/.angular/
+
+# Entornos Angular (contienen API keys)
 **/src/environments/*.ts
 
-*.json
+# Vercel
+.vercel
+**/.vercel
+
+# Firebase
+.firebase/
+**/.firebase/
+
+# Python
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Archivos de prueba con credenciales
+Arquitectura/Backend/test-admin-secure.js
+Arquitectura/Backend/create-admin.js
+Arquitectura/Backend/seed-data.js
+Arquitectura/Backend/sync-env-vercel.ps1
+
+# Logs
+*.log
+logs/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDEs
+.vscode/settings.json
+.idea/
+
+# Metodología — archivos sensibles JSON
 Metodologia/*.json
-*client_secret*
