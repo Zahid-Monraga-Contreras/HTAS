@@ -22,9 +22,29 @@ const checkDevelopment = (req, res, next) => {
 router.use(checkDevelopment);
 
 // Ruta para crear administradores de prueba
+/**
+ * @swagger
+ * /api/dev/create-test-admin:
+ *   post:
+ *     summary: Endpoint for POST /create-test-admin
+ *     tags: [Dev]
+ *     responses:
+ *       200:
+ *         description: OK
+ */
 router.post('/create-test-admin', devController.createTestAdmin);
 
 // Ruta para limpiar usuarios de prueba (opcional)
+/**
+ * @swagger
+ * /api/dev/clean-test-admins:
+ *   delete:
+ *     summary: Endpoint for DELETE /clean-test-admins
+ *     tags: [Dev]
+ *     responses:
+ *       200:
+ *         description: OK
+ */
 router.delete('/clean-test-admins', async (req, res) => {
     // Solo limpia usuarios con dominio @ejemplo-test.com
     await db.query(

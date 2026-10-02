@@ -18,6 +18,8 @@ const googlefitRoutes = require('./routes/googlefit.routes');
 const algorithmRoutes = require('./routes/algorithm.routes');
 const solicitudesRoutes = require('./routes/solicitudes.routes');
 const asignacionesRoutes = require('./routes/asignaciones.routes');
+const swaggerDocs = require('./swagger');
+
 
 const app = express();
 
@@ -45,6 +47,30 @@ app.use('/api/solicitudes', solicitudesRoutes);
 app.use('/api/asignaciones', asignacionesRoutes);
 
 // Ruta de prueba para verificar que el servidor funciona
+/**
+ * @swagger
+ * /:
+ *   get:
+ *     summary: Verifica que el servidor está funcionando
+ *     description: Retorna un mensaje indicando el estado del servidor, su versión y un listado de los endpoints principales.
+ *     tags: [General]
+ *     responses:
+ *       200:
+ *         description: El servidor está funcionando correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 mensaje:
+ *                   type: string
+ *                   example: Servidor HTAS funcionando correctamente
+ *                 version:
+ *                   type: string
+ *                   example: 1.0.0
+ *                 endpoints:
+ *                   type: object
+ */
 app.get('/', (req, res) => {
     res.json({
         mensaje: 'Servidor HTAS funcionando correctamente',
@@ -98,6 +124,9 @@ app.get('/', (req, res) => {
         }
     });
 });
+
+// Inicializar Swagger UI
+swaggerDocs(app, process.env.PORT || 3000);
 
 // Manejo de errores 404 - Ruta no encontrada
 app.use((req, res) => {

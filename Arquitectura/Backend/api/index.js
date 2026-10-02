@@ -20,12 +20,7 @@ vercelApp.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 // RUTAS DE VERIFICACIÓN (antes de la app principal)
 // =============================================
 vercelApp.get('/', (req, res) => {
-    res.json({
-        mensaje: 'HTAS API funcionando en Vercel',
-        version: '1.0.0',
-        entorno: process.env.NODE_ENV || 'production',
-        timestamp: new Date().toISOString()
-    });
+    res.redirect('/api/docs');
 });
 
 vercelApp.get('/api/estado', (req, res) => {

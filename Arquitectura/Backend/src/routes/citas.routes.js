@@ -8,27 +8,209 @@ const db = require('../db/database');
 // (sin cambios aquí: el idDoctor ya se maneja dentro del controlador,
 //  que lee req.query.idDoctor / req.body.idDoctor automáticamente)
 // ==========================================================================
+/**
+ * @swagger
+ * /api/citas/todas-las-citas:
+ *   get:
+ *     summary: Endpoint for GET /todas-las-citas
+ *     tags: [Citas]
+ *     responses:
+ *       200:
+ *         description: OK
+ */
 router.get('/todas-las-citas', citasController.getAllCitas);
+/**
+ * @swagger
+ * /api/citas/agendar-cita:
+ *   post:
+ *     summary: Endpoint for POST /agendar-cita
+ *     tags: [Citas]
+ *     responses:
+ *       200:
+ *         description: OK
+ */
 router.post('/agendar-cita', citasController.agendarCita);
+/**
+ * @swagger
+ * /api/citas/mis-citas/{email}:
+ *   get:
+ *     summary: Endpoint for GET /mis-citas/:email
+ *     tags: [Citas]
+ *     parameters:
+ *       - in: path
+ *         name: email
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ */
 router.get('/mis-citas/:email', citasController.getCitasUsuario);
+/**
+ * @swagger
+ * /api/citas/actualizar-cita/{idCita}:
+ *   put:
+ *     summary: Endpoint for PUT /actualizar-cita/:idCita
+ *     tags: [Citas]
+ *     parameters:
+ *       - in: path
+ *         name: idCita
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ */
 router.put('/actualizar-cita/:idCita', citasController.actualizarEstadoCita);
 
 // ==========================================================================
 // RUTAS PARA GESTIÓN DE CITAS (sin cambios)
 // ==========================================================================
+/**
+ * @swagger
+ * /api/citas/cita/{idCita}:
+ *   put:
+ *     summary: Endpoint for PUT /cita/:idCita
+ *     tags: [Citas]
+ *     parameters:
+ *       - in: path
+ *         name: idCita
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ */
 router.put('/cita/:idCita', citasController.actualizarCita);
+/**
+ * @swagger
+ * /api/citas/cita/{idCita}:
+ *   get:
+ *     summary: Endpoint for GET /cita/:idCita
+ *     tags: [Citas]
+ *     parameters:
+ *       - in: path
+ *         name: idCita
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ */
 router.get('/cita/:idCita', citasController.getCitaById);
+/**
+ * @swagger
+ * /api/citas/citas/fecha/{fecha}:
+ *   get:
+ *     summary: Endpoint for GET /citas/fecha/:fecha
+ *     tags: [Citas]
+ *     parameters:
+ *       - in: path
+ *         name: fecha
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ */
 router.get('/citas/fecha/:fecha', citasController.getCitasByFecha);
+/**
+ * @swagger
+ * /api/citas/citas/hoy:
+ *   get:
+ *     summary: Endpoint for GET /citas/hoy
+ *     tags: [Citas]
+ *     responses:
+ *       200:
+ *         description: OK
+ */
 router.get('/citas/hoy', citasController.getCitasHoy);
+/**
+ * @swagger
+ * /api/citas/cita/{idCita}/cancelar:
+ *   patch:
+ *     summary: Endpoint for PATCH /cita/:idCita/cancelar
+ *     tags: [Citas]
+ *     parameters:
+ *       - in: path
+ *         name: idCita
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ */
 router.patch('/cita/:idCita/cancelar', citasController.cancelarCita);
+/**
+ * @swagger
+ * /api/citas/cita/{idCita}:
+ *   delete:
+ *     summary: Endpoint for DELETE /cita/:idCita
+ *     tags: [Citas]
+ *     parameters:
+ *       - in: path
+ *         name: idCita
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ */
 router.delete('/cita/:idCita', citasController.eliminarCita);
+/**
+ * @swagger
+ * /api/citas/citas/estadisticas:
+ *   get:
+ *     summary: Endpoint for GET /citas/estadisticas
+ *     tags: [Citas]
+ *     responses:
+ *       200:
+ *         description: OK
+ */
 router.get('/citas/estadisticas', citasController.getEstadisticasCitas);
 
 // ==========================================================================
 // RUTAS PARA VALIDACIÓN DE DISPONIBILIDAD (sin cambios aquí)
 // ==========================================================================
+/**
+ * @swagger
+ * /api/citas/verificar-disponibilidad:
+ *   get:
+ *     summary: Endpoint for GET /verificar-disponibilidad
+ *     tags: [Citas]
+ *     responses:
+ *       200:
+ *         description: OK
+ */
 router.get('/verificar-disponibilidad', citasController.verificarDisponibilidad);
+/**
+ * @swagger
+ * /api/citas/horarios-disponibles:
+ *   get:
+ *     summary: Endpoint for GET /horarios-disponibles
+ *     tags: [Citas]
+ *     responses:
+ *       200:
+ *         description: OK
+ */
 router.get('/horarios-disponibles', citasController.getHorariosDisponibles);
+/**
+ * @swagger
+ * /api/citas/disponibles/hoy:
+ *   get:
+ *     summary: Endpoint for GET /disponibles/hoy
+ *     tags: [Citas]
+ *     responses:
+ *       200:
+ *         description: OK
+ */
 router.get('/disponibles/hoy', citasController.getCitasDisponiblesHoy);
 
 // ==========================================================================
@@ -37,6 +219,16 @@ router.get('/disponibles/hoy', citasController.getCitasDisponiblesHoy);
 
 // ⭐ CORREGIDO: columnas en minúsculas (antes usaba "FechaCita" con comillas
 //    y mayúsculas, que no existen así en tu tabla real) + soporte de idDoctor
+/**
+ * @swagger
+ * /api/citas/consultas/disponibilidad-masiva:
+ *   post:
+ *     summary: Endpoint for POST /consultas/disponibilidad-masiva
+ *     tags: [Citas]
+ *     responses:
+ *       200:
+ *         description: OK
+ */
 router.post('/consultas/disponibilidad-masiva', async (req, res) => {
     try {
         const { citas } = req.body;
@@ -136,6 +328,22 @@ router.post('/consultas/disponibilidad-masiva', async (req, res) => {
 
 // ⭐ CORREGIDO: columnas en minúsculas (antes tenía "IdCita", "NombrePaciente", etc.
 //    con comillas y mayúsculas, que hubieran tronado con "columna no existe")
+/**
+ * @swagger
+ * /api/citas/consultas/proximas/{email}:
+ *   get:
+ *     summary: Endpoint for GET /consultas/proximas/:email
+ *     tags: [Citas]
+ *     parameters:
+ *       - in: path
+ *         name: email
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ */
 router.get('/consultas/proximas/:email', async (req, res) => {
     try {
         const { email } = req.params;
@@ -181,6 +389,22 @@ router.get('/consultas/proximas/:email', async (req, res) => {
 });
 
 // ⭐ CORREGIDO: columnas en minúsculas
+/**
+ * @swagger
+ * /api/citas/consultas/historial/{email}:
+ *   get:
+ *     summary: Endpoint for GET /consultas/historial/:email
+ *     tags: [Citas]
+ *     parameters:
+ *       - in: path
+ *         name: email
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ */
 router.get('/consultas/historial/:email', async (req, res) => {
     try {
         const { email } = req.params;
@@ -245,6 +469,16 @@ router.get('/consultas/historial/:email', async (req, res) => {
 // ==========================================================================
 
 // ⭐ CORREGIDO: columnas en minúsculas
+/**
+ * @swagger
+ * /api/citas/admin/resumen:
+ *   get:
+ *     summary: Endpoint for GET /admin/resumen
+ *     tags: [Citas]
+ *     responses:
+ *       200:
+ *         description: OK
+ */
 router.get('/admin/resumen', async (req, res) => {
     try {
         const resultado = await db.query(`
@@ -275,6 +509,22 @@ router.get('/admin/resumen', async (req, res) => {
 });
 
 // ⭐ CORREGIDO: columnas en minúsculas
+/**
+ * @swagger
+ * /api/citas/admin/cupos-por-hora/{fecha}:
+ *   get:
+ *     summary: Endpoint for GET /admin/cupos-por-hora/:fecha
+ *     tags: [Citas]
+ *     parameters:
+ *       - in: path
+ *         name: fecha
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ */
 router.get('/admin/cupos-por-hora/:fecha', async (req, res) => {
     try {
         const { fecha } = req.params;
