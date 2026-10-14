@@ -14,7 +14,6 @@ const tomasRoutes = require('./routes/tomas.routes');
 const dispositivosRoutes = require('./routes/dispositivos.routes');
 const pagosRoutes = require('./routes/pagos.routes');
 const contactoRoutes = require('./routes/contacto.routes');
-const googlefitRoutes = require('./routes/googlefit.routes');
 const algorithmRoutes = require('./routes/algorithm.routes');
 const solicitudesRoutes = require('./routes/solicitudes.routes');
 const asignacionesRoutes = require('./routes/asignaciones.routes');
@@ -41,7 +40,6 @@ app.use('/api/tomas', tomasRoutes);
 app.use('/api/dispositivos', dispositivosRoutes);
 app.use('/api/pagos', pagosRoutes);
 app.use('/api/contacto', contactoRoutes);
-app.use('/api/googlefit', googlefitRoutes);
 app.use('/api/algorithm', algorithmRoutes);
 app.use('/api/solicitudes', solicitudesRoutes);
 app.use('/api/asignaciones', asignacionesRoutes);
@@ -86,7 +84,6 @@ app.get('/', (req, res) => {
             dispositivos: '/api/dispositivos',
             pagos: '/api/pagos',
             contacto: '/api/contacto',
-            googlefit: '/api/googlefit',
             algoritmo: {
                 'POST /api/algorithm/analizar': 'Analizar con un PDF (requiere autenticacion)',
                 'POST /api/algorithm/analizar-completo': 'Analizar con dos PDFs (cedula + diagnostico)',
