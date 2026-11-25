@@ -14,6 +14,7 @@ Cada enlace incluye una descripción corta y el archivo donde aparece.
 |---|---|---|
 | https://github.com/Zahid-Monraga-Contreras/HTAS | Repositorio personal del proyecto (rama `main`) | — |
 | https://github.com/utcvti-research/2526-IDGS-14-HTAS | Repositorio del profesor / institucional (UTCV) | — |
+| https://github.com/Zahid-Monraga-Contreras/HTAS.git | URL para clonar el repositorio (`git clone`) | `docs/02_Guia_Instalacion_y_Ejecucion_HTAS.docx`, `docs/Documentacion_Integral_HTAS.docx` |
 
 ## Releases
 
@@ -21,14 +22,17 @@ Cada enlace incluye una descripción corta y el archivo donde aparece.
 |---|---|---|
 | https://github.com/Zahid-Monraga-Contreras/HTAS/releases/tag/v1.0.0 | Versión v1.0.0 en el repositorio personal | Etiqueta `v1.0.0` |
 | https://github.com/utcvti-research/2526-IDGS-14-HTAS/releases/tag/v1.0.0 | Versión v1.0.0 en el repositorio del profesor | Etiqueta `v1.0.0` |
-| [releases/HTAS-v1.0.0-frontend.zip](releases/HTAS-v1.0.0-frontend.zip) | Paquete de despliegue del frontend (Angular) | `releases/README.md` |
-| [releases/HTAS-v1.0.0-backend.zip](releases/HTAS-v1.0.0-backend.zip) | Paquete de despliegue del backend (Node.js/Express) | `releases/README.md` |
-| [releases/HTAS-v1.0.0-fastapi.zip](releases/HTAS-v1.0.0-fastapi.zip) | Paquete de despliegue del servicio Python (FastAPI) | `releases/README.md` |
-| [releases/HTAS-Paquete-Completo.zip](releases/HTAS-Paquete-Completo.zip) | Paquete maestro con todos los componentes | `releases/README.md` |
-| [releases/HTAS-Ejecutable-Lanzador.bat](releases/HTAS-Ejecutable-Lanzador.bat) | Lanzador para Windows del sistema | `releases/README.md` |
+| [releases/HTAS-v1.0.0-frontend.zip](releases/HTAS-v1.0.0-frontend.zip) | Compilación de producción del frontend Angular 21 | Carpeta `releases/`; `docs/03_Paquetes_de_Despliegue_y_Ejecutables_HTAS.docx` |
+| [releases/HTAS-v1.0.0-backend.zip](releases/HTAS-v1.0.0-backend.zip) | Paquete de la API REST Node.js/Express | Carpeta `releases/`; `docs/03_Paquetes_de_Despliegue_y_Ejecutables_HTAS.docx` |
+| [releases/HTAS-v1.0.0-fastapi.zip](releases/HTAS-v1.0.0-fastapi.zip) | Paquete del microservicio de IA (Python/FastAPI) | Carpeta `releases/`; `docs/03_Paquetes_de_Despliegue_y_Ejecutables_HTAS.docx` |
+| [releases/HTAS-Paquete-Completo.zip](releases/HTAS-Paquete-Completo.zip) | Paquete de entrega: los tres .zip, el lanzador y la versión PDF de los documentos | Carpeta `releases/`; `docs/03_Paquetes_de_Despliegue_y_Ejecutables_HTAS.docx` |
+| [releases/HTAS-Ejecutable-Lanzador.bat](releases/HTAS-Ejecutable-Lanzador.bat) | Lanzador para Windows (inicia FastAPI, backend y frontend) | Carpeta `releases/`; `docs/03_Paquetes_de_Despliegue_y_Ejecutables_HTAS.docx` |
 
 > Nota: `v1.0.0` existe como **etiqueta** en ambos repositorios, pero todavía no tiene una
 > *Release* publicada en GitHub (con notas y archivos adjuntos). Los enlaces muestran la etiqueta.
+>
+> El archivo `releases/README.md` todavía enlaza estos paquetes con rutas absolutas locales
+> (`file:///c:/Users/zahid/.../docs/...`) que no funcionan en GitHub; los enlaces correctos son los de esta tabla.
 
 ## Documentación
 
@@ -36,11 +40,15 @@ Cada enlace incluye una descripción corta y el archivo donde aparece.
 |---|---|---|
 | [README.md](README.md) | Documentación principal del proyecto | — |
 | [CHANGELOG.md](CHANGELOG.md) | Historial de cambios | — |
-| [docs/README.md](docs/README.md) | Índice de la documentación técnica | — |
-| [docs/01_Historial_de_Versiones_HTAS.docx](docs/01_Historial_de_Versiones_HTAS.docx) | Historial de versiones | `docs/README.md` |
-| [docs/02_Guia_Instalacion_y_Ejecucion_HTAS.docx](docs/02_Guia_Instalacion_y_Ejecucion_HTAS.docx) | Guía de instalación y ejecución | `docs/README.md` |
-| [docs/03_Paquetes_de_Despliegue_y_Ejecutables_HTAS.docx](docs/03_Paquetes_de_Despliegue_y_Ejecutables_HTAS.docx) | Paquetes de despliegue y ejecutables | `docs/README.md` |
-| [docs/Documentacion_Integral_HTAS.docx](docs/Documentacion_Integral_HTAS.docx) | Documentación técnica integral (portada UTCV) | `docs/README.md` |
+| [docs/README.md](docs/README.md) · [GitHub (personal)](https://github.com/Zahid-Monraga-Contreras/HTAS/blob/main/docs/README.md) · [GitHub (profesor)](https://github.com/utcvti-research/2526-IDGS-14-HTAS/blob/main/docs/README.md) | Índice de la documentación técnica | — |
+| [docs/01_Historial_de_Versiones_HTAS.docx](docs/01_Historial_de_Versiones_HTAS.docx) · [GitHub (personal)](https://github.com/Zahid-Monraga-Contreras/HTAS/blob/main/docs/01_Historial_de_Versiones_HTAS.docx) · [GitHub (profesor)](https://github.com/utcvti-research/2526-IDGS-14-HTAS/blob/main/docs/01_Historial_de_Versiones_HTAS.docx) | Historial de versiones: matriz de versiones y etapas de desarrollo según los commits | `docs/README.md` |
+| [docs/02_Guia_Instalacion_y_Ejecucion_HTAS.docx](docs/02_Guia_Instalacion_y_Ejecucion_HTAS.docx) · [GitHub (personal)](https://github.com/Zahid-Monraga-Contreras/HTAS/blob/main/docs/02_Guia_Instalacion_y_Ejecucion_HTAS.docx) · [GitHub (profesor)](https://github.com/utcvti-research/2526-IDGS-14-HTAS/blob/main/docs/02_Guia_Instalacion_y_Ejecucion_HTAS.docx) | Guía de instalación, configuración y ejecución | `docs/README.md` |
+| [docs/03_Paquetes_de_Despliegue_y_Ejecutables_HTAS.docx](docs/03_Paquetes_de_Despliegue_y_Ejecutables_HTAS.docx) · [GitHub (personal)](https://github.com/Zahid-Monraga-Contreras/HTAS/blob/main/docs/03_Paquetes_de_Despliegue_y_Ejecutables_HTAS.docx) · [GitHub (profesor)](https://github.com/utcvti-research/2526-IDGS-14-HTAS/blob/main/docs/03_Paquetes_de_Despliegue_y_Ejecutables_HTAS.docx) | Paquetes de despliegue (Vercel, Firebase, Render, Neon) y lanzador | `docs/README.md` |
+| [docs/Documentacion_Integral_HTAS.docx](docs/Documentacion_Integral_HTAS.docx) · [GitHub (personal)](https://github.com/Zahid-Monraga-Contreras/HTAS/blob/main/docs/Documentacion_Integral_HTAS.docx) · [GitHub (profesor)](https://github.com/utcvti-research/2526-IDGS-14-HTAS/blob/main/docs/Documentacion_Integral_HTAS.docx) | Documentación técnica integral (reúne los tres documentos anteriores) | `docs/README.md` |
+| [Arquitectura/Backend/sql/bd_htas.sql](Arquitectura/Backend/sql/bd_htas.sql) | Esquema de la base de datos PostgreSQL | `docs/02_Guia_Instalacion_y_Ejecucion_HTAS.docx`, `docs/03_Paquetes_de_Despliegue_y_Ejecutables_HTAS.docx` |
+| [Arquitectura/Backend/.env.example](Arquitectura/Backend/.env.example) | Plantilla de variables de entorno del backend (solo valores de ejemplo) | `docs/02_Guia_Instalacion_y_Ejecucion_HTAS.docx` |
+| [Arquitectura/FrontEnd/environment.example.md](Arquitectura/FrontEnd/environment.example.md) | Guía de configuración del entorno del frontend | `docs/02_Guia_Instalacion_y_Ejecucion_HTAS.docx` |
+| [build.ps1](build.ps1) · [build.bat](build.bat) | Scripts de instalación y compilación para Windows | `docs/02_Guia_Instalacion_y_Ejecucion_HTAS.docx` |
 | [Metodologia/Articulo HTAS  v1.docx.pdf](<Metodologia/Articulo HTAS  v1.docx.pdf>) | Artículo del proyecto HTAS | — |
 | [Metodologia/DISENO_DEL_REPOSITORIO_MULTIDISCIPLINARIOdocx.pdf](Metodologia/DISENO_DEL_REPOSITORIO_MULTIDISCIPLINARIOdocx.pdf) | Diseño del repositorio multidisciplinario | — |
 | [Metodologia/cedula_prueba_htas.pdf](Metodologia/cedula_prueba_htas.pdf) | Cédula de prueba | — |
@@ -62,18 +70,20 @@ Cada enlace incluye una descripción corta y el archivo donde aparece.
 | https://htas-backend.vercel.app/api/mediciones | Endpoint de mediciones (monitoreo wearable) | `Arquitectura/Backend/python/dispositivo/monitoreo_wearable.py` |
 | https://htas-python.onrender.com | Servicio Python/FastAPI en Render | `Arquitectura/Backend/src/services/python.service.js` |
 | https://htas-1wv5.onrender.com | Servicio Python/FastAPI en Render (alterno) | `Arquitectura/Backend/src/services/python.service.js` |
+| [Arquitectura/Backend/vercel.json](Arquitectura/Backend/vercel.json) · [api/index.js](Arquitectura/Backend/api/index.js) | Configuración y punto de entrada del backend en Vercel | `docs/03_Paquetes_de_Despliegue_y_Ejecutables_HTAS.docx` |
+| [Arquitectura/FrontEnd/firebase.json](Arquitectura/FrontEnd/firebase.json) · [.firebaserc](Arquitectura/FrontEnd/.firebaserc) | Configuración de Firebase Hosting | `docs/03_Paquetes_de_Despliegue_y_Ejecutables_HTAS.docx` |
 
 ### Desarrollo local
 
 | Enlace | Descripción | Origen |
 |---|---|---|
-| http://localhost:4200 | Frontend Angular (`ng serve`) | `README.md`, `Arquitectura/FrontEnd/README.md`, `releases/HTAS-Ejecutable-Lanzador.bat` |
-| http://localhost:3000 | Backend Node.js/Express | `README.md`, `Arquitectura/Backend/src/swagger.js` |
+| http://localhost:4200 | Frontend Angular (`npm start`) | `README.md`, `Arquitectura/FrontEnd/README.md`, `releases/HTAS-Ejecutable-Lanzador.bat`, `docs/02_Guia_Instalacion_y_Ejecucion_HTAS.docx`, `docs/03_Paquetes_de_Despliegue_y_Ejecutables_HTAS.docx`, `docs/Documentacion_Integral_HTAS.docx` |
+| http://localhost:3000 | Backend Node.js/Express | `README.md`, `Arquitectura/Backend/src/swagger.js`, `docs/02_Guia_Instalacion_y_Ejecucion_HTAS.docx`, `docs/Documentacion_Integral_HTAS.docx` |
 | http://localhost:3000/api | Base de la API REST (auth, usuarios, citas, medicamentos, tratamientos, tomas, dispositivos, mediciones, solicitudes, algorithm, pagos) | `Arquitectura/FrontEnd/src/environments/environment.ts` |
-| http://localhost:3000/api/docs | Documentación Swagger del backend | `Arquitectura/Backend/src/swagger.js` |
-| http://localhost:3000/api/googlefit/callback | Callback OAuth de Google Fit | `Arquitectura/Backend/.env.example` |
-| http://127.0.0.1:8000 | Servicio Python/FastAPI | `README.md`, `Arquitectura/Backend/src/app.js` |
-| http://127.0.0.1:8000/docs | Documentación interactiva de FastAPI | `README.md` |
+| http://localhost:3000/api/docs | Documentación Swagger del backend | `Arquitectura/Backend/src/swagger.js`, `docs/02_Guia_Instalacion_y_Ejecucion_HTAS.docx`, `docs/Documentacion_Integral_HTAS.docx` |
+| http://localhost:3000/api/googlefit/callback | Callback OAuth de Google Fit (integración no activa en el código actual) | `Arquitectura/Backend/.env.example` |
+| http://127.0.0.1:8000 | Servicio Python/FastAPI | `README.md`, `Arquitectura/Backend/src/app.js`, `docs/02_Guia_Instalacion_y_Ejecucion_HTAS.docx`, `docs/Documentacion_Integral_HTAS.docx` |
+| http://127.0.0.1:8000/docs | Documentación interactiva de FastAPI | `README.md`, `docs/02_Guia_Instalacion_y_Ejecucion_HTAS.docx`, `docs/Documentacion_Integral_HTAS.docx` |
 | http://localhost:9876/debug.html | Depuración de pruebas unitarias (Karma) | `Arquitectura/FrontEnd/.vscode/launch.json` |
 
 ## Herramientas y servicios externos
