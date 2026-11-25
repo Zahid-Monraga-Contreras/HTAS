@@ -1,20 +1,22 @@
-# 📁 Documentación y Paquetes de Despliegue — Proyecto HTAS
+# 📁 Documentación Técnica — Proyecto HTAS
 
-Todos los archivos requeridos han sido generados y organizados en este directorio (`c:\Users\zahid\Documents\HTAS\docs`).
+Esta carpeta (`docs/`) contiene la documentación técnica del proyecto **HTAS (Hipertensión Arterial Sistémica)** en formato Word (`.docx`). Todos los documentos incluyen la portada institucional de la UTCV y no tienen encabezados ni pies de página.
+
+Los paquetes de despliegue y el lanzador para Windows se encuentran en la carpeta [`releases/`](../releases/).
 
 ---
 
-## 📑 Documentos PDF Generados (Con Portada UTCV, Sin Encabezados ni Pies de Página)
+## 📑 Documentos Word (.docx)
 
-1. **[`01_Historial_de_Versiones_HTAS.docx`](file:///c:/Users/zahid/Documents/HTAS/docs/01_Historial_de_Versiones_HTAS.pdf)**
+1. **[`01_Historial_de_Versiones_HTAS.docx`](01_Historial_de_Versiones_HTAS.docx)**
 
-   - **Contenido:** Matriz de control de versiones, registro detallado de cambios (v0.1.0, v0.2.0, v0.3.0 y v1.0.0 Final), listado de características añadidas, correcciones de errores, refactorizaciones y auditoría de commits.
-2. **[`02_Guia_Instalacion_y_Ejecucion_HTAS.docx`](file:///c:/Users/zahid/Documents/HTAS/docs/02_Guia_Instalacion_y_Ejecucion_HTAS.pdf)**
+   - **Contenido:** matriz de control de versiones y detalle de cada etapa de desarrollo. Las fechas provienen del historial de commits; solo v1.0.0 (29/09/2026) existe como etiqueta en git, y las versiones 0.1.0 a 0.3.0 se describen como etapas de desarrollo. Incluye además los cambios posteriores a v1.0.0 y una nota sobre verificación y calidad.
+2. **[`02_Guia_Instalacion_y_Ejecucion_HTAS.docx`](02_Guia_Instalacion_y_Ejecucion_HTAS.docx)**
 
-   - **Contenido:** Requisitos previos de software y servicios en la nube, clonación, instalación de dependencias (Node.js, Python FastAPI, Angular), variables de entorno (`.env`), migración e inicialización de base de datos PostgreSQL, comandos de desarrollo y scripts de compilación.
-3. **[`03_Paquetes_de_Despliegue_y_Ejecutables_HTAS.docx`](file:///c:/Users/zahid/Documents/HTAS/docs/03_Paquetes_de_Despliegue_y_Ejecutables_HTAS.pdf)**
+   - **Contenido:** requisitos previos (Node.js, npm, Python, Angular CLI, Git y PostgreSQL), clonación del repositorio, instalación de dependencias del backend, del microservicio de IA y del frontend, configuración del archivo `.env` con valores de ejemplo, carga del esquema `sql/bd_htas.sql`, ejecución en modo desarrollo (puertos 8000, 3000 y 4200) y uso de los scripts `build.ps1` y `build.bat`.
+3. **[`03_Paquetes_de_Despliegue_y_Ejecutables_HTAS.docx`](03_Paquetes_de_Despliegue_y_Ejecutables_HTAS.docx)**
 
-   - **Contenido:** Inventario de paquetes generados, manual de despliegue en Vercel (Backend), Firebase Hosting (Frontend), Render/Vercel (FastAPI) e instrucciones del lanzador ejecutable de Windows.
-4. **[`Documentacion_Integral_HTAS.docx`](file:///c:/Users/zahid/Documents/HTAS/docs/Documentacion_Integral_HTAS.pdf)**
+   - **Contenido:** arquitectura de despliegue, inventario de los paquetes de `releases/`, publicación del backend en Vercel, del frontend en Firebase Hosting, del microservicio de IA en Render y de la base de datos en Neon, e instrucciones de uso del lanzador `HTAS-Ejecutable-Lanzador.bat`.
+4. **[`Documentacion_Integral_HTAS.docx`](Documentacion_Integral_HTAS.docx)**
 
-   - **Contenido:** Documento técnico maestro unificado que integra los tres apartados anteriores en un solo archivo PDF institucional.
+   - **Contenido:** documento técnico unificado que reúne, en tres secciones, el contenido de los tres documentos anteriores.
